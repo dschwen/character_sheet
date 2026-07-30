@@ -89,3 +89,7 @@ includes ability modifiers, typed skill and saving-throw proficiencies, d20-test
 Initiative, Passive Perception, inventory, armor and Shield candidates, weapon attacks and damage,
 Weapon Mastery metadata, Hit Points, Rage resources, conditional actions, resistances, validations,
 coverage warnings, and calculation traces.
+
+The rules kernel also exposes atomic Short Rest and Long Rest proposals. Rest processing validates
+Hit Die spending, previews field-level state changes and resource recharge, and preserves a trace
+without mutating the input character.

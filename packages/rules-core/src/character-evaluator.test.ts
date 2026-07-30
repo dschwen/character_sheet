@@ -477,4 +477,26 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       "WEAPON_MASTERY_SELECTION_LIMIT",
     );
   });
+
+  it("validates expended Hit Dice against class levels", () => {
+    const character = loadCharacter();
+    const invalid: CharacterDocument = {
+      ...character,
+      state: {
+        ...character.state,
+        expendedHitDice: {
+          "srd521.class.barbarian": 2,
+        },
+      },
+    };
+
+    const evaluation = evaluateCharacter({
+      character: invalid,
+      packages: [loadRulesPackage()],
+    });
+
+    expect(evaluation.validations.map((validation) => validation.code)).toContain(
+      "HIT_DICE_EXPENDED_ABOVE_MAXIMUM",
+    );
+  });
 });

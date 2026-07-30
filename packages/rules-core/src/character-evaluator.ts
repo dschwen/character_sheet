@@ -139,8 +139,14 @@ const armorBodySchema = z
   .passthrough();
 
 const tableBodySchema = z.object({ entries: z.record(z.number()) });
+const rechargeRuleSchema = z
+  .object({
+    event: z.enum(["short-rest", "long-rest", "initiative", "dawn", "manual"]),
+    amount: z.union([z.number().nonnegative(), z.literal("all")]),
+  })
+  .strict();
 const resourceParametersSchema = z
-  .object({ recharge: z.array(z.unknown()).default([]) })
+  .object({ recharge: z.array(rechargeRuleSchema).default([]) })
   .passthrough();
 const actionParametersSchema = z.object({ actionEconomy: z.string().optional() }).passthrough();
 const resistanceParametersSchema = z.object({ damageTypes: z.array(z.string()) }).passthrough();
@@ -1498,6 +1504,21 @@ function validateActiveState(character: CharacterDocument, state: EngineState): 
     addValidation(state, "CHARACTER_HAS_NO_LEVELS", "The character has no class levels.", [
       "build.levels",
     ]);
+  }
+  const levels = new Map<string, number>();
+  for (const level of character.build.levels) {
+    levels.set(level.classId, (levels.get(level.classId) ?? 0) + 1);
+  }
+  for (const [classId, expended] of Object.entries(character.state.expendedHitDice)) {
+    const maximum = levels.get(classId) ?? 0;
+    if (expended > maximum) {
+      addValidation(
+        state,
+        "HIT_DICE_EXPENDED_ABOVE_MAXIMUM",
+        `Expended ${classId} Hit Dice exceed the character's ${String(maximum)} levels in that class.`,
+        [`state.expendedHitDice.${classId}`],
+      );
+    }
   }
 }
 

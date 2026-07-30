@@ -168,6 +168,7 @@ const characterStateSchema = z
     currentHitPoints: z.number().int(),
     temporaryHitPoints: z.number().int().min(0).default(0),
     expendedResources: z.record(entityIdSchema, z.number().int().min(0)).default({}),
+    expendedHitDice: z.record(entityIdSchema, z.number().int().min(0)).default({}),
     expendedSpellSlots: z.record(z.string(), z.number().int().min(0)).default({}),
     conditionIds: z.array(entityIdSchema).default([]),
     activeEffectIds: z.array(entityIdSchema).default([]),

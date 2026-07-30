@@ -50,6 +50,7 @@ describe("characterDocumentSchema", () => {
     });
     expect(character.state.temporaryHitPoints).toBe(0);
     expect(character.state.activeEffectIds).toEqual([]);
+    expect(character.state.expendedHitDice).toEqual({});
     expect(character.loadout.inventory).toEqual([]);
     expect(character.overrides).toEqual([]);
   });

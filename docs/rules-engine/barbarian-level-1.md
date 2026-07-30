@@ -47,5 +47,6 @@ Focused interaction tests verify:
 ## Current boundary
 
 This slice intentionally does not resolve Weapon Mastery combat effects, Rage duration transitions,
-rests, ammunition, target range, or damage application. Rage and Unarmored Defense still carry
-semantic-review warnings because their authoring IR has not been approved.
+ammunition, target range, or damage application. Rage and Unarmored Defense still carry
+semantic-review warnings because their authoring IR has not been approved. Rest processing is
+available as a separate atomic state-transition proposal.

@@ -1,5 +1,5 @@
 import type { CalculationTrace, JsonValue } from "@dnd/calculation-trace";
-import type { CharacterDocument } from "@dnd/character-model";
+import type { CharacterDocument, CharacterState } from "@dnd/character-model";
 import type { AuthoringIr, ContentEntity, PackageManifest } from "@dnd/content-schema";
 
 export type StatId = string;
@@ -86,8 +86,13 @@ export interface ResourceInstance {
   maximum: number;
   expended: number;
   current: number;
-  recharge: unknown[];
+  recharge: RechargeRule[];
   traceId: string;
+}
+
+export interface RechargeRule {
+  event: "short-rest" | "long-rest" | "initiative" | "dawn" | "manual";
+  amount: number | "all";
 }
 
 export interface ActionSummary {
@@ -136,6 +141,36 @@ export interface AttackSummary {
     enabled: boolean;
   };
   traceId: string;
+}
+
+export type RestEvent = "short-rest" | "long-rest";
+
+export interface HitDieSpend {
+  classId: string;
+  rolls: number[];
+}
+
+export interface RestRequest {
+  event: RestEvent;
+  hitDice?: HitDieSpend[];
+}
+
+export interface StateChange {
+  path: string;
+  before: JsonValue;
+  after: JsonValue;
+  reason: string;
+  traceId: string;
+}
+
+export interface StateTransitionProposal {
+  kind: "rest";
+  event: RestEvent;
+  applicable: boolean;
+  changes: StateChange[];
+  nextState: CharacterState;
+  validations: ValidationMessage[];
+  traces: Readonly<Record<string, CalculationTrace>>;
 }
 
 export interface CharacterEvaluation {
