@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "useUnknownInCatchVariables": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@dnd/character-model": ["packages/character-model/src/index.ts"],
+      "@dnd/content-schema": ["packages/content-schema/src/index.ts"],
+      "@dnd/calculation-trace": ["packages/calculation-trace/src/index.ts"],
+      "@dnd/rules-core": ["packages/rules-core/src/index.ts"],
+      "@dnd/rules-api": ["packages/rules-api/src/index.ts"]
+    },
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["packages/**/*.ts", "apps/**/*.ts", "vitest.config.ts"]
+}

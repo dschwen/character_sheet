@@ -1,0 +1,9 @@
+{
+  "name": "@dnd/content-srd-5.2.1",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "generated"
+  ]
+}

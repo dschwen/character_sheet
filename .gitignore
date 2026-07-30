@@ -1,0 +1,13 @@
+node_modules/
+dist/
+/coverage/
+.venv/
+.turbo/
+.next/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+sources/**/source.pdf
+/generated/

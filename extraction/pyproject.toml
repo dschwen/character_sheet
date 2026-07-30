@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "srd-extract"
+version = "0.1.0"
+description = "Reproducible layout-aware extraction tools for the D&D SRD"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.9",
+  "pytest>=8.0",
+  "ruff>=0.9"
+]
+
+[project.scripts]
+srd-acquire = "srd_extract.acquire:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["srd_extract"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["srd_extract", "tests"]

@@ -1,0 +1,13 @@
+{
+  "package": "srd-5.2.1",
+  "generatedAt": null,
+  "counts": {
+    "UNCLASSIFIED": 0,
+    "TEXT_ONLY": 0,
+    "STRUCTURED": 0,
+    "EXECUTABLE": 0,
+    "TESTED": 0,
+    "VERIFIED": 0
+  },
+  "note": "Bootstrap package: SRD entity extraction has not started."
+}

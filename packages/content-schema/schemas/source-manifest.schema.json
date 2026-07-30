@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.dnd-character-manager.local/source-manifest.schema.json",
+  "title": "SRD source manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["source_id", "source_url", "retrieved_at", "sha256", "page_count", "license"],
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "retrieved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "page_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "license": {
+      "const": "CC-BY-4.0"
+    },
+    "http_headers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "pdf_metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  }
+}
