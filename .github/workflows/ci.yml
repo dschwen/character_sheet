@@ -35,5 +35,6 @@ jobs:
           cache: pip
       - run: pip install -e './extraction[dev]'
       - run: ruff check extraction
+      - run: ruff format --check extraction
       - run: mypy extraction
       - run: pytest extraction

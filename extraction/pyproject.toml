@@ -7,7 +7,9 @@ name = "srd-extract"
 version = "0.1.0"
 description = "Reproducible layout-aware extraction tools for the D&D SRD"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+  "PyMuPDF==1.28.0"
+]
 
 [project.optional-dependencies]
 dev = [
@@ -18,6 +20,7 @@ dev = [
 
 [project.scripts]
 srd-acquire = "srd_extract.acquire:main"
+srd-extract-layout = "srd_extract.pipeline:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["srd_extract"]

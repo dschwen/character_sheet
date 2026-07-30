@@ -41,3 +41,20 @@ python -m srd_extract.acquire \
 
 The command extracts page 1 for attribution review. It intentionally does not invent or guess the
 required notice language.
+
+## Run the layout extraction proof of concept
+
+The first extraction slice covers PDF pages 28–30: the Barbarian class introduction, core-traits
+table, progression table, and feature text.
+
+```bash
+.venv/bin/python -m srd_extract.pipeline \
+  --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
+  --out generated/extraction/srd-5.2.1 \
+  --pages 28-30 \
+  --overlays
+```
+
+The pipeline writes independent raw, classified-layout, normalized-page, document-tree, and visual
+overlay artifacts. Generated extraction output is ignored because it is reproducible from the
+pinned source.
