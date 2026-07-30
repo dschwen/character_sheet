@@ -98,11 +98,53 @@ export interface ActionSummary {
   traceId: string;
 }
 
+export interface InventoryItemSummary {
+  id: string;
+  entityId: string;
+  name: string;
+  quantity: number;
+  equipped: boolean;
+  kind: string;
+}
+
+export interface DamageSummary {
+  diceCount?: number;
+  diceSize?: number;
+  flat?: number;
+  bonus: number;
+  type: string;
+  traceId: string;
+}
+
+export interface AttackSummary {
+  id: string;
+  itemId: string;
+  weaponId: string;
+  name: string;
+  ability: string;
+  attackBonus: number;
+  proficient: boolean;
+  damage: DamageSummary;
+  attackType: "melee" | "ranged";
+  properties: string[];
+  range?: {
+    normal: number;
+    long: number;
+  };
+  mastery?: {
+    property: string;
+    enabled: boolean;
+  };
+  traceId: string;
+}
+
 export interface CharacterEvaluation {
   facts: Readonly<Record<string, JsonValue>>;
   values: Readonly<Record<StatId, DerivedValue>>;
   proficiencies: ProficiencySummary;
   d20Tests: Readonly<Record<string, D20TestSummary>>;
+  inventory: InventoryItemSummary[];
+  attacks: AttackSummary[];
   actions: ActionSummary[];
   resources: ResourceInstance[];
   resistances: string[];

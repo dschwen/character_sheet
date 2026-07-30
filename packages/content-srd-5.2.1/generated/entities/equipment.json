@@ -1,0 +1,2766 @@
+[
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 1,
+        "denomination": "sp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 4,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "slow",
+      "properties": [
+        "light"
+      ],
+      "propertyText": [
+        "Light"
+      ],
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.club",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Club"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b005"
+        ],
+        "page": 91,
+        "quoteHash": "32cf7e18e21b9e3ec7890b2a189a7cc1ef4989c4a20361954e9a7aac69a82fae",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 4,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "nick",
+      "properties": [
+        "finesse",
+        "light",
+        "thrown"
+      ],
+      "propertyText": [
+        "Finesse",
+        "Light",
+        "Thrown (Range 20/60)"
+      ],
+      "range": {
+        "ammunition": null,
+        "long": 60,
+        "normal": 20
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.weapon.dagger",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Dagger"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b006"
+        ],
+        "page": 91,
+        "quoteHash": "35df1e8147890414fb36fc34b5a5751fb225e7697121083d9e36c795836d0190",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 2,
+        "denomination": "sp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "push",
+      "properties": [
+        "two-handed"
+      ],
+      "propertyText": [
+        "Two-Handed"
+      ],
+      "weightLb": 10.0
+    },
+    "id": "srd521.equipment.weapon.greatclub",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Greatclub"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b007"
+        ],
+        "page": 91,
+        "quoteHash": "c873605e3b2453ac230e6d52f011b297512ff2b9e67b4c1bb9a827a9e25c234c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "vex",
+      "properties": [
+        "light",
+        "thrown"
+      ],
+      "propertyText": [
+        "Light",
+        "Thrown (Range 20/60)"
+      ],
+      "range": {
+        "ammunition": null,
+        "long": 60,
+        "normal": 20
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.handaxe",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Handaxe"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b008"
+        ],
+        "page": 91,
+        "quoteHash": "0e2df212b1dad04d230151a24d4d1877d4478fe593a31e0a1758f0a779d25a65",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 5,
+        "denomination": "sp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "slow",
+      "properties": [
+        "thrown"
+      ],
+      "propertyText": [
+        "Thrown (Range 30/120)"
+      ],
+      "range": {
+        "ammunition": null,
+        "long": 120,
+        "normal": 30
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.javelin",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Javelin"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b009"
+        ],
+        "page": 91,
+        "quoteHash": "5d3c04533a82346990933e83cc1c3bdd675398df6e6cdffebb3ef61b54d6739c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 4,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "nick",
+      "properties": [
+        "light",
+        "thrown"
+      ],
+      "propertyText": [
+        "Light",
+        "Thrown (Range 20/60)"
+      ],
+      "range": {
+        "ammunition": null,
+        "long": 60,
+        "normal": 20
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.light-hammer",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Light Hammer"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b010"
+        ],
+        "page": 91,
+        "quoteHash": "ac5ceb121cc9088e5d32da27537478d1a7867564fff97170e495a368b798c40b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "sap",
+      "properties": [],
+      "propertyText": [],
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.weapon.mace",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Mace"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b011"
+        ],
+        "page": 91,
+        "quoteHash": "a488cbc9b190e7dacc2276c5ff60557c1ad647b31249d3138862fad26103cc94",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 2,
+        "denomination": "sp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "topple",
+      "properties": [
+        "versatile"
+      ],
+      "propertyText": [
+        "Versatile (1d8)"
+      ],
+      "versatileDamage": {
+        "diceCount": 1,
+        "diceSize": 8
+      },
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.weapon.quarterstaff",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Quarterstaff"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b012"
+        ],
+        "page": 91,
+        "quoteHash": "ab253d2e60f60d92bd148a99c3132ca7a853ee841c9563b56ea600818e10314b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 4,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "nick",
+      "properties": [
+        "light"
+      ],
+      "propertyText": [
+        "Light"
+      ],
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.sickle",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Sickle"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b013"
+        ],
+        "page": 91,
+        "quoteHash": "6254740cf0b29f0e316b5d48fb41c44a0ad8492ef2bbf822995eeb6086beff2f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "simple",
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "sap",
+      "properties": [
+        "thrown",
+        "versatile"
+      ],
+      "propertyText": [
+        "Thrown (Range 20/60)",
+        "Versatile (1d8)"
+      ],
+      "range": {
+        "ammunition": null,
+        "long": 60,
+        "normal": 20
+      },
+      "versatileDamage": {
+        "diceCount": 1,
+        "diceSize": 8
+      },
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.weapon.spear",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Spear"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b014"
+        ],
+        "page": 91,
+        "quoteHash": "3206acca655c6acb5845f16bc53e0f4dc62f5dfc1fa9772b6c35e86e9f68df6a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "simple",
+      "cost": {
+        "amount": 5,
+        "denomination": "cp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 4,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "vex",
+      "properties": [
+        "finesse",
+        "thrown"
+      ],
+      "propertyText": [
+        "Finesse",
+        "Thrown (Range 20/60)"
+      ],
+      "range": {
+        "ammunition": null,
+        "long": 60,
+        "normal": 20
+      },
+      "weightLb": 0.25
+    },
+    "id": "srd521.equipment.weapon.dart",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Dart"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b016"
+        ],
+        "page": 91,
+        "quoteHash": "2748e23d098960a0787de96b779c42c8c996d32761e35a47ea36d7589552337e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "simple",
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "slow",
+      "properties": [
+        "ammunition",
+        "loading",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Ammunition (Range 80/320; Bolt)",
+        "Loading",
+        "Two-Handed"
+      ],
+      "range": {
+        "ammunition": "Bolt",
+        "long": 320,
+        "normal": 80
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.weapon.light-crossbow",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Light Crossbow"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b017",
+          "p0091-b018"
+        ],
+        "page": 91,
+        "quoteHash": "67b339b8c658c028f8ca5c433efb13c80ea8396eb784431dd05f1995e2410a4b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "simple",
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "vex",
+      "properties": [
+        "ammunition",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Ammunition (Range 80/320; Arrow)",
+        "Two-Handed"
+      ],
+      "range": {
+        "ammunition": "Arrow",
+        "long": 320,
+        "normal": 80
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.shortbow",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Shortbow"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b019"
+        ],
+        "page": 91,
+        "quoteHash": "588381eacd819ff162008bd4121b6a5f4d8fa6af52998be1af9a688354469d5c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "simple",
+      "cost": {
+        "amount": 1,
+        "denomination": "sp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 4,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "slow",
+      "properties": [
+        "ammunition"
+      ],
+      "propertyText": [
+        "Ammunition (Range 30/120; Bullet)"
+      ],
+      "range": {
+        "ammunition": "Bullet",
+        "long": 120,
+        "normal": 30
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.weapon.sling",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Sling"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b020"
+        ],
+        "page": 91,
+        "quoteHash": "539545d50f0990d9f7e603da29edefb8a20056990b426b1540b939f279243214",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "simple",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "topple",
+      "properties": [
+        "versatile"
+      ],
+      "propertyText": [
+        "Versatile (1d10)"
+      ],
+      "versatileDamage": {
+        "diceCount": 1,
+        "diceSize": 10
+      },
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.weapon.battleaxe",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Battleaxe"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b022"
+        ],
+        "page": 91,
+        "quoteHash": "4b9707e599494225ba10c5cfb02d84142b4762ec3c571d7a7028780ac640cb3a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "sap",
+      "properties": [],
+      "propertyText": [],
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.flail",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Flail"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b023"
+        ],
+        "page": 91,
+        "quoteHash": "996395374026bc535837359d7e701fc897ca57bf62bdb89e6fa32a5a89a97afe",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 20,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 10,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "graze",
+      "properties": [
+        "heavy",
+        "reach",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Heavy",
+        "Reach",
+        "Two-Handed"
+      ],
+      "weightLb": 6.0
+    },
+    "id": "srd521.equipment.weapon.glaive",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Glaive"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b024"
+        ],
+        "page": 91,
+        "quoteHash": "206d0d8b90ea2b3d512f5d1362e8883ea58887e402e831289e89d9bccd111265",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 30,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 12,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "cleave",
+      "properties": [
+        "heavy",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Heavy",
+        "Two-Handed"
+      ],
+      "weightLb": 7.0
+    },
+    "id": "srd521.equipment.weapon.greataxe",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Greataxe"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b025"
+        ],
+        "page": 91,
+        "quoteHash": "6425dc9a5de22cf7d7073c3453b8ae08fb80549d5497c69977b423a133f3c8bb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 2,
+        "diceSize": 6,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "graze",
+      "properties": [
+        "heavy",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Heavy",
+        "Two-Handed"
+      ],
+      "weightLb": 6.0
+    },
+    "id": "srd521.equipment.weapon.greatsword",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Greatsword"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b026"
+        ],
+        "page": 91,
+        "quoteHash": "6d423bf4f481c02fab5fdef2db5279f1e9107e769c7b78caa077e1e2cb367a90",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 20,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 10,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "cleave",
+      "properties": [
+        "heavy",
+        "reach",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Heavy",
+        "Reach",
+        "Two-Handed"
+      ],
+      "weightLb": 6.0
+    },
+    "id": "srd521.equipment.weapon.halberd",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Halberd"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b027"
+        ],
+        "page": 91,
+        "quoteHash": "6f7c65287de73ad527e2bb6ffd4637f2e50ce00a287ad366377a19b177143850",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 10,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "topple",
+      "properties": [
+        "heavy",
+        "reach",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Heavy",
+        "Reach",
+        "Two-Handed (unless mounted)"
+      ],
+      "weightLb": 6.0
+    },
+    "id": "srd521.equipment.weapon.lance",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Lance"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b028"
+        ],
+        "page": 91,
+        "quoteHash": "c2a8f97087a9e07ad8bae093a401b5ba4908afec3b907d219619486f9cbc6278",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 15,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "sap",
+      "properties": [
+        "versatile"
+      ],
+      "propertyText": [
+        "Versatile (1d10)"
+      ],
+      "versatileDamage": {
+        "diceCount": 1,
+        "diceSize": 10
+      },
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.weapon.longsword",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Longsword"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b029"
+        ],
+        "page": 91,
+        "quoteHash": "a38a78e746302cd9e079e7fbc06a9624f251c7051950c1945b638413d4fdc040",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 2,
+        "diceSize": 6,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "topple",
+      "properties": [
+        "heavy",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Heavy",
+        "Two-Handed"
+      ],
+      "weightLb": 10.0
+    },
+    "id": "srd521.equipment.weapon.maul",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Maul"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b030"
+        ],
+        "page": 91,
+        "quoteHash": "e21d76107da9ad8838217f670a5f71972d91c46b51215beab803aa855939cd7f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 15,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "sap",
+      "properties": [],
+      "propertyText": [],
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.weapon.morningstar",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Morningstar"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b031"
+        ],
+        "page": 91,
+        "quoteHash": "6914be1fa129f65ed2c75adea20a1dd1e2599baeff781058fc1ec387a2286f6f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 10,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "push",
+      "properties": [
+        "heavy",
+        "reach",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Heavy",
+        "Reach",
+        "Two-Handed"
+      ],
+      "weightLb": 18.0
+    },
+    "id": "srd521.equipment.weapon.pike",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Pike"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b032"
+        ],
+        "page": 91,
+        "quoteHash": "7d9dfd40dec8c6985b65508224f9ac3358020560ebef443d713d545b210b74ed",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "vex",
+      "properties": [
+        "finesse"
+      ],
+      "propertyText": [
+        "Finesse"
+      ],
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.rapier",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Rapier"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b033"
+        ],
+        "page": 91,
+        "quoteHash": "d1610b18e29ccfdf599bff38862b717347fc7b7720eec324f3c2e593def8c55c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "nick",
+      "properties": [
+        "finesse",
+        "light"
+      ],
+      "propertyText": [
+        "Finesse",
+        "Light"
+      ],
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.weapon.scimitar",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Scimitar"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b034"
+        ],
+        "page": 91,
+        "quoteHash": "10a6f1061e30d7a0680dedf92c8dd423e553bb304f8bfb0fccf0a47f0349be90",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "vex",
+      "properties": [
+        "finesse",
+        "light"
+      ],
+      "propertyText": [
+        "Finesse",
+        "Light"
+      ],
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.shortsword",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Shortsword"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b035"
+        ],
+        "page": 91,
+        "quoteHash": "aae9aa8810fe9e28c0d0835a2a801b75ef1c05e3f6d93078e9af55296d23b1e4",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "topple",
+      "properties": [
+        "thrown",
+        "versatile"
+      ],
+      "propertyText": [
+        "Thrown (Range 20/60)",
+        "Versatile (1d10)"
+      ],
+      "range": {
+        "ammunition": null,
+        "long": 60,
+        "normal": 20
+      },
+      "versatileDamage": {
+        "diceCount": 1,
+        "diceSize": 10
+      },
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.weapon.trident",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Trident"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b036"
+        ],
+        "page": 91,
+        "quoteHash": "9ff4ea4a128cc992e729c67f8da1f25f167d3d3bf35af5c0dc35fc6ab7f8486e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 15,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "bludgeoning"
+      },
+      "mastery": "push",
+      "properties": [
+        "versatile"
+      ],
+      "propertyText": [
+        "Versatile (1d10)"
+      ],
+      "versatileDamage": {
+        "diceCount": 1,
+        "diceSize": 10
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.weapon.warhammer",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Warhammer"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b037"
+        ],
+        "page": 91,
+        "quoteHash": "808cfc0bab77fbae8180f374dfbecd07d770be9befd7f9fcec5978b03713cb2e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "sap",
+      "properties": [
+        "versatile"
+      ],
+      "propertyText": [
+        "Versatile (1d10)"
+      ],
+      "versatileDamage": {
+        "diceCount": 1,
+        "diceSize": 10
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.war-pick",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "War Pick"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b038"
+        ],
+        "page": 91,
+        "quoteHash": "e2a41cfeb2eeb0cd4a7707a8d95f44aa098524a86bb83de61acf3510fcda6675",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "category": "martial",
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 4,
+        "flat": null,
+        "type": "slashing"
+      },
+      "mastery": "slow",
+      "properties": [
+        "finesse",
+        "reach"
+      ],
+      "propertyText": [
+        "Finesse",
+        "Reach"
+      ],
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.weapon.whip",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Whip"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b039"
+        ],
+        "page": 91,
+        "quoteHash": "0748aafab21c8f5b90941075cbcd38fcdd5f4b7e0b39dc276d4795bfc641793d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "melee"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "martial",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": null,
+        "diceSize": null,
+        "flat": 1,
+        "type": "piercing"
+      },
+      "mastery": "vex",
+      "properties": [
+        "ammunition",
+        "loading"
+      ],
+      "propertyText": [
+        "Ammunition (Range 25/100; Needle)",
+        "Loading"
+      ],
+      "range": {
+        "ammunition": "Needle",
+        "long": 100,
+        "normal": 25
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.weapon.blowgun",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Blowgun"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b041"
+        ],
+        "page": 91,
+        "quoteHash": "8769ee2b42ef9441ade43b54204f00505e21f3bc0a92456b3017d474157f09fe",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "martial",
+      "cost": {
+        "amount": 75,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "vex",
+      "properties": [
+        "ammunition",
+        "light",
+        "loading"
+      ],
+      "propertyText": [
+        "Ammunition (Range 30/120; Bolt)",
+        "Light",
+        "Loading"
+      ],
+      "range": {
+        "ammunition": "Bolt",
+        "long": 120,
+        "normal": 30
+      },
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.weapon.hand-crossbow",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Hand Crossbow"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b042"
+        ],
+        "page": 91,
+        "quoteHash": "5cffe20ce2fd8d5c2b8abd7abd0925240e18ee925db9eeb190e86f885b866189",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "martial",
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 10,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "push",
+      "properties": [
+        "ammunition",
+        "heavy",
+        "loading",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Ammunition (Range 100/400; Bolt)",
+        "Heavy",
+        "Loading",
+        "Two-Handed"
+      ],
+      "range": {
+        "ammunition": "Bolt",
+        "long": 400,
+        "normal": 100
+      },
+      "weightLb": 18.0
+    },
+    "id": "srd521.equipment.weapon.heavy-crossbow",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Heavy Crossbow"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b043",
+          "p0091-b044"
+        ],
+        "page": 91,
+        "quoteHash": "a7d7abedaa0471da03cba7e49b43487c6f3f7a89ca7d4e923b431e49e51ac1e6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "martial",
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "slow",
+      "properties": [
+        "ammunition",
+        "heavy",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Ammunition (Range 150/600; Arrow)",
+        "Heavy",
+        "Two-Handed"
+      ],
+      "range": {
+        "ammunition": "Arrow",
+        "long": 600,
+        "normal": 150
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.weapon.longbow",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Longbow"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b045",
+          "p0091-b046"
+        ],
+        "page": 91,
+        "quoteHash": "1d7e94c7afe9ebbae501486baf85aa2dfd5630bd3346d69e2c7b13d2a7b47e54",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "martial",
+      "cost": {
+        "amount": 500,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 12,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "slow",
+      "properties": [
+        "ammunition",
+        "loading",
+        "two-handed"
+      ],
+      "propertyText": [
+        "Ammunition (Range 40/120; Bullet)",
+        "Loading",
+        "Two-Handed"
+      ],
+      "range": {
+        "ammunition": "Bullet",
+        "long": 120,
+        "normal": 40
+      },
+      "weightLb": 10.0
+    },
+    "id": "srd521.equipment.weapon.musket",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Musket"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b047",
+          "p0091-b048"
+        ],
+        "page": 91,
+        "quoteHash": "8fca39c98eaa858c269b19f8399e195bbbde43c483c8d61e3e0e4407d6e30d2c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "category": "martial",
+      "cost": {
+        "amount": 250,
+        "denomination": "gp"
+      },
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 10,
+        "flat": null,
+        "type": "piercing"
+      },
+      "mastery": "vex",
+      "properties": [
+        "ammunition",
+        "loading"
+      ],
+      "propertyText": [
+        "Ammunition (Range 30/90; Bullet)",
+        "Loading"
+      ],
+      "range": {
+        "ammunition": "Bullet",
+        "long": 90,
+        "normal": 30
+      },
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.weapon.pistol",
+    "kind": "equipment-weapon",
+    "name": {
+      "en": "Pistol"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Weapons table on page 91.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0091-b049"
+        ],
+        "page": 91,
+        "quoteHash": "6f327e142cdaf6b197a665c857c041e341666905e9c97c9e08b9d337ffc5dc23",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "weapon",
+      "martial",
+      "ranged"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 11,
+        "dexterityCap": null,
+        "kind": "formula"
+      },
+      "category": "light",
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": true,
+      "strengthRequirement": null,
+      "weightLb": 8.0
+    },
+    "id": "srd521.equipment.armor.light.padded-armor",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Padded Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b016"
+        ],
+        "page": 92,
+        "quoteHash": "516239bd607ee719b4466037d3008f80b663bfd135230b122e2ad8433945a371",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "light"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 11,
+        "dexterityCap": null,
+        "kind": "formula"
+      },
+      "category": "light",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": false,
+      "strengthRequirement": null,
+      "weightLb": 10.0
+    },
+    "id": "srd521.equipment.armor.light.leather-armor",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Leather Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b017"
+        ],
+        "page": 92,
+        "quoteHash": "11808960876bc5f99e151942fccefc4e0b1f555cff4ea9cac75f2a87156104d0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "light"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 12,
+        "dexterityCap": null,
+        "kind": "formula"
+      },
+      "category": "light",
+      "cost": {
+        "amount": 45,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": false,
+      "strengthRequirement": null,
+      "weightLb": 13.0
+    },
+    "id": "srd521.equipment.armor.light.studded-leather-armor",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Studded Leather Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b018"
+        ],
+        "page": 92,
+        "quoteHash": "e87d6c2ac5ef95f1ddb271a623d700b026d35a2f5c000f62b826fb4a828f6eb6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "light"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 12,
+        "dexterityCap": 2,
+        "kind": "formula"
+      },
+      "category": "medium",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": false,
+      "strengthRequirement": null,
+      "weightLb": 12.0
+    },
+    "id": "srd521.equipment.armor.medium.hide-armor",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Hide Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b020"
+        ],
+        "page": 92,
+        "quoteHash": "cc0301cc76d6747001bc708f245ce0237d6434af9d2715e5d6a63a36d351c0b1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "medium"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 13,
+        "dexterityCap": 2,
+        "kind": "formula"
+      },
+      "category": "medium",
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": false,
+      "strengthRequirement": null,
+      "weightLb": 20.0
+    },
+    "id": "srd521.equipment.armor.medium.chain-shirt",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Chain Shirt"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b021"
+        ],
+        "page": 92,
+        "quoteHash": "2dc0d8ccd28f9e327aa66f1c5a80e1fdaeca4229a383677e2cba08d76245d80a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "medium"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 14,
+        "dexterityCap": 2,
+        "kind": "formula"
+      },
+      "category": "medium",
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": true,
+      "strengthRequirement": null,
+      "weightLb": 45.0
+    },
+    "id": "srd521.equipment.armor.medium.scale-mail",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Scale Mail"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b022"
+        ],
+        "page": 92,
+        "quoteHash": "9b5430e1eb280625604c9f18c05d49dc3f6046b2362211486b7c58a638df647b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "medium"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 14,
+        "dexterityCap": 2,
+        "kind": "formula"
+      },
+      "category": "medium",
+      "cost": {
+        "amount": 400,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": false,
+      "strengthRequirement": null,
+      "weightLb": 20.0
+    },
+    "id": "srd521.equipment.armor.medium.breastplate",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Breastplate"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b023"
+        ],
+        "page": 92,
+        "quoteHash": "700534ca4cca21a10177978e56e08f386261e785123ea6b90f976a30c1cc3b77",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "medium"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 15,
+        "dexterityCap": 2,
+        "kind": "formula"
+      },
+      "category": "medium",
+      "cost": {
+        "amount": 750,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": true,
+      "strengthRequirement": null,
+      "weightLb": 40.0
+    },
+    "id": "srd521.equipment.armor.medium.half-plate-armor",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Half Plate Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b024"
+        ],
+        "page": 92,
+        "quoteHash": "48abef048b886b8ebdca71b81d367b64da055abdc54cf4dbfe31862cd5f4a2fa",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "medium"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 14,
+        "kind": "fixed"
+      },
+      "category": "heavy",
+      "cost": {
+        "amount": 30,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": true,
+      "strengthRequirement": null,
+      "weightLb": 40.0
+    },
+    "id": "srd521.equipment.armor.heavy.ring-mail",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Ring Mail"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b026"
+        ],
+        "page": 92,
+        "quoteHash": "73e303258e0117a25b88124f6778f7dbe2a7cf863e6cfa88b3313d5e7193c938",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "heavy"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 16,
+        "kind": "fixed"
+      },
+      "category": "heavy",
+      "cost": {
+        "amount": 75,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": true,
+      "strengthRequirement": 13,
+      "weightLb": 55.0
+    },
+    "id": "srd521.equipment.armor.heavy.chain-mail",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Chain Mail"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b027"
+        ],
+        "page": 92,
+        "quoteHash": "2c0a3e8a837a2d2b386d588baa1e9687649ae20224285b8776f87d6be0137db5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "heavy"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 17,
+        "kind": "fixed"
+      },
+      "category": "heavy",
+      "cost": {
+        "amount": 200,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": true,
+      "strengthRequirement": 15,
+      "weightLb": 60.0
+    },
+    "id": "srd521.equipment.armor.heavy.splint-armor",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Splint Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b028"
+        ],
+        "page": 92,
+        "quoteHash": "32d1113ac1980b9324163f13be2b12abf9cc52ae74029ce2eaff1e0e25894835",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "heavy"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "base": 18,
+        "kind": "fixed"
+      },
+      "category": "heavy",
+      "cost": {
+        "amount": 1500,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": true,
+      "strengthRequirement": 15,
+      "weightLb": 65.0
+    },
+    "id": "srd521.equipment.armor.heavy.plate-armor",
+    "kind": "equipment-armor",
+    "name": {
+      "en": "Plate Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b029"
+        ],
+        "page": 92,
+        "quoteHash": "f5a4d11753bc0150d16df1b8434199eeabac2cf5ab779c42a5121c71c115f44c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "heavy"
+    ]
+  },
+  {
+    "body": {
+      "armorClass": {
+        "bonus": 2,
+        "kind": "bonus"
+      },
+      "category": "shield",
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "stealthDisadvantage": false,
+      "strengthRequirement": null,
+      "weightLb": 6.0
+    },
+    "id": "srd521.equipment.shield",
+    "kind": "equipment-shield",
+    "name": {
+      "en": "Shield"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Armor table on page 92.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0092-b031"
+        ],
+        "page": 92,
+        "quoteHash": "6e3c72cdbbdd21d2addddf15cd5de0fa8b9eb79312de96e9b672dc0c1279d1d3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "armor",
+      "shield"
+    ]
+  }
+]

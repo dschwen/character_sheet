@@ -19,15 +19,16 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(23);
+    expect(parsedEntities).toHaveLength(74);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
     expect(entityIds).toContain("srd521.class-feature.barbarian.improved-brutal-strike.level-17");
-    expect(entityIds.slice(-2)).toEqual([
-      "srd521.table.barbarian.rages",
-      "srd521.table.barbarian.rage-damage",
-    ]);
+    expect(entityIds).toContain("srd521.table.barbarian.rages");
+    expect(entityIds).toContain("srd521.table.barbarian.rage-damage");
+    expect(entityIds).toContain("srd521.equipment.weapon.greataxe");
+    expect(entityIds).toContain("srd521.equipment.armor.heavy.chain-mail");
+    expect(entityIds).toContain("srd521.equipment.shield");
   });
 
   it("validates the acquired source manifest against the pinned artifact", () => {

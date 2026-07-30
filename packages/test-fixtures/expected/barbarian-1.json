@@ -14,11 +14,16 @@
     "skill.perception": 3,
     "initiative": 2,
     "passive.perception": 13,
+    "speed.armorPenalty": 0,
     "hitPoints.maximum": 15,
     "armorClass": 15,
     "rage.damageBonus": 2,
     "srd521.resource.barbarian.rage.maximum": 2,
-    "srd521.resource.barbarian.rage.current": 1
+    "srd521.resource.barbarian.rage.current": 1,
+    "attack.greataxe-1.bonus": 5,
+    "attack.greataxe-1.damageBonus": 5,
+    "attack.handaxes.bonus": 5,
+    "attack.handaxes.damageBonus": 5
   },
   "proficiencies": {
     "savingThrows": ["strength", "constitution"],
@@ -37,5 +42,41 @@
     "available": true,
     "actionEconomy": "bonus-action"
   },
+  "attacks": [
+    {
+      "id": "attack.greataxe-1",
+      "weaponId": "srd521.equipment.weapon.greataxe",
+      "ability": "strength",
+      "attackBonus": 5,
+      "proficient": true,
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 12,
+        "bonus": 5,
+        "type": "slashing"
+      },
+      "mastery": {
+        "property": "cleave",
+        "enabled": true
+      }
+    },
+    {
+      "id": "attack.handaxes",
+      "weaponId": "srd521.equipment.weapon.handaxe",
+      "ability": "strength",
+      "attackBonus": 5,
+      "proficient": true,
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "bonus": 5,
+        "type": "slashing"
+      },
+      "mastery": {
+        "property": "vex",
+        "enabled": true
+      }
+    }
+  ],
   "validationCodes": []
 }

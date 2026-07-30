@@ -17,6 +17,10 @@ content, draft authoring IR, and calculation traces in one deterministic evaluat
 | Perception            |     +3 |
 | Initiative            |     +2 |
 | Passive Perception    |     13 |
+| Greataxe attack       |     +5 |
+| Greataxe damage       | 1d12+5 |
+| Handaxe attack        |     +5 |
+| Handaxe damage        |  1d6+5 |
 | Maximum Hit Points    |     15 |
 | Armor Class           |     15 |
 | Rage maximum          |      2 |
@@ -42,6 +46,6 @@ Focused interaction tests verify:
 
 ## Current boundary
 
-This slice intentionally does not calculate attacks, inventory armor formulas, Rage duration
-transitions, rests, or damage application. Rage and Unarmored Defense still carry semantic-review
-warnings because their authoring IR has not been approved.
+This slice intentionally does not resolve Weapon Mastery combat effects, Rage duration transitions,
+rests, ammunition, target range, or damage application. Rage and Unarmored Defense still carry
+semantic-review warnings because their authoring IR has not been approved.

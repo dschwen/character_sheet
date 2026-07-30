@@ -109,12 +109,59 @@ const characterBuildSchema = z
 const characterLoadoutSchema = z
   .object({
     preparedSpellIds: z.array(entityIdSchema).default([]),
+    inventory: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            entityId: entityIdSchema,
+            quantity: z.number().int().positive().default(1),
+          })
+          .strict(),
+      )
+      .default([]),
     equippedItemIds: z.array(z.string().min(1)).default([]),
     attunedItemIds: z.array(z.string().min(1)).default([]),
     selectedWeaponMasteryIds: z.array(entityIdSchema).default([]),
     choices: z.array(choiceSelectionSchema).default([]),
   })
-  .strict();
+  .strict()
+  .superRefine((loadout, context) => {
+    const inventoryIds = loadout.inventory.map((item) => item.id);
+    if (new Set(inventoryIds).size !== inventoryIds.length) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Inventory item IDs must be unique",
+        path: ["inventory"],
+      });
+    }
+    const equippedIds = new Set(loadout.equippedItemIds);
+    if (equippedIds.size !== loadout.equippedItemIds.length) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Equipped item IDs must be unique",
+        path: ["equippedItemIds"],
+      });
+    }
+    for (const [index, itemId] of loadout.equippedItemIds.entries()) {
+      if (!inventoryIds.includes(itemId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Equipped items must reference inventory item IDs",
+          path: ["equippedItemIds", index],
+        });
+      }
+    }
+    if (
+      new Set(loadout.selectedWeaponMasteryIds).size !== loadout.selectedWeaponMasteryIds.length
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Selected Weapon Mastery IDs must be unique",
+        path: ["selectedWeaponMasteryIds"],
+      });
+    }
+  });
 
 const characterStateSchema = z
   .object({
@@ -168,6 +215,7 @@ export type RulesetReference = z.infer<typeof rulesetReferenceSchema>;
 export type CharacterBuild = z.infer<typeof characterBuildSchema>;
 export type ProficiencyChoice = z.infer<typeof proficiencyChoiceSchema>;
 export type ProficiencyChoices = z.infer<typeof proficiencyChoicesSchema>;
+export type InventoryItem = CharacterLoadout["inventory"][number];
 export type CharacterLoadout = z.infer<typeof characterLoadoutSchema>;
 export type CharacterState = z.infer<typeof characterStateSchema>;
 export type CharacterDocument = z.infer<typeof characterDocumentSchema>;

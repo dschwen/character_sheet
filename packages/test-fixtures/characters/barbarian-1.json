@@ -42,7 +42,25 @@
       ]
     }
   },
-  "loadout": {},
+  "loadout": {
+    "inventory": [
+      {
+        "id": "greataxe-1",
+        "entityId": "srd521.equipment.weapon.greataxe",
+        "quantity": 1
+      },
+      {
+        "id": "handaxes",
+        "entityId": "srd521.equipment.weapon.handaxe",
+        "quantity": 4
+      }
+    ],
+    "equippedItemIds": ["greataxe-1"],
+    "selectedWeaponMasteryIds": [
+      "srd521.equipment.weapon.greataxe",
+      "srd521.equipment.weapon.handaxe"
+    ]
+  },
   "state": {
     "currentHitPoints": 12,
     "expendedResources": {

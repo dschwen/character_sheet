@@ -52,6 +52,23 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
         savingThrows: string[];
         skills: string[];
       };
+      attacks: {
+        id: string;
+        weaponId: string;
+        ability: string;
+        attackBonus: number;
+        proficient: boolean;
+        damage: {
+          diceCount: number;
+          diceSize: number;
+          bonus: number;
+          type: string;
+        };
+        mastery: {
+          property: string;
+          enabled: boolean;
+        };
+      }[];
       validationCodes: string[];
     };
 
@@ -71,6 +88,16 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
     expect(evaluation.resistances).toEqual(expected.resistances);
     expect(evaluation.resources[0]).toMatchObject(expected.resource);
     expect(evaluation.actions[0]).toMatchObject(expected.action);
+    expect(evaluation.attacks).toMatchObject(expected.attacks);
+    expect(evaluation.inventory).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "greataxe-1",
+          entityId: "srd521.equipment.weapon.greataxe",
+          equipped: true,
+        }),
+      ]),
+    );
     expect(
       Object.entries(evaluation.proficiencies.savingThrows)
         .filter(([, proficiency]) => proficiency.level === "proficient")
@@ -111,6 +138,14 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
         }),
       ]),
     );
+    expect(evaluation.traces["attack.greataxe-1.bonus"]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "srd521.equipment.weapon.greataxe",
+          page: 91,
+        }),
+      ]),
+    );
   });
 
   it("is deterministic", () => {
@@ -128,7 +163,15 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       ...character,
       loadout: {
         ...character.loadout,
-        equippedItemIds: ["srd521.equipment.armor.heavy.chain-mail"],
+        inventory: [
+          ...character.loadout.inventory,
+          {
+            id: "chain-mail-1",
+            entityId: "srd521.equipment.armor.heavy.chain-mail",
+            quantity: 1,
+          },
+        ],
+        equippedItemIds: ["chain-mail-1"],
       },
     };
 
@@ -138,8 +181,8 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
     });
 
     expect(evaluation.values.armorClass).toMatchObject({
-      value: 12,
-      selectedCandidate: "base-unarmored",
+      value: 16,
+      selectedCandidate: "equipped-chain-mail-1",
     });
     expect(evaluation.values.armorClass?.candidates).toEqual(
       expect.arrayContaining([
@@ -153,6 +196,10 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
     expect(evaluation.validations.map((message) => message.code)).toContain(
       "RAGE_WITH_HEAVY_ARMOR",
     );
+    expect(evaluation.validations.map((message) => message.code)).toContain(
+      "ARMOR_TRAINING_MISSING",
+    );
+    expect(evaluation.d20Tests["savingThrow.strength"]?.rollMode).toBe("disadvantage");
   });
 
   it("validates impossible Rage concentration and resource state", () => {
@@ -260,6 +307,174 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
         "CLASS_SKILL_PROFICIENCY_COUNT",
         "CLASS_SKILL_PROFICIENCY_NOT_ALLOWED",
       ]),
+    );
+  });
+
+  it("applies trained medium armor, a Shield, and armor Stealth Disadvantage", () => {
+    const character = loadCharacter();
+    const armored: CharacterDocument = {
+      ...character,
+      loadout: {
+        ...character.loadout,
+        inventory: [
+          ...character.loadout.inventory,
+          {
+            id: "scale-mail-1",
+            entityId: "srd521.equipment.armor.medium.scale-mail",
+            quantity: 1,
+          },
+          {
+            id: "shield-1",
+            entityId: "srd521.equipment.shield",
+            quantity: 1,
+          },
+        ],
+        equippedItemIds: ["scale-mail-1", "shield-1"],
+      },
+    };
+
+    const evaluation = evaluateCharacter({
+      character: armored,
+      packages: [loadRulesPackage()],
+    });
+
+    expect(evaluation.values.armorClass).toMatchObject({
+      value: 18,
+      selectedCandidate: "equipped-scale-mail-1",
+    });
+    expect(evaluation.d20Tests["skill.stealth"]?.rollMode).toBe("disadvantage");
+    expect(evaluation.validations.map((validation) => validation.code)).not.toContain(
+      "ARMOR_TRAINING_MISSING",
+    );
+    expect(evaluation.traces.armorClass?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "srd521.equipment.armor.medium.scale-mail",
+          page: 92,
+        }),
+        expect.objectContaining({
+          entityId: "srd521.equipment.shield",
+          page: 92,
+        }),
+      ]),
+    );
+  });
+
+  it("selects Dexterity for a Finesse weapon when it is higher", () => {
+    const character = loadCharacter();
+    const finesse: CharacterDocument = {
+      ...character,
+      build: {
+        ...character.build,
+        abilityScores: {
+          ...character.build.abilityScores,
+          strength: 10,
+          dexterity: 18,
+        },
+      },
+      loadout: {
+        ...character.loadout,
+        inventory: [
+          {
+            id: "dagger-1",
+            entityId: "srd521.equipment.weapon.dagger",
+            quantity: 1,
+          },
+        ],
+        equippedItemIds: ["dagger-1"],
+        selectedWeaponMasteryIds: [],
+      },
+      state: {
+        ...character.state,
+        activeEffectIds: [],
+      },
+    };
+
+    const evaluation = evaluateCharacter({
+      character: finesse,
+      packages: [loadRulesPackage()],
+    });
+
+    expect(evaluation.attacks[0]).toMatchObject({
+      ability: "dexterity",
+      attackBonus: 6,
+      damage: {
+        diceCount: 1,
+        diceSize: 4,
+        bonus: 4,
+      },
+    });
+  });
+
+  it("traces the armor speed penalty when Strength is below the requirement", () => {
+    const character = loadCharacter();
+    const encumbered: CharacterDocument = {
+      ...character,
+      build: {
+        ...character.build,
+        abilityScores: {
+          ...character.build.abilityScores,
+          strength: 12,
+        },
+      },
+      loadout: {
+        ...character.loadout,
+        inventory: [
+          ...character.loadout.inventory,
+          {
+            id: "chain-mail-1",
+            entityId: "srd521.equipment.armor.heavy.chain-mail",
+            quantity: 1,
+          },
+        ],
+        equippedItemIds: ["chain-mail-1"],
+      },
+    };
+
+    const evaluation = evaluateCharacter({
+      character: encumbered,
+      packages: [loadRulesPackage()],
+    });
+
+    expect(evaluation.values["speed.armorPenalty"]?.value).toBe(-10);
+    expect(evaluation.traces["speed.armorPenalty"]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "srd521.equipment.armor.heavy.chain-mail",
+          page: 92,
+        }),
+      ]),
+    );
+  });
+
+  it("validates the class Weapon Mastery selection limit", () => {
+    const character = loadCharacter();
+    const tooMany: CharacterDocument = {
+      ...character,
+      loadout: {
+        ...character.loadout,
+        inventory: [
+          ...character.loadout.inventory,
+          {
+            id: "dagger-1",
+            entityId: "srd521.equipment.weapon.dagger",
+            quantity: 1,
+          },
+        ],
+        selectedWeaponMasteryIds: [
+          ...character.loadout.selectedWeaponMasteryIds,
+          "srd521.equipment.weapon.dagger",
+        ],
+      },
+    };
+
+    const evaluation = evaluateCharacter({
+      character: tooMany,
+      packages: [loadRulesPackage()],
+    });
+
+    expect(evaluation.validations.map((validation) => validation.code)).toContain(
+      "WEAPON_MASTERY_SELECTION_LIMIT",
     );
   });
 });

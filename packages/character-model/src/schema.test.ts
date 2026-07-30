@@ -50,6 +50,7 @@ describe("characterDocumentSchema", () => {
     });
     expect(character.state.temporaryHitPoints).toBe(0);
     expect(character.state.activeEffectIds).toEqual([]);
+    expect(character.loadout.inventory).toEqual([]);
     expect(character.overrides).toEqual([]);
   });
 
@@ -66,6 +67,17 @@ describe("characterDocumentSchema", () => {
               hitPointChoice: "fixed",
             },
           ],
+        },
+      }),
+    ).toThrow();
+  });
+
+  it("rejects equipped item IDs that are absent from inventory", () => {
+    expect(() =>
+      characterDocumentSchema.parse({
+        ...baseCharacter,
+        loadout: {
+          equippedItemIds: ["missing-item"],
         },
       }),
     ).toThrow();

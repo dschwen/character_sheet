@@ -1,13 +1,13 @@
 {
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 23,
+    "STRUCTURED": 74,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
     "VERIFIED": 0
   },
   "generatedAt": null,
-  "note": "Barbarian pages 28–30 proof of concept. Proposed executable rules remain in needs-review authoring IR.",
+  "note": "Barbarian pages 28–30 and equipment pages 91–92 proof of concept. Proposed executable rules remain under review.",
   "package": "srd-5.2.1"
 }

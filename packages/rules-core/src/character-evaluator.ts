@@ -10,14 +10,18 @@ import {
   characterDocumentSchema,
   type CharacterDocument,
   type CharacterLevel,
+  type InventoryItem,
 } from "@dnd/character-model";
 import type { AuthoringIr, ContentEntity, DraftRule, Expr, Predicate } from "@dnd/content-schema";
 import type {
   ActionSummary,
+  AttackSummary,
   CharacterEvaluation,
+  D20RollEffect,
   D20TestSummary,
   DerivedValue,
   EvaluateCharacterInput,
+  InventoryItemSummary,
   LoadedRulesPackage,
   ProficiencyEntry,
   ProficiencyLevel,
@@ -66,6 +70,8 @@ const classBodySchema = z
   .object({
     hitPointDie: z.number().int().positive(),
     savingThrowProficiencies: z.array(z.enum(abilities)).default([]),
+    weaponProficiencies: z.array(z.enum(["simple", "martial"])).default([]),
+    armorTraining: z.array(z.enum(["light", "medium", "heavy", "shield"])).default([]),
     skillProficiencyChoice: z
       .object({
         minimum: z.number().int().min(0),
@@ -76,6 +82,7 @@ const classBodySchema = z
     progression: z.array(
       z.object({
         level: z.number().int().min(1).max(20),
+        weaponMastery: z.number().int().min(0).optional(),
         features: z.array(
           z.object({
             name: z.string(),
@@ -84,6 +91,50 @@ const classBodySchema = z
         ),
       }),
     ),
+  })
+  .passthrough();
+
+const damageBodySchema = z
+  .object({
+    diceCount: z.number().int().positive().nullable(),
+    diceSize: z.number().int().positive().nullable(),
+    flat: z.number().int().nonnegative().nullable(),
+    type: z.string().min(1),
+  })
+  .strict();
+const weaponBodySchema = z
+  .object({
+    category: z.enum(["simple", "martial"]),
+    attackType: z.enum(["melee", "ranged"]),
+    damage: damageBodySchema,
+    properties: z.array(z.string()),
+    mastery: z.string().min(1),
+    range: z
+      .object({
+        normal: z.number().int().positive(),
+        long: z.number().int().positive(),
+      })
+      .passthrough()
+      .optional(),
+  })
+  .passthrough();
+const armorClassBodySchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("fixed"), base: z.number().int() }).strict(),
+  z
+    .object({
+      kind: z.literal("formula"),
+      base: z.number().int(),
+      dexterityCap: z.number().int().nullable(),
+    })
+    .strict(),
+  z.object({ kind: z.literal("bonus"), bonus: z.number().int() }).strict(),
+]);
+const armorBodySchema = z
+  .object({
+    category: z.enum(["light", "medium", "heavy", "shield"]),
+    armorClass: armorClassBodySchema,
+    strengthRequirement: z.number().int().positive().nullable(),
+    stealthDisadvantage: z.boolean(),
   })
   .passthrough();
 
@@ -113,6 +164,8 @@ interface EngineState {
     readonly skills: Record<string, ProficiencyEntry>;
   };
   readonly d20Tests: Record<string, D20TestSummary>;
+  readonly inventory: InventoryItemSummary[];
+  readonly attacks: AttackSummary[];
 }
 
 interface PackageIndex {
@@ -120,6 +173,19 @@ interface PackageIndex {
   readonly authoringIr: AuthoringIr[];
   readonly tables: Record<string, Readonly<Record<string, JsonScalar>>>;
   readonly packages: LoadedRulesPackage[];
+}
+
+interface ResolvedInventoryItem {
+  readonly item: InventoryItem;
+  readonly entity?: ContentEntity;
+  readonly equipped: boolean;
+}
+
+interface EquipmentContext {
+  readonly items: ResolvedInventoryItem[];
+  readonly armorTraining: ReadonlySet<string>;
+  readonly weaponProficiencies: ReadonlySet<string>;
+  readonly rollEffects: D20RollEffect[];
 }
 
 function addValidation(
@@ -271,17 +337,178 @@ function materializeFacts(character: CharacterDocument, state: EngineState): Map
   for (const ability of abilities) {
     state.facts[`ability.${ability}.score`] = character.build.abilityScores[ability];
   }
-  state.facts["equipment.wearingArmor"] = character.loadout.equippedItemIds.some((itemId) =>
-    itemId.includes(".armor."),
+  const equippedIds = new Set(character.loadout.equippedItemIds);
+  const equippedEntityIds = character.loadout.inventory
+    .filter((item) => equippedIds.has(item.id))
+    .map((item) => item.entityId);
+  state.facts["equipment.wearingArmor"] = equippedEntityIds.some((entityId) =>
+    entityId.includes(".armor."),
   );
-  state.facts["equipment.wearingHeavyArmor"] = character.loadout.equippedItemIds.some((itemId) =>
-    itemId.includes(".armor.heavy."),
+  state.facts["equipment.wearingHeavyArmor"] = equippedEntityIds.some((entityId) =>
+    entityId.includes(".armor.heavy."),
   );
   state.facts["state.rage.active"] = character.state.activeEffectIds.includes(
     "srd521.effect.barbarian.rage",
   );
   state.facts["state.concentrating"] = character.state.concentrationSpellId !== undefined;
   return classLevels;
+}
+
+function startingClassEntity(
+  character: CharacterDocument,
+  index: PackageIndex,
+): ContentEntity | undefined {
+  const classId = character.build.levels[0]?.classId;
+  const entity = classId === undefined ? undefined : index.entities.get(classId);
+  return entity?.kind === "class" ? entity : undefined;
+}
+
+function equipmentRollTestIds(ability: Ability): string[] {
+  return [
+    `savingThrow.${ability}`,
+    ...skillDefinitions
+      .filter((skill) => skill.ability === ability)
+      .map((skill) => `skill.${skill.id}`),
+    ...(ability === "dexterity" ? ["initiative"] : []),
+  ];
+}
+
+function resolveEquipment(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): EquipmentContext {
+  const equippedIds = new Set(character.loadout.equippedItemIds);
+  const classEntity = startingClassEntity(character, index);
+  const classBody = classEntity === undefined ? undefined : classBodySchema.parse(classEntity.body);
+  const armorTraining = new Set(classBody?.armorTraining ?? []);
+  const weaponProficiencies = new Set(classBody?.weaponProficiencies ?? []);
+  const items = character.loadout.inventory.map((item): ResolvedInventoryItem => {
+    const entity = index.entities.get(item.entityId);
+    if (entity === undefined) {
+      addValidation(
+        state,
+        "INVENTORY_ENTITY_MISSING",
+        `Inventory entity ${item.entityId} is not loaded.`,
+        ["loadout.inventory"],
+      );
+    }
+    state.inventory.push({
+      id: item.id,
+      entityId: item.entityId,
+      name: entity?.name.en ?? item.entityId,
+      quantity: item.quantity,
+      equipped: equippedIds.has(item.id),
+      kind: entity?.kind ?? "unknown",
+    });
+    return {
+      item,
+      ...(entity === undefined ? {} : { entity }),
+      equipped: equippedIds.has(item.id),
+    };
+  });
+  const equippedArmor = items.filter(
+    (item) => item.equipped && item.entity?.kind === "equipment-armor",
+  );
+  const equippedShields = items.filter(
+    (item) => item.equipped && item.entity?.kind === "equipment-shield",
+  );
+  if (equippedArmor.length > 1) {
+    addValidation(
+      state,
+      "MULTIPLE_ARMOR_SUITES_EQUIPPED",
+      "A character can wear only one suit of armor at a time.",
+      ["loadout.equippedItemIds"],
+    );
+  }
+  if (equippedShields.length > 1) {
+    addValidation(
+      state,
+      "MULTIPLE_SHIELDS_EQUIPPED",
+      "A character can wield only one Shield at a time.",
+      ["loadout.equippedItemIds"],
+    );
+  }
+
+  const rollEffects: D20RollEffect[] = [];
+  let armorSpeedPenalty = 0;
+  for (const resolved of [...equippedArmor, ...equippedShields]) {
+    const entity = resolved.entity;
+    if (entity === undefined) {
+      continue;
+    }
+    const armor = armorBodySchema.parse(entity.body);
+    if (armor.category !== "shield" && !armorTraining.has(armor.category)) {
+      addValidation(
+        state,
+        "ARMOR_TRAINING_MISSING",
+        `${entity.name.en ?? entity.id} is equipped without ${armor.category} armor training.`,
+        ["loadout.equippedItemIds"],
+        "warning",
+      );
+      for (const ability of ["strength", "dexterity"] as const) {
+        for (const testId of equipmentRollTestIds(ability)) {
+          rollEffects.push({
+            testId,
+            kind: "disadvantage",
+            source: `${entity.id}:untrained`,
+          });
+        }
+      }
+    }
+    if (armor.category === "shield" && !armorTraining.has("shield")) {
+      addValidation(
+        state,
+        "SHIELD_TRAINING_MISSING",
+        `${entity.name.en ?? entity.id} grants no Armor Class benefit without Shield training.`,
+        ["loadout.equippedItemIds"],
+        "warning",
+      );
+    }
+    if (armor.stealthDisadvantage) {
+      rollEffects.push({
+        testId: "skill.stealth",
+        kind: "disadvantage",
+        source: `${entity.id}:stealth`,
+      });
+    }
+    const strengthScore = requireNumber(
+      state.facts["ability.strength.score"] ?? null,
+      "Strength score",
+    );
+    if (
+      armor.category !== "shield" &&
+      armor.strengthRequirement !== null &&
+      strengthScore < armor.strengthRequirement
+    ) {
+      armorSpeedPenalty = -10;
+    }
+  }
+  const speedTraceId = "speed.armorPenalty";
+  state.facts[speedTraceId] = armorSpeedPenalty;
+  state.values[speedTraceId] = { value: armorSpeedPenalty, traceId: speedTraceId };
+  state.traces[speedTraceId] = {
+    id: speedTraceId,
+    result: armorSpeedPenalty,
+    nodes: [
+      {
+        id: `${speedTraceId}.requirements`,
+        operation: "apply-armor-strength-requirement",
+        inputs: [
+          state.facts["ability.strength.score"] ?? null,
+          ...equippedArmor.map((item) => {
+            const body = armorBodySchema.parse(item.entity?.body);
+            return body.strengthRequirement;
+          }),
+        ],
+        output: armorSpeedPenalty,
+      },
+    ],
+    sourceReferences: equippedArmor.flatMap((item) =>
+      item.entity === undefined ? [] : entitySourceReferences(item.entity),
+    ),
+  };
+  return { items, armorTraining, weaponProficiencies, rollEffects };
 }
 
 function evaluateAbilities(state: EngineState): void {
@@ -370,6 +597,7 @@ function recordD20Test(
   ability: Ability,
   proficiency: ProficiencyEntry,
   context: EvaluateCharacterInput["context"],
+  additionalRollEffects: readonly D20RollEffect[],
   sourceReferencesForTest: SourceReference[],
   state: EngineState,
 ): void {
@@ -378,7 +606,10 @@ function recordD20Test(
     `${ability} modifier`,
   );
   const modifier = abilityModifier + proficiency.bonus;
-  const effects = context?.d20RollEffects?.filter((effect) => effect.testId === testId) ?? [];
+  const effects = [
+    ...(context?.d20RollEffects?.filter((effect) => effect.testId === testId) ?? []),
+    ...additionalRollEffects.filter((effect) => effect.testId === testId),
+  ];
   const advantageSources = effects
     .filter((effect) => effect.kind === "advantage")
     .map((effect) => effect.source);
@@ -437,6 +668,7 @@ function evaluateD20Tests(
   index: PackageIndex,
   state: EngineState,
   context: EvaluateCharacterInput["context"],
+  additionalRollEffects: readonly D20RollEffect[],
 ): void {
   const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
   const firstClassId = character.build.levels[0]?.classId;
@@ -521,6 +753,7 @@ function evaluateD20Tests(
       ability,
       entry,
       context,
+      additionalRollEffects,
       referencesForSources(sources, index),
       state,
     );
@@ -550,13 +783,22 @@ function evaluateD20Tests(
       skill.ability,
       entry,
       context,
+      additionalRollEffects,
       referencesForSources(sources, index),
       state,
     );
   }
 
   const noProficiency = proficiencyEntry("none", proficiencyBonus, []);
-  recordD20Test("initiative", "dexterity", noProficiency, context, [], state);
+  recordD20Test(
+    "initiative",
+    "dexterity",
+    noProficiency,
+    context,
+    additionalRollEffects,
+    [],
+    state,
+  );
 
   const perception = state.d20Tests["skill.perception"];
   if (perception !== undefined) {
@@ -777,6 +1019,7 @@ function evaluateArmorClass(
   granted: ReadonlySet<string>,
   index: PackageIndex,
   state: EngineState,
+  equipment: EquipmentContext,
 ): void {
   const candidates: {
     id: string;
@@ -786,24 +1029,94 @@ function evaluateArmorClass(
     trace: CalculationTrace;
     sourceReferences: SourceReference[];
   }[] = [];
+  const equippedArmor = equipment.items.filter(
+    (item) => item.equipped && item.entity?.kind === "equipment-armor",
+  );
+  const equippedShield = equipment.items.find(
+    (item) => item.equipped && item.entity?.kind === "equipment-shield",
+  );
+  const shieldArmor =
+    equippedShield === undefined ? undefined : armorBodySchema.parse(equippedShield.entity?.body);
+  const shieldBonus =
+    equipment.armorTraining.has("shield") && shieldArmor?.armorClass.kind === "bonus"
+      ? shieldArmor.armorClass.bonus
+      : 0;
+  const shieldSources =
+    shieldBonus > 0 && equippedShield?.entity !== undefined
+      ? entitySourceReferences(equippedShield.entity)
+      : [];
   const baseTrace = new ExpressionEvaluator({ facts: state.facts }).evaluate(
     {
       kind: "add",
       args: [
         { kind: "literal", value: 10 },
         { kind: "ref", path: "ability.dexterity.modifier" },
+        { kind: "literal", value: shieldBonus },
       ],
     },
     "armorClass.base",
   );
   candidates.push({
     id: "base-unarmored",
-    applicable: true,
+    applicable: equippedArmor.length === 0,
     value: requireNumber(baseTrace.value, "Base Armor Class"),
-    rejectionReasons: [],
+    rejectionReasons:
+      equippedArmor.length === 0 ? [] : ["An equipped armor suit replaces the unarmored formula."],
     trace: baseTrace.trace,
-    sourceReferences: [],
+    sourceReferences: shieldSources,
   });
+  for (const resolved of equippedArmor) {
+    const entity = resolved.entity;
+    if (entity === undefined) {
+      continue;
+    }
+    const armor = armorBodySchema.parse(entity.body);
+    const dexterityModifier = requireNumber(
+      state.facts["ability.dexterity.modifier"] ?? null,
+      "Dexterity modifier",
+    );
+    let value: number;
+    const inputs: JsonScalar[] = [];
+    switch (armor.armorClass.kind) {
+      case "fixed":
+        value = armor.armorClass.base + shieldBonus;
+        inputs.push(armor.armorClass.base, shieldBonus);
+        break;
+      case "formula": {
+        const dexterityContribution =
+          armor.armorClass.dexterityCap === null
+            ? dexterityModifier
+            : Math.min(dexterityModifier, armor.armorClass.dexterityCap);
+        value = armor.armorClass.base + dexterityContribution + shieldBonus;
+        inputs.push(armor.armorClass.base, dexterityContribution, shieldBonus);
+        break;
+      }
+      case "bonus":
+        continue;
+    }
+    const traceId = `armorClass.${resolved.item.id}`;
+    candidates.push({
+      id: `equipped-${resolved.item.id}`,
+      applicable: true,
+      value,
+      rejectionReasons: [],
+      trace: {
+        id: traceId,
+        result: value,
+        nodes: [
+          {
+            id: `${traceId}.formula`,
+            operation: "equipped-armor-formula",
+            inputs,
+            output: value,
+            label: entity.name.en ?? entity.id,
+          },
+        ],
+        sourceReferences: [...entitySourceReferences(entity), ...shieldSources],
+      },
+      sourceReferences: [...entitySourceReferences(entity), ...shieldSources],
+    });
+  }
   for (const { ir, rule } of rules) {
     if (
       rule.type !== "add-candidate-calculation" ||
@@ -828,13 +1141,31 @@ function evaluateArmorClass(
     }
     const traceId = `armorClass.${rule.id}.value`;
     const valueTrace = evaluateExpression(rule.expression, traceId, state, index, granted);
+    const unshieldedValue = requireNumber(valueTrace.result as JsonScalar, traceId);
+    const value = unshieldedValue + shieldBonus;
+    const trace =
+      shieldBonus === 0
+        ? valueTrace
+        : {
+            ...valueTrace,
+            result: value,
+            nodes: [
+              ...valueTrace.nodes,
+              {
+                id: `${traceId}.shield`,
+                operation: "add-shield-bonus",
+                inputs: [unshieldedValue, shieldBonus],
+                output: value,
+              },
+            ],
+          };
     candidates.push({
       id: rule.id,
       applicable: true,
-      value: requireNumber(valueTrace.result as JsonScalar, traceId),
+      value,
       rejectionReasons: [],
-      trace: valueTrace,
-      sourceReferences: sourceReferences(ir),
+      trace,
+      sourceReferences: [...sourceReferences(ir), ...shieldSources],
     });
   }
   const applicableCandidates = candidates.filter(
@@ -874,6 +1205,205 @@ function evaluateArmorClass(
     traceId,
   };
   state.facts[traceId] = selected.value;
+}
+
+function evaluateAttacks(
+  character: CharacterDocument,
+  equipment: EquipmentContext,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
+  const strengthModifier = requireNumber(
+    state.facts["ability.strength.modifier"] ?? null,
+    "Strength modifier",
+  );
+  const dexterityModifier = requireNumber(
+    state.facts["ability.dexterity.modifier"] ?? null,
+    "Dexterity modifier",
+  );
+  const selectedMasteries = new Set(character.loadout.selectedWeaponMasteryIds);
+  const classEntity = startingClassEntity(character, index);
+  const classBody = classEntity === undefined ? undefined : classBodySchema.parse(classEntity.body);
+  const classLevel =
+    classEntity === undefined
+      ? 0
+      : character.build.levels.filter((level) => level.classId === classEntity.id).length;
+  const masteryCapacity =
+    classBody?.progression.find((row) => row.level === classLevel)?.weaponMastery ?? 0;
+  if (selectedMasteries.size > masteryCapacity) {
+    addValidation(
+      state,
+      "WEAPON_MASTERY_SELECTION_LIMIT",
+      `Selected Weapon Masteries exceed the maximum of ${String(masteryCapacity)}.`,
+      ["loadout.selectedWeaponMasteryIds"],
+    );
+  }
+
+  const ownedWeaponIds = new Set(
+    equipment.items
+      .filter((resolved) => resolved.entity?.kind === "equipment-weapon")
+      .map((resolved) => resolved.item.entityId),
+  );
+  for (const masteryId of selectedMasteries) {
+    const entity = index.entities.get(masteryId);
+    if (entity?.kind !== "equipment-weapon") {
+      addValidation(
+        state,
+        "WEAPON_MASTERY_ENTITY_INVALID",
+        `${masteryId} is not a loaded weapon.`,
+        ["loadout.selectedWeaponMasteryIds"],
+      );
+    } else if (!ownedWeaponIds.has(masteryId)) {
+      addValidation(
+        state,
+        "WEAPON_MASTERY_WEAPON_NOT_OWNED",
+        `${masteryId} is selected for mastery but is not in inventory.`,
+        ["loadout.selectedWeaponMasteryIds"],
+        "warning",
+      );
+    } else {
+      const weapon = weaponBodySchema.parse(entity.body);
+      if (!equipment.weaponProficiencies.has(weapon.category)) {
+        addValidation(
+          state,
+          "WEAPON_MASTERY_REQUIRES_PROFICIENCY",
+          `${masteryId} cannot be selected without weapon proficiency.`,
+          ["loadout.selectedWeaponMasteryIds"],
+        );
+      }
+    }
+  }
+
+  for (const resolved of equipment.items) {
+    const entity = resolved.entity;
+    if (entity?.kind !== "equipment-weapon") {
+      continue;
+    }
+    const weapon = weaponBodySchema.parse(entity.body);
+    const finesse = weapon.properties.includes("finesse");
+    const ability: Ability = finesse
+      ? dexterityModifier > strengthModifier
+        ? "dexterity"
+        : "strength"
+      : weapon.attackType === "ranged"
+        ? "dexterity"
+        : "strength";
+    const abilityModifier = ability === "strength" ? strengthModifier : dexterityModifier;
+    const proficient = equipment.weaponProficiencies.has(weapon.category);
+    const proficiency = proficient ? proficiencyBonus : 0;
+    const attackBonus = abilityModifier + proficiency;
+    const attackId = `attack.${resolved.item.id}`;
+    const traceId = `${attackId}.bonus`;
+    const proficiencySources =
+      proficient && classEntity !== undefined ? entitySourceReferences(classEntity) : [];
+    state.traces[traceId] = {
+      id: traceId,
+      result: attackBonus,
+      nodes: [
+        {
+          id: `${traceId}.ability`,
+          operation: finesse ? "select-finesse-ability" : "select-weapon-ability",
+          inputs: finesse
+            ? [strengthModifier, dexterityModifier]
+            : [weapon.attackType, abilityModifier],
+          output: abilityModifier,
+          label: ability,
+        },
+        {
+          id: `${traceId}.proficiency`,
+          operation: "apply-weapon-proficiency",
+          inputs: [weapon.category, proficiencyBonus, proficient],
+          output: proficiency,
+        },
+        {
+          id: `${traceId}.total`,
+          operation: "add",
+          inputs: [abilityModifier, proficiency],
+          output: attackBonus,
+        },
+      ],
+      sourceReferences: [...entitySourceReferences(entity), ...proficiencySources],
+    };
+    state.facts[traceId] = attackBonus;
+    state.values[traceId] = { value: attackBonus, traceId };
+
+    const rageBonusValue =
+      state.facts["state.rage.active"] === true && ability === "strength"
+        ? state.values["rage.damageBonus"]?.value
+        : 0;
+    const rageBonus = typeof rageBonusValue === "number" ? rageBonusValue : 0;
+    const damageBonus = abilityModifier + rageBonus;
+    const damageTraceId = `${attackId}.damageBonus`;
+    state.traces[damageTraceId] = {
+      id: damageTraceId,
+      result: damageBonus,
+      nodes: [
+        {
+          id: `${damageTraceId}.ability`,
+          operation: "apply-damage-ability-modifier",
+          inputs: [ability, abilityModifier],
+          output: abilityModifier,
+        },
+        {
+          id: `${damageTraceId}.rage`,
+          operation: "apply-rage-damage",
+          inputs: [state.facts["state.rage.active"] ?? false, rageBonus],
+          output: rageBonus,
+          suppressed: rageBonus === 0,
+          ...(rageBonus === 0
+            ? { reason: "Rage is inactive or the attack does not use Strength." }
+            : {}),
+        },
+        {
+          id: `${damageTraceId}.total`,
+          operation: "add",
+          inputs: [abilityModifier, rageBonus],
+          output: damageBonus,
+        },
+      ],
+      sourceReferences: [
+        ...entitySourceReferences(entity),
+        ...(rageBonus === 0 ? [] : (state.traces["rage.damageBonus"]?.sourceReferences ?? [])),
+      ],
+    };
+    state.facts[damageTraceId] = damageBonus;
+    state.values[damageTraceId] = { value: damageBonus, traceId: damageTraceId };
+
+    const damage = weapon.damage;
+    state.attacks.push({
+      id: attackId,
+      itemId: resolved.item.id,
+      weaponId: entity.id,
+      name: entity.name.en ?? entity.id,
+      ability,
+      attackBonus,
+      proficient,
+      damage: {
+        ...(damage.diceCount === null ? {} : { diceCount: damage.diceCount }),
+        ...(damage.diceSize === null ? {} : { diceSize: damage.diceSize }),
+        ...(damage.flat === null ? {} : { flat: damage.flat }),
+        bonus: damageBonus,
+        type: damage.type,
+        traceId: damageTraceId,
+      },
+      attackType: weapon.attackType,
+      properties: weapon.properties,
+      ...(weapon.range === undefined
+        ? {}
+        : {
+            range: {
+              normal: weapon.range.normal,
+              long: weapon.range.long,
+            },
+          }),
+      mastery: {
+        property: weapon.mastery,
+        enabled: selectedMasteries.has(entity.id) && masteryCapacity > 0,
+      },
+      traceId,
+    });
+  }
 }
 
 function evaluateConditionalRules(
@@ -987,18 +1517,22 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
       skills: {},
     },
     d20Tests: {},
+    inventory: [],
+    attacks: [],
   };
   validatePackagePins(character, index, state);
   const classLevels = materializeFacts(character, state);
   evaluateAbilities(state);
   evaluateProficiency(state);
-  evaluateD20Tests(character, index, state, input.context);
+  const equipment = resolveEquipment(character, index, state);
+  evaluateD20Tests(character, index, state, input.context, equipment.rollEffects);
   evaluateHitPoints(character, index, state);
   const granted = grantedFeatureIds(classLevels, index);
   const rules = applicableRules(index, granted);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
-  evaluateArmorClass(rules, granted, index, state);
+  evaluateArmorClass(rules, granted, index, state, equipment);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
+  evaluateAttacks(character, equipment, index, state);
   validateActiveState(character, state);
   const coverageWarnings = index.authoringIr
     .filter((ir) => granted.has(ir.id) && ir.review.semantics !== "approved")
@@ -1012,6 +1546,8 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     values: state.values,
     proficiencies: state.proficiencies,
     d20Tests: state.d20Tests,
+    inventory: state.inventory,
+    attacks: state.attacks,
     actions: state.actions,
     resources: state.resources,
     resistances: [...state.resistances].sort(),

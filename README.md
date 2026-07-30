@@ -70,8 +70,22 @@ Generate the typed Barbarian proof-of-concept content and draft authoring IR:
 This command parses both class tables, reconciles the progression against feature headings, and
 generates source-linked draft mechanics for Rage and Unarmored Defense.
 
+Generate the structured weapon and armor entities from SRD pages 91–92:
+
+```bash
+.venv/bin/python -m srd_extract.pipeline \
+  --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
+  --out generated/extraction/srd-5.2.1-equipment \
+  --pages 91-92
+
+.venv/bin/python -m srd_extract.equipment \
+  --extraction generated/extraction/srd-5.2.1-equipment \
+  --output packages/content-srd-5.2.1/generated
+```
+
 The rules kernel evaluates the reviewed
 `packages/test-fixtures/characters/barbarian-1.json` fixture in its integration suite. The result
 includes ability modifiers, typed skill and saving-throw proficiencies, d20-test roll states,
-Initiative, Passive Perception, Hit Points, Armor Class candidates, Rage resources and damage,
-conditional actions, resistances, validations, coverage warnings, and calculation traces.
+Initiative, Passive Perception, inventory, armor and Shield candidates, weapon attacks and damage,
+Weapon Mastery metadata, Hit Points, Rage resources, conditional actions, resistances, validations,
+coverage warnings, and calculation traces.
