@@ -1,0 +1,174 @@
+{
+  "classId": "srd521.class.fighter",
+  "counts": {
+    "repeat-reference": 8,
+    "resolved": 15,
+    "subclass-placeholder": 4,
+    "unresolved": 0
+  },
+  "entries": [
+    {
+      "entityId": "srd521.class-feature.fighter.fighting-style",
+      "level": 1,
+      "name": "Fighting Style",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.second-wind",
+      "level": 1,
+      "name": "Second Wind",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.weapon-mastery",
+      "level": 1,
+      "name": "Weapon Mastery",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.action-surge",
+      "level": 2,
+      "name": "Action Surge (one use)",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.tactical-mind",
+      "level": 2,
+      "name": "Tactical Mind",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.fighter-subclass",
+      "level": 3,
+      "name": "Fighter Subclass",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+      "level": 4,
+      "name": "Ability Score Improvement",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.extra-attack",
+      "level": 5,
+      "name": "Extra Attack",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.tactical-shift",
+      "level": 5,
+      "name": "Tactical Shift",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+      "level": 6,
+      "name": "Ability Score Improvement",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": null,
+      "level": 7,
+      "name": "Subclass feature",
+      "status": "subclass-placeholder"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+      "level": 8,
+      "name": "Ability Score Improvement",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.indomitable",
+      "level": 9,
+      "name": "Indomitable (one use)",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.tactical-master",
+      "level": 9,
+      "name": "Tactical Master",
+      "status": "resolved"
+    },
+    {
+      "entityId": null,
+      "level": 10,
+      "name": "Subclass feature",
+      "status": "subclass-placeholder"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.two-extra-attacks",
+      "level": 11,
+      "name": "Two Extra Attacks",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+      "level": 12,
+      "name": "Ability Score Improvement",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.indomitable",
+      "level": 13,
+      "name": "Indomitable (two uses)",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.studied-attacks",
+      "level": 13,
+      "name": "Studied Attacks",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+      "level": 14,
+      "name": "Ability Score Improvement",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": null,
+      "level": 15,
+      "name": "Subclass feature",
+      "status": "subclass-placeholder"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+      "level": 16,
+      "name": "Ability Score Improvement",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.action-surge",
+      "level": 17,
+      "name": "Action Surge (two uses)",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.indomitable",
+      "level": 17,
+      "name": "Indomitable (three uses)",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": null,
+      "level": 18,
+      "name": "Subclass feature",
+      "status": "subclass-placeholder"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.epic-boon",
+      "level": 19,
+      "name": "Epic Boon",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.fighter.three-extra-attacks",
+      "level": 20,
+      "name": "Three Extra Attacks",
+      "status": "resolved"
+    }
+  ],
+  "valid": true
+}

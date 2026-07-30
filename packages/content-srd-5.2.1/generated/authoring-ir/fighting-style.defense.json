@@ -1,0 +1,63 @@
+{
+  "id": "srd521.feat.fighting-style.defense",
+  "kind": "feat",
+  "level": 1,
+  "parentId": "srd521.class-feature.fighter.fighting-style",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 1
+      },
+      "id": "defense-armor-class",
+      "parameters": {
+        "stackingKey": "fighting-style.defense"
+      },
+      "target": "armor-class",
+      "type": "add-modifier",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "equipment.wearingArmor"
+        },
+        "right": {
+          "kind": "literal",
+          "value": true
+        }
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0088-b002",
+        "p0088-b003"
+      ],
+      "page": 88,
+      "quoteHash": "4a841cea36086ff2bf577b217c2ff040139b1e8444ffadfb492038cb58f89749",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Fighting Style Feat (Prerequisite: Fighting Style Feature)"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "While you’re wearing Light, Medium, or Heavy armor, you gain a +1 bonus to Armor Class."
+      }
+    ],
+    "title": "Defense"
+  }
+}

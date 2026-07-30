@@ -3,6 +3,7 @@ import { z } from "zod";
 import type {
   CalculationTrace,
   JsonScalar,
+  JsonValue,
   SourceReference,
   TraceNode,
 } from "@dnd/calculation-trace";
@@ -148,7 +149,21 @@ const rechargeRuleSchema = z
 const resourceParametersSchema = z
   .object({ recharge: z.array(rechargeRuleSchema).default([]) })
   .passthrough();
-const actionParametersSchema = z.object({ actionEconomy: z.string().optional() }).passthrough();
+const actionParametersSchema = z
+  .object({
+    actionEconomy: z.string().optional(),
+    spends: z.number().int().positive().optional(),
+    resourceId: z.string().min(1).optional(),
+    healing: z
+      .object({
+        diceCount: z.number().int().positive(),
+        diceSize: z.number().int().positive(),
+        bonusFact: z.string().min(1),
+      })
+      .strict()
+      .optional(),
+  })
+  .passthrough();
 const resistanceParametersSchema = z.object({ damageTypes: z.array(z.string()) }).passthrough();
 const validationParametersSchema = z
   .object({
@@ -357,6 +372,7 @@ function materializeFacts(character: CharacterDocument, state: EngineState): Map
     "srd521.effect.barbarian.rage",
   );
   state.facts["state.concentrating"] = character.state.concentrationSpellId !== undefined;
+  state.facts["hitPoints.current"] = character.state.currentHitPoints;
   return classLevels;
 }
 
@@ -1035,6 +1051,45 @@ function evaluateArmorClass(
     trace: CalculationTrace;
     sourceReferences: SourceReference[];
   }[] = [];
+  let ruleModifierBonus = 0;
+  const ruleModifierNodes: TraceNode[] = [];
+  const ruleModifierSources: SourceReference[] = [];
+  for (const { ir, rule } of rules) {
+    if (
+      rule.type !== "add-modifier" ||
+      rule.target !== "armor-class" ||
+      rule.expression === undefined
+    ) {
+      continue;
+    }
+    const applicable =
+      rule.when === undefined ||
+      evaluatePredicate(rule.when, `armorClass.${rule.id}.applicable`, state, index, granted)
+        .result === true;
+    if (!applicable) {
+      continue;
+    }
+    const modifierTrace = evaluateExpression(
+      rule.expression,
+      `armorClass.${rule.id}.modifier`,
+      state,
+      index,
+      granted,
+    );
+    const modifier = requireNumber(
+      modifierTrace.result as JsonScalar,
+      `armorClass.${rule.id}.modifier`,
+    );
+    ruleModifierBonus += modifier;
+    ruleModifierNodes.push(...prefixNodes(`armorClass.${rule.id}`, modifierTrace.nodes), {
+      id: `armorClass.${rule.id}.apply`,
+      operation: "apply-armor-class-modifier",
+      inputs: [modifier],
+      output: modifier,
+      label: ir.text.title,
+    });
+    ruleModifierSources.push(...sourceReferences(ir));
+  }
   const equippedArmor = equipment.items.filter(
     (item) => item.equipped && item.entity?.kind === "equipment-armor",
   );
@@ -1058,6 +1113,7 @@ function evaluateArmorClass(
         { kind: "literal", value: 10 },
         { kind: "ref", path: "ability.dexterity.modifier" },
         { kind: "literal", value: shieldBonus },
+        { kind: "literal", value: ruleModifierBonus },
       ],
     },
     "armorClass.base",
@@ -1069,7 +1125,7 @@ function evaluateArmorClass(
     rejectionReasons:
       equippedArmor.length === 0 ? [] : ["An equipped armor suit replaces the unarmored formula."],
     trace: baseTrace.trace,
-    sourceReferences: shieldSources,
+    sourceReferences: [...shieldSources, ...ruleModifierSources],
   });
   for (const resolved of equippedArmor) {
     const entity = resolved.entity;
@@ -1085,16 +1141,16 @@ function evaluateArmorClass(
     const inputs: JsonScalar[] = [];
     switch (armor.armorClass.kind) {
       case "fixed":
-        value = armor.armorClass.base + shieldBonus;
-        inputs.push(armor.armorClass.base, shieldBonus);
+        value = armor.armorClass.base + shieldBonus + ruleModifierBonus;
+        inputs.push(armor.armorClass.base, shieldBonus, ruleModifierBonus);
         break;
       case "formula": {
         const dexterityContribution =
           armor.armorClass.dexterityCap === null
             ? dexterityModifier
             : Math.min(dexterityModifier, armor.armorClass.dexterityCap);
-        value = armor.armorClass.base + dexterityContribution + shieldBonus;
-        inputs.push(armor.armorClass.base, dexterityContribution, shieldBonus);
+        value = armor.armorClass.base + dexterityContribution + shieldBonus + ruleModifierBonus;
+        inputs.push(armor.armorClass.base, dexterityContribution, shieldBonus, ruleModifierBonus);
         break;
       }
       case "bonus":
@@ -1110,6 +1166,7 @@ function evaluateArmorClass(
         id: traceId,
         result: value,
         nodes: [
+          ...ruleModifierNodes,
           {
             id: `${traceId}.formula`,
             operation: "equipped-armor-formula",
@@ -1118,9 +1175,17 @@ function evaluateArmorClass(
             label: entity.name.en ?? entity.id,
           },
         ],
-        sourceReferences: [...entitySourceReferences(entity), ...shieldSources],
+        sourceReferences: [
+          ...entitySourceReferences(entity),
+          ...shieldSources,
+          ...ruleModifierSources,
+        ],
       },
-      sourceReferences: [...entitySourceReferences(entity), ...shieldSources],
+      sourceReferences: [
+        ...entitySourceReferences(entity),
+        ...shieldSources,
+        ...ruleModifierSources,
+      ],
     });
   }
   for (const { ir, rule } of rules) {
@@ -1148,9 +1213,9 @@ function evaluateArmorClass(
     const traceId = `armorClass.${rule.id}.value`;
     const valueTrace = evaluateExpression(rule.expression, traceId, state, index, granted);
     const unshieldedValue = requireNumber(valueTrace.result as JsonScalar, traceId);
-    const value = unshieldedValue + shieldBonus;
+    const value = unshieldedValue + shieldBonus + ruleModifierBonus;
     const trace =
-      shieldBonus === 0
+      shieldBonus === 0 && ruleModifierBonus === 0
         ? valueTrace
         : {
             ...valueTrace,
@@ -1159,8 +1224,8 @@ function evaluateArmorClass(
               ...valueTrace.nodes,
               {
                 id: `${traceId}.shield`,
-                operation: "add-shield-bonus",
-                inputs: [unshieldedValue, shieldBonus],
+                operation: "add-armor-class-bonuses",
+                inputs: [unshieldedValue, shieldBonus, ruleModifierBonus],
                 output: value,
               },
             ],
@@ -1171,7 +1236,7 @@ function evaluateArmorClass(
       value,
       rejectionReasons: [],
       trace,
-      sourceReferences: [...sourceReferences(ir), ...shieldSources],
+      sourceReferences: [...sourceReferences(ir), ...shieldSources, ...ruleModifierSources],
     });
   }
   const applicableCandidates = candidates.filter(
@@ -1427,6 +1492,16 @@ function evaluateConditionalRules(
       state.traces[traceId] = withRuleSource(trace, ir);
       const available = trace.result === true;
       const parameters = actionParametersSchema.parse(rule.parameters);
+      const actionParameters: Record<string, JsonValue> = {};
+      if (parameters.spends !== undefined) {
+        actionParameters.spends = parameters.spends;
+      }
+      if (parameters.resourceId !== undefined) {
+        actionParameters.resourceId = parameters.resourceId;
+      }
+      if (parameters.healing !== undefined) {
+        actionParameters.healing = parameters.healing;
+      }
       state.actions.push({
         id: rule.target ?? rule.id,
         available,
@@ -1434,6 +1509,7 @@ function evaluateConditionalRules(
         ...(parameters.actionEconomy === undefined
           ? {}
           : { actionEconomy: parameters.actionEconomy }),
+        ...(Object.keys(actionParameters).length === 0 ? {} : { parameters: actionParameters }),
         traceId,
       });
     }
@@ -1549,6 +1625,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateD20Tests(character, index, state, input.context, equipment.rollEffects);
   evaluateHitPoints(character, index, state);
   const granted = grantedFeatureIds(classLevels, index);
+  character.build.featIds.forEach((featId) => granted.add(featId));
   const rules = applicableRules(index, granted);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment);

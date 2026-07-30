@@ -100,6 +100,7 @@ export interface ActionSummary {
   available: boolean;
   reasons: string[];
   actionEconomy?: string;
+  parameters?: Readonly<Record<string, JsonValue>>;
   traceId: string;
 }
 
@@ -166,6 +167,21 @@ export interface StateChange {
 export interface StateTransitionProposal {
   kind: "rest";
   event: RestEvent;
+  applicable: boolean;
+  changes: StateChange[];
+  nextState: CharacterState;
+  validations: ValidationMessage[];
+  traces: Readonly<Record<string, CalculationTrace>>;
+}
+
+export interface ActionUseRequest {
+  actionId: string;
+  rolls?: number[];
+}
+
+export interface ActionTransitionProposal {
+  kind: "action";
+  actionId: string;
   applicable: boolean;
   changes: StateChange[];
   nextState: CharacterState;

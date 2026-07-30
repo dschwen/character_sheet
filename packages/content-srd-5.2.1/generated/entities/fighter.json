@@ -1,0 +1,1198 @@
+[
+  {
+    "body": {
+      "armorTraining": [
+        "light",
+        "medium",
+        "heavy",
+        "shield"
+      ],
+      "hitPointDie": 10,
+      "primaryAbilities": [
+        "strength",
+        "dexterity"
+      ],
+      "progression": [
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.fighting-style",
+              "name": "Fighting Style"
+            },
+            {
+              "entityId": "srd521.class-feature.fighter.second-wind",
+              "name": "Second Wind"
+            },
+            {
+              "entityId": "srd521.class-feature.fighter.weapon-mastery",
+              "name": "Weapon Mastery"
+            }
+          ],
+          "level": 1,
+          "proficiencyBonus": 2,
+          "secondWind": 2,
+          "weaponMastery": 3
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.action-surge",
+              "name": "Action Surge (one use)"
+            },
+            {
+              "entityId": "srd521.class-feature.fighter.tactical-mind",
+              "name": "Tactical Mind"
+            }
+          ],
+          "level": 2,
+          "proficiencyBonus": 2,
+          "secondWind": 2,
+          "weaponMastery": 3
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.fighter-subclass",
+              "name": "Fighter Subclass"
+            }
+          ],
+          "level": 3,
+          "proficiencyBonus": 2,
+          "secondWind": 2,
+          "weaponMastery": 3
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 4,
+          "proficiencyBonus": 2,
+          "secondWind": 3,
+          "weaponMastery": 4
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.extra-attack",
+              "name": "Extra Attack"
+            },
+            {
+              "entityId": "srd521.class-feature.fighter.tactical-shift",
+              "name": "Tactical Shift"
+            }
+          ],
+          "level": 5,
+          "proficiencyBonus": 3,
+          "secondWind": 3,
+          "weaponMastery": 4
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 6,
+          "proficiencyBonus": 3,
+          "secondWind": 3,
+          "weaponMastery": 4
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 7,
+          "proficiencyBonus": 3,
+          "secondWind": 3,
+          "weaponMastery": 4
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 8,
+          "proficiencyBonus": 3,
+          "secondWind": 3,
+          "weaponMastery": 4
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.indomitable",
+              "name": "Indomitable (one use)"
+            },
+            {
+              "entityId": "srd521.class-feature.fighter.tactical-master",
+              "name": "Tactical Master"
+            }
+          ],
+          "level": 9,
+          "proficiencyBonus": 4,
+          "secondWind": 3,
+          "weaponMastery": 4
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 10,
+          "proficiencyBonus": 4,
+          "secondWind": 4,
+          "weaponMastery": 5
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.two-extra-attacks",
+              "name": "Two Extra Attacks"
+            }
+          ],
+          "level": 11,
+          "proficiencyBonus": 4,
+          "secondWind": 4,
+          "weaponMastery": 5
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 12,
+          "proficiencyBonus": 4,
+          "secondWind": 4,
+          "weaponMastery": 5
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.indomitable",
+              "name": "Indomitable (two uses)"
+            },
+            {
+              "entityId": "srd521.class-feature.fighter.studied-attacks",
+              "name": "Studied Attacks"
+            }
+          ],
+          "level": 13,
+          "proficiencyBonus": 5,
+          "secondWind": 4,
+          "weaponMastery": 5
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 14,
+          "proficiencyBonus": 5,
+          "secondWind": 4,
+          "weaponMastery": 5
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 15,
+          "proficiencyBonus": 5,
+          "secondWind": 4,
+          "weaponMastery": 5
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 16,
+          "proficiencyBonus": 5,
+          "secondWind": 4,
+          "weaponMastery": 6
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.action-surge",
+              "name": "Action Surge (two uses)"
+            },
+            {
+              "entityId": "srd521.class-feature.fighter.indomitable",
+              "name": "Indomitable (three uses)"
+            }
+          ],
+          "level": 17,
+          "proficiencyBonus": 6,
+          "secondWind": 4,
+          "weaponMastery": 6
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 18,
+          "proficiencyBonus": 6,
+          "secondWind": 4,
+          "weaponMastery": 6
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.epic-boon",
+              "name": "Epic Boon"
+            }
+          ],
+          "level": 19,
+          "proficiencyBonus": 6,
+          "secondWind": 4,
+          "weaponMastery": 6
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.fighter.three-extra-attacks",
+              "name": "Three Extra Attacks"
+            }
+          ],
+          "level": 20,
+          "proficiencyBonus": 6,
+          "secondWind": 4,
+          "weaponMastery": 6
+        }
+      ],
+      "savingThrowProficiencies": [
+        "strength",
+        "constitution"
+      ],
+      "skillProficiencyChoice": {
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "acrobatics",
+          "animal handling",
+          "athletics",
+          "history",
+          "insight",
+          "intimidation",
+          "persuasion",
+          "perception",
+          "survival"
+        ]
+      },
+      "startingEquipment": {
+        "choose": 1,
+        "options": [
+          {
+            "currencyGp": 4,
+            "id": "A",
+            "items": [
+              {
+                "entityId": "srd521.equipment.armor.heavy.chain-mail",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.greatsword",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.flail",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.javelin",
+                "quantity": 8
+              }
+            ]
+          }
+        ]
+      },
+      "startingEquipmentText": "Choose A, B, or C: (A) Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer’s Pack, and 4 GP; (B) Studded Leather Armor, Scimitar, Short­sword, Longbow, 20 Arrows, Quiver, Dungeoneer’s Pack, and 11 GP; or (C) 155 GP",
+      "weaponProficiencies": [
+        "simple",
+        "martial"
+      ]
+    },
+    "id": "srd521.class.fighter",
+    "kind": "class",
+    "name": {
+      "en": "Fighter"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Pages 47–48 Fighter vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0047-b003",
+          "p0047-b004",
+          "p0047-b005",
+          "p0047-b006",
+          "p0047-b007",
+          "p0047-b008",
+          "p0047-b009",
+          "p0047-b010",
+          "p0047-b011",
+          "p0047-b017",
+          "p0047-b019",
+          "p0047-b021",
+          "p0047-b023",
+          "p0047-b018",
+          "p0047-b020",
+          "p0047-b022",
+          "p0047-b024",
+          "p0047-b025",
+          "p0047-b026",
+          "p0047-b027",
+          "p0047-b028",
+          "p0047-b029",
+          "p0047-b030",
+          "p0047-b031",
+          "p0047-b032",
+          "p0047-b033",
+          "p0047-b034",
+          "p0047-b035",
+          "p0047-b036",
+          "p0047-b037",
+          "p0047-b038",
+          "p0047-b039",
+          "p0047-b040",
+          "p0047-b041",
+          "p0047-b042",
+          "p0047-b043",
+          "p0047-b044"
+        ],
+        "page": 47,
+        "quoteHash": "e1c1ba381e384c38cba4f29584cb72cac9dfbebfa525b0c90637310d840a2eba",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class",
+      "fighter"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 1,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You have honed your martial prowess and gain a Fighting Style feat of your choice (see “Feats”). Defense is recommended. Whenever you gain a Fighter level, you can replace the feat you chose with a different Fighting Style feat."
+          }
+        ],
+        "title": "Fighting Style"
+      }
+    },
+    "id": "srd521.class-feature.fighter.fighting-style",
+    "kind": "class-feature",
+    "name": {
+      "en": "Fighting Style"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0047-b016"
+        ],
+        "page": 47,
+        "quoteHash": "e9122f1995d1c5f8e59f61859d4114f121e0cd39fbf0fb9226087c299aa0e4ba",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-1"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 1,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You have a limited well of physical and mental stamina that you can draw on. As a Bonus Action, you can use it to regain Hit Points equal to 1d10 plus your Fighter level. You can use this feature twice. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. When you reach certain Fighter levels, you gain more uses of this feature, as shown in the Second Wind column of the Fighter Features table."
+          }
+        ],
+        "title": "Second Wind"
+      }
+    },
+    "id": "srd521.class-feature.fighter.second-wind",
+    "kind": "class-feature",
+    "name": {
+      "en": "Second Wind"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b002"
+        ],
+        "page": 48,
+        "quoteHash": "bf67b1eaeb4b02b85c5bbeec4ba2c3e2f5d6264cbca1f43f7260344b4e923994",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-1"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 1,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Your training with weapons allows you to use the mastery properties of three kinds of Simple or Martial weapons of your choice. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices. When you reach certain Fighter levels, you gain the ability to use the mastery properties of more kinds of weapons, as shown in the Weapon Mastery column of the Fighter Features table."
+          }
+        ],
+        "title": "Weapon Mastery"
+      }
+    },
+    "id": "srd521.class-feature.fighter.weapon-mastery",
+    "kind": "class-feature",
+    "name": {
+      "en": "Weapon Mastery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b003"
+        ],
+        "page": 48,
+        "quoteHash": "1875b96169669c595c5251e61df7b28a7c91c34a4bb35f007a0ac6997e44f5bf",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-1"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 2,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional action, except the Magic action. Once you use this feature, you can’t do so again until you finish a Short or Long Rest. Starting at level 17, you can use it twice before a rest but only once on a turn."
+          }
+        ],
+        "title": "Action Surge"
+      }
+    },
+    "id": "srd521.class-feature.fighter.action-surge",
+    "kind": "class-feature",
+    "name": {
+      "en": "Action Surge"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b004"
+        ],
+        "page": 48,
+        "quoteHash": "8df054490879e9dbfe77eaafa722aaf4e122d7651333dac97a28adeab3d3794c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-2"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 2,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You have a mind for tactics on and off the battlefield. When you fail an ability check, you can expend a use of your Second Wind to push yourself toward success. Rather than regaining Hit Points, you roll 1d10 and add the number rolled to the ability check, potentially turning it into a success. If the check still fails, this use of Second Wind isn’t expended."
+          }
+        ],
+        "title": "Tactical Mind"
+      }
+    },
+    "id": "srd521.class-feature.fighter.tactical-mind",
+    "kind": "class-feature",
+    "name": {
+      "en": "Tactical Mind"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b005"
+        ],
+        "page": 48,
+        "quoteHash": "d6e980f8e633bda98202a9c72874d4c1f9be4995d24560b7eaec72e275c7d9f1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-2"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 3,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain a Fighter subclass of your choice. The Champion subclass is detailed after this class’s description. A subclass is a specialization that grants you features at certain Fighter levels. For the rest of your career, you gain each of your subclass’s features that are of your Fighter level or lower."
+          }
+        ],
+        "title": "Fighter Subclass"
+      }
+    },
+    "id": "srd521.class-feature.fighter.fighter-subclass",
+    "kind": "class-feature",
+    "name": {
+      "en": "Fighter Subclass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b006"
+        ],
+        "page": 48,
+        "quoteHash": "eb73fbce3f8a3bdbd09b1e9c53c42dba88a80d9f10e2b8472669bbee58dbf7ed",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-3"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 4,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain the Ability Score Improvement feat (see “Feats”) or another feat of your choice for which you qualify. You gain this feature again at Fighter levels 6, 8, 12, 14, and 16."
+          }
+        ],
+        "title": "Ability Score Improvement"
+      }
+    },
+    "id": "srd521.class-feature.fighter.ability-score-improvement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b007"
+        ],
+        "page": 48,
+        "quoteHash": "efb35c8a2e04b12efc3a4ca54ee462a04063d51e087fed9ddf68c232a2c456f8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-4"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 5,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You can attack twice instead of once whenever you take the Attack action on your turn."
+          }
+        ],
+        "title": "Extra Attack"
+      }
+    },
+    "id": "srd521.class-feature.fighter.extra-attack",
+    "kind": "class-feature",
+    "name": {
+      "en": "Extra Attack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b008"
+        ],
+        "page": 48,
+        "quoteHash": "fbf13a03f72ea9591bb816108e99aecb61b0e4b3e952341ed1c49d8df0e7e967",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-5"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 5,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Whenever you activate your Second Wind with a Bonus Action, you can move up to half your Speed without provoking Opportunity Attacks."
+          }
+        ],
+        "title": "Tactical Shift"
+      }
+    },
+    "id": "srd521.class-feature.fighter.tactical-shift",
+    "kind": "class-feature",
+    "name": {
+      "en": "Tactical Shift"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b009"
+        ],
+        "page": 48,
+        "quoteHash": "f5bdc91f60ca7efa1bb1b810f4d7260b7a72db7065276386f9094dbd03dcb4fe",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-5"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 9,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "If you fail a saving throw, you can reroll it with a bonus equal to your Fighter level. You must use the new roll, and you can’t use this feature again until you finish a Long Rest. You can use this feature twice before a Long Rest starting at level 13 and three times before a Long Rest starting at level 17."
+          }
+        ],
+        "title": "Indomitable"
+      }
+    },
+    "id": "srd521.class-feature.fighter.indomitable",
+    "kind": "class-feature",
+    "name": {
+      "en": "Indomitable"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b010"
+        ],
+        "page": 48,
+        "quoteHash": "0d5b070ff16af94da409dd0c160a3255c2f45818ccaf3271d6cace4262d5e98c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-9"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 9,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "When you attack with a weapon whose mastery property you can use, you can replace that property with the Push, Sap, or Slow property for that attack."
+          }
+        ],
+        "title": "Tactical Master"
+      }
+    },
+    "id": "srd521.class-feature.fighter.tactical-master",
+    "kind": "class-feature",
+    "name": {
+      "en": "Tactical Master"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b011"
+        ],
+        "page": 48,
+        "quoteHash": "3a3d55193a82637f62cc1c32c0e956bdf778ba71fdcc86749e31614739adea1b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-9"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 11,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You can attack three times instead of once whenever you take the Attack action on your turn."
+          }
+        ],
+        "title": "Two Extra Attacks"
+      }
+    },
+    "id": "srd521.class-feature.fighter.two-extra-attacks",
+    "kind": "class-feature",
+    "name": {
+      "en": "Two Extra Attacks"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b012"
+        ],
+        "page": 48,
+        "quoteHash": "7b2d750ae886631a5c843f8332a68f3bddcbfc4132eb4a60a6ba2e5632e66c4a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-11"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 13,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You study your opponents and learn from each attack you make. If you make an attack roll against a creature and miss, you have Advantage on your next attack roll against that creature before the end of your next turn."
+          }
+        ],
+        "title": "Studied Attacks"
+      }
+    },
+    "id": "srd521.class-feature.fighter.studied-attacks",
+    "kind": "class-feature",
+    "name": {
+      "en": "Studied Attacks"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b013"
+        ],
+        "page": 48,
+        "quoteHash": "249599a9d35f1949b634f86a6c0571c546f62c35a5b67c3a22c9fb254308b77d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-13"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 19,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain an Epic Boon feat (see “Feats”) or another feat of your choice for which you qualify. Boon of Combat Prowess is recommended."
+          }
+        ],
+        "title": "Epic Boon"
+      }
+    },
+    "id": "srd521.class-feature.fighter.epic-boon",
+    "kind": "class-feature",
+    "name": {
+      "en": "Epic Boon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b014"
+        ],
+        "page": 48,
+        "quoteHash": "da4ec1e6a3541c63dd3b4cf6daa843e4b12f00ebe3b0c09598c857ecb8f04346",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-19"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 20,
+      "parentId": "srd521.class.fighter",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You can attack four times instead of once whenever you take the Attack action on your turn."
+          }
+        ],
+        "title": "Three Extra Attacks"
+      }
+    },
+    "id": "srd521.class-feature.fighter.three-extra-attacks",
+    "kind": "class-feature",
+    "name": {
+      "en": "Three Extra Attacks"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0048-b015"
+        ],
+        "page": 48,
+        "quoteHash": "e8442bc576e42ea5ad38b0a07b3b0d63b20b1c3b9236801520d878c90dc541fc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "fighter",
+      "level-20"
+    ]
+  },
+  {
+    "body": {
+      "entries": {
+        "1": 2,
+        "10": 4,
+        "11": 4,
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4,
+        "16": 4,
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "2": 2,
+        "20": 4,
+        "3": 2,
+        "4": 3,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 3,
+        "9": 3
+      },
+      "keyType": "class-level",
+      "valueType": "integer"
+    },
+    "id": "srd521.table.fighter.second-wind",
+    "kind": "rule-table",
+    "name": {
+      "en": "Fighter Second Wind Uses"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the Fighter Features table.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0047-b003",
+          "p0047-b004",
+          "p0047-b005",
+          "p0047-b006",
+          "p0047-b007",
+          "p0047-b008",
+          "p0047-b009",
+          "p0047-b010",
+          "p0047-b011",
+          "p0047-b017",
+          "p0047-b019",
+          "p0047-b021",
+          "p0047-b023",
+          "p0047-b018",
+          "p0047-b020",
+          "p0047-b022",
+          "p0047-b024",
+          "p0047-b025",
+          "p0047-b026",
+          "p0047-b027",
+          "p0047-b028",
+          "p0047-b029",
+          "p0047-b030",
+          "p0047-b031",
+          "p0047-b032",
+          "p0047-b033",
+          "p0047-b034",
+          "p0047-b035",
+          "p0047-b036",
+          "p0047-b037",
+          "p0047-b038",
+          "p0047-b039",
+          "p0047-b040",
+          "p0047-b041",
+          "p0047-b042",
+          "p0047-b043",
+          "p0047-b044"
+        ],
+        "page": 47,
+        "quoteHash": "e1c1ba381e384c38cba4f29584cb72cac9dfbebfa525b0c90637310d840a2eba",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "rule-table",
+      "fighter"
+    ]
+  },
+  {
+    "body": {
+      "category": "fighting-style",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Fighting Style Feat (Prerequisite: Fighting Style Feature)"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "While you’re wearing Light, Medium, or Heavy armor, you gain a +1 bonus to Armor Class."
+          }
+        ],
+        "title": "Defense"
+      }
+    },
+    "id": "srd521.feat.fighting-style.defense",
+    "kind": "feat",
+    "name": {
+      "en": "Defense"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Defense Fighting Style extracted from page 88.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0088-b002",
+          "p0088-b003"
+        ],
+        "page": 88,
+        "quoteHash": "4a841cea36086ff2bf577b217c2ff040139b1e8444ffadfb492038cb58f89749",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "fighting-style"
+    ]
+  }
+]

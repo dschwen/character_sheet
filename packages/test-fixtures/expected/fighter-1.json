@@ -1,0 +1,93 @@
+{
+  "values": {
+    "ability.strength.modifier": 3,
+    "ability.dexterity.modifier": 2,
+    "ability.constitution.modifier": 2,
+    "ability.intelligence.modifier": 0,
+    "ability.wisdom.modifier": 1,
+    "ability.charisma.modifier": -1,
+    "proficiencyBonus": 2,
+    "savingThrow.strength": 5,
+    "savingThrow.constitution": 4,
+    "skill.athletics": 5,
+    "skill.perception": 3,
+    "initiative": 2,
+    "passive.perception": 13,
+    "hitPoints.maximum": 12,
+    "armorClass": 17,
+    "srd521.resource.fighter.second-wind.maximum": 2,
+    "srd521.resource.fighter.second-wind.current": 1,
+    "attack.greatsword-1.bonus": 5,
+    "attack.greatsword-1.damageBonus": 3,
+    "attack.flail-1.bonus": 5,
+    "attack.flail-1.damageBonus": 3,
+    "attack.javelins.bonus": 5,
+    "attack.javelins.damageBonus": 3
+  },
+  "selectedArmorClassCandidate": "equipped-chain-mail-1",
+  "resource": {
+    "id": "srd521.resource.fighter.second-wind",
+    "maximum": 2,
+    "expended": 1,
+    "current": 1
+  },
+  "action": {
+    "id": "action.second-wind",
+    "available": true,
+    "actionEconomy": "bonus-action",
+    "parameters": {
+      "spends": 1,
+      "resourceId": "srd521.resource.fighter.second-wind",
+      "healing": {
+        "diceCount": 1,
+        "diceSize": 10,
+        "bonusFact": "classLevel.fighter"
+      }
+    }
+  },
+  "attacks": [
+    {
+      "id": "attack.greatsword-1",
+      "attackBonus": 5,
+      "damage": {
+        "diceCount": 2,
+        "diceSize": 6,
+        "bonus": 3,
+        "type": "slashing"
+      },
+      "mastery": {
+        "property": "graze",
+        "enabled": true
+      }
+    },
+    {
+      "id": "attack.flail-1",
+      "attackBonus": 5,
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 8,
+        "bonus": 3,
+        "type": "bludgeoning"
+      },
+      "mastery": {
+        "property": "sap",
+        "enabled": true
+      }
+    },
+    {
+      "id": "attack.javelins",
+      "attackBonus": 5,
+      "damage": {
+        "diceCount": 1,
+        "diceSize": 6,
+        "bonus": 3,
+        "type": "piercing"
+      },
+      "mastery": {
+        "property": "slow",
+        "enabled": true
+      }
+    }
+  ],
+  "validationCodes": []
+}

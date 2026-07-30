@@ -169,7 +169,7 @@ export const authoringIrSchema = z
   .object({
     schemaVersion: z.literal("0.1.0"),
     id: entityIdSchema,
-    kind: z.literal("class-feature"),
+    kind: z.enum(["class-feature", "feat"]),
     parentId: entityIdSchema,
     level: z.number().int().min(1).max(20),
     source: z.array(sourceSpanSchema).min(1),
