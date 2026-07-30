@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { exprSchema, packageManifestSchema } from "./index.js";
+import { authoringIrSchema, exprSchema, packageManifestSchema } from "./index.js";
 
 describe("content schemas", () => {
   it("accepts an empty pinned SRD package manifest", () => {
@@ -22,5 +22,25 @@ describe("content schemas", () => {
 
   it("rejects empty arithmetic expressions", () => {
     expect(() => exprSchema.parse({ kind: "add", args: [] })).toThrow();
+  });
+
+  it("rejects draft authoring IR without source provenance", () => {
+    expect(() =>
+      authoringIrSchema.parse({
+        schemaVersion: "0.1.0",
+        id: "srd521.class-feature.barbarian.rage",
+        kind: "class-feature",
+        parentId: "srd521.class.barbarian",
+        level: 1,
+        source: [],
+        text: { title: "Rage", nodes: [] },
+        proposedRules: [],
+        review: {
+          extraction: "approved",
+          semantics: "needs-review",
+          tests: "missing",
+        },
+      }),
+    ).toThrow();
   });
 });

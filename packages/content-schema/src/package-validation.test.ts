@@ -1,8 +1,14 @@
 import { readFileSync } from "node:fs";
 
+import { z } from "zod";
 import { describe, expect, it } from "vitest";
 
-import { contentEntitySchema, packageManifestSchema, sourceManifestSchema } from "./index.js";
+import {
+  authoringIrSchema,
+  contentEntitySchema,
+  packageManifestSchema,
+  sourceManifestSchema,
+} from "./index.js";
 
 describe("bootstrap content package", () => {
   it("loads and validates", () => {
@@ -11,7 +17,17 @@ describe("bootstrap content package", () => {
     const entities: unknown = JSON.parse(readFileSync(new URL("entities.json", root), "utf8"));
 
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
-    expect(contentEntitySchema.array().parse(entities)).toEqual([]);
+    const parsedEntities = contentEntitySchema.array().parse(entities);
+    const entityIds = parsedEntities.map((entity) => entity.id);
+    expect(parsedEntities).toHaveLength(23);
+    expect(entityIds[0]).toBe("srd521.class.barbarian");
+    expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
+    expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
+    expect(entityIds).toContain("srd521.class-feature.barbarian.improved-brutal-strike.level-17");
+    expect(entityIds.slice(-2)).toEqual([
+      "srd521.table.barbarian.rages",
+      "srd521.table.barbarian.rage-damage",
+    ]);
   });
 
   it("validates the acquired source manifest against the pinned artifact", () => {
@@ -27,5 +43,57 @@ describe("bootstrap content package", () => {
       page_count: 364,
       sha256: "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87",
     });
+  });
+
+  it("validates source-linked Barbarian authoring IR and table references", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const entities: unknown = JSON.parse(readFileSync(new URL("entities.json", root), "utf8"));
+    const rage: unknown = JSON.parse(
+      readFileSync(new URL("authoring-ir/barbarian.rage.json", root), "utf8"),
+    );
+    const unarmoredDefense: unknown = JSON.parse(
+      readFileSync(new URL("authoring-ir/barbarian.unarmored-defense.json", root), "utf8"),
+    );
+
+    const parsedEntities = contentEntitySchema.array().parse(entities);
+    const entityIds = new Set(parsedEntities.map((entity) => entity.id));
+    const classEntity = parsedEntities.find((entity) => entity.id === "srd521.class.barbarian");
+    const classBody = z
+      .object({
+        progression: z.array(
+          z.object({
+            level: z.number().int(),
+            features: z.array(
+              z.object({
+                name: z.string(),
+                entityId: z.string().nullable(),
+              }),
+            ),
+          }),
+        ),
+      })
+      .parse(classEntity?.body);
+    const parsedRage = authoringIrSchema.parse(rage);
+    const parsedUnarmoredDefense = authoringIrSchema.parse(unarmoredDefense);
+    const referencedTables = parsedRage.proposedRules.flatMap((rule) =>
+      rule.expression?.kind === "tableLookup" ? [rule.expression.table] : [],
+    );
+
+    expect(referencedTables).toEqual([
+      "srd521.table.barbarian.rages",
+      "srd521.table.barbarian.rage-damage",
+    ]);
+    expect(referencedTables.every((table) => entityIds.has(table))).toBe(true);
+    expect(
+      classBody.progression
+        .flatMap((row) => row.features)
+        .every((feature) => feature.entityId === null || entityIds.has(feature.entityId)),
+    ).toBe(true);
+    expect(classBody.progression.map((row) => row.level)).toEqual(
+      Array.from({ length: 20 }, (_, index) => index + 1),
+    );
+    expect(parsedRage.source.map((source) => source.page)).toEqual([28, 29]);
+    expect(parsedRage.review.semantics).toBe("needs-review");
+    expect(parsedUnarmoredDefense.proposedRules[0]?.type).toBe("add-candidate-calculation");
   });
 });

@@ -1,13 +1,13 @@
 {
-  "package": "srd-5.2.1",
-  "generatedAt": null,
   "counts": {
-    "UNCLASSIFIED": 0,
-    "TEXT_ONLY": 0,
-    "STRUCTURED": 0,
     "EXECUTABLE": 0,
+    "STRUCTURED": 23,
     "TESTED": 0,
+    "TEXT_ONLY": 0,
+    "UNCLASSIFIED": 0,
     "VERIFIED": 0
   },
-  "note": "Bootstrap package: SRD entity extraction has not started."
+  "generatedAt": null,
+  "note": "Barbarian pages 28–30 proof of concept. Proposed executable rules remain in needs-review authoring IR.",
+  "package": "srd-5.2.1"
 }

@@ -21,6 +21,7 @@ dev = [
 [project.scripts]
 srd-acquire = "srd_extract.acquire:main"
 srd-extract-layout = "srd_extract.pipeline:main"
+srd-extract-barbarian = "srd_extract.barbarian:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["srd_extract"]

@@ -1,0 +1,926 @@
+[
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 1,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You can imbue yourself with a primal power called Rage, a force that grants you extraordinary might and resilience. You can enter it as a Bonus Action if you aren’t wearing Heavy armor. You can enter your Rage the number of times shown for your Barbarian level in the Rages column of the Barbarian Features table. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest."
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "While active, your Rage follows the rules below. Damage Resistance. You have Resistance to Bludgeoning, Piercing, and Slashing damage. Rage Damage. When you make an attack using Strength—with either a weapon or an Unarmed Strike—and deal damage to the target, you gain a bonus to the damage that increases as you gain levels as a Barbarian, as shown in the Rage Damage column of the Barbarian Features table. Strength Advantage. You have Advantage on Strength checks and Strength saving throws. No Concentration or Spells. You can’t maintain Concentration, and you can’t cast spells. Duration. The Rage lasts until the end of your next turn, and it ends early if you don Heavy armor or have the Incapacitated condition. If your Rage is still active on your next turn, you can extend the Rage for another round by doing one of the following:"
+          },
+          {
+            "items": [
+              "Make an attack roll against an enemy.",
+              "Force an enemy to make a saving throw.",
+              "Take a Bonus Action to extend your Rage."
+            ],
+            "kind": "ListNode",
+            "text": "Make an attack roll against an enemy. • Force an enemy to make a saving throw. • Take a Bonus Action to extend your Rage."
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Each time the Rage is extended, it lasts until the end of your next turn. You can maintain a Rage for up to 10 minutes."
+          }
+        ],
+        "title": "Rage"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.rage",
+    "kind": "class-feature",
+    "name": {
+      "en": "Rage"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0028-b018"
+        ],
+        "page": 28,
+        "quoteHash": "55a8ccb9c502b3f023193abaaaca1d1f89d1cdf854c6261c6e58a1fcda0f99f8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0029-b002",
+          "p0029-b003",
+          "p0029-b004"
+        ],
+        "page": 29,
+        "quoteHash": "3b9e6a50e276f00c5b32812842c8056b9677f860cdcc890af9f18a43f4f05564",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-1"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 1,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "While you aren’t wearing any armor, your base Armor Class equals 10 plus your Dexterity and Constitution modifiers. You can use a Shield and still gain this benefit."
+          }
+        ],
+        "title": "Unarmored Defense"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.unarmored-defense",
+    "kind": "class-feature",
+    "name": {
+      "en": "Unarmored Defense"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b005"
+        ],
+        "page": 29,
+        "quoteHash": "343650a781164bfe17b1e1efbcdb9f54c03f6c4cd0bba47f5692f11d9a1eb9c7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-1"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 1,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Your training with weapons allows you to use the mastery properties of two kinds of Simple or Martial Melee weapons of your choice, such as Greataxes and Handaxes. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices. When you reach certain Barbarian levels, you gain the ability to use the mastery properties of more kinds of weapons, as shown in the Weapon Mastery column of the Barbarian Features table."
+          }
+        ],
+        "title": "Weapon Mastery"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.weapon-mastery",
+    "kind": "class-feature",
+    "name": {
+      "en": "Weapon Mastery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b006"
+        ],
+        "page": 29,
+        "quoteHash": "ce1c23cd4f628a5b5f8badf1b52b16295ea9fa693b66f0ab10882b0a094c85d9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-1"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 2,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain an uncanny sense of when things aren’t as they should be, giving you an edge when you dodge perils. You have Advantage on Dexterity saving throws unless you have the Incapacitated condition."
+          }
+        ],
+        "title": "Danger Sense"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.danger-sense",
+    "kind": "class-feature",
+    "name": {
+      "en": "Danger Sense"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b007"
+        ],
+        "page": 29,
+        "quoteHash": "f7bd3b694fcdb388615977bfa4a1f618e4d01814320bccbb091a07df8044c34d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-2"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 2,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You can throw aside all concern for defense to attack with increased ferocity. When you make your first attack roll on your turn, you can decide to attack recklessly. Doing so gives you Advantage on attack rolls using Strength until the start of your next"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "turn, but attack rolls against you have Advantage during that time."
+          }
+        ],
+        "title": "Reckless Attack"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.reckless-attack",
+    "kind": "class-feature",
+    "name": {
+      "en": "Reckless Attack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b008",
+          "p0029-b009"
+        ],
+        "page": 29,
+        "quoteHash": "a0c1106d451e43fba8b112c4cc0cba71de6a2e1a8e7f7c8c786a9566a516bb4b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-2"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 3,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain a Barbarian subclass of your choice. The Path of the Berserker subclass is detailed after this class’s description. A subclass is a specialization that grants you features at certain Barbarian levels. For the rest of your career, you gain each of your subclass’s features that are of your Barbarian level or lower."
+          }
+        ],
+        "title": "Barbarian Subclass"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.barbarian-subclass",
+    "kind": "class-feature",
+    "name": {
+      "en": "Barbarian Subclass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b010"
+        ],
+        "page": 29,
+        "quoteHash": "3a609e46d95652daf4e5b7cdc7c9b8f283ab4ec8e1b3c43bc69f63e9b9ef728c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-3"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 3,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain proficiency in another skill of your choice from the skill list available to Barbarians at level 1. In addition, while your Rage is active, you can channel primal power when you attempt certain tasks; whenever you make an ability check using one of the following skills, you can make it as a Strength check even if it normally uses a different ability: Acrobatics, Intimidation, Perception, Stealth, or Survival. When you use this ability, your Strength represents primal power coursing through you, honing your agility, bearing, and senses."
+          }
+        ],
+        "title": "Primal Knowledge"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.primal-knowledge",
+    "kind": "class-feature",
+    "name": {
+      "en": "Primal Knowledge"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b011"
+        ],
+        "page": 29,
+        "quoteHash": "1c0da92123492d0a0e2c656e6f6ec04973fd7d69bd3dd702f766a55cbc751f89",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-3"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 4,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain the Ability Score Improvement feat (see “Feats”) or another feat of your choice for which you qualify. You gain this feature again at Barbarian levels 8, 12, and 16."
+          }
+        ],
+        "title": "Ability Score Improvement"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.ability-score-improvement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b012"
+        ],
+        "page": 29,
+        "quoteHash": "9ac4c21cbc8c88db1b69c9f1762bc31a624ca1b801f883cbfd07a725d7842f7f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-4"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 5,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You can attack twice instead of once whenever you take the Attack action on your turn."
+          }
+        ],
+        "title": "Extra Attack"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.extra-attack",
+    "kind": "class-feature",
+    "name": {
+      "en": "Extra Attack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b013"
+        ],
+        "page": 29,
+        "quoteHash": "fbf13a03f72ea9591bb816108e99aecb61b0e4b3e952341ed1c49d8df0e7e967",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-5"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 5,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Your speed increases by 10 feet while you aren’t wearing Heavy armor."
+          }
+        ],
+        "title": "Fast Movement"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.fast-movement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Fast Movement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b014"
+        ],
+        "page": 29,
+        "quoteHash": "585167544dc523469fc20d4446f18ad72693080a4848507a122f7c62abece2e8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-5"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 7,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Your instincts are so honed that you have Advantage on Initiative rolls."
+          }
+        ],
+        "title": "Feral Instinct"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.feral-instinct",
+    "kind": "class-feature",
+    "name": {
+      "en": "Feral Instinct"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b015"
+        ],
+        "page": 29,
+        "quoteHash": "fe12b93a32cb80e2b80f12c103bc2b12dd4a85aef0cca71b37837d715b072416",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-7"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 7,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "As part of the Bonus Action you take to enter your Rage, you can move up to half your Speed."
+          }
+        ],
+        "title": "Instinctive Pounce"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.instinctive-pounce",
+    "kind": "class-feature",
+    "name": {
+      "en": "Instinctive Pounce"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b016"
+        ],
+        "page": 29,
+        "quoteHash": "1827c02c1b84bbd89af83283f111d0bb6b80893eac56d20a841fa522298aa84c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-7"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 9,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "If you use Reckless Attack, you can forgo any Advantage on one Strength-based attack roll of your choice on your turn. The chosen attack roll mustn’t have Disadvantage. If the chosen attack roll hits, the target takes an extra 1d10 damage of the same type dealt by the weapon or Unarmed Strike, and you can cause one Brutal Strike effect of your choice. You have the following effect options. Forceful Blow. The target is pushed 15 feet straight away from you. You can then move up to half your Speed straight toward the target without provoking Opportunity Attacks."
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Hamstring Blow. The target’s Speed is reduced by 15 feet until the start of your next turn. A target can be affected by only one Hamstring Blow at a time— the most recent one."
+          }
+        ],
+        "title": "Brutal Strike"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.brutal-strike",
+    "kind": "class-feature",
+    "name": {
+      "en": "Brutal Strike"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0029-b017"
+        ],
+        "page": 29,
+        "quoteHash": "5331f7a6f0fb764b54bba486a6dbf33cd435a920f76324855ea086b7072e35fc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0030-b002"
+        ],
+        "page": 30,
+        "quoteHash": "dbacc180806b0576fb59c77051747fc867c2740ea83e3a6a6c25f5a79887b56f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-9"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 11,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Your Rage can keep you fighting despite grievous wounds. If you drop to 0 Hit Points while your Rage is active and don’t die outright, you can make a DC 10 Constitution saving throw. If you succeed, your Hit Points instead change to a number equal to twice your Barbarian level. Each time you use this feature after the first, the DC increases by 5. When you finish a Short or Long Rest, the DC resets to 10."
+          }
+        ],
+        "title": "Relentless Rage"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.relentless-rage",
+    "kind": "class-feature",
+    "name": {
+      "en": "Relentless Rage"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0030-b003"
+        ],
+        "page": 30,
+        "quoteHash": "8ad749fb5b73c17641171cae1b7fcefc74ccf2d0f18073d710e71462d033348b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-11"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 13,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You have honed new ways to attack furiously. The following effects are now among your Brutal Strike options. Staggering Blow. The target has Disadvantage on the next saving throw it makes, and it can’t make Opportunity Attacks until the start of your next turn. Sundering Blow. Before the start of your next turn, the next attack roll made by another creature against the target gains a +5 bonus to the roll. An attack roll can gain only one Sundering Blow bonus."
+          }
+        ],
+        "title": "Improved Brutal Strike"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.improved-brutal-strike",
+    "kind": "class-feature",
+    "name": {
+      "en": "Improved Brutal Strike"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0030-b004"
+        ],
+        "page": 30,
+        "quoteHash": "8b651eaf4efbe0ed7a4d9906e62a45bcb6d1d16de835d49789f76daebb6e34ca",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-13"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 15,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "When you roll Initiative, you can regain all expended uses of Rage. After you regain uses of Rage in this way, you can’t do so again until you finish a Long Rest. In addition, your Rage is so fierce that it now lasts for 10 minutes without you needing to do anything to extend it from round to round. Your Rage ends early if you have the Unconscious condition (not just the Incapacitated condition) or don Heavy armor."
+          }
+        ],
+        "title": "Persistent Rage"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.persistent-rage",
+    "kind": "class-feature",
+    "name": {
+      "en": "Persistent Rage"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0030-b005"
+        ],
+        "page": 30,
+        "quoteHash": "4b3dff9a69c9336aaf77d14d0d3745be663d7189e3245ec1226a6626dae421c9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-15"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 17,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "The extra damage of your Brutal Strike increases to 2d10. In addition, you can use two different Brutal Strike effects whenever you use your Brutal Strike feature."
+          }
+        ],
+        "title": "Improved Brutal Strike"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.improved-brutal-strike.level-17",
+    "kind": "class-feature",
+    "name": {
+      "en": "Improved Brutal Strike"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0030-b006"
+        ],
+        "page": 30,
+        "quoteHash": "1a3bc8075005367b396be072f046f4cd672d3b25c79b4f3c77a861a2c4f46290",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-17"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 18,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "If your total for a Strength check or Strength saving throw is less than your Strength score, you can use that score in place of the total."
+          }
+        ],
+        "title": "Indomitable Might"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.indomitable-might",
+    "kind": "class-feature",
+    "name": {
+      "en": "Indomitable Might"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0030-b007"
+        ],
+        "page": 30,
+        "quoteHash": "31d5c32cf18eb825498ce6716efa1e848f266b4b9af208554c325108f02518ab",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-18"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 19,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain an Epic Boon feat (see “Feats”) or another feat of your choice for which you qualify. Boon of Irresistible Offense is recommended."
+          }
+        ],
+        "title": "Epic Boon"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.epic-boon",
+    "kind": "class-feature",
+    "name": {
+      "en": "Epic Boon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0030-b008"
+        ],
+        "page": 30,
+        "quoteHash": "463f553563c562d911b19958efe0ed8d3a70c77b281290f6d41516dc1f8c599f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-19"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 20,
+      "parentId": "srd521.class.barbarian",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You embody primal power. Your Strength and Constitution scores increase by 4, to a maximum of 25."
+          }
+        ],
+        "title": "Primal Champion"
+      }
+    },
+    "id": "srd521.class-feature.barbarian.primal-champion",
+    "kind": "class-feature",
+    "name": {
+      "en": "Primal Champion"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0030-b009"
+        ],
+        "page": 30,
+        "quoteHash": "7e67c3634ba86cd482748a87f6cd43ccc09c4a03d616b76e50cbb111e44edf8b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "barbarian",
+      "level-20"
+    ]
+  }
+]

@@ -1,0 +1,72 @@
+{
+  "id": "srd521.class-feature.barbarian.unarmored-defense",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.barbarian",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "args": [
+          {
+            "kind": "literal",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "path": "ability.dexterity.modifier"
+          },
+          {
+            "kind": "ref",
+            "path": "ability.constitution.modifier"
+          }
+        ],
+        "kind": "add"
+      },
+      "id": "barbarian-unarmored-defense",
+      "parameters": {
+        "selection": "automatic-highest",
+        "shieldAllowed": true
+      },
+      "target": "armor-class",
+      "type": "add-candidate-calculation",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "equipment.wearingArmor"
+        },
+        "right": {
+          "kind": "literal",
+          "value": false
+        }
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0029-b005"
+      ],
+      "page": 29,
+      "quoteHash": "343650a781164bfe17b1e1efbcdb9f54c03f6c4cd0bba47f5692f11d9a1eb9c7",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "While you aren’t wearing any armor, your base Armor Class equals 10 plus your Dexterity and Constitution modifiers. You can use a Shield and still gain this benefit."
+      }
+    ],
+    "title": "Unarmored Defense"
+  }
+}

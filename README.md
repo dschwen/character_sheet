@@ -58,3 +58,14 @@ table, progression table, and feature text.
 The pipeline writes independent raw, classified-layout, normalized-page, document-tree, and visual
 overlay artifacts. Generated extraction output is ignored because it is reproducible from the
 pinned source.
+
+Generate the typed Barbarian proof-of-concept content and draft authoring IR:
+
+```bash
+.venv/bin/python -m srd_extract.barbarian \
+  --extraction generated/extraction/srd-5.2.1 \
+  --output packages/content-srd-5.2.1/generated
+```
+
+This command parses both class tables, reconciles the progression against feature headings, and
+generates source-linked draft mechanics for Rage and Unarmored Defense.

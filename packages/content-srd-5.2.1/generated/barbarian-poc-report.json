@@ -1,0 +1,74 @@
+{
+  "classId": "srd521.class.barbarian",
+  "coreTraits": {
+    "armor_training": [
+      "light",
+      "medium",
+      "shield"
+    ],
+    "hit_point_die": 12,
+    "primary_abilities": [
+      "strength"
+    ],
+    "saving_throw_proficiencies": [
+      "strength",
+      "constitution"
+    ],
+    "skill_choice_count": 2,
+    "skill_options": [
+      "animal handling",
+      "athletics",
+      "intimidation",
+      "nature",
+      "perception",
+      "survival"
+    ],
+    "starting_equipment_text": "Choose A or B: (A) Greataxe, 4 Handaxes, Explorer’s Pack, and 15 GP; or (B) 75 GP",
+    "weapon_proficiencies": [
+      "simple",
+      "martial"
+    ]
+  },
+  "extractedClassFeatures": 20,
+  "generatedEntities": [
+    "srd521.class.barbarian",
+    "srd521.class-feature.barbarian.rage",
+    "srd521.class-feature.barbarian.unarmored-defense",
+    "srd521.class-feature.barbarian.weapon-mastery",
+    "srd521.class-feature.barbarian.danger-sense",
+    "srd521.class-feature.barbarian.reckless-attack",
+    "srd521.class-feature.barbarian.barbarian-subclass",
+    "srd521.class-feature.barbarian.primal-knowledge",
+    "srd521.class-feature.barbarian.ability-score-improvement",
+    "srd521.class-feature.barbarian.extra-attack",
+    "srd521.class-feature.barbarian.fast-movement",
+    "srd521.class-feature.barbarian.feral-instinct",
+    "srd521.class-feature.barbarian.instinctive-pounce",
+    "srd521.class-feature.barbarian.brutal-strike",
+    "srd521.class-feature.barbarian.relentless-rage",
+    "srd521.class-feature.barbarian.improved-brutal-strike",
+    "srd521.class-feature.barbarian.persistent-rage",
+    "srd521.class-feature.barbarian.improved-brutal-strike.level-17",
+    "srd521.class-feature.barbarian.indomitable-might",
+    "srd521.class-feature.barbarian.epic-boon",
+    "srd521.class-feature.barbarian.primal-champion",
+    "srd521.table.barbarian.rages",
+    "srd521.table.barbarian.rage-damage"
+  ],
+  "parsedCoreRows": {
+    "Armor Training": "Light and Medium armor and Shields",
+    "Hit Point Die": "D12 per Barbarian level",
+    "Primary Ability": "Strength",
+    "Saving Throw Proficiencies": "Strength and Constitution",
+    "Skill Proficiencies": "Choose 2: Animal Handling, Athletics, Intimidation, Nature, Perception, or Survival",
+    "Starting Equipment": "Choose A or B: (A) Greataxe, 4 Handaxes, Explorer’s Pack, and 15 GP; or (B) 75 GP",
+    "Weapon Proficiencies": "Simple and Martial weapons"
+  },
+  "progressionRows": 20,
+  "reconciliation": {
+    "repeat-reference": 3,
+    "resolved": 20,
+    "subclass-placeholder": 3,
+    "unresolved": 0
+  }
+}

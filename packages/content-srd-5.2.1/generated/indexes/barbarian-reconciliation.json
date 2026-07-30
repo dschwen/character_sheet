@@ -1,0 +1,168 @@
+{
+  "classId": "srd521.class.barbarian",
+  "counts": {
+    "repeat-reference": 3,
+    "resolved": 20,
+    "subclass-placeholder": 3,
+    "unresolved": 0
+  },
+  "entries": [
+    {
+      "entityId": "srd521.class-feature.barbarian.rage",
+      "level": 1,
+      "name": "Rage",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.unarmored-defense",
+      "level": 1,
+      "name": "Unarmored Defense",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.weapon-mastery",
+      "level": 1,
+      "name": "Weapon Mastery",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.danger-sense",
+      "level": 2,
+      "name": "Danger Sense",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.reckless-attack",
+      "level": 2,
+      "name": "Reckless Attack",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.barbarian-subclass",
+      "level": 3,
+      "name": "Barbarian Subclass",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.primal-knowledge",
+      "level": 3,
+      "name": "Primal Knowledge",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.ability-score-improvement",
+      "level": 4,
+      "name": "Ability Score Improvement",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.extra-attack",
+      "level": 5,
+      "name": "Extra Attack",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.fast-movement",
+      "level": 5,
+      "name": "Fast Movement",
+      "status": "resolved"
+    },
+    {
+      "entityId": null,
+      "level": 6,
+      "name": "Subclass feature",
+      "status": "subclass-placeholder"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.feral-instinct",
+      "level": 7,
+      "name": "Feral Instinct",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.instinctive-pounce",
+      "level": 7,
+      "name": "Instinctive Pounce",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.ability-score-improvement",
+      "level": 8,
+      "name": "Ability Score Improvement",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.brutal-strike",
+      "level": 9,
+      "name": "Brutal Strike",
+      "status": "resolved"
+    },
+    {
+      "entityId": null,
+      "level": 10,
+      "name": "Subclass feature",
+      "status": "subclass-placeholder"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.relentless-rage",
+      "level": 11,
+      "name": "Relentless Rage",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.ability-score-improvement",
+      "level": 12,
+      "name": "Ability Score Improvement",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.improved-brutal-strike",
+      "level": 13,
+      "name": "Improved Brutal Strike",
+      "status": "resolved"
+    },
+    {
+      "entityId": null,
+      "level": 14,
+      "name": "Subclass feature",
+      "status": "subclass-placeholder"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.persistent-rage",
+      "level": 15,
+      "name": "Persistent Rage",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.ability-score-improvement",
+      "level": 16,
+      "name": "Ability Score Improvement",
+      "status": "repeat-reference"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.improved-brutal-strike.level-17",
+      "level": 17,
+      "name": "Improved Brutal Strike",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.indomitable-might",
+      "level": 18,
+      "name": "Indomitable Might",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.epic-boon",
+      "level": 19,
+      "name": "Epic Boon",
+      "status": "resolved"
+    },
+    {
+      "entityId": "srd521.class-feature.barbarian.primal-champion",
+      "level": 20,
+      "name": "Primal Champion",
+      "status": "resolved"
+    }
+  ],
+  "valid": true
+}

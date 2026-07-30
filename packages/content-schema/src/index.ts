@@ -134,6 +134,71 @@ export const reviewStatusSchema = z.enum([
   "VERIFIED",
 ]);
 
+export const automationLevelSchema = z.enum([
+  "display-only",
+  "structured",
+  "sheet-automated",
+  "roll-assisted",
+  "state-automated",
+  "fully-automated",
+]);
+
+export const draftRuleTypeSchema = z.enum([
+  "grant-resource",
+  "grant-action",
+  "grant-resistance",
+  "add-modifier",
+  "grant-advantage",
+  "add-validation",
+  "add-candidate-calculation",
+]);
+
+export const draftRuleSchema = z
+  .object({
+    id: z.string().min(1),
+    type: draftRuleTypeSchema,
+    target: z.string().min(1).optional(),
+    when: predicateSchema.optional(),
+    expression: exprSchema.optional(),
+    parameters: z.record(z.unknown()).default({}),
+    automationLevel: automationLevelSchema,
+  })
+  .strict();
+
+export const authoringIrSchema = z
+  .object({
+    schemaVersion: z.literal("0.1.0"),
+    id: entityIdSchema,
+    kind: z.literal("class-feature"),
+    parentId: entityIdSchema,
+    level: z.number().int().min(1).max(20),
+    source: z.array(sourceSpanSchema).min(1),
+    text: z
+      .object({
+        title: z.string().min(1),
+        nodes: z.array(
+          z
+            .object({
+              kind: z.enum(["ParagraphNode", "ListNode"]),
+              text: z.string().min(1),
+              items: z.array(z.string().min(1)).optional(),
+            })
+            .strict(),
+        ),
+      })
+      .strict(),
+    proposedRules: z.array(draftRuleSchema),
+    review: z
+      .object({
+        extraction: z.literal("approved"),
+        semantics: z.enum(["missing", "needs-review", "approved"]),
+        tests: z.enum(["missing", "draft", "approved"]),
+        notes: z.array(z.string()).default([]),
+      })
+      .strict(),
+  })
+  .strict();
+
 export const contentEntitySchema = z
   .object({
     id: entityIdSchema,
@@ -159,3 +224,5 @@ export type PackageManifest = z.infer<typeof packageManifestSchema>;
 export type SourceManifest = z.infer<typeof sourceManifestSchema>;
 export type SourceSpan = z.infer<typeof sourceSpanSchema>;
 export type ContentEntity = z.infer<typeof contentEntitySchema>;
+export type DraftRule = z.infer<typeof draftRuleSchema>;
+export type AuthoringIr = z.infer<typeof authoringIrSchema>;

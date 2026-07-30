@@ -1,0 +1,250 @@
+{
+  "id": "srd521.class-feature.barbarian.rage",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.barbarian",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.barbarian"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.barbarian.rages"
+      },
+      "id": "rage-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": 1,
+            "event": "short-rest"
+          },
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "resource.rage",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "enter-rage",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "spends": 1
+      },
+      "target": "action.enter-rage",
+      "type": "grant-action",
+      "when": {
+        "args": [
+          {
+            "kind": "equals",
+            "left": {
+              "kind": "ref",
+              "path": "equipment.wearingHeavyArmor"
+            },
+            "right": {
+              "kind": "literal",
+              "value": false
+            }
+          },
+          {
+            "kind": "resourceAvailable",
+            "resourceId": "srd521.resource.barbarian.rage"
+          }
+        ],
+        "kind": "all"
+      }
+    },
+    {
+      "automationLevel": "sheet-automated",
+      "id": "rage-resistance",
+      "parameters": {
+        "damageTypes": [
+          "bludgeoning",
+          "piercing",
+          "slashing"
+        ]
+      },
+      "target": "defense.damage-resistance",
+      "type": "grant-resistance",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "state.rage.active"
+        },
+        "right": {
+          "kind": "literal",
+          "value": true
+        }
+      }
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.barbarian"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.barbarian.rage-damage"
+      },
+      "id": "rage-damage",
+      "parameters": {
+        "attackKinds": [
+          "weapon",
+          "unarmed-strike"
+        ]
+      },
+      "target": "attack.damage.bonus",
+      "type": "add-modifier",
+      "when": {
+        "args": [
+          {
+            "kind": "equals",
+            "left": {
+              "kind": "ref",
+              "path": "state.rage.active"
+            },
+            "right": {
+              "kind": "literal",
+              "value": true
+            }
+          },
+          {
+            "kind": "equals",
+            "left": {
+              "kind": "ref",
+              "path": "attack.ability"
+            },
+            "right": {
+              "kind": "literal",
+              "value": "strength"
+            }
+          }
+        ],
+        "kind": "all"
+      }
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "rage-strength-check-advantage",
+      "parameters": {},
+      "target": "d20.strength.check",
+      "type": "grant-advantage",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "state.rage.active"
+        },
+        "right": {
+          "kind": "literal",
+          "value": true
+        }
+      }
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "rage-strength-save-advantage",
+      "parameters": {},
+      "target": "d20.strength.saving-throw",
+      "type": "grant-advantage",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "state.rage.active"
+        },
+        "right": {
+          "kind": "literal",
+          "value": true
+        }
+      }
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "rage-spell-restriction",
+      "parameters": {
+        "forbids": [
+          "concentration",
+          "cast-spell"
+        ],
+        "severity": "error"
+      },
+      "target": "state.rage.active",
+      "type": "add-validation",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "state.rage.active"
+        },
+        "right": {
+          "kind": "literal",
+          "value": true
+        }
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Duration extension remains structured text pending the combat-turn state model."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0028-b018"
+      ],
+      "page": 28,
+      "quoteHash": "55a8ccb9c502b3f023193abaaaca1d1f89d1cdf854c6261c6e58a1fcda0f99f8",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0029-b002",
+        "p0029-b003",
+        "p0029-b004"
+      ],
+      "page": 29,
+      "quoteHash": "3b9e6a50e276f00c5b32812842c8056b9677f860cdcc890af9f18a43f4f05564",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can imbue yourself with a primal power called Rage, a force that grants you extraordinary might and resilience. You can enter it as a Bonus Action if you aren’t wearing Heavy armor. You can enter your Rage the number of times shown for your Barbarian level in the Rages column of the Barbarian Features table. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest."
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "While active, your Rage follows the rules below. Damage Resistance. You have Resistance to Bludgeoning, Piercing, and Slashing damage. Rage Damage. When you make an attack using Strength—with either a weapon or an Unarmed Strike—and deal damage to the target, you gain a bonus to the damage that increases as you gain levels as a Barbarian, as shown in the Rage Damage column of the Barbarian Features table. Strength Advantage. You have Advantage on Strength checks and Strength saving throws. No Concentration or Spells. You can’t maintain Concentration, and you can’t cast spells. Duration. The Rage lasts until the end of your next turn, and it ends early if you don Heavy armor or have the Incapacitated condition. If your Rage is still active on your next turn, you can extend the Rage for another round by doing one of the following:"
+      },
+      {
+        "items": [
+          "Make an attack roll against an enemy.",
+          "Force an enemy to make a saving throw.",
+          "Take a Bonus Action to extend your Rage."
+        ],
+        "kind": "ListNode",
+        "text": "Make an attack roll against an enemy. • Force an enemy to make a saving throw. • Take a Bonus Action to extend your Rage."
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "Each time the Rage is extended, it lasts until the end of your next turn. You can maintain a Rage for up to 10 minutes."
+      }
+    ],
+    "title": "Rage"
+  }
+}
