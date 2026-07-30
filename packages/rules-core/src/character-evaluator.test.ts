@@ -48,6 +48,10 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
         available: boolean;
         actionEconomy: string;
       };
+      proficiencies: {
+        savingThrows: string[];
+        skills: string[];
+      };
       validationCodes: string[];
     };
 
@@ -67,6 +71,16 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
     expect(evaluation.resistances).toEqual(expected.resistances);
     expect(evaluation.resources[0]).toMatchObject(expected.resource);
     expect(evaluation.actions[0]).toMatchObject(expected.action);
+    expect(
+      Object.entries(evaluation.proficiencies.savingThrows)
+        .filter(([, proficiency]) => proficiency.level === "proficient")
+        .map(([ability]) => ability),
+    ).toEqual(expected.proficiencies.savingThrows);
+    expect(
+      Object.entries(evaluation.proficiencies.skills)
+        .filter(([, proficiency]) => proficiency.level === "proficient")
+        .map(([skill]) => skill),
+    ).toEqual(expected.proficiencies.skills);
     expect(evaluation.validations.map((message) => message.code)).toEqual(expected.validationCodes);
     expect(evaluation.coverageWarnings).toHaveLength(2);
 
@@ -86,6 +100,14 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       expect.arrayContaining([
         expect.objectContaining({
           entityId: "srd521.class-feature.barbarian.rage",
+        }),
+      ]),
+    );
+    expect(evaluation.traces["savingThrow.strength"]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "srd521.class.barbarian",
+          page: 28,
         }),
       ]),
     );
@@ -156,5 +178,88 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
     expect(codes).toContain("RESOURCE_EXPENDED_ABOVE_MAXIMUM");
     expect(evaluation.resources[0]?.current).toBe(0);
     expect(evaluation.actions[0]?.available).toBe(false);
+  });
+
+  it("resolves situational advantage and disadvantage without stacking", () => {
+    const input = {
+      character: loadCharacter(),
+      packages: [loadRulesPackage()],
+    };
+    const advantaged = evaluateCharacter({
+      ...input,
+      context: {
+        d20RollEffects: [
+          {
+            testId: "skill.perception",
+            kind: "advantage",
+            source: "help",
+          },
+          {
+            testId: "skill.perception",
+            kind: "advantage",
+            source: "inspiration",
+          },
+        ],
+      },
+    });
+    const cancelled = evaluateCharacter({
+      ...input,
+      context: {
+        d20RollEffects: [
+          {
+            testId: "skill.perception",
+            kind: "advantage",
+            source: "help",
+          },
+          {
+            testId: "skill.perception",
+            kind: "disadvantage",
+            source: "obscured",
+          },
+        ],
+      },
+    });
+
+    expect(advantaged.d20Tests["skill.perception"]?.rollMode).toBe("advantage");
+    expect(cancelled.d20Tests["skill.perception"]?.rollMode).toBe("normal");
+    expect(cancelled.traces["skill.perception"]?.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          operation: "resolve-advantage-disadvantage",
+          output: "normal",
+        }),
+      ]),
+    );
+  });
+
+  it("validates illegal or incomplete starting class skill choices", () => {
+    const character = loadCharacter();
+    const invalid: CharacterDocument = {
+      ...character,
+      build: {
+        ...character.build,
+        proficiencyChoices: {
+          skills: [
+            {
+              skillId: "srd521.skill.arcana",
+              sourceId: "srd521.class.barbarian",
+            },
+          ],
+          expertise: [],
+        },
+      },
+    };
+
+    const evaluation = evaluateCharacter({
+      character: invalid,
+      packages: [loadRulesPackage()],
+    });
+
+    expect(evaluation.validations.map((validation) => validation.code)).toEqual(
+      expect.arrayContaining([
+        "CLASS_SKILL_PROFICIENCY_COUNT",
+        "CLASS_SKILL_PROFICIENCY_NOT_ALLOWED",
+      ]),
+    );
   });
 });

@@ -11,6 +11,12 @@ content, draft authoring IR, and calculation traces in one deterministic evaluat
 | Dexterity modifier    |     +2 |
 | Constitution modifier |     +3 |
 | Proficiency Bonus     |     +2 |
+| Strength save         |     +5 |
+| Constitution save     |     +5 |
+| Athletics             |     +5 |
+| Perception            |     +3 |
+| Initiative            |     +2 |
+| Passive Perception    |     13 |
 | Maximum Hit Points    |     15 |
 | Armor Class           |     15 |
 | Rage maximum          |      2 |
@@ -36,6 +42,6 @@ Focused interaction tests verify:
 
 ## Current boundary
 
-This slice intentionally does not calculate attacks, skills, saving throws, inventory armor
-formulas, Rage duration transitions, rests, or damage application. Rage and Unarmored Defense still
-carry semantic-review warnings because their authoring IR has not been approved.
+This slice intentionally does not calculate attacks, inventory armor formulas, Rage duration
+transitions, rests, or damage application. Rage and Unarmored Defense still carry semantic-review
+warnings because their authoring IR has not been approved.

@@ -28,6 +28,18 @@
       "intelligence": 10,
       "wisdom": 12,
       "charisma": 8
+    },
+    "proficiencyChoices": {
+      "skills": [
+        {
+          "skillId": "srd521.skill.athletics",
+          "sourceId": "srd521.class.barbarian"
+        },
+        {
+          "skillId": "srd521.skill.perception",
+          "sourceId": "srd521.class.barbarian"
+        }
+      ]
     }
   },
   "loadout": {},

@@ -72,5 +72,6 @@ generates source-linked draft mechanics for Rage and Unarmored Defense.
 
 The rules kernel evaluates the reviewed
 `packages/test-fixtures/characters/barbarian-1.json` fixture in its integration suite. The result
-includes ability modifiers, proficiency, Hit Points, Armor Class candidates, Rage resources and
-damage, conditional actions, resistances, validations, coverage warnings, and calculation traces.
+includes ability modifiers, typed skill and saving-throw proficiencies, d20-test roll states,
+Initiative, Passive Perception, Hit Points, Armor Class candidates, Rage resources and damage,
+conditional actions, resistances, validations, coverage warnings, and calculation traces.

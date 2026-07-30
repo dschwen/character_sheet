@@ -12,6 +12,30 @@ const choiceSelectionSchema = z
   })
   .strict();
 
+const proficiencyChoiceSchema = z
+  .object({
+    skillId: entityIdSchema,
+    sourceId: entityIdSchema,
+  })
+  .strict();
+
+const uniqueProficiencyChoices = (choices: z.infer<typeof proficiencyChoiceSchema>[]): boolean =>
+  new Set(choices.map((choice) => `${choice.sourceId}:${choice.skillId}`)).size === choices.length;
+
+const proficiencyChoicesSchema = z
+  .object({
+    skills: z
+      .array(proficiencyChoiceSchema)
+      .default([])
+      .refine(uniqueProficiencyChoices, "Skill proficiency choices must be unique per source"),
+    expertise: z
+      .array(proficiencyChoiceSchema)
+      .default([])
+      .refine(uniqueProficiencyChoices, "Skill expertise choices must be unique per source"),
+  })
+  .strict()
+  .default({});
+
 const characterLevelSchema = z
   .object({
     characterLevel: z.number().int().min(1).max(20),
@@ -67,6 +91,7 @@ const characterBuildSchema = z
     featIds: z.array(entityIdSchema).default([]),
     learnedSpellIds: z.array(entityIdSchema).default([]),
     choices: z.array(choiceSelectionSchema).default([]),
+    proficiencyChoices: proficiencyChoicesSchema,
   })
   .strict()
   .superRefine((build, context) => {
@@ -141,6 +166,8 @@ export type EntityId = z.infer<typeof entityIdSchema>;
 export type CharacterLevel = z.infer<typeof characterLevelSchema>;
 export type RulesetReference = z.infer<typeof rulesetReferenceSchema>;
 export type CharacterBuild = z.infer<typeof characterBuildSchema>;
+export type ProficiencyChoice = z.infer<typeof proficiencyChoiceSchema>;
+export type ProficiencyChoices = z.infer<typeof proficiencyChoicesSchema>;
 export type CharacterLoadout = z.infer<typeof characterLoadoutSchema>;
 export type CharacterState = z.infer<typeof characterStateSchema>;
 export type CharacterDocument = z.infer<typeof characterDocumentSchema>;

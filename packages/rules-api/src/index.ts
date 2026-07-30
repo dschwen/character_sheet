@@ -19,6 +19,38 @@ export interface EvaluateCharacterInput {
 export interface EvaluationContext {
   encounterRound?: number;
   situationalTags?: string[];
+  d20RollEffects?: D20RollEffect[];
+}
+
+export type ProficiencyLevel = "none" | "half" | "proficient" | "expertise";
+export type RollMode = "normal" | "advantage" | "disadvantage";
+
+export interface D20RollEffect {
+  testId: string;
+  kind: "advantage" | "disadvantage";
+  source: string;
+}
+
+export interface ProficiencyEntry {
+  level: ProficiencyLevel;
+  bonus: number;
+  sources: string[];
+}
+
+export interface ProficiencySummary {
+  savingThrows: Readonly<Record<string, ProficiencyEntry>>;
+  skills: Readonly<Record<string, ProficiencyEntry>>;
+}
+
+export interface D20TestSummary {
+  id: string;
+  ability: string;
+  modifier: number;
+  proficiency: ProficiencyEntry;
+  rollMode: RollMode;
+  advantageSources: string[];
+  disadvantageSources: string[];
+  traceId: string;
 }
 
 export interface CandidateResult<T> {
@@ -69,6 +101,8 @@ export interface ActionSummary {
 export interface CharacterEvaluation {
   facts: Readonly<Record<string, JsonValue>>;
   values: Readonly<Record<StatId, DerivedValue>>;
+  proficiencies: ProficiencySummary;
+  d20Tests: Readonly<Record<string, D20TestSummary>>;
   actions: ActionSummary[];
   resources: ResourceInstance[];
   resistances: string[];

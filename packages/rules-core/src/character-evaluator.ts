@@ -15,13 +15,17 @@ import type { AuthoringIr, ContentEntity, DraftRule, Expr, Predicate } from "@dn
 import type {
   ActionSummary,
   CharacterEvaluation,
+  D20TestSummary,
   DerivedValue,
   EvaluateCharacterInput,
   LoadedRulesPackage,
+  ProficiencyEntry,
+  ProficiencyLevel,
   ResourceInstance,
   ValidationMessage,
 } from "@dnd/rules-api";
 
+import { proficiencyContribution, resolveProficiencyLevel, resolveRollMode } from "./d20.js";
 import { ExpressionEvaluator } from "./evaluator.js";
 
 const abilities = [
@@ -33,9 +37,42 @@ const abilities = [
   "charisma",
 ] as const;
 
+type Ability = (typeof abilities)[number];
+
+const skillDefinitions = [
+  { id: "acrobatics", ability: "dexterity" },
+  { id: "animal-handling", ability: "wisdom" },
+  { id: "arcana", ability: "intelligence" },
+  { id: "athletics", ability: "strength" },
+  { id: "deception", ability: "charisma" },
+  { id: "history", ability: "intelligence" },
+  { id: "insight", ability: "wisdom" },
+  { id: "intimidation", ability: "charisma" },
+  { id: "investigation", ability: "intelligence" },
+  { id: "medicine", ability: "wisdom" },
+  { id: "nature", ability: "intelligence" },
+  { id: "perception", ability: "wisdom" },
+  { id: "performance", ability: "charisma" },
+  { id: "persuasion", ability: "charisma" },
+  { id: "religion", ability: "intelligence" },
+  { id: "sleight-of-hand", ability: "dexterity" },
+  { id: "stealth", ability: "dexterity" },
+  { id: "survival", ability: "wisdom" },
+] as const satisfies readonly { id: string; ability: Ability }[];
+
+const skillEntityPrefix = "srd521.skill.";
+
 const classBodySchema = z
   .object({
     hitPointDie: z.number().int().positive(),
+    savingThrowProficiencies: z.array(z.enum(abilities)).default([]),
+    skillProficiencyChoice: z
+      .object({
+        minimum: z.number().int().min(0),
+        maximum: z.number().int().min(0),
+        options: z.array(z.string()),
+      })
+      .optional(),
     progression: z.array(
       z.object({
         level: z.number().int().min(1).max(20),
@@ -71,6 +108,11 @@ interface EngineState {
   readonly resources: ResourceInstance[];
   readonly actions: ActionSummary[];
   readonly resistances: Set<string>;
+  readonly proficiencies: {
+    readonly savingThrows: Record<string, ProficiencyEntry>;
+    readonly skills: Record<string, ProficiencyEntry>;
+  };
+  readonly d20Tests: Record<string, D20TestSummary>;
 }
 
 interface PackageIndex {
@@ -106,6 +148,16 @@ function requireNumber(value: JsonScalar, label: string): number {
 function sourceReferences(ir: AuthoringIr): SourceReference[] {
   return ir.source.map((source) => ({
     entityId: ir.id,
+    sourceId: source.sourceId,
+    page: source.page,
+    ...(source.blocks === undefined ? {} : { blocks: source.blocks }),
+    quoteHash: source.quoteHash,
+  }));
+}
+
+function entitySourceReferences(entity: ContentEntity): SourceReference[] {
+  return entity.source.map((source) => ({
+    entityId: entity.id,
     sourceId: source.sourceId,
     page: source.page,
     ...(source.blocks === undefined ? {} : { blocks: source.blocks }),
@@ -288,6 +340,250 @@ function evaluateProficiency(state: EngineState): void {
   state.facts[traceId] = bonus;
   state.values[traceId] = { value: bonus, traceId };
   state.traces[traceId] = result.trace;
+}
+
+function normalizedSkillId(value: string): string {
+  return value.trim().toLowerCase().replaceAll(/\s+/g, "-");
+}
+
+function proficiencyEntry(
+  level: ProficiencyLevel,
+  proficiencyBonus: number,
+  sources: string[],
+): ProficiencyEntry {
+  return {
+    level,
+    bonus: proficiencyContribution(level, proficiencyBonus),
+    sources: [...new Set(sources)].sort(),
+  };
+}
+
+function referencesForSources(sources: readonly string[], index: PackageIndex): SourceReference[] {
+  return [...new Set(sources)].flatMap((sourceId) => {
+    const entity = index.entities.get(sourceId);
+    return entity === undefined ? [] : entitySourceReferences(entity);
+  });
+}
+
+function recordD20Test(
+  testId: string,
+  ability: Ability,
+  proficiency: ProficiencyEntry,
+  context: EvaluateCharacterInput["context"],
+  sourceReferencesForTest: SourceReference[],
+  state: EngineState,
+): void {
+  const abilityModifier = requireNumber(
+    state.facts[`ability.${ability}.modifier`] ?? null,
+    `${ability} modifier`,
+  );
+  const modifier = abilityModifier + proficiency.bonus;
+  const effects = context?.d20RollEffects?.filter((effect) => effect.testId === testId) ?? [];
+  const advantageSources = effects
+    .filter((effect) => effect.kind === "advantage")
+    .map((effect) => effect.source);
+  const disadvantageSources = effects
+    .filter((effect) => effect.kind === "disadvantage")
+    .map((effect) => effect.source);
+  const rollMode = resolveRollMode(advantageSources, disadvantageSources);
+  const traceId = testId;
+  state.traces[traceId] = {
+    id: traceId,
+    result: modifier,
+    nodes: [
+      {
+        id: `${traceId}.ability`,
+        operation: "apply-ability-modifier",
+        inputs: [ability, abilityModifier],
+        output: abilityModifier,
+      },
+      {
+        id: `${traceId}.proficiency`,
+        operation: "apply-proficiency",
+        inputs: [proficiency.level, proficiency.bonus],
+        output: proficiency.bonus,
+      },
+      {
+        id: `${traceId}.total`,
+        operation: "add",
+        inputs: [abilityModifier, proficiency.bonus],
+        output: modifier,
+      },
+      {
+        id: `${traceId}.roll-mode`,
+        operation: "resolve-advantage-disadvantage",
+        inputs: [advantageSources, disadvantageSources],
+        output: rollMode,
+      },
+    ],
+    sourceReferences: sourceReferencesForTest,
+  };
+  state.facts[testId] = modifier;
+  state.values[testId] = { value: modifier, traceId };
+  state.d20Tests[testId] = {
+    id: testId,
+    ability,
+    modifier,
+    proficiency,
+    rollMode,
+    advantageSources,
+    disadvantageSources,
+    traceId,
+  };
+}
+
+function evaluateD20Tests(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+  context: EvaluateCharacterInput["context"],
+): void {
+  const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
+  const firstClassId = character.build.levels[0]?.classId;
+  const firstClassEntity =
+    firstClassId === undefined ? undefined : index.entities.get(firstClassId);
+  const firstClassBody =
+    firstClassEntity?.kind === "class" ? classBodySchema.parse(firstClassEntity.body) : undefined;
+
+  const selectedSkillIds = new Set(
+    character.build.proficiencyChoices.skills.map((choice) => choice.skillId),
+  );
+  const expertiseSkillIds = new Set(
+    character.build.proficiencyChoices.expertise.map((choice) => choice.skillId),
+  );
+  const knownSkillIds = new Set(skillDefinitions.map((skill) => `${skillEntityPrefix}${skill.id}`));
+
+  for (const choice of [
+    ...character.build.proficiencyChoices.skills,
+    ...character.build.proficiencyChoices.expertise,
+  ]) {
+    if (!knownSkillIds.has(choice.skillId)) {
+      addValidation(
+        state,
+        "UNKNOWN_SKILL_PROFICIENCY",
+        `${choice.skillId} is not a recognized skill.`,
+        ["build.proficiencyChoices"],
+      );
+    }
+    if (!index.entities.has(choice.sourceId)) {
+      addValidation(
+        state,
+        "PROFICIENCY_SOURCE_MISSING",
+        `Proficiency source ${choice.sourceId} is not loaded.`,
+        ["build.proficiencyChoices"],
+      );
+    }
+  }
+
+  if (firstClassId !== undefined && firstClassBody?.skillProficiencyChoice !== undefined) {
+    const classChoices = character.build.proficiencyChoices.skills.filter(
+      (choice) => choice.sourceId === firstClassId,
+    );
+    const allowed = new Set(
+      firstClassBody.skillProficiencyChoice.options.map(
+        (option) => `${skillEntityPrefix}${normalizedSkillId(option)}`,
+      ),
+    );
+    if (
+      classChoices.length < firstClassBody.skillProficiencyChoice.minimum ||
+      classChoices.length > firstClassBody.skillProficiencyChoice.maximum
+    ) {
+      addValidation(
+        state,
+        "CLASS_SKILL_PROFICIENCY_COUNT",
+        `${firstClassId} requires ${String(firstClassBody.skillProficiencyChoice.minimum)} skill proficiency choices.`,
+        ["build.proficiencyChoices.skills"],
+      );
+    }
+    for (const choice of classChoices) {
+      if (!allowed.has(choice.skillId)) {
+        addValidation(
+          state,
+          "CLASS_SKILL_PROFICIENCY_NOT_ALLOWED",
+          `${choice.skillId} is not available from ${firstClassId}.`,
+          ["build.proficiencyChoices.skills"],
+        );
+      }
+    }
+  }
+
+  for (const ability of abilities) {
+    const proficient = firstClassBody?.savingThrowProficiencies.includes(ability) ?? false;
+    const sources = proficient && firstClassId !== undefined ? [firstClassId] : [];
+    const entry = proficiencyEntry(
+      resolveProficiencyLevel(proficient ? ["proficient"] : []),
+      proficiencyBonus,
+      sources,
+    );
+    state.proficiencies.savingThrows[ability] = entry;
+    recordD20Test(
+      `savingThrow.${ability}`,
+      ability,
+      entry,
+      context,
+      referencesForSources(sources, index),
+      state,
+    );
+  }
+
+  for (const skill of skillDefinitions) {
+    const entityId = `${skillEntityPrefix}${skill.id}`;
+    const proficiencySources = character.build.proficiencyChoices.skills
+      .filter((choice) => choice.skillId === entityId)
+      .map((choice) => choice.sourceId);
+    const expertiseSources = character.build.proficiencyChoices.expertise
+      .filter((choice) => choice.skillId === entityId)
+      .map((choice) => choice.sourceId);
+    const contributions: ProficiencyLevel[] = [
+      ...(selectedSkillIds.has(entityId) ? (["proficient"] as const) : []),
+      ...(expertiseSkillIds.has(entityId) ? (["expertise"] as const) : []),
+    ];
+    const sources = [...proficiencySources, ...expertiseSources];
+    const entry = proficiencyEntry(
+      resolveProficiencyLevel(contributions),
+      proficiencyBonus,
+      sources,
+    );
+    state.proficiencies.skills[skill.id] = entry;
+    recordD20Test(
+      `skill.${skill.id}`,
+      skill.ability,
+      entry,
+      context,
+      referencesForSources(sources, index),
+      state,
+    );
+  }
+
+  const noProficiency = proficiencyEntry("none", proficiencyBonus, []);
+  recordD20Test("initiative", "dexterity", noProficiency, context, [], state);
+
+  const perception = state.d20Tests["skill.perception"];
+  if (perception !== undefined) {
+    const traceId = "passive.perception";
+    const value = 10 + perception.modifier;
+    state.traces[traceId] = {
+      id: traceId,
+      result: value,
+      nodes: [
+        {
+          id: `${traceId}.base`,
+          operation: "passive-check-base",
+          inputs: [],
+          output: 10,
+        },
+        {
+          id: `${traceId}.add-modifier`,
+          operation: "add",
+          inputs: [10, perception.modifier],
+          output: value,
+        },
+      ],
+      sourceReferences: state.traces[perception.traceId]?.sourceReferences ?? [],
+    };
+    state.facts[traceId] = value;
+    state.values[traceId] = { value, traceId };
+  }
 }
 
 function hitPointBase(
@@ -686,11 +982,17 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     resources: [],
     actions: [],
     resistances: new Set<string>(),
+    proficiencies: {
+      savingThrows: {},
+      skills: {},
+    },
+    d20Tests: {},
   };
   validatePackagePins(character, index, state);
   const classLevels = materializeFacts(character, state);
   evaluateAbilities(state);
   evaluateProficiency(state);
+  evaluateD20Tests(character, index, state, input.context);
   evaluateHitPoints(character, index, state);
   const granted = grantedFeatureIds(classLevels, index);
   const rules = applicableRules(index, granted);
@@ -708,6 +1010,8 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   return {
     facts: state.facts,
     values: state.values,
+    proficiencies: state.proficiencies,
+    d20Tests: state.d20Tests,
     actions: state.actions,
     resources: state.resources,
     resistances: [...state.resistances].sort(),

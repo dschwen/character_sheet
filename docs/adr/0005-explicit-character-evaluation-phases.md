@@ -9,13 +9,14 @@ The first character evaluator runs deterministic phases in this order:
 
 1. validate package pins;
 2. materialize choices and state as facts;
-3. derive ability modifiers and proficiency;
-4. calculate per-level Hit Points;
-5. grant level-gated feature IDs;
-6. instantiate resources;
-7. evaluate competing Armor Class candidates;
-8. evaluate conditional actions, resistances, modifiers, and validations;
-9. report review-coverage warnings.
+3. derive ability modifiers and the character-level Proficiency Bonus;
+4. resolve proficiency states, saving throws, skills, Initiative, and passive scores;
+5. calculate per-level Hit Points;
+6. grant level-gated feature IDs;
+7. instantiate resources;
+8. evaluate competing Armor Class candidates;
+9. evaluate conditional actions, resistances, modifiers, and validations;
+10. report review-coverage warnings.
 
 Rules remain declarative inputs. The evaluator does not dispatch arbitrary package code.
 

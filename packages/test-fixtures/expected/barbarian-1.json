@@ -7,11 +7,22 @@
     "ability.wisdom.modifier": 1,
     "ability.charisma.modifier": -1,
     "proficiencyBonus": 2,
+    "savingThrow.strength": 5,
+    "savingThrow.dexterity": 2,
+    "savingThrow.constitution": 5,
+    "skill.athletics": 5,
+    "skill.perception": 3,
+    "initiative": 2,
+    "passive.perception": 13,
     "hitPoints.maximum": 15,
     "armorClass": 15,
     "rage.damageBonus": 2,
     "srd521.resource.barbarian.rage.maximum": 2,
     "srd521.resource.barbarian.rage.current": 1
+  },
+  "proficiencies": {
+    "savingThrows": ["strength", "constitution"],
+    "skills": ["athletics", "perception"]
   },
   "selectedArmorClassCandidate": "barbarian-unarmored-defense",
   "resistances": ["bludgeoning", "piercing", "slashing"],
