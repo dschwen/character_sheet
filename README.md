@@ -69,3 +69,8 @@ Generate the typed Barbarian proof-of-concept content and draft authoring IR:
 
 This command parses both class tables, reconciles the progression against feature headings, and
 generates source-linked draft mechanics for Rage and Unarmored Defense.
+
+The rules kernel evaluates the reviewed
+`packages/test-fixtures/characters/barbarian-1.json` fixture in its integration suite. The result
+includes ability modifiers, proficiency, Hit Points, Armor Class candidates, Rage resources and
+damage, conditional actions, resistances, validations, coverage warnings, and calculation traces.

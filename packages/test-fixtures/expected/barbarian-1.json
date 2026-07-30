@@ -1,0 +1,30 @@
+{
+  "values": {
+    "ability.strength.modifier": 3,
+    "ability.dexterity.modifier": 2,
+    "ability.constitution.modifier": 3,
+    "ability.intelligence.modifier": 0,
+    "ability.wisdom.modifier": 1,
+    "ability.charisma.modifier": -1,
+    "proficiencyBonus": 2,
+    "hitPoints.maximum": 15,
+    "armorClass": 15,
+    "rage.damageBonus": 2,
+    "srd521.resource.barbarian.rage.maximum": 2,
+    "srd521.resource.barbarian.rage.current": 1
+  },
+  "selectedArmorClassCandidate": "barbarian-unarmored-defense",
+  "resistances": ["bludgeoning", "piercing", "slashing"],
+  "resource": {
+    "id": "srd521.resource.barbarian.rage",
+    "maximum": 2,
+    "expended": 1,
+    "current": 1
+  },
+  "action": {
+    "id": "action.enter-rage",
+    "available": true,
+    "actionEconomy": "bonus-action"
+  },
+  "validationCodes": []
+}

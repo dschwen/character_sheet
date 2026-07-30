@@ -27,7 +27,7 @@
           }
         ]
       },
-      "target": "resource.rage",
+      "target": "srd521.resource.barbarian.rage",
       "type": "grant-resource"
     },
     {

@@ -495,7 +495,7 @@ def _rage_ir(feature: ExtractedFeature) -> dict[str, Any]:
             {
                 "id": "rage-resource",
                 "type": "grant-resource",
-                "target": "resource.rage",
+                "target": "srd521.resource.barbarian.rage",
                 "expression": {
                     "kind": "tableLookup",
                     "table": "srd521.table.barbarian.rages",

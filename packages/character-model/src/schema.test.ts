@@ -45,6 +45,7 @@ describe("characterDocumentSchema", () => {
 
     expect(character.build.featIds).toEqual([]);
     expect(character.state.temporaryHitPoints).toBe(0);
+    expect(character.state.activeEffectIds).toEqual([]);
     expect(character.overrides).toEqual([]);
   });
 

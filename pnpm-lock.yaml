@@ -73,9 +73,18 @@ importers:
       '@dnd/calculation-trace':
         specifier: workspace:^
         version: link:../calculation-trace
+      '@dnd/character-model':
+        specifier: workspace:^
+        version: link:../character-model
       '@dnd/content-schema':
         specifier: workspace:^
         version: link:../content-schema
+      '@dnd/rules-api':
+        specifier: workspace:^
+        version: link:../rules-api
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
 
 packages:
 

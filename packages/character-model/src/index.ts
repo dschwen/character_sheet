@@ -98,6 +98,7 @@ const characterStateSchema = z
     expendedResources: z.record(entityIdSchema, z.number().int().min(0)).default({}),
     expendedSpellSlots: z.record(z.string(), z.number().int().min(0)).default({}),
     conditionIds: z.array(entityIdSchema).default([]),
+    activeEffectIds: z.array(entityIdSchema).default([]),
     concentrationSpellId: entityIdSchema.optional(),
     deathSaveSuccesses: z.number().int().min(0).max(3).default(0),
     deathSaveFailures: z.number().int().min(0).max(3).default(0),

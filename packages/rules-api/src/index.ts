@@ -1,12 +1,13 @@
 import type { CalculationTrace, JsonValue } from "@dnd/calculation-trace";
 import type { CharacterDocument } from "@dnd/character-model";
-import type { ContentEntity, PackageManifest } from "@dnd/content-schema";
+import type { AuthoringIr, ContentEntity, PackageManifest } from "@dnd/content-schema";
 
 export type StatId = string;
 
 export interface LoadedRulesPackage {
   manifest: PackageManifest;
   entities: ContentEntity[];
+  authoringIr?: AuthoringIr[];
 }
 
 export interface EvaluateCharacterInput {
@@ -48,9 +49,29 @@ export interface CoverageWarning {
   message: string;
 }
 
+export interface ResourceInstance {
+  id: string;
+  maximum: number;
+  expended: number;
+  current: number;
+  recharge: unknown[];
+  traceId: string;
+}
+
+export interface ActionSummary {
+  id: string;
+  available: boolean;
+  reasons: string[];
+  actionEconomy?: string;
+  traceId: string;
+}
+
 export interface CharacterEvaluation {
   facts: Readonly<Record<string, JsonValue>>;
   values: Readonly<Record<StatId, DerivedValue>>;
+  actions: ActionSummary[];
+  resources: ResourceInstance[];
+  resistances: string[];
   validations: ValidationMessage[];
   traces: Readonly<Record<string, CalculationTrace>>;
   coverageWarnings: CoverageWarning[];
