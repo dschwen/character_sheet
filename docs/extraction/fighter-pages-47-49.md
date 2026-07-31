@@ -1,7 +1,7 @@
-# Fighter pages 47–48 extraction audit
+# Fighter and Champion extraction audit
 
-The Fighter extraction combines the class layout on pages 47–48 with the Defense Fighting Style
-definition on page 88.
+The Fighter extraction combines the class layout on pages 47–48, Champion on page 49, Ability Score
+Improvement on page 87, and the Defense Fighting Style definition on page 88.
 
 ## Reproduction
 
@@ -9,7 +9,7 @@ definition on page 88.
 .venv/bin/python -m srd_extract.pipeline \
   --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
   --out generated/extraction/srd-5.2.1-fighter \
-  --pages 47-48,88 \
+  --pages 47-49,87-88 \
   --overlays
 
 .venv/bin/python -m srd_extract.fighter \
@@ -26,7 +26,8 @@ authoring IR, reconciliation indexes, and the parser report are checked in.
 | ----------------------------- | ----: |
 | Progression rows              |    20 |
 | Extracted feature sections    |    15 |
-| Generated Fighter entities    |    18 |
+| Generated Fighter entities    |    26 |
+| Extracted Champion features   |     6 |
 | Resolved feature references   |    15 |
 | Repeated feature references   |     8 |
 | Subclass placeholders         |     4 |
@@ -37,9 +38,9 @@ Weapon Mastery progression, core class traits, and progression-to-heading reconc
 
 ## Generated mechanics
 
-Second Wind is represented as a level-scaled resource, Short Rest and Long Rest recharge rules, and
-a Bonus Action with source-linked healing parameters. Defense is represented as a feat rule that
-adds 1 to Armor Class only while armor is worn.
+Second Wind and Action Surge are represented as resources with their distinct recharge rules.
+Action Surge, Tactical Mind, Extra Attack, Tactical Shift, Improved Critical, Remarkable Athlete,
+Ability Score Improvement, and Defense have source-linked authoring IR.
 
-The other Fighter features remain structured source text. Their presence in the content package
-does not imply executable coverage.
+Fighter and Champion features above level 5 remain structured source text. Their presence in the
+content package does not imply executable coverage.

@@ -65,7 +65,7 @@ Focused interaction tests verify:
 
 ## Current boundary
 
-This slice does not execute Graze, Sap, Slow, or Savage Attacker damage rolls, enforce attack range
-or ammunition, apply damage, represent tool proficiencies, or automate Fighter features above
-level 1. Second Wind, Defense, and Savage Attacker retain semantic-review warnings because their
-authoring IR has not been approved.
+This fixture does not execute Graze, Sap, Slow, or Savage Attacker damage rolls, enforce attack
+range or ammunition, apply damage, or represent tool proficiencies. Fighter levels 2–5 are covered
+by the separate level-5 fixture. Second Wind, Defense, and Savage Attacker retain semantic-review
+warnings because their authoring IR has not been approved.

@@ -1,0 +1,80 @@
+{
+  "id": "srd521.class-feature.fighter.tactical-shift",
+  "kind": "class-feature",
+  "level": 5,
+  "parentId": "srd521.class.fighter",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "id": "use-tactical-shift",
+      "parameters": {
+        "actionEconomy": "with-second-wind",
+        "movement": {
+          "provokesOpportunityAttacks": false,
+          "speedFraction": 0.5
+        }
+      },
+      "target": "action.tactical-shift",
+      "type": "grant-action",
+      "when": {
+        "args": [
+          {
+            "kind": "resourceAvailable",
+            "resourceId": "srd521.resource.fighter.second-wind"
+          },
+          {
+            "kind": "compare",
+            "left": {
+              "kind": "ref",
+              "path": "hitPoints.current"
+            },
+            "op": "lt",
+            "right": {
+              "kind": "ref",
+              "path": "hitPoints.maximum"
+            }
+          },
+          {
+            "kind": "compare",
+            "left": {
+              "kind": "ref",
+              "path": "hitPoints.current"
+            },
+            "op": "gt",
+            "right": {
+              "kind": "literal",
+              "value": 0
+            }
+          }
+        ],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0048-b009"
+      ],
+      "page": 48,
+      "quoteHash": "f5bdc91f60ca7efa1bb1b810f4d7260b7a72db7065276386f9094dbd03dcb4fe",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Whenever you activate your Second Wind with a Bonus Action, you can move up to half your Speed without provoking Opportunity Attacks."
+      }
+    ],
+    "title": "Tactical Shift"
+  }
+}

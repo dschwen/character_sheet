@@ -19,7 +19,7 @@ const actionUseRequestSchema = z
   })
   .strict();
 
-const healingActionParametersSchema = z
+const stateActionParametersSchema = z
   .object({
     spends: z.number().int().positive(),
     resourceId: z.string().min(1),
@@ -29,7 +29,8 @@ const healingActionParametersSchema = z
         diceSize: z.number().int().positive(),
         bonusFact: z.string().min(1),
       })
-      .strict(),
+      .strict()
+      .optional(),
   })
   .passthrough();
 
@@ -117,7 +118,7 @@ export function proposeAction(
     );
   }
 
-  const parsedParameters = healingActionParametersSchema.safeParse(action?.parameters);
+  const parsedParameters = stateActionParametersSchema.safeParse(action?.parameters);
   if (action !== undefined && !parsedParameters.success) {
     addValidation(
       validations,
@@ -128,7 +129,14 @@ export function proposeAction(
   }
   if (parsedParameters.success) {
     const healing = parsedParameters.data.healing;
-    if (request.rolls.length !== healing.diceCount) {
+    if (healing === undefined && request.rolls.length > 0) {
+      addValidation(
+        validations,
+        "ACTION_ROLLS_NOT_EXPECTED",
+        `${request.actionId} does not accept dice rolls.`,
+        ["request.rolls"],
+      );
+    } else if (healing !== undefined && request.rolls.length !== healing.diceCount) {
       addValidation(
         validations,
         "ACTION_ROLL_COUNT_INVALID",
@@ -137,7 +145,7 @@ export function proposeAction(
       );
     }
     for (const [index, roll] of request.rolls.entries()) {
-      if (roll > healing.diceSize) {
+      if (healing !== undefined && roll > healing.diceSize) {
         addValidation(
           validations,
           "ACTION_ROLL_OUT_OF_RANGE",
@@ -165,9 +173,15 @@ export function proposeAction(
 
   const parameters = parsedParameters.data;
   const resource = evaluation.resources.find((candidate) => candidate.id === parameters.resourceId);
-  const bonus = evaluation.facts[parameters.healing.bonusFact];
-  const maximumHitPoints = evaluation.values["hitPoints.maximum"]?.value;
-  if (resource === undefined || typeof bonus !== "number" || typeof maximumHitPoints !== "number") {
+  const bonus =
+    parameters.healing === undefined ? undefined : evaluation.facts[parameters.healing.bonusFact];
+  const maximumHitPoints =
+    parameters.healing === undefined ? undefined : evaluation.values["hitPoints.maximum"]?.value;
+  if (
+    resource === undefined ||
+    (parameters.healing !== undefined &&
+      (typeof bonus !== "number" || typeof maximumHitPoints !== "number"))
+  ) {
     addValidation(
       validations,
       "ACTION_TRANSITION_FACT_MISSING",
@@ -189,23 +203,30 @@ export function proposeAction(
   const changes: StateChange[] = [];
   const traces: Record<string, CalculationTrace> = {};
   const sourceTrace = evaluation.traces[action.traceId];
-  const healing = request.rolls.reduce((total, roll) => total + roll, 0) + bonus;
-  const healedHitPoints = Math.min(
-    maximumHitPoints,
-    character.state.currentHitPoints + Math.max(0, healing),
-  );
-  nextState.currentHitPoints = healedHitPoints;
-  recordChange(
-    changes,
-    traces,
-    "state.currentHitPoints",
-    character.state.currentHitPoints,
-    healedHitPoints,
-    `${request.actionId} restores Hit Points.`,
-    "apply-action-healing",
-    [character.state.currentHitPoints, ...request.rolls, bonus, maximumHitPoints],
-    sourceTrace,
-  );
+  let healedHitPoints = character.state.currentHitPoints;
+  if (
+    parameters.healing !== undefined &&
+    typeof bonus === "number" &&
+    typeof maximumHitPoints === "number"
+  ) {
+    const healing = request.rolls.reduce((total, roll) => total + roll, 0) + bonus;
+    healedHitPoints = Math.min(
+      maximumHitPoints,
+      character.state.currentHitPoints + Math.max(0, healing),
+    );
+    nextState.currentHitPoints = healedHitPoints;
+    recordChange(
+      changes,
+      traces,
+      "state.currentHitPoints",
+      character.state.currentHitPoints,
+      healedHitPoints,
+      `${request.actionId} restores Hit Points.`,
+      "apply-action-healing",
+      [character.state.currentHitPoints, ...request.rolls, bonus, maximumHitPoints],
+      sourceTrace,
+    );
+  }
   const expendedBefore = character.state.expendedResources[parameters.resourceId] ?? 0;
   const expendedAfter = Math.min(resource.maximum, expendedBefore + parameters.spends);
   nextState.expendedResources[parameters.resourceId] = expendedAfter;

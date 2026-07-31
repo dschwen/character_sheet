@@ -18,6 +18,9 @@ A Short Rest proposal:
 For the level-1 Barbarian fixture, spending one d12 Hit Die and rolling 5 restores up to 8 HP. A
 Short Rest restores one expended Rage use, not every use.
 
+For the level-5 Fighter fixture, a Short Rest restores one Second Wind use and all expended Action
+Surge uses. The different amounts come from each feature's own recharge data.
+
 ## Long Rest
 
 The modeled Long Rest proposal:

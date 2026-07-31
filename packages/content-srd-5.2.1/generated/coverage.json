@@ -1,13 +1,13 @@
 {
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 96,
+    "STRUCTURED": 104,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
     "VERIFIED": 0
   },
   "generatedAt": null,
-  "note": "Barbarian, Fighter level-1, Human, Soldier, origin-feat, and equipment proof-of-concept content. Proposed executable rules remain under review.",
+  "note": "Barbarian, Fighter through level 5, Human, Soldier, and equipment content. Proposed executable rules remain under review.",
   "package": "srd-5.2.1"
 }

@@ -1,0 +1,45 @@
+{
+  "id": "srd521.subclass-feature.fighter.champion.improved-critical",
+  "kind": "subclass-feature",
+  "level": 3,
+  "parentId": "srd521.subclass.fighter.champion",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 19
+      },
+      "id": "champion-improved-critical",
+      "parameters": {},
+      "target": "weapon-attacks",
+      "type": "set-critical-threshold"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0049-b005"
+      ],
+      "page": 49,
+      "quoteHash": "ae4d1903efc3d767572dacbcf67400366cee4e78a5701f62e89638900286b769",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Your attack rolls with weapons and Unarmed Strikes can score a Critical Hit on a roll of 19 or 20 on the d20."
+      }
+    ],
+    "title": "Improved Critical"
+  }
+}

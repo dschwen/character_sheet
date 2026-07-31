@@ -7,14 +7,14 @@ Feat, Fighting Style, weapon, and armor proof-of-concept content.
 |---|---:|
 | UNCLASSIFIED | 0 |
 | TEXT_ONLY | 0 |
-| STRUCTURED | 96 |
+| STRUCTURED | 104 |
 | EXECUTABLE | 0 |
 | TESTED | 0 |
 | VERIFIED | 0 |
 
 The package contains both class progressions, their extracted class features and scaling tables,
-Human, Soldier, Savage Attacker, Skilled, the Defense Fighting Style, and the weapon and armor
-tables needed by the reviewed level-1 fixtures. Rage, Unarmored Defense, Second Wind, Defense, and
-Savage Attacker have schema-valid proposed rules with draft integration tests; other features
-retain structured source text only. All remain `STRUCTURED` until their semantics and tests are
-reviewed and approved.
+Champion, Human, Soldier, Savage Attacker, Skilled, Ability Score Improvement, the Defense Fighting
+Style, and the weapon and armor tables needed by the reviewed fixtures. Rage, Unarmored Defense,
+the Fighter level 1–5 features, Champion level-3 features, Defense, and Savage Attacker have
+schema-valid proposed rules with draft integration tests; other features retain structured source
+text only. All remain `STRUCTURED` until their semantics and tests are reviewed and approved.

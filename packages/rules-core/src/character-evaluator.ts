@@ -173,6 +173,13 @@ const featBodySchema = z
   .object({
     category: z.string().min(1),
     repeatable: z.boolean().default(false),
+    prerequisite: z
+      .object({
+        minimumCharacterLevel: z.number().int().positive(),
+      })
+      .optional(),
+    abilityScoreIncreasePatterns: z.array(z.array(z.number().int().positive())).optional(),
+    maximumAbilityScore: z.number().int().positive().optional(),
     proficiencyChoice: z
       .object({
         minimum: z.number().int().nonnegative(),
@@ -180,6 +187,19 @@ const featBodySchema = z
         categories: z.array(z.enum(["skill", "tool"])),
       })
       .optional(),
+  })
+  .passthrough();
+const subclassBodySchema = z
+  .object({
+    parentClassId: z.string().min(1),
+    progression: z.array(
+      z
+        .object({
+          level: z.number().int().min(1).max(20),
+          features: z.array(z.string().min(1)),
+        })
+        .strict(),
+    ),
   })
   .passthrough();
 const tableBodySchema = z.object({ entries: z.record(z.number()) });
@@ -210,6 +230,23 @@ const actionParametersSchema = z
         rolls: z.number().int().min(2),
         choose: z.string().min(1),
         appliesTo: z.string().min(1),
+      })
+      .strict()
+      .optional(),
+    grantsAction: z.string().min(1).optional(),
+    excludes: z.array(z.string().min(1)).optional(),
+    checkBonus: z
+      .object({
+        diceCount: z.number().int().positive(),
+        diceSize: z.number().int().positive(),
+      })
+      .strict()
+      .optional(),
+    refundIfCheckStillFails: z.boolean().optional(),
+    movement: z
+      .object({
+        speedFraction: z.number().positive(),
+        provokesOpportunityAttacks: z.boolean(),
       })
       .strict()
       .optional(),
@@ -591,6 +628,147 @@ function resolveOrigins(
   };
 }
 
+function validateProgressionSelections(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  const classLevelCounts = new Map<string, number>();
+  for (const level of character.build.levels) {
+    classLevelCounts.set(level.classId, (classLevelCounts.get(level.classId) ?? 0) + 1);
+  }
+  const fighterLevel = classLevelCounts.get("srd521.class.fighter") ?? 0;
+  const subclass =
+    character.build.subclassId === undefined
+      ? undefined
+      : index.entities.get(character.build.subclassId);
+  if (fighterLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "FIGHTER_SUBCLASS_REQUIRED",
+      "A Fighter of level 3 or higher must select a Fighter subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (fighterLevel < 3 && character.build.subclassId !== undefined) {
+    addValidation(
+      state,
+      "FIGHTER_SUBCLASS_LEVEL_REQUIRED",
+      "A Fighter subclass requires Fighter level 3.",
+      ["build.subclassId"],
+    );
+  }
+  if (character.build.subclassId !== undefined && subclass?.kind !== "subclass") {
+    addValidation(
+      state,
+      "SUBCLASS_ENTITY_MISSING",
+      `Subclass entity ${character.build.subclassId} is not loaded.`,
+      ["build.subclassId"],
+    );
+  } else if (
+    subclass?.kind === "subclass" &&
+    subclassBodySchema.parse(subclass.body).parentClassId !== "srd521.class.fighter"
+  ) {
+    addValidation(state, "SUBCLASS_CLASS_MISMATCH", `${subclass.id} is not a Fighter subclass.`, [
+      "build.subclassId",
+    ]);
+  }
+
+  const characterLevel = character.build.levels.length;
+  const selectedGeneralFeats = character.build.featIds.filter((featId) => {
+    const feat = index.entities.get(featId);
+    return feat?.kind === "feat" && featBodySchema.parse(feat.body).category === "general";
+  });
+  const fighter = index.entities.get("srd521.class.fighter");
+  const grantedGeneralFeatChoices =
+    fighter?.kind === "class"
+      ? classBodySchema
+          .parse(fighter.body)
+          .progression.filter((row) => row.level <= fighterLevel)
+          .flatMap((row) => row.features)
+          .filter((feature) => feature.name === "Ability Score Improvement").length
+      : 0;
+  if (selectedGeneralFeats.length !== grantedGeneralFeatChoices) {
+    addValidation(
+      state,
+      "FIGHTER_GENERAL_FEAT_CHOICE_COUNT",
+      `Fighter level ${String(fighterLevel)} grants ${String(grantedGeneralFeatChoices)} General feat choice.`,
+      ["build.featIds"],
+    );
+  }
+  for (const featId of character.build.featIds) {
+    const feat = index.entities.get(featId);
+    if (feat?.kind !== "feat") {
+      continue;
+    }
+    const body = featBodySchema.parse(feat.body);
+    if (
+      body.prerequisite !== undefined &&
+      characterLevel < body.prerequisite.minimumCharacterLevel
+    ) {
+      addValidation(
+        state,
+        "FEAT_LEVEL_PREREQUISITE",
+        `${featId} requires character level ${String(body.prerequisite.minimumCharacterLevel)}.`,
+        ["build.featIds"],
+      );
+    }
+  }
+
+  const increases = Object.entries(character.build.featAbilityScoreIncreases) as [
+    Ability,
+    number,
+  ][];
+  const abilityIncreaseFeat = character.build.featIds
+    .map((featId) => index.entities.get(featId))
+    .find(
+      (feat): feat is ContentEntity =>
+        feat?.kind === "feat" &&
+        featBodySchema.parse(feat.body).abilityScoreIncreasePatterns !== undefined,
+    );
+  if (abilityIncreaseFeat === undefined && increases.length > 0) {
+    addValidation(
+      state,
+      "FEAT_ABILITY_INCREASE_WITHOUT_FEAT",
+      "Feat ability increases require a selected feat that grants them.",
+      ["build.featAbilityScoreIncreases"],
+    );
+  }
+  if (abilityIncreaseFeat !== undefined) {
+    const body = featBodySchema.parse(abilityIncreaseFeat.body);
+    const selectedPattern = increases
+      .map(([, amount]) => amount)
+      .sort((left, right) => right - left);
+    const patternIsAllowed = body.abilityScoreIncreasePatterns?.some(
+      (pattern) =>
+        JSON.stringify([...pattern].sort((left, right) => right - left)) ===
+        JSON.stringify(selectedPattern),
+    );
+    if (patternIsAllowed !== true) {
+      addValidation(
+        state,
+        "FEAT_ABILITY_INCREASE_PATTERN",
+        `${abilityIncreaseFeat.id} requires either one +2 or two +1 increases.`,
+        ["build.featAbilityScoreIncreases"],
+      );
+    }
+    for (const [ability, increase] of increases) {
+      const finalScore =
+        character.build.abilityScores[ability] +
+        (character.build.backgroundAbilityScoreIncreases[ability] ?? 0) +
+        increase;
+      if (body.maximumAbilityScore !== undefined && finalScore > body.maximumAbilityScore) {
+        addValidation(
+          state,
+          "FEAT_ABILITY_SCORE_ABOVE_MAXIMUM",
+          `${ability} cannot exceed ${String(body.maximumAbilityScore)} from ${abilityIncreaseFeat.id}.`,
+          [`build.featAbilityScoreIncreases.${ability}`],
+        );
+      }
+    }
+  }
+}
+
 function materializeFacts(character: CharacterDocument, state: EngineState): Map<string, number> {
   const classLevels = new Map<string, number>();
   for (const level of character.build.levels) {
@@ -606,7 +784,8 @@ function materializeFacts(character: CharacterDocument, state: EngineState): Map
   for (const ability of abilities) {
     state.facts[`ability.${ability}.score`] =
       character.build.abilityScores[ability] +
-      (character.build.backgroundAbilityScoreIncreases[ability] ?? 0);
+      (character.build.backgroundAbilityScoreIncreases[ability] ?? 0) +
+      (character.build.featAbilityScoreIncreases[ability] ?? 0);
   }
   const equippedIds = new Set(character.loadout.equippedItemIds);
   const equippedEntityIds = character.loadout.inventory
@@ -1006,6 +1185,16 @@ function evaluateD20Tests(
     character.build.proficiencyChoices.expertise.map((choice) => choice.skillId),
   );
   const knownSkillIds = new Set(skillDefinitions.map((skill) => `${skillEntityPrefix}${skill.id}`));
+  const testSourceReferences = (testId: string, proficiencySources: string[]) =>
+    referencesForSources(
+      [
+        ...proficiencySources,
+        ...additionalRollEffects
+          .filter((effect) => effect.testId === testId)
+          .map((effect) => effect.source),
+      ],
+      index,
+    );
 
   for (const choice of [
     ...character.build.proficiencyChoices.skills,
@@ -1141,7 +1330,7 @@ function evaluateD20Tests(
       entry,
       context,
       additionalRollEffects,
-      referencesForSources(sources, index),
+      testSourceReferences(`savingThrow.${ability}`, sources),
       state,
     );
   }
@@ -1171,7 +1360,7 @@ function evaluateD20Tests(
       entry,
       context,
       additionalRollEffects,
-      referencesForSources(sources, index),
+      testSourceReferences(`skill.${skill.id}`, sources),
       state,
     );
   }
@@ -1183,7 +1372,7 @@ function evaluateD20Tests(
     noProficiency,
     context,
     additionalRollEffects,
-    [],
+    testSourceReferences("initiative", []),
     state,
   );
 
@@ -1332,6 +1521,29 @@ function grantedFeatureIds(classLevels: Map<string, number>, index: PackageIndex
   return granted;
 }
 
+function grantSubclassFeatures(
+  character: CharacterDocument,
+  classLevels: ReadonlyMap<string, number>,
+  index: PackageIndex,
+  granted: Set<string>,
+): void {
+  if (character.build.subclassId === undefined) {
+    return;
+  }
+  const subclass = index.entities.get(character.build.subclassId);
+  if (subclass?.kind !== "subclass") {
+    return;
+  }
+  const body = subclassBodySchema.parse(subclass.body);
+  const classLevel = classLevels.get(body.parentClassId) ?? 0;
+  granted.add(subclass.id);
+  for (const row of body.progression) {
+    if (row.level <= classLevel) {
+      row.features.forEach((featureId) => granted.add(featureId));
+    }
+  }
+}
+
 function applicableRules(
   index: PackageIndex,
   granted: ReadonlySet<string>,
@@ -1339,6 +1551,106 @@ function applicableRules(
   return index.authoringIr.flatMap((ir) =>
     granted.has(ir.id) ? ir.proposedRules.map((rule) => ({ ir, rule })) : [],
   );
+}
+
+function ruleRollEffects(
+  rules: { ir: AuthoringIr; rule: DraftRule }[],
+  state: EngineState,
+  index: PackageIndex,
+  granted: ReadonlySet<string>,
+): D20RollEffect[] {
+  return rules.flatMap(({ ir, rule }) => {
+    if (rule.type !== "grant-advantage" || rule.target === undefined) {
+      return [];
+    }
+    if (
+      rule.when !== undefined &&
+      evaluatePredicate(rule.when, `${rule.id}.advantage-applicable`, state, index, granted)
+        .result !== true
+    ) {
+      return [];
+    }
+    return [{ testId: rule.target, kind: "advantage" as const, source: ir.id }];
+  });
+}
+
+interface AttackRuleSummary {
+  readonly attacksPerAction: number;
+  readonly criticalHitThreshold: number;
+  readonly criticalHitTraceId: string;
+}
+
+function evaluateAttackRules(
+  rules: { ir: AuthoringIr; rule: DraftRule }[],
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): AttackRuleSummary {
+  let attacksPerAction = 1;
+  let criticalHitThreshold = 20;
+  const attackCountSources: SourceReference[] = [];
+  const criticalSources: SourceReference[] = [];
+  for (const { ir, rule } of rules) {
+    if (
+      (rule.type !== "set-attack-count" && rule.type !== "set-critical-threshold") ||
+      rule.expression === undefined
+    ) {
+      continue;
+    }
+    const traceId =
+      rule.type === "set-attack-count"
+        ? "attackAction.attacks"
+        : "weaponAttacks.criticalHitThreshold";
+    const trace = evaluateExpression(rule.expression, traceId, state, index, granted);
+    const value = requireNumber(trace.result as JsonScalar, traceId);
+    state.traces[traceId] = withRuleSource(trace, ir);
+    if (rule.type === "set-attack-count") {
+      attacksPerAction = value;
+      attackCountSources.push(...sourceReferences(ir));
+    } else {
+      criticalHitThreshold = value;
+      criticalSources.push(...sourceReferences(ir));
+    }
+  }
+  const attackCountTraceId = "attackAction.attacks";
+  state.traces[attackCountTraceId] ??= {
+    id: attackCountTraceId,
+    result: attacksPerAction,
+    nodes: [
+      {
+        id: `${attackCountTraceId}.base`,
+        operation: "base-attacks-per-action",
+        inputs: [],
+        output: attacksPerAction,
+      },
+    ],
+    sourceReferences: attackCountSources,
+  };
+  state.facts[attackCountTraceId] = attacksPerAction;
+  state.values[attackCountTraceId] = {
+    value: attacksPerAction,
+    traceId: attackCountTraceId,
+  };
+  const criticalHitTraceId = "weaponAttacks.criticalHitThreshold";
+  state.traces[criticalHitTraceId] ??= {
+    id: criticalHitTraceId,
+    result: criticalHitThreshold,
+    nodes: [
+      {
+        id: `${criticalHitTraceId}.base`,
+        operation: "base-critical-hit-threshold",
+        inputs: [],
+        output: criticalHitThreshold,
+      },
+    ],
+    sourceReferences: criticalSources,
+  };
+  state.facts[criticalHitTraceId] = criticalHitThreshold;
+  state.values[criticalHitTraceId] = {
+    value: criticalHitThreshold,
+    traceId: criticalHitTraceId,
+  };
+  return { attacksPerAction, criticalHitThreshold, criticalHitTraceId };
 }
 
 function evaluateResources(
@@ -1646,6 +1958,7 @@ function evaluateArmorClass(
 function evaluateAttacks(
   character: CharacterDocument,
   equipment: EquipmentContext,
+  attackRules: AttackRuleSummary,
   index: PackageIndex,
   state: EngineState,
 ): void {
@@ -1672,6 +1985,13 @@ function evaluateAttacks(
       state,
       "WEAPON_MASTERY_SELECTION_LIMIT",
       `Selected Weapon Masteries exceed the maximum of ${String(masteryCapacity)}.`,
+      ["loadout.selectedWeaponMasteryIds"],
+    );
+  } else if (selectedMasteries.size < masteryCapacity) {
+    addValidation(
+      state,
+      "WEAPON_MASTERY_SELECTION_COUNT",
+      `Select ${String(masteryCapacity)} Weapon Masteries for this class level.`,
       ["loadout.selectedWeaponMasteryIds"],
     );
   }
@@ -1837,6 +2157,8 @@ function evaluateAttacks(
         property: weapon.mastery,
         enabled: selectedMasteries.has(entity.id) && masteryCapacity > 0,
       },
+      criticalHitThreshold: attackRules.criticalHitThreshold,
+      criticalHitTraceId: attackRules.criticalHitTraceId,
       traceId,
     });
   }
@@ -1869,6 +2191,47 @@ function evaluateConditionalRules(
       }
       if (parameters.damageReroll !== undefined) {
         actionParameters.damageReroll = parameters.damageReroll;
+      }
+      if (parameters.grantsAction !== undefined) {
+        actionParameters.grantsAction = parameters.grantsAction;
+      }
+      if (parameters.excludes !== undefined) {
+        actionParameters.excludes = parameters.excludes;
+      }
+      if (parameters.checkBonus !== undefined) {
+        actionParameters.checkBonus = parameters.checkBonus;
+      }
+      if (parameters.refundIfCheckStillFails !== undefined) {
+        actionParameters.refundIfCheckStillFails = parameters.refundIfCheckStillFails;
+      }
+      if (parameters.movement !== undefined) {
+        const walkingSpeed = state.facts["speed.walking"];
+        const maximumFeet =
+          typeof walkingSpeed === "number"
+            ? walkingSpeed * parameters.movement.speedFraction
+            : undefined;
+        actionParameters.movement = {
+          ...parameters.movement,
+          ...(maximumFeet === undefined ? {} : { maximumFeet }),
+        };
+        if (maximumFeet !== undefined && typeof walkingSpeed === "number") {
+          const movementTraceId = `${rule.target ?? rule.id}.maximumMovement`;
+          state.facts[movementTraceId] = maximumFeet;
+          state.values[movementTraceId] = { value: maximumFeet, traceId: movementTraceId };
+          state.traces[movementTraceId] = {
+            id: movementTraceId,
+            result: maximumFeet,
+            nodes: [
+              {
+                id: `${movementTraceId}.fraction`,
+                operation: "multiply-speed-fraction",
+                inputs: [walkingSpeed, parameters.movement.speedFraction],
+                output: maximumFeet,
+              },
+            ],
+            sourceReferences: sourceReferences(ir),
+          };
+        }
       }
       state.actions.push({
         id: rule.target ?? rule.id,
@@ -1987,14 +2350,10 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   };
   validatePackagePins(character, index, state);
   const origins = resolveOrigins(character, index, state);
+  validateProgressionSelections(character, index, state);
   const classLevels = materializeFacts(character, state);
-  evaluateAbilities(state);
-  evaluateProficiency(state);
-  const equipment = resolveEquipment(character, index, state);
-  evaluateWalkingSpeed(state);
-  evaluateD20Tests(character, origins, index, state, input.context, equipment.rollEffects);
-  evaluateHitPoints(character, index, state);
   const granted = grantedFeatureIds(classLevels, index);
+  grantSubclassFeatures(character, classLevels, index, granted);
   if (character.build.speciesId !== undefined) {
     granted.add(character.build.speciesId);
   }
@@ -2003,10 +2362,20 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   }
   character.build.featIds.forEach((featId) => granted.add(featId));
   const rules = applicableRules(index, granted);
+  evaluateAbilities(state);
+  evaluateProficiency(state);
+  const equipment = resolveEquipment(character, index, state);
+  evaluateWalkingSpeed(state);
+  evaluateD20Tests(character, origins, index, state, input.context, [
+    ...equipment.rollEffects,
+    ...ruleRollEffects(rules, state, index, granted),
+  ]);
+  evaluateHitPoints(character, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
-  evaluateAttacks(character, equipment, index, state);
+  const attackRules = evaluateAttackRules(rules, granted, index, state);
+  evaluateAttacks(character, equipment, attackRules, index, state);
   validateActiveState(character, state);
   const coverageWarnings = index.authoringIr
     .filter((ir) => granted.has(ir.id) && ir.review.semantics !== "approved")

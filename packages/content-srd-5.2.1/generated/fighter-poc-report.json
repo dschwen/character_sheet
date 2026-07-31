@@ -37,6 +37,7 @@
       "martial"
     ]
   },
+  "extractedChampionFeatures": 6,
   "extractedClassFeatures": 15,
   "generatedEntities": [
     "srd521.class.fighter",
@@ -56,7 +57,15 @@
     "srd521.class-feature.fighter.epic-boon",
     "srd521.class-feature.fighter.three-extra-attacks",
     "srd521.table.fighter.second-wind",
-    "srd521.feat.fighting-style.defense"
+    "srd521.feat.fighting-style.defense",
+    "srd521.subclass.fighter.champion",
+    "srd521.subclass-feature.fighter.champion.improved-critical",
+    "srd521.subclass-feature.fighter.champion.remarkable-athlete",
+    "srd521.subclass-feature.fighter.champion.additional-fighting-style",
+    "srd521.subclass-feature.fighter.champion.heroic-warrior",
+    "srd521.subclass-feature.fighter.champion.superior-critical",
+    "srd521.subclass-feature.fighter.champion.survivor",
+    "srd521.feat.general.ability-score-improvement"
   ],
   "progression": [
     {

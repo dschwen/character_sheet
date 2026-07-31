@@ -1,0 +1,55 @@
+{
+  "id": "srd521.class-feature.fighter.tactical-mind",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.fighter",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-tactical-mind",
+      "parameters": {
+        "actionEconomy": "failed-ability-check-trigger",
+        "checkBonus": {
+          "diceCount": 1,
+          "diceSize": 10
+        },
+        "refundIfCheckStillFails": true,
+        "resourceId": "srd521.resource.fighter.second-wind"
+      },
+      "target": "action.tactical-mind",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.fighter.second-wind"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "The resource is spent only after the assisted check result is known."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0048-b005"
+      ],
+      "page": 48,
+      "quoteHash": "d6e980f8e633bda98202a9c72874d4c1f9be4995d24560b7eaec72e275c7d9f1",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You have a mind for tactics on and off the battlefield. When you fail an ability check, you can expend a use of your Second Wind to push yourself toward success. Rather than regaining Hit Points, you roll 1d10 and add the number rolled to the ability check, potentially turning it into a success. If the check still fails, this use of Second Wind isn’t expended."
+      }
+    ],
+    "title": "Tactical Mind"
+  }
+}

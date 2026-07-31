@@ -1,0 +1,40 @@
+{
+  "id": "srd521.feat.general.ability-score-improvement",
+  "kind": "feat",
+  "level": 4,
+  "parentId": "srd521.class-feature.fighter.ability-score-improvement",
+  "proposedRules": [],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Selected increases are validated and materialized by the choice evaluator."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0087-b014",
+        "p0087-b015"
+      ],
+      "page": 87,
+      "quoteHash": "a423db7c77aefd0c56b1be8e14fd2efdf313f4fc3ddd02ee6467b8dc21bbf8a6",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "General Feat (Prerequisite: Level 4+)"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. This feat can’t increase an ability score above 20. Repeatable. You can take this feat more than once."
+      }
+    ],
+    "title": "Ability Score Improvement"
+  }
+}

@@ -151,6 +151,8 @@ export const draftRuleTypeSchema = z.enum([
   "grant-advantage",
   "add-validation",
   "add-candidate-calculation",
+  "set-attack-count",
+  "set-critical-threshold",
 ]);
 
 export const draftRuleSchema = z
@@ -169,7 +171,7 @@ export const authoringIrSchema = z
   .object({
     schemaVersion: z.literal("0.1.0"),
     id: entityIdSchema,
-    kind: z.enum(["class-feature", "feat"]),
+    kind: z.enum(["class-feature", "subclass-feature", "feat"]),
     parentId: entityIdSchema,
     level: z.number().int().min(1).max(20),
     source: z.array(sourceSpanSchema).min(1),

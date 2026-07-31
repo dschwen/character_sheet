@@ -1,0 +1,72 @@
+{
+  "id": "srd521.subclass-feature.fighter.champion.remarkable-athlete",
+  "kind": "subclass-feature",
+  "level": 3,
+  "parentId": "srd521.subclass.fighter.champion",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "id": "remarkable-athlete-initiative",
+      "parameters": {},
+      "target": "initiative",
+      "type": "grant-advantage"
+    },
+    {
+      "automationLevel": "sheet-automated",
+      "id": "remarkable-athlete-athletics",
+      "parameters": {},
+      "target": "skill.athletics",
+      "type": "grant-advantage"
+    },
+    {
+      "automationLevel": "sheet-automated",
+      "id": "remarkable-athlete-critical-move",
+      "parameters": {
+        "actionEconomy": "after-critical-hit",
+        "movement": {
+          "provokesOpportunityAttacks": false,
+          "speedFraction": 0.5
+        }
+      },
+      "target": "action.remarkable-athlete-critical-move",
+      "type": "grant-action",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "literal",
+          "value": true
+        },
+        "right": {
+          "kind": "literal",
+          "value": true
+        }
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0049-b006"
+      ],
+      "page": 49,
+      "quoteHash": "c9ad35e721aaf6938e44456502c706f340ce4792f7fcf7e5eb6f29a01d25db14",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Thanks to your athleticism, you have Advantage on Initiative rolls and Strength (Athletics) checks. In addition, immediately after you score a Critical Hit, you can move up to half your Speed without provoking Opportunity Attacks."
+      }
+    ],
+    "title": "Remarkable Athlete"
+  }
+}

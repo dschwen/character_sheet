@@ -1194,5 +1194,416 @@
       "feat",
       "fighting-style"
     ]
+  },
+  {
+    "body": {
+      "parentClassId": "srd521.class.fighter",
+      "progression": [
+        {
+          "features": [
+            "srd521.subclass-feature.fighter.champion.improved-critical",
+            "srd521.subclass-feature.fighter.champion.remarkable-athlete"
+          ],
+          "level": 3
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.fighter.champion.additional-fighting-style"
+          ],
+          "level": 7
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.fighter.champion.heroic-warrior"
+          ],
+          "level": 10
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.fighter.champion.superior-critical"
+          ],
+          "level": 15
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.fighter.champion.survivor"
+          ],
+          "level": 18
+        }
+      ],
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "A Champion focuses on the development of martial prowess in a relentless pursuit of victory. Champions combine rigorous training with physical excellence to deal devastating blows, withstand peril, and garner glory. Whether in athletic contests or bloody battle, Champions strive for the crown of the victor."
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Pursue Physical Excellence in Combat"
+          }
+        ],
+        "title": "Champion"
+      }
+    },
+    "id": "srd521.subclass.fighter.champion",
+    "kind": "subclass",
+    "name": {
+      "en": "Champion"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Champion extracted from Fighter subclass page 49.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0049-b002",
+          "p0049-b004",
+          "p0049-b003"
+        ],
+        "page": 49,
+        "quoteHash": "7a182a3e72faf37b6bc1690d42b803aa3db693e1472925ea5ac553bbeec4c632",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass",
+      "fighter",
+      "champion"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 3,
+      "parentId": "srd521.subclass.fighter.champion",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Your attack rolls with weapons and Unarmed Strikes can score a Critical Hit on a roll of 19 or 20 on the d20."
+          }
+        ],
+        "title": "Improved Critical"
+      }
+    },
+    "id": "srd521.subclass-feature.fighter.champion.improved-critical",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Improved Critical"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0049-b005"
+        ],
+        "page": 49,
+        "quoteHash": "ae4d1903efc3d767572dacbcf67400366cee4e78a5701f62e89638900286b769",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "fighter",
+      "champion",
+      "level-3"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 3,
+      "parentId": "srd521.subclass.fighter.champion",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Thanks to your athleticism, you have Advantage on Initiative rolls and Strength (Athletics) checks. In addition, immediately after you score a Critical Hit, you can move up to half your Speed without provoking Opportunity Attacks."
+          }
+        ],
+        "title": "Remarkable Athlete"
+      }
+    },
+    "id": "srd521.subclass-feature.fighter.champion.remarkable-athlete",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Remarkable Athlete"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0049-b006"
+        ],
+        "page": 49,
+        "quoteHash": "c9ad35e721aaf6938e44456502c706f340ce4792f7fcf7e5eb6f29a01d25db14",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "fighter",
+      "champion",
+      "level-3"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 7,
+      "parentId": "srd521.subclass.fighter.champion",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain another Fighting Style feat of your choice."
+          }
+        ],
+        "title": "Additional Fighting Style"
+      }
+    },
+    "id": "srd521.subclass-feature.fighter.champion.additional-fighting-style",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Additional Fighting Style"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0049-b007"
+        ],
+        "page": 49,
+        "quoteHash": "6ac26c7a663be7085244ea35d30296d459cb6f81e207c34653a2685da31afe42",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "fighter",
+      "champion",
+      "level-7"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 10,
+      "parentId": "srd521.subclass.fighter.champion",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "The thrill of battle drives you toward victory. During combat, you can give yourself Heroic Inspiration whenever you start your turn without it."
+          }
+        ],
+        "title": "Heroic Warrior"
+      }
+    },
+    "id": "srd521.subclass-feature.fighter.champion.heroic-warrior",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Heroic Warrior"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0049-b008"
+        ],
+        "page": 49,
+        "quoteHash": "f5062610f60f3cb1bbf51aca876ed364dc89f1cd189affc79145a00af19e4ea5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "fighter",
+      "champion",
+      "level-10"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 15,
+      "parentId": "srd521.subclass.fighter.champion",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Your attack rolls with weapons and Unarmed Strikes can now score a Critical Hit on a roll of 18–20 on the d20."
+          }
+        ],
+        "title": "Superior Critical"
+      }
+    },
+    "id": "srd521.subclass-feature.fighter.champion.superior-critical",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Superior Critical"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0049-b009"
+        ],
+        "page": 49,
+        "quoteHash": "efe5aaa5dbe063432d5e7e0daac49de9a3b9e8578d936e438d0907dd394e9c73",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "fighter",
+      "champion",
+      "level-15"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "structured",
+      "level": 18,
+      "parentId": "srd521.subclass.fighter.champion",
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "You attain the pinnacle of resilience in battle, giving you these benefits. Defy Death. You have Advantage on Death Saving Throws. Moreover, when you roll 18–20 on a Death Saving Throw, you gain the benefit of rolling a 20 on it. Heroic Rally. At the start of each of your turns, you regain Hit Points equal to 5 plus your Constitution modifier if you are Bloodied and have at least 1 Hit Point."
+          }
+        ],
+        "title": "Survivor"
+      }
+    },
+    "id": "srd521.subclass-feature.fighter.champion.survivor",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Survivor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Executable rules are proposals in the authoring IR.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0049-b010"
+        ],
+        "page": 49,
+        "quoteHash": "3c57592a34615c2381821d2207841b6de944700fa59197b44bb33cc51b96e66c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "fighter",
+      "champion",
+      "level-18"
+    ]
+  },
+  {
+    "body": {
+      "abilityScoreIncreasePatterns": [
+        [
+          2
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "category": "general",
+      "maximumAbilityScore": 20,
+      "prerequisite": {
+        "minimumCharacterLevel": 4
+      },
+      "repeatable": true,
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "General Feat (Prerequisite: Level 4+)"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. This feat can’t increase an ability score above 20. Repeatable. You can take this feat more than once."
+          }
+        ],
+        "title": "Ability Score Improvement"
+      }
+    },
+    "id": "srd521.feat.general.ability-score-improvement",
+    "kind": "feat",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ability Score Improvement extracted from page 87.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0087-b014",
+          "p0087-b015"
+        ],
+        "page": 87,
+        "quoteHash": "a423db7c77aefd0c56b1be8e14fd2efdf313f4fc3ddd02ee6467b8dc21bbf8a6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "general-feat"
+    ]
   }
 ]

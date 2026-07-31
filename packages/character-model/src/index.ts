@@ -102,6 +102,8 @@ const characterBuildSchema = z
     speciesSize: z.enum(["small", "medium", "large"]).optional(),
     backgroundId: entityIdSchema.optional(),
     backgroundAbilityScoreIncreases: backgroundAbilityScoreIncreasesSchema,
+    subclassId: entityIdSchema.optional(),
+    featAbilityScoreIncreases: backgroundAbilityScoreIncreasesSchema,
     featIds: z.array(entityIdSchema).default([]),
     learnedSpellIds: z.array(entityIdSchema).default([]),
     choices: z.array(choiceSelectionSchema).default([]),

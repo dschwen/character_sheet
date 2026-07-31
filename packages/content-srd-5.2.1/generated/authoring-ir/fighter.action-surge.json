@@ -1,0 +1,94 @@
+{
+  "id": "srd521.class-feature.fighter.action-surge",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.fighter",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "condition": {
+          "kind": "compare",
+          "left": {
+            "kind": "ref",
+            "path": "classLevel.fighter"
+          },
+          "op": "gte",
+          "right": {
+            "kind": "literal",
+            "value": 17
+          }
+        },
+        "else": {
+          "kind": "literal",
+          "value": 1
+        },
+        "kind": "if",
+        "then": {
+          "kind": "literal",
+          "value": 2
+        }
+      },
+      "id": "action-surge-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "short-rest"
+          },
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.fighter.action-surge",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "use-action-surge",
+      "parameters": {
+        "actionEconomy": "on-your-turn",
+        "excludes": [
+          "magic"
+        ],
+        "grantsAction": "one-additional-action",
+        "resourceId": "srd521.resource.fighter.action-surge",
+        "spends": 1
+      },
+      "target": "action.action-surge",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.fighter.action-surge"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0048-b004"
+      ],
+      "page": 48,
+      "quoteHash": "8df054490879e9dbfe77eaafa722aaf4e122d7651333dac97a28adeab3d3794c",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional action, except the Magic action. Once you use this feature, you can’t do so again until you finish a Short or Long Rest. Starting at level 17, you can use it twice before a rest but only once on a turn."
+      }
+    ],
+    "title": "Action Surge"
+  }
+}

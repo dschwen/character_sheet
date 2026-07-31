@@ -71,14 +71,14 @@ Generate the typed Barbarian proof-of-concept content and draft authoring IR:
 This command parses both class tables, reconciles the progression against feature headings, and
 generates source-linked draft mechanics for Rage and Unarmored Defense.
 
-Generate the typed Fighter content from class pages 47–48 and the Defense Fighting Style on page
-88:
+Generate the typed Fighter-through-level-5 content from class pages 47–49, Ability Score
+Improvement on page 87, and the Defense Fighting Style on page 88:
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
   --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
   --out generated/extraction/srd-5.2.1-fighter \
-  --pages 47-48,88 \
+  --pages 47-49,87-88 \
   --overlays
 
 .venv/bin/python -m srd_extract.fighter \
@@ -86,8 +86,8 @@ Generate the typed Fighter content from class pages 47–48 and the Defense Figh
   --output packages/content-srd-5.2.1/generated
 ```
 
-This parser validates all 20 progression rows, reconciles every feature reference, and generates
-draft authoring IR for Second Wind and the Defense Fighting Style.
+This parser validates all 20 progression rows, reconciles every feature reference, extracts the
+Champion subclass, and generates draft authoring IR for the supported Fighter level 1–5 features.
 
 Generate the Human and Soldier origin slice from pages 83, 86, and 87:
 
@@ -119,12 +119,13 @@ Generate the structured weapon and armor entities from SRD pages 91–92:
   --output packages/content-srd-5.2.1/generated
 ```
 
-The rules kernel evaluates reviewed level-1 Barbarian and Human Soldier Fighter fixtures in its
-integration suite. Results include origin ability increases, species size and speed, typed skill
-and saving-throw proficiencies, d20-test roll states, Initiative, Passive Perception, inventory,
-armor and Shield candidates, weapon attacks and damage, Weapon Mastery metadata, Hit Points,
-feature resources, conditional actions, resistances, validations, coverage warnings, and
-calculation traces.
+The rules kernel evaluates reviewed level-1 Barbarian and level-1/level-5 Human Soldier Fighter
+fixtures in its integration suite. Results include origin and feat ability increases, subclass
+features, species size and speed, typed skill and saving-throw proficiencies, d20-test roll states,
+Initiative, Passive Perception, inventory, armor and Shield candidates, weapon attacks and damage,
+Weapon Mastery metadata, attacks per Attack action, critical-hit thresholds, Hit Points, feature
+resources, conditional actions, resistances, validations, coverage warnings, and calculation
+traces.
 
 The rules kernel also exposes atomic Short Rest, Long Rest, and action-use proposals. Transition
 processing validates explicit dice results, previews field-level state changes and resource

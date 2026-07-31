@@ -141,6 +141,8 @@ export interface AttackSummary {
     property: string;
     enabled: boolean;
   };
+  criticalHitThreshold: number;
+  criticalHitTraceId: string;
   traceId: string;
 }
 

@@ -19,7 +19,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(96);
+    expect(parsedEntities).toHaveLength(104);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -36,6 +36,9 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.background.soldier");
     expect(entityIds).toContain("srd521.feat.origin.savage-attacker");
     expect(entityIds).toContain("srd521.feat.origin.skilled");
+    expect(entityIds).toContain("srd521.subclass.fighter.champion");
+    expect(entityIds).toContain("srd521.subclass-feature.fighter.champion.improved-critical");
+    expect(entityIds).toContain("srd521.feat.general.ability-score-improvement");
   });
 
   it("validates the acquired source manifest against the pinned artifact", () => {
@@ -128,6 +131,36 @@ describe("bootstrap content package", () => {
       type: "add-modifier",
       target: "armor-class",
     });
+  });
+
+  it("validates Fighter levels 2–5 and Champion authoring IR", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const files = [
+      "fighter.action-surge.json",
+      "fighter.tactical-mind.json",
+      "fighter.extra-attack.json",
+      "fighter.tactical-shift.json",
+      "champion.improved-critical.json",
+      "champion.remarkable-athlete.json",
+      "feat.ability-score-improvement.json",
+    ];
+    const authoringIr = files.map((file) =>
+      authoringIrSchema.parse(
+        JSON.parse(readFileSync(new URL(`authoring-ir/${file}`, root), "utf8")),
+      ),
+    );
+
+    expect(authoringIr.map((ir) => ir.source[0]?.page)).toEqual([48, 48, 48, 48, 49, 49, 87]);
+    expect(authoringIr.flatMap((ir) => ir.proposedRules.map((rule) => rule.type))).toEqual(
+      expect.arrayContaining([
+        "grant-resource",
+        "grant-action",
+        "grant-advantage",
+        "set-attack-count",
+        "set-critical-threshold",
+      ]),
+    );
+    expect(authoringIr.filter((ir) => ir.kind === "subclass-feature")).toHaveLength(2);
   });
 
   it("validates the Human, Soldier, and Savage Attacker origin slice", () => {

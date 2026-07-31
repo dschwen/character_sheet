@@ -1,0 +1,94 @@
+{
+  "values": {
+    "ability.strength.modifier": 4,
+    "ability.dexterity.modifier": 2,
+    "ability.constitution.modifier": 2,
+    "ability.intelligence.modifier": 0,
+    "ability.wisdom.modifier": 1,
+    "ability.charisma.modifier": -1,
+    "proficiencyBonus": 3,
+    "savingThrow.strength": 7,
+    "savingThrow.constitution": 5,
+    "skill.athletics": 7,
+    "skill.perception": 4,
+    "skill.intimidation": 2,
+    "skill.persuasion": 2,
+    "skill.arcana": 3,
+    "skill.insight": 4,
+    "skill.stealth": 5,
+    "skill.survival": 4,
+    "initiative": 2,
+    "passive.perception": 14,
+    "speed.walking": 30,
+    "hitPoints.maximum": 44,
+    "armorClass": 17,
+    "attackAction.attacks": 2,
+    "weaponAttacks.criticalHitThreshold": 19,
+    "srd521.resource.fighter.second-wind.maximum": 3,
+    "srd521.resource.fighter.second-wind.current": 2,
+    "srd521.resource.fighter.action-surge.maximum": 1,
+    "srd521.resource.fighter.action-surge.current": 1,
+    "attack.greatsword-1.bonus": 7,
+    "attack.greatsword-1.damageBonus": 4,
+    "attack.flail-1.bonus": 7,
+    "attack.flail-1.damageBonus": 4,
+    "attack.javelins.bonus": 7,
+    "attack.javelins.damageBonus": 4,
+    "attack.longbow-1.bonus": 5,
+    "attack.longbow-1.damageBonus": 2,
+    "action.tactical-shift.maximumMovement": 15,
+    "action.remarkable-athlete-critical-move.maximumMovement": 15
+  },
+  "rollModes": {
+    "initiative": "advantage",
+    "skill.athletics": "advantage",
+    "skill.stealth": "disadvantage"
+  },
+  "actions": {
+    "action.action-surge": {
+      "available": true,
+      "actionEconomy": "on-your-turn",
+      "parameters": {
+        "spends": 1,
+        "resourceId": "srd521.resource.fighter.action-surge",
+        "grantsAction": "one-additional-action",
+        "excludes": ["magic"]
+      }
+    },
+    "action.tactical-mind": {
+      "available": true,
+      "actionEconomy": "failed-ability-check-trigger",
+      "parameters": {
+        "resourceId": "srd521.resource.fighter.second-wind",
+        "checkBonus": {
+          "diceCount": 1,
+          "diceSize": 10
+        },
+        "refundIfCheckStillFails": true
+      }
+    },
+    "action.tactical-shift": {
+      "available": true,
+      "actionEconomy": "with-second-wind",
+      "parameters": {
+        "movement": {
+          "speedFraction": 0.5,
+          "provokesOpportunityAttacks": false,
+          "maximumFeet": 15
+        }
+      }
+    },
+    "action.remarkable-athlete-critical-move": {
+      "available": true,
+      "actionEconomy": "after-critical-hit",
+      "parameters": {
+        "movement": {
+          "speedFraction": 0.5,
+          "provokesOpportunityAttacks": false,
+          "maximumFeet": 15
+        }
+      }
+    }
+  },
+  "validationCodes": []
+}

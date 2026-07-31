@@ -16,6 +16,8 @@ from srd_extract.io import read_json, write_json
 SOURCE_ID = "wotc-srd-5.2.1-en"
 CLASS_ID = "srd521.class.fighter"
 DEFENSE_ID = "srd521.feat.fighting-style.defense"
+CHAMPION_ID = "srd521.subclass.fighter.champion"
+ASI_ID = "srd521.feat.general.ability-score-improvement"
 HEADING_PATTERN = re.compile(r"^Level (?P<level>\d+): (?P<name>.+)$")
 
 
@@ -206,6 +208,56 @@ def extract_class_features(document: dict[str, Any]) -> tuple[dict[str, Any], ..
     return tuple(features)
 
 
+def extract_champion_features(document: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+    page_nodes = [node for node in document["nodes"] if str(node["parentId"]) == "page-0049"]
+    start = next(
+        index
+        for index, node in enumerate(page_nodes)
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Fighter Subclass: Champion"
+    )
+    end = next(
+        index
+        for index, node in enumerate(page_nodes[start + 1 :], start + 1)
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Monk"
+    )
+    champion_nodes = page_nodes[start:end]
+    features: list[dict[str, Any]] = []
+    for index, node in enumerate(champion_nodes):
+        if node["kind"] != "HeadingNode":
+            continue
+        match = HEADING_PATTERN.fullmatch(node["normalizedText"])
+        if match is None:
+            continue
+        body_nodes: list[dict[str, Any]] = []
+        for following in champion_nodes[index + 1 :]:
+            if following["kind"] == "HeadingNode":
+                break
+            body_nodes.append(following)
+        if not body_nodes:
+            raise ValueError(f"Champion feature has no body: {node['normalizedText']}")
+        name = match.group("name")
+        features.append(
+            {
+                "id": f"srd521.subclass-feature.fighter.champion.{_slug(name)}",
+                "name": name,
+                "level": int(match.group("level")),
+                "bodyNodes": body_nodes,
+                "source": list(_source_spans_for_nodes([node, *body_nodes])),
+            }
+        )
+    expected = {
+        "Improved Critical",
+        "Remarkable Athlete",
+        "Additional Fighting Style",
+        "Heroic Warrior",
+        "Superior Critical",
+        "Survivor",
+    }
+    if {feature["name"] for feature in features} != expected:
+        raise ValueError("Champion feature extraction is incomplete")
+    return tuple(features)
+
+
 def _base_feature_name(name: str) -> str:
     return re.sub(r" \((?:one|two|three) uses?\)$", "", name)
 
@@ -301,6 +353,135 @@ def _feature_entity(feature: dict[str, Any]) -> dict[str, Any]:
         "rules": [],
         "review": _review("Executable rules are proposals in the authoring IR."),
     }
+
+
+def _champion_entities(
+    document: dict[str, Any],
+    features: tuple[dict[str, Any], ...],
+) -> list[dict[str, Any]]:
+    page_nodes = [node for node in document["nodes"] if str(node["parentId"]) == "page-0049"]
+    heading_index = next(
+        index
+        for index, node in enumerate(page_nodes)
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Fighter Subclass: Champion"
+    )
+    introduction = page_nodes[heading_index : heading_index + 3]
+    subclass = {
+        "id": CHAMPION_ID,
+        "kind": "subclass",
+        "name": {"en": "Champion"},
+        "tags": ["subclass", "fighter", "champion"],
+        "source": list(_source_spans_for_nodes(introduction)),
+        "body": {
+            "parentClassId": CLASS_ID,
+            "progression": [
+                {
+                    "level": level,
+                    "features": [
+                        feature["id"] for feature in features if feature["level"] == level
+                    ],
+                }
+                for level in sorted({int(feature["level"]) for feature in features})
+            ],
+            "text": {
+                "title": "Champion",
+                "nodes": [
+                    {"kind": node["kind"], "text": node["normalizedText"]}
+                    for node in introduction[1:]
+                ],
+            },
+        },
+        "rules": [],
+        "review": _review("Champion extracted from Fighter subclass page 49."),
+    }
+    feature_entities = [
+        {
+            "id": feature["id"],
+            "kind": "subclass-feature",
+            "name": {"en": feature["name"]},
+            "tags": [
+                "subclass-feature",
+                "fighter",
+                "champion",
+                f"level-{feature['level']}",
+            ],
+            "source": feature["source"],
+            "body": {
+                "level": feature["level"],
+                "parentId": CHAMPION_ID,
+                "text": _feature_text(feature),
+                "automationLevel": "structured",
+            },
+            "rules": [],
+            "review": _review("Executable rules are proposals in the authoring IR."),
+        }
+        for feature in features
+    ]
+    return [subclass, *feature_entities]
+
+
+def _ability_score_improvement_entity(
+    document: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    page_nodes = [node for node in document["nodes"] if str(node["parentId"]) == "page-0087"]
+    start = next(
+        index
+        for index, node in enumerate(page_nodes)
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Ability Score Improvement"
+    )
+    end = next(
+        index
+        for index, node in enumerate(page_nodes[start + 1 :], start + 1)
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Grappler"
+    )
+    nodes = page_nodes[start:end]
+    text = " ".join(str(node["normalizedText"]) for node in nodes)
+    if (
+        "General Feat (Prerequisite: Level 4+)" not in text
+        or "Increase one ability score of your choice by 2" not in text
+        or "increase two ability scores of your choice by 1" not in text
+        or "Repeatable." not in text
+    ):
+        raise ValueError("Ability Score Improvement feat text is incomplete")
+    source = list(_source_spans_for_nodes(nodes))
+    structured_text = {
+        "title": "Ability Score Improvement",
+        "nodes": [{"kind": node["kind"], "text": node["normalizedText"]} for node in nodes[1:]],
+    }
+    entity = {
+        "id": ASI_ID,
+        "kind": "feat",
+        "name": {"en": "Ability Score Improvement"},
+        "tags": ["feat", "general-feat"],
+        "source": source,
+        "body": {
+            "category": "general",
+            "repeatable": True,
+            "prerequisite": {"minimumCharacterLevel": 4},
+            "abilityScoreIncreasePatterns": [[2], [1, 1]],
+            "maximumAbilityScore": 20,
+            "text": structured_text,
+        },
+        "rules": [],
+        "review": _review("Ability Score Improvement extracted from page 87."),
+    }
+    ir = {
+        "schemaVersion": "0.1.0",
+        "id": ASI_ID,
+        "kind": "feat",
+        "parentId": "srd521.class-feature.fighter.ability-score-improvement",
+        "level": 4,
+        "source": source,
+        "text": structured_text,
+        "proposedRules": [],
+        "review": {
+            "extraction": "approved",
+            "semantics": "needs-review",
+            "tests": "draft",
+            "notes": ["Selected increases are validated and materialized by the choice evaluator."],
+        },
+    }
+    return entity, ir
 
 
 def _class_entity(
@@ -456,6 +637,221 @@ def _second_wind_ir(feature: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _feature_ir(
+    feature: dict[str, Any],
+    proposed_rules: list[dict[str, Any]],
+    notes: list[str] | None = None,
+    *,
+    kind: str = "class-feature",
+    parent_id: str = CLASS_ID,
+) -> dict[str, Any]:
+    return {
+        "schemaVersion": "0.1.0",
+        "id": feature["id"],
+        "kind": kind,
+        "parentId": parent_id,
+        "level": feature["level"],
+        "source": feature["source"],
+        "text": _feature_text(feature),
+        "proposedRules": proposed_rules,
+        "review": {
+            "extraction": "approved",
+            "semantics": "needs-review",
+            "tests": "draft",
+            "notes": notes or [],
+        },
+    }
+
+
+def _level_five_authoring_ir(
+    features: tuple[dict[str, Any], ...],
+    champion_features: tuple[dict[str, Any], ...],
+) -> dict[str, dict[str, Any]]:
+    by_name = {feature["name"]: feature for feature in features}
+    champion_by_name = {feature["name"]: feature for feature in champion_features}
+    action_surge = _feature_ir(
+        by_name["Action Surge"],
+        [
+            {
+                "id": "action-surge-resource",
+                "type": "grant-resource",
+                "target": "srd521.resource.fighter.action-surge",
+                "expression": {
+                    "kind": "if",
+                    "condition": {
+                        "kind": "compare",
+                        "op": "gte",
+                        "left": {"kind": "ref", "path": "classLevel.fighter"},
+                        "right": {"kind": "literal", "value": 17},
+                    },
+                    "then": {"kind": "literal", "value": 2},
+                    "else": {"kind": "literal", "value": 1},
+                },
+                "parameters": {
+                    "recharge": [
+                        {"event": "short-rest", "amount": "all"},
+                        {"event": "long-rest", "amount": "all"},
+                    ]
+                },
+                "automationLevel": "state-automated",
+            },
+            {
+                "id": "use-action-surge",
+                "type": "grant-action",
+                "target": "action.action-surge",
+                "when": {
+                    "kind": "resourceAvailable",
+                    "resourceId": "srd521.resource.fighter.action-surge",
+                },
+                "parameters": {
+                    "actionEconomy": "on-your-turn",
+                    "spends": 1,
+                    "resourceId": "srd521.resource.fighter.action-surge",
+                    "grantsAction": "one-additional-action",
+                    "excludes": ["magic"],
+                },
+                "automationLevel": "state-automated",
+            },
+        ],
+    )
+    tactical_mind = _feature_ir(
+        by_name["Tactical Mind"],
+        [
+            {
+                "id": "use-tactical-mind",
+                "type": "grant-action",
+                "target": "action.tactical-mind",
+                "when": {
+                    "kind": "resourceAvailable",
+                    "resourceId": "srd521.resource.fighter.second-wind",
+                },
+                "parameters": {
+                    "actionEconomy": "failed-ability-check-trigger",
+                    "resourceId": "srd521.resource.fighter.second-wind",
+                    "checkBonus": {"diceCount": 1, "diceSize": 10},
+                    "refundIfCheckStillFails": True,
+                },
+                "automationLevel": "roll-assisted",
+            }
+        ],
+        ["The resource is spent only after the assisted check result is known."],
+    )
+    extra_attack = _feature_ir(
+        by_name["Extra Attack"],
+        [
+            {
+                "id": "fighter-extra-attack",
+                "type": "set-attack-count",
+                "target": "attackAction.attacks",
+                "expression": {"kind": "literal", "value": 2},
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            }
+        ],
+    )
+    tactical_shift = _feature_ir(
+        by_name["Tactical Shift"],
+        [
+            {
+                "id": "use-tactical-shift",
+                "type": "grant-action",
+                "target": "action.tactical-shift",
+                "when": {
+                    "kind": "all",
+                    "args": [
+                        {
+                            "kind": "resourceAvailable",
+                            "resourceId": "srd521.resource.fighter.second-wind",
+                        },
+                        {
+                            "kind": "compare",
+                            "op": "lt",
+                            "left": {"kind": "ref", "path": "hitPoints.current"},
+                            "right": {"kind": "ref", "path": "hitPoints.maximum"},
+                        },
+                        {
+                            "kind": "compare",
+                            "op": "gt",
+                            "left": {"kind": "ref", "path": "hitPoints.current"},
+                            "right": {"kind": "literal", "value": 0},
+                        },
+                    ],
+                },
+                "parameters": {
+                    "actionEconomy": "with-second-wind",
+                    "movement": {
+                        "speedFraction": 0.5,
+                        "provokesOpportunityAttacks": False,
+                    },
+                },
+                "automationLevel": "sheet-automated",
+            }
+        ],
+    )
+    improved_critical = _feature_ir(
+        champion_by_name["Improved Critical"],
+        [
+            {
+                "id": "champion-improved-critical",
+                "type": "set-critical-threshold",
+                "target": "weapon-attacks",
+                "expression": {"kind": "literal", "value": 19},
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            }
+        ],
+        kind="subclass-feature",
+        parent_id=CHAMPION_ID,
+    )
+    remarkable_athlete = _feature_ir(
+        champion_by_name["Remarkable Athlete"],
+        [
+            {
+                "id": "remarkable-athlete-initiative",
+                "type": "grant-advantage",
+                "target": "initiative",
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            },
+            {
+                "id": "remarkable-athlete-athletics",
+                "type": "grant-advantage",
+                "target": "skill.athletics",
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            },
+            {
+                "id": "remarkable-athlete-critical-move",
+                "type": "grant-action",
+                "target": "action.remarkable-athlete-critical-move",
+                "when": {
+                    "kind": "equals",
+                    "left": {"kind": "literal", "value": True},
+                    "right": {"kind": "literal", "value": True},
+                },
+                "parameters": {
+                    "actionEconomy": "after-critical-hit",
+                    "movement": {
+                        "speedFraction": 0.5,
+                        "provokesOpportunityAttacks": False,
+                    },
+                },
+                "automationLevel": "sheet-automated",
+            },
+        ],
+        kind="subclass-feature",
+        parent_id=CHAMPION_ID,
+    )
+    return {
+        "fighter.action-surge.json": action_surge,
+        "fighter.tactical-mind.json": tactical_mind,
+        "fighter.extra-attack.json": extra_attack,
+        "fighter.tactical-shift.json": tactical_shift,
+        "champion.improved-critical.json": improved_critical,
+        "champion.remarkable-athlete.json": remarkable_athlete,
+    }
+
+
 def _defense_entity_and_ir(nodes: list[dict[str, Any]]) -> tuple[dict[str, Any], dict[str, Any]]:
     defense_nodes = nodes[:3]
     source = list(_source_spans_for_nodes(defense_nodes))
@@ -536,6 +932,9 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
     progression_source = next(source for source in class_source if source["page"] == 47)
     class_entity = _class_entity(traits, progression, reconciliation, class_source)
     feature_entities = [_feature_entity(feature) for feature in features]
+    champion_features = extract_champion_features(document)
+    champion_entities = _champion_entities(document, champion_features)
+    asi_entity, asi_ir = _ability_score_improvement_entity(document)
     second_wind = next(feature for feature in features if feature["name"] == "Second Wind")
     defense_nodes = [node for node in document["nodes"] if str(node["parentId"]) == "page-0088"]
     defense_entity, defense_ir = _defense_entity_and_ir(defense_nodes)
@@ -545,24 +944,31 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
         *feature_entities,
         second_wind_table,
         defense_entity,
+        *champion_entities,
+        asi_entity,
     ]
     existing = [
         entity
         for entity in read_json(output / "entities.json")
         if entity["id"] != CLASS_ID
         and not str(entity["id"]).startswith("srd521.class-feature.fighter.")
-        and entity["id"] not in {"srd521.table.fighter.second-wind", DEFENSE_ID}
+        and not str(entity["id"]).startswith("srd521.subclass-feature.fighter.champion.")
+        and entity["id"]
+        not in {"srd521.table.fighter.second-wind", DEFENSE_ID, CHAMPION_ID, ASI_ID}
     ]
     all_entities = [*existing, *fighter_entities]
     write_json(output / "entities" / "fighter.json", fighter_entities)
     write_json(output / "entities.json", all_entities)
     write_json(output / "authoring-ir" / "fighter.second-wind.json", _second_wind_ir(second_wind))
     write_json(output / "authoring-ir" / "fighting-style.defense.json", defense_ir)
+    write_json(output / "authoring-ir" / "feat.ability-score-improvement.json", asi_ir)
+    for filename, ir in _level_five_authoring_ir(features, champion_features).items():
+        write_json(output / "authoring-ir" / filename, ir)
     write_json(output / "indexes" / "fighter-reconciliation.json", reconciliation)
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Barbarian, Fighter level-1, and equipment proof-of-concept content. "
+        "Barbarian, Fighter through level 5, Human, Soldier, and equipment content. "
         "Proposed executable rules remain under review."
     )
     write_json(output / "coverage.json", coverage)
@@ -571,6 +977,7 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
         "coreTraits": traits,
         "progressionRows": len(progression),
         "extractedClassFeatures": len(features),
+        "extractedChampionFeatures": len(champion_features),
         "generatedEntities": [entity["id"] for entity in fighter_entities],
         "reconciliation": reconciliation["counts"],
         "progression": [asdict(row) for row in progression],

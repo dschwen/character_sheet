@@ -1,6 +1,6 @@
 from typing import Any
 
-from srd_extract.fighter import parse_core_traits, parse_progression
+from srd_extract.fighter import extract_champion_features, parse_core_traits, parse_progression
 
 
 def _word(text: str, x: float, y: float) -> dict[str, Any]:
@@ -53,3 +53,59 @@ def test_parse_fighter_progression_enforces_twenty_levels() -> None:
     assert progression[0].weapon_mastery == 3
     assert progression[4].proficiency_bonus == 3
     assert progression[-1].level == 20
+
+
+def test_extract_champion_features_reconciles_all_headings() -> None:
+    nodes: list[dict[str, Any]] = [
+        {
+            "kind": "HeadingNode",
+            "normalizedText": "Fighter Subclass: Champion",
+            "parentId": "page-0049",
+            "sourceBlocks": ["champion"],
+        },
+        {
+            "kind": "ParagraphNode",
+            "normalizedText": "Champion introduction.",
+            "parentId": "page-0049",
+            "sourceBlocks": ["intro"],
+        },
+    ]
+    for level, name in (
+        (3, "Improved Critical"),
+        (3, "Remarkable Athlete"),
+        (7, "Additional Fighting Style"),
+        (10, "Heroic Warrior"),
+        (15, "Superior Critical"),
+        (18, "Survivor"),
+    ):
+        nodes.extend(
+            [
+                {
+                    "kind": "HeadingNode",
+                    "normalizedText": f"Level {level}: {name}",
+                    "parentId": "page-0049",
+                    "sourceBlocks": [f"heading-{level}-{name}"],
+                },
+                {
+                    "kind": "ParagraphNode",
+                    "normalizedText": f"{name} text.",
+                    "parentId": "page-0049",
+                    "sourceBlocks": [f"body-{level}-{name}"],
+                },
+            ]
+        )
+    nodes.append(
+        {
+            "kind": "HeadingNode",
+            "normalizedText": "Monk",
+            "parentId": "page-0049",
+            "sourceBlocks": ["monk"],
+        }
+    )
+
+    features = extract_champion_features({"nodes": nodes})
+
+    assert len(features) == 6
+    assert features[0]["id"] == "srd521.subclass-feature.fighter.champion.improved-critical"
+    assert features[1]["level"] == 3
+    assert features[-1]["name"] == "Survivor"

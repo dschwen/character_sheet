@@ -45,6 +45,7 @@ describe("characterDocumentSchema", () => {
 
     expect(character.build.featIds).toEqual([]);
     expect(character.build.backgroundAbilityScoreIncreases).toEqual({});
+    expect(character.build.featAbilityScoreIncreases).toEqual({});
     expect(character.build.proficiencyChoices).toEqual({
       skills: [],
       expertise: [],
