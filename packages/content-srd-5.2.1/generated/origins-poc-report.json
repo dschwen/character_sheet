@@ -1,0 +1,82 @@
+{
+  "generatedEntities": [
+    "srd521.background.soldier",
+    "srd521.species.human",
+    "srd521.feat.origin.savage-attacker",
+    "srd521.feat.origin.skilled"
+  ],
+  "human": {
+    "creatureType": "humanoid",
+    "longRestGrantsHeroicInspiration": true,
+    "originFeatChoice": {
+      "category": "origin",
+      "maximum": 1,
+      "minimum": 1
+    },
+    "recommendedOriginFeatId": "srd521.feat.origin.skilled",
+    "sizeOptions": [
+      "medium",
+      "small"
+    ],
+    "skillProficiencyChoice": {
+      "maximum": 1,
+      "minimum": 1,
+      "options": "any-skill"
+    },
+    "traitsText": "Resourceful. You gain Heroic Inspiration whenever you finish a Long Rest. Skillful. You gain proficiency in one skill of your choice. Versatile. You gain an Origin feat of your choice (see “Feats”). Skilled is recommended.",
+    "walkingSpeed": 30
+  },
+  "originFeats": {
+    "srd521.feat.origin.savage-attacker": {
+      "category": "origin",
+      "chooseDamageRoll": "either",
+      "description": "You’ve trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",
+      "repeatable": false,
+      "trigger": "once-per-turn-weapon-hit",
+      "weaponDamageRolls": 2
+    },
+    "srd521.feat.origin.skilled": {
+      "category": "origin",
+      "description": "You gain proficiency in any combination of three skills or tools of your choice. Repeatable. You can take this feat more than once.",
+      "proficiencyChoice": {
+        "categories": [
+          "skill",
+          "tool"
+        ],
+        "maximum": 3,
+        "minimum": 3
+      },
+      "repeatable": true
+    }
+  },
+  "soldier": {
+    "abilityScoreIncreasePatterns": [
+      [
+        2,
+        1
+      ],
+      [
+        1,
+        1,
+        1
+      ]
+    ],
+    "abilityScoreOptions": [
+      "strength",
+      "dexterity",
+      "constitution"
+    ],
+    "equipmentText": "Choose A or B: (A) Spear, Shortbow, 20 Arrows, Gaming Set (same as above), Healer’s Kit, Quiver, Traveler’s Clothes, 14 GP; or (B) 50 GP",
+    "featId": "srd521.feat.origin.savage-attacker",
+    "skillProficiencies": [
+      "srd521.skill.athletics",
+      "srd521.skill.intimidation"
+    ],
+    "toolProficiencyChoice": {
+      "category": "gaming-set",
+      "maximum": 1,
+      "minimum": 1,
+      "text": "Choose one kind of Gaming Set (see “Equipment”)"
+    }
+  }
+}

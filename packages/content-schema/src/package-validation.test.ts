@@ -19,7 +19,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(92);
+    expect(parsedEntities).toHaveLength(96);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -32,6 +32,10 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.class.fighter");
     expect(entityIds).toContain("srd521.class-feature.fighter.second-wind");
     expect(entityIds).toContain("srd521.feat.fighting-style.defense");
+    expect(entityIds).toContain("srd521.species.human");
+    expect(entityIds).toContain("srd521.background.soldier");
+    expect(entityIds).toContain("srd521.feat.origin.savage-attacker");
+    expect(entityIds).toContain("srd521.feat.origin.skilled");
   });
 
   it("validates the acquired source manifest against the pinned artifact", () => {
@@ -123,6 +127,29 @@ describe("bootstrap content package", () => {
     expect(parsedDefense.proposedRules[0]).toMatchObject({
       type: "add-modifier",
       target: "armor-class",
+    });
+  });
+
+  it("validates the Human, Soldier, and Savage Attacker origin slice", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const entities = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities/origins.json", root), "utf8")));
+    const savageAttacker = authoringIrSchema.parse(
+      JSON.parse(readFileSync(new URL("authoring-ir/origin.savage-attacker.json", root), "utf8")),
+    );
+
+    expect(entities.map((entity) => entity.id)).toEqual([
+      "srd521.background.soldier",
+      "srd521.species.human",
+      "srd521.feat.origin.savage-attacker",
+      "srd521.feat.origin.skilled",
+    ]);
+    expect(entities.map((entity) => entity.source[0]?.page)).toEqual([83, 86, 87, 87]);
+    expect(savageAttacker.proposedRules[0]).toMatchObject({
+      type: "grant-action",
+      target: "action.savage-attacker",
+      automationLevel: "roll-assisted",
     });
   });
 });

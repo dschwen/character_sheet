@@ -36,6 +36,18 @@ const proficiencyChoicesSchema = z
   .strict()
   .default({});
 
+const backgroundAbilityScoreIncreasesSchema = z
+  .object({
+    strength: z.number().int().min(1).max(2).optional(),
+    dexterity: z.number().int().min(1).max(2).optional(),
+    constitution: z.number().int().min(1).max(2).optional(),
+    intelligence: z.number().int().min(1).max(2).optional(),
+    wisdom: z.number().int().min(1).max(2).optional(),
+    charisma: z.number().int().min(1).max(2).optional(),
+  })
+  .strict()
+  .default({});
+
 const characterLevelSchema = z
   .object({
     characterLevel: z.number().int().min(1).max(20),
@@ -87,7 +99,9 @@ const characterBuildSchema = z
       })
       .strict(),
     speciesId: entityIdSchema.optional(),
+    speciesSize: z.enum(["small", "medium", "large"]).optional(),
     backgroundId: entityIdSchema.optional(),
+    backgroundAbilityScoreIncreases: backgroundAbilityScoreIncreasesSchema,
     featIds: z.array(entityIdSchema).default([]),
     learnedSpellIds: z.array(entityIdSchema).default([]),
     choices: z.array(choiceSelectionSchema).default([]),
@@ -173,6 +187,7 @@ const characterStateSchema = z
     conditionIds: z.array(entityIdSchema).default([]),
     activeEffectIds: z.array(entityIdSchema).default([]),
     concentrationSpellId: entityIdSchema.optional(),
+    heroicInspiration: z.boolean().default(false),
     deathSaveSuccesses: z.number().int().min(0).max(3).default(0),
     deathSaveFailures: z.number().int().min(0).max(3).default(0),
     exhaustion: z.number().int().min(0).max(6).default(0),

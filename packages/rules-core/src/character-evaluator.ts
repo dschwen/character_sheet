@@ -139,6 +139,49 @@ const armorBodySchema = z
   })
   .passthrough();
 
+const backgroundBodySchema = z
+  .object({
+    abilityScoreOptions: z.array(z.enum(abilities)).length(3),
+    abilityScoreIncreasePatterns: z.array(z.array(z.number().int().positive())),
+    featId: z.string().min(1),
+    skillProficiencies: z.array(z.string().min(1)),
+  })
+  .passthrough();
+const speciesBodySchema = z
+  .object({
+    creatureType: z.string().min(1),
+    sizeOptions: z.array(z.enum(["small", "medium", "large"])).min(1),
+    walkingSpeed: z.number().int().positive(),
+    longRestGrantsHeroicInspiration: z.boolean().default(false),
+    skillProficiencyChoice: z
+      .object({
+        minimum: z.number().int().nonnegative(),
+        maximum: z.number().int().nonnegative(),
+        options: z.literal("any-skill"),
+      })
+      .optional(),
+    originFeatChoice: z
+      .object({
+        minimum: z.number().int().nonnegative(),
+        maximum: z.number().int().nonnegative(),
+        category: z.literal("origin"),
+      })
+      .optional(),
+  })
+  .passthrough();
+const featBodySchema = z
+  .object({
+    category: z.string().min(1),
+    repeatable: z.boolean().default(false),
+    proficiencyChoice: z
+      .object({
+        minimum: z.number().int().nonnegative(),
+        maximum: z.number().int().nonnegative(),
+        categories: z.array(z.enum(["skill", "tool"])),
+      })
+      .optional(),
+  })
+  .passthrough();
 const tableBodySchema = z.object({ entries: z.record(z.number()) });
 const rechargeRuleSchema = z
   .object({
@@ -159,6 +202,14 @@ const actionParametersSchema = z
         diceCount: z.number().int().positive(),
         diceSize: z.number().int().positive(),
         bonusFact: z.string().min(1),
+      })
+      .strict()
+      .optional(),
+    damageReroll: z
+      .object({
+        rolls: z.number().int().min(2),
+        choose: z.string().min(1),
+        appliesTo: z.string().min(1),
       })
       .strict()
       .optional(),
@@ -207,6 +258,13 @@ interface EquipmentContext {
   readonly armorTraining: ReadonlySet<string>;
   readonly weaponProficiencies: ReadonlySet<string>;
   readonly rollEffects: D20RollEffect[];
+}
+
+interface OriginContext {
+  readonly background?: ContentEntity;
+  readonly backgroundBody?: z.infer<typeof backgroundBodySchema>;
+  readonly species?: ContentEntity;
+  readonly speciesBody?: z.infer<typeof speciesBodySchema>;
 }
 
 function addValidation(
@@ -343,6 +401,196 @@ function validatePackagePins(
   }
 }
 
+function resolveOrigins(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): OriginContext {
+  const background =
+    character.build.backgroundId === undefined
+      ? undefined
+      : index.entities.get(character.build.backgroundId);
+  const species =
+    character.build.speciesId === undefined
+      ? undefined
+      : index.entities.get(character.build.speciesId);
+  if (character.build.backgroundId !== undefined && background?.kind !== "background") {
+    addValidation(
+      state,
+      "BACKGROUND_ENTITY_MISSING",
+      `Background entity ${character.build.backgroundId} is not loaded.`,
+      ["build.backgroundId"],
+    );
+  }
+  if (character.build.speciesId !== undefined && species?.kind !== "species") {
+    addValidation(
+      state,
+      "SPECIES_ENTITY_MISSING",
+      `Species entity ${character.build.speciesId} is not loaded.`,
+      ["build.speciesId"],
+    );
+  }
+  const backgroundBody =
+    background?.kind === "background" ? backgroundBodySchema.parse(background.body) : undefined;
+  const speciesBody =
+    species?.kind === "species" ? speciesBodySchema.parse(species.body) : undefined;
+  const increases = Object.entries(character.build.backgroundAbilityScoreIncreases) as [
+    Ability,
+    number,
+  ][];
+  if (backgroundBody === undefined && increases.length > 0) {
+    addValidation(
+      state,
+      "BACKGROUND_ABILITY_INCREASE_WITHOUT_BACKGROUND",
+      "Background ability increases require a loaded background.",
+      ["build.backgroundAbilityScoreIncreases"],
+    );
+  }
+  if (background !== undefined && backgroundBody !== undefined) {
+    const allowed = new Set(backgroundBody.abilityScoreOptions);
+    for (const [ability] of increases) {
+      if (!allowed.has(ability)) {
+        addValidation(
+          state,
+          "BACKGROUND_ABILITY_INCREASE_NOT_ALLOWED",
+          `${ability} cannot be increased by ${background.id}.`,
+          [`build.backgroundAbilityScoreIncreases.${ability}`],
+        );
+      }
+    }
+    const selectedPattern = increases
+      .map(([, amount]) => amount)
+      .sort((left, right) => right - left);
+    const patternIsAllowed = backgroundBody.abilityScoreIncreasePatterns.some(
+      (pattern) =>
+        JSON.stringify([...pattern].sort((left, right) => right - left)) ===
+        JSON.stringify(selectedPattern),
+    );
+    if (!patternIsAllowed) {
+      addValidation(
+        state,
+        "BACKGROUND_ABILITY_INCREASE_PATTERN",
+        `${background.id} requires either +2/+1 or +1/+1/+1 ability increases.`,
+        ["build.backgroundAbilityScoreIncreases"],
+      );
+    }
+    if (!character.build.featIds.includes(backgroundBody.featId)) {
+      addValidation(
+        state,
+        "BACKGROUND_FEAT_MISSING",
+        `${background.id} grants ${backgroundBody.featId}.`,
+        ["build.featIds"],
+      );
+    }
+  }
+  for (const [ability, increase] of increases) {
+    if (character.build.abilityScores[ability] + increase > 20) {
+      addValidation(
+        state,
+        "BACKGROUND_ABILITY_SCORE_ABOVE_MAXIMUM",
+        `The ${ability} background increase would raise the score above 20.`,
+        [`build.backgroundAbilityScoreIncreases.${ability}`],
+      );
+    }
+  }
+  if (species !== undefined && speciesBody !== undefined) {
+    if (
+      character.build.speciesSize === undefined ||
+      !speciesBody.sizeOptions.includes(character.build.speciesSize)
+    ) {
+      addValidation(
+        state,
+        "SPECIES_SIZE_INVALID",
+        `${species.id} requires one of: ${speciesBody.sizeOptions.join(", ")}.`,
+        ["build.speciesSize"],
+      );
+    }
+    const selectedOriginFeats = character.build.featIds.filter((featId) => {
+      const entity = index.entities.get(featId);
+      return entity?.kind === "feat" && featBodySchema.parse(entity.body).category === "origin";
+    });
+    const backgroundFeatId = backgroundBody?.featId;
+    let backgroundGrantRemaining = backgroundFeatId === undefined ? 0 : 1;
+    const versatileSelections = selectedOriginFeats.filter((featId) => {
+      if (featId === backgroundFeatId && backgroundGrantRemaining > 0) {
+        backgroundGrantRemaining -= 1;
+        return false;
+      }
+      return true;
+    });
+    const choice = speciesBody.originFeatChoice;
+    if (
+      choice !== undefined &&
+      (versatileSelections.length < choice.minimum || versatileSelections.length > choice.maximum)
+    ) {
+      addValidation(
+        state,
+        "SPECIES_ORIGIN_FEAT_COUNT",
+        `${species.id} requires ${String(choice.minimum)} additional Origin feat.`,
+        ["build.featIds"],
+      );
+    }
+    state.facts["species.creatureType"] = speciesBody.creatureType;
+    state.facts["species.size"] = character.build.speciesSize ?? null;
+    state.facts["species.longRestGrantsHeroicInspiration"] =
+      speciesBody.longRestGrantsHeroicInspiration;
+    const resourcefulTraceId = "species.longRestGrantsHeroicInspiration";
+    state.traces[resourcefulTraceId] = {
+      id: resourcefulTraceId,
+      result: speciesBody.longRestGrantsHeroicInspiration,
+      nodes: [
+        {
+          id: `${resourcefulTraceId}.grant`,
+          operation: "grant-species-trait",
+          inputs: [species.id],
+          output: speciesBody.longRestGrantsHeroicInspiration,
+          label: "Resourceful",
+        },
+      ],
+      sourceReferences: entitySourceReferences(species),
+    };
+    const speedTraceId = "speed.walking.base";
+    state.facts[speedTraceId] = speciesBody.walkingSpeed;
+    state.values[speedTraceId] = { value: speciesBody.walkingSpeed, traceId: speedTraceId };
+    state.traces[speedTraceId] = {
+      id: speedTraceId,
+      result: speciesBody.walkingSpeed,
+      nodes: [
+        {
+          id: `${speedTraceId}.species`,
+          operation: "grant-species-walking-speed",
+          inputs: [species.id],
+          output: speciesBody.walkingSpeed,
+        },
+      ],
+      sourceReferences: entitySourceReferences(species),
+    };
+  }
+  for (const [indexInBuild, featId] of character.build.featIds.entries()) {
+    const feat = index.entities.get(featId);
+    if (feat?.kind !== "feat") {
+      addValidation(state, "FEAT_ENTITY_MISSING", `Feat entity ${featId} is not loaded.`, [
+        `build.featIds.${String(indexInBuild)}`,
+      ]);
+      continue;
+    }
+    if (
+      character.build.featIds.indexOf(featId) !== indexInBuild &&
+      !featBodySchema.parse(feat.body).repeatable
+    ) {
+      addValidation(state, "FEAT_NOT_REPEATABLE", `${featId} can be selected only once.`, [
+        `build.featIds.${String(indexInBuild)}`,
+      ]);
+    }
+  }
+  return {
+    ...(background?.kind === "background" && backgroundBody !== undefined
+      ? { background, backgroundBody }
+      : {}),
+    ...(species?.kind === "species" && speciesBody !== undefined ? { species, speciesBody } : {}),
+  };
+}
+
 function materializeFacts(character: CharacterDocument, state: EngineState): Map<string, number> {
   const classLevels = new Map<string, number>();
   for (const level of character.build.levels) {
@@ -356,7 +604,9 @@ function materializeFacts(character: CharacterDocument, state: EngineState): Map
     }
   }
   for (const ability of abilities) {
-    state.facts[`ability.${ability}.score`] = character.build.abilityScores[ability];
+    state.facts[`ability.${ability}.score`] =
+      character.build.abilityScores[ability] +
+      (character.build.backgroundAbilityScoreIncreases[ability] ?? 0);
   }
   const equippedIds = new Set(character.loadout.equippedItemIds);
   const equippedEntityIds = character.loadout.inventory
@@ -533,6 +783,34 @@ function resolveEquipment(
   return { items, armorTraining, weaponProficiencies, rollEffects };
 }
 
+function evaluateWalkingSpeed(state: EngineState): void {
+  const base = state.facts["speed.walking.base"];
+  const armorPenalty = state.facts["speed.armorPenalty"];
+  if (typeof base !== "number" || typeof armorPenalty !== "number") {
+    return;
+  }
+  const traceId = "speed.walking";
+  const value = Math.max(0, base + armorPenalty);
+  state.facts[traceId] = value;
+  state.values[traceId] = { value, traceId };
+  state.traces[traceId] = {
+    id: traceId,
+    result: value,
+    nodes: [
+      {
+        id: `${traceId}.combine`,
+        operation: "apply-walking-speed-modifiers",
+        inputs: [base, armorPenalty],
+        output: value,
+      },
+    ],
+    sourceReferences: [
+      ...(state.traces["speed.walking.base"]?.sourceReferences ?? []),
+      ...(state.traces["speed.armorPenalty"]?.sourceReferences ?? []),
+    ],
+  };
+}
+
 function evaluateAbilities(state: EngineState): void {
   for (const ability of abilities) {
     const traceId = `ability.${ability}.modifier`;
@@ -687,6 +965,7 @@ function recordD20Test(
 
 function evaluateD20Tests(
   character: CharacterDocument,
+  origins: OriginContext,
   index: PackageIndex,
   state: EngineState,
   context: EvaluateCharacterInput["context"],
@@ -698,10 +977,31 @@ function evaluateD20Tests(
     firstClassId === undefined ? undefined : index.entities.get(firstClassId);
   const firstClassBody =
     firstClassEntity?.kind === "class" ? classBodySchema.parse(firstClassEntity.body) : undefined;
+  const allowedSkillChoiceSources = new Set<string>();
+  if (firstClassId !== undefined && firstClassBody?.skillProficiencyChoice !== undefined) {
+    allowedSkillChoiceSources.add(firstClassId);
+  }
+  if (origins.species !== undefined && origins.speciesBody?.skillProficiencyChoice !== undefined) {
+    allowedSkillChoiceSources.add(origins.species.id);
+  }
+  for (const featId of character.build.featIds) {
+    const feat = index.entities.get(featId);
+    if (
+      feat?.kind === "feat" &&
+      featBodySchema.parse(feat.body).proficiencyChoice?.categories.includes("skill") === true
+    ) {
+      allowedSkillChoiceSources.add(featId);
+    }
+  }
 
-  const selectedSkillIds = new Set(
-    character.build.proficiencyChoices.skills.map((choice) => choice.skillId),
+  const backgroundSkillGrants = (origins.backgroundBody?.skillProficiencies ?? []).map(
+    (skillId) => ({
+      skillId,
+      sourceId: origins.background?.id ?? "",
+    }),
   );
+  const skillChoices = [...character.build.proficiencyChoices.skills, ...backgroundSkillGrants];
+  const selectedSkillIds = new Set(skillChoices.map((choice) => choice.skillId));
   const expertiseSkillIds = new Set(
     character.build.proficiencyChoices.expertise.map((choice) => choice.skillId),
   );
@@ -725,6 +1025,17 @@ function evaluateD20Tests(
         "PROFICIENCY_SOURCE_MISSING",
         `Proficiency source ${choice.sourceId} is not loaded.`,
         ["build.proficiencyChoices"],
+      );
+    }
+    if (
+      character.build.proficiencyChoices.skills.includes(choice) &&
+      !allowedSkillChoiceSources.has(choice.sourceId)
+    ) {
+      addValidation(
+        state,
+        "SKILL_PROFICIENCY_SOURCE_NOT_GRANTED",
+        `${choice.sourceId} does not grant a skill choice to this character.`,
+        ["build.proficiencyChoices.skills"],
       );
     }
   }
@@ -761,6 +1072,60 @@ function evaluateD20Tests(
     }
   }
 
+  if (origins.species !== undefined && origins.speciesBody?.skillProficiencyChoice !== undefined) {
+    const speciesChoices = character.build.proficiencyChoices.skills.filter(
+      (choice) => choice.sourceId === origins.species?.id,
+    );
+    const requirement = origins.speciesBody.skillProficiencyChoice;
+    if (
+      speciesChoices.length < requirement.minimum ||
+      speciesChoices.length > requirement.maximum
+    ) {
+      addValidation(
+        state,
+        "SPECIES_SKILL_PROFICIENCY_COUNT",
+        `${origins.species.id} requires ${String(requirement.minimum)} skill proficiency choice.`,
+        ["build.proficiencyChoices.skills"],
+      );
+    }
+  }
+  for (const featId of character.build.featIds) {
+    const feat = index.entities.get(featId);
+    if (feat?.kind !== "feat") {
+      continue;
+    }
+    const proficiencyChoice = featBodySchema.parse(feat.body).proficiencyChoice;
+    if (!proficiencyChoice?.categories.includes("skill")) {
+      continue;
+    }
+    const featChoices = character.build.proficiencyChoices.skills.filter(
+      (choice) => choice.sourceId === featId,
+    );
+    if (
+      featChoices.length < proficiencyChoice.minimum ||
+      featChoices.length > proficiencyChoice.maximum
+    ) {
+      addValidation(
+        state,
+        "FEAT_SKILL_PROFICIENCY_COUNT",
+        `${featId} requires ${String(proficiencyChoice.minimum)} proficiency choices in the supported skill-only slice.`,
+        ["build.proficiencyChoices.skills"],
+      );
+    }
+  }
+  const duplicateSkillIds = [...selectedSkillIds].filter(
+    (skillId) => skillChoices.filter((choice) => choice.skillId === skillId).length > 1,
+  );
+  for (const skillId of duplicateSkillIds) {
+    addValidation(
+      state,
+      "DUPLICATE_SKILL_PROFICIENCY",
+      `${skillId} is granted by more than one selected origin or class choice.`,
+      ["build.proficiencyChoices.skills"],
+      "warning",
+    );
+  }
+
   for (const ability of abilities) {
     const proficient = firstClassBody?.savingThrowProficiencies.includes(ability) ?? false;
     const sources = proficient && firstClassId !== undefined ? [firstClassId] : [];
@@ -783,7 +1148,7 @@ function evaluateD20Tests(
 
   for (const skill of skillDefinitions) {
     const entityId = `${skillEntityPrefix}${skill.id}`;
-    const proficiencySources = character.build.proficiencyChoices.skills
+    const proficiencySources = skillChoices
       .filter((choice) => choice.skillId === entityId)
       .map((choice) => choice.sourceId);
     const expertiseSources = character.build.proficiencyChoices.expertise
@@ -1502,6 +1867,9 @@ function evaluateConditionalRules(
       if (parameters.healing !== undefined) {
         actionParameters.healing = parameters.healing;
       }
+      if (parameters.damageReroll !== undefined) {
+        actionParameters.damageReroll = parameters.damageReroll;
+      }
       state.actions.push({
         id: rule.target ?? rule.id,
         available,
@@ -1618,13 +1986,21 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     attacks: [],
   };
   validatePackagePins(character, index, state);
+  const origins = resolveOrigins(character, index, state);
   const classLevels = materializeFacts(character, state);
   evaluateAbilities(state);
   evaluateProficiency(state);
   const equipment = resolveEquipment(character, index, state);
-  evaluateD20Tests(character, index, state, input.context, equipment.rollEffects);
+  evaluateWalkingSpeed(state);
+  evaluateD20Tests(character, origins, index, state, input.context, equipment.rollEffects);
   evaluateHitPoints(character, index, state);
   const granted = grantedFeatureIds(classLevels, index);
+  if (character.build.speciesId !== undefined) {
+    granted.add(character.build.speciesId);
+  }
+  if (character.build.backgroundId !== undefined) {
+    granted.add(character.build.backgroundId);
+  }
   character.build.featIds.forEach((featId) => granted.add(featId));
   const rules = applicableRules(index, granted);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);

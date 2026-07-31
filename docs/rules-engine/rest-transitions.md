@@ -32,6 +32,10 @@ The modeled Long Rest proposal:
 
 Long Rest benefits cite the glossary rule on SRD page 185; Short Rest and Hit Die spending cite page 187. Resource changes retain the source of the feature that defined their recharge rule.
 
+A Human's Resourceful trait also proposes setting Heroic Inspiration to true after a Long Rest.
+That change cites the Human species entry on page 86 and remains immutable and previewable with
+the rest of the proposal.
+
 ## Current boundary
 
 Ability-score reductions and spell-slot recovery are not yet represented by the character model.

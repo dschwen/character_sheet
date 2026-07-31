@@ -44,11 +44,13 @@ describe("characterDocumentSchema", () => {
     const character = characterDocumentSchema.parse(baseCharacter);
 
     expect(character.build.featIds).toEqual([]);
+    expect(character.build.backgroundAbilityScoreIncreases).toEqual({});
     expect(character.build.proficiencyChoices).toEqual({
       skills: [],
       expertise: [],
     });
     expect(character.state.temporaryHitPoints).toBe(0);
+    expect(character.state.heroicInspiration).toBe(false);
     expect(character.state.activeEffectIds).toEqual([]);
     expect(character.state.expendedHitDice).toEqual({});
     expect(character.loadout.inventory).toEqual([]);

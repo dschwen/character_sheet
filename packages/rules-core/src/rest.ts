@@ -406,6 +406,22 @@ function proposeLongRest(
       [restSources["long-rest"]],
     );
   }
+  if (evaluation.facts["species.longRestGrantsHeroicInspiration"] === true) {
+    nextState.heroicInspiration = true;
+    recordChange(
+      changes,
+      traces,
+      "state.heroicInspiration",
+      character.state.heroicInspiration,
+      true,
+      "Resourceful grants Heroic Inspiration after a Long Rest.",
+      "grant-heroic-inspiration",
+      [character.state.heroicInspiration],
+      evaluation.traces["species.longRestGrantsHeroicInspiration"]?.sourceReferences ?? [
+        restSources["long-rest"],
+      ],
+    );
+  }
   resourceRecharge("long-rest", character, evaluation, nextState, changes, traces);
 }
 

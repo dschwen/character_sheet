@@ -1,8 +1,8 @@
 # Level-1 Fighter engine vertical slice
 
-The reviewed fixture `fixture-fighter-1` exercises Fighter class traits, selected Fighting Style,
-equipment, Weapon Mastery selections, mutable state, draft authoring IR, rest recharge, action use,
-and calculation traces in one deterministic evaluation.
+The reviewed fixture `fixture-fighter-1` exercises Human and Soldier origins, Fighter class traits,
+selected feats, equipment, Weapon Mastery selections, mutable state, draft authoring IR, rest
+recharge, action use, and calculation traces in one deterministic evaluation.
 
 ## Critical outputs
 
@@ -18,6 +18,7 @@ and calculation traces in one deterministic evaluation.
 | Perception                   |        +3 |
 | Initiative                   |        +2 |
 | Passive Perception           |        13 |
+| Walking Speed                |   30 feet |
 | Maximum Hit Points           |        12 |
 | Armor Class                  |        17 |
 | Second Wind maximum          |         2 |
@@ -33,6 +34,11 @@ on page 88.
 The fixture selects Greatsword, Flail, and Javelin Weapon Masteries. Their Graze, Sap, and Slow
 metadata is enabled on the corresponding attacks, but applying those combat effects remains
 outside this slice.
+
+Soldier supplies Athletics and Intimidation, Savage Attacker, and the selected +1 Strength, +1
+Dexterity, and +1 Constitution increases. Human supplies Medium size, 30-foot Speed, Persuasion
+from Skillful, and Skilled from Versatile. Skilled supplies Arcana, Insight, and Stealth in the
+fixture; tool selections are not yet modeled.
 
 ## Second Wind
 
@@ -51,11 +57,15 @@ Focused interaction tests verify:
 - Defense applies only while the feat is selected and armor is worn;
 - Second Wind is unavailable at full HP or with no remaining uses;
 - Short Rest and Long Rest apply the feature's distinct recharge rules;
+- Human Resourceful grants Heroic Inspiration on a Long Rest;
+- illegal ability-increase patterns, species size, feat grants, and skill-choice counts are
+  reported;
 - an invalid explicit die result rejects the whole action proposal;
 - evaluation is deterministic and every derived value has a trace.
 
 ## Current boundary
 
-This slice does not execute Graze, Sap, or Slow, enforce attack range or ammunition, apply damage,
-or automate Fighter features above level 1. Second Wind and Defense retain semantic-review
-warnings because their authoring IR has not been approved.
+This slice does not execute Graze, Sap, Slow, or Savage Attacker damage rolls, enforce attack range
+or ammunition, apply damage, represent tool proficiencies, or automate Fighter features above
+level 1. Second Wind, Defense, and Savage Attacker retain semantic-review warnings because their
+authoring IR has not been approved.

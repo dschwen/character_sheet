@@ -26,6 +26,7 @@ function loadRulesPackage(): LoadedRulesPackage {
       "barbarian.unarmored-defense.json",
       "fighter.second-wind.json",
       "fighting-style.defense.json",
+      "origin.savage-attacker.json",
     ].map((file) =>
       authoringIrSchema.parse(readJson(new URL(`authoring-ir/${file}`, packageRoot))),
     ),
@@ -50,6 +51,7 @@ describe("evaluateCharacter Fighter level-1 vertical slice", () => {
         current: number;
       };
       action: Record<string, unknown>;
+      savageAttackerAction: Record<string, unknown>;
       attacks: Record<string, unknown>[];
       validationCodes: string[];
     };
@@ -67,10 +69,15 @@ describe("evaluateCharacter Fighter level-1 vertical slice", () => {
       expected.selectedArmorClassCandidate,
     );
     expect(evaluation.resources[0]).toMatchObject(expected.resource);
-    expect(evaluation.actions[0]).toMatchObject(expected.action);
+    expect(evaluation.actions.find((action) => action.id === "action.second-wind")).toMatchObject(
+      expected.action,
+    );
+    expect(
+      evaluation.actions.find((action) => action.id === "action.savage-attacker"),
+    ).toMatchObject(expected.savageAttackerAction);
     expect(evaluation.attacks).toMatchObject(expected.attacks);
     expect(evaluation.validations.map((message) => message.code)).toEqual(expected.validationCodes);
-    expect(evaluation.coverageWarnings).toHaveLength(2);
+    expect(evaluation.coverageWarnings).toHaveLength(3);
 
     for (const [id, value] of Object.entries(evaluation.values)) {
       expect(evaluation.traces[value.traceId], `Missing trace for ${id}`).toBeDefined();
@@ -95,6 +102,22 @@ describe("evaluateCharacter Fighter level-1 vertical slice", () => {
         expect.objectContaining({
           entityId: "srd521.class-feature.fighter.second-wind",
           page: 48,
+        }),
+      ]),
+    );
+    expect(evaluation.traces["speed.walking"]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "srd521.species.human",
+          page: 86,
+        }),
+      ]),
+    );
+    expect(evaluation.traces["skill.athletics"]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "srd521.background.soldier",
+          page: 83,
         }),
       ]),
     );
@@ -185,6 +208,91 @@ describe("evaluateCharacter Fighter level-1 vertical slice", () => {
     expect(shortRest.nextState.expendedResources["srd521.resource.fighter.second-wind"]).toBe(1);
     expect(longRest.nextState.expendedResources["srd521.resource.fighter.second-wind"]).toBe(0);
     expect(longRest.nextState.currentHitPoints).toBe(12);
+    expect(longRest.nextState.heroicInspiration).toBe(true);
+    expect(longRest.traces["transition.state.heroicInspiration"]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "srd521.species.human",
+          page: 86,
+        }),
+      ]),
+    );
+  });
+
+  it("validates Human and Soldier origin selections", () => {
+    const character = loadCharacter();
+    const invalid: CharacterDocument = {
+      ...character,
+      build: {
+        ...character.build,
+        speciesSize: "large",
+        backgroundAbilityScoreIncreases: {
+          strength: 1,
+          wisdom: 1,
+        },
+        featIds: ["srd521.feat.fighting-style.defense"],
+        proficiencyChoices: {
+          ...character.build.proficiencyChoices,
+          skills: [
+            ...character.build.proficiencyChoices.skills.filter(
+              (choice) =>
+                choice.sourceId !== "srd521.species.human" &&
+                choice.sourceId !== "srd521.feat.origin.skilled",
+            ),
+            {
+              skillId: "srd521.skill.arcana",
+              sourceId: "srd521.feat.origin.savage-attacker",
+            },
+          ],
+        },
+      },
+    };
+
+    const evaluation = evaluateCharacter({
+      character: invalid,
+      packages: [loadRulesPackage()],
+    });
+    const codes = evaluation.validations.map((message) => message.code);
+
+    expect(codes).toEqual(
+      expect.arrayContaining([
+        "BACKGROUND_ABILITY_INCREASE_NOT_ALLOWED",
+        "BACKGROUND_ABILITY_INCREASE_PATTERN",
+        "BACKGROUND_FEAT_MISSING",
+        "SPECIES_SIZE_INVALID",
+        "SPECIES_ORIGIN_FEAT_COUNT",
+        "SPECIES_SKILL_PROFICIENCY_COUNT",
+        "SKILL_PROFICIENCY_SOURCE_NOT_GRANTED",
+      ]),
+    );
+  });
+
+  it("rejects repeating a non-repeatable Origin feat", () => {
+    const character = loadCharacter();
+    const repeated: CharacterDocument = {
+      ...character,
+      build: {
+        ...character.build,
+        featIds: [
+          "srd521.feat.fighting-style.defense",
+          "srd521.feat.origin.savage-attacker",
+          "srd521.feat.origin.savage-attacker",
+        ],
+        proficiencyChoices: {
+          ...character.build.proficiencyChoices,
+          skills: character.build.proficiencyChoices.skills.filter(
+            (choice) => choice.sourceId !== "srd521.feat.origin.skilled",
+          ),
+        },
+      },
+    };
+
+    const evaluation = evaluateCharacter({
+      character: repeated,
+      packages: [loadRulesPackage()],
+    });
+
+    expect(evaluation.validations.map((message) => message.code)).toContain("FEAT_NOT_REPEATABLE");
   });
 
   it("proposes Second Wind healing and resource spending atomically", () => {

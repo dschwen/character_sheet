@@ -22,23 +22,51 @@
       }
     ],
     "abilityScores": {
-      "strength": 16,
-      "dexterity": 14,
-      "constitution": 14,
+      "strength": 15,
+      "dexterity": 13,
+      "constitution": 13,
       "intelligence": 10,
       "wisdom": 12,
       "charisma": 8
     },
-    "featIds": ["srd521.feat.fighting-style.defense"],
+    "speciesId": "srd521.species.human",
+    "speciesSize": "medium",
+    "backgroundId": "srd521.background.soldier",
+    "backgroundAbilityScoreIncreases": {
+      "strength": 1,
+      "dexterity": 1,
+      "constitution": 1
+    },
+    "featIds": [
+      "srd521.feat.fighting-style.defense",
+      "srd521.feat.origin.savage-attacker",
+      "srd521.feat.origin.skilled"
+    ],
     "proficiencyChoices": {
       "skills": [
         {
-          "skillId": "srd521.skill.athletics",
+          "skillId": "srd521.skill.perception",
           "sourceId": "srd521.class.fighter"
         },
         {
-          "skillId": "srd521.skill.perception",
+          "skillId": "srd521.skill.survival",
           "sourceId": "srd521.class.fighter"
+        },
+        {
+          "skillId": "srd521.skill.persuasion",
+          "sourceId": "srd521.species.human"
+        },
+        {
+          "skillId": "srd521.skill.arcana",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.insight",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.stealth",
+          "sourceId": "srd521.feat.origin.skilled"
         }
       ]
     }

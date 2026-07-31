@@ -1,0 +1,66 @@
+{
+  "id": "srd521.feat.origin.savage-attacker",
+  "kind": "feat",
+  "level": 1,
+  "parentId": "srd521.background.soldier",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "savage-attacker-damage-reroll",
+      "parameters": {
+        "actionEconomy": "once-per-turn-trigger",
+        "damageReroll": {
+          "appliesTo": "weapon-damage-dice",
+          "choose": "either",
+          "rolls": 2
+        }
+      },
+      "target": "action.savage-attacker",
+      "type": "grant-action",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "literal",
+          "value": true
+        },
+        "right": {
+          "kind": "literal",
+          "value": true
+        }
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "The engine exposes the option but does not roll weapon damage."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0087-b010",
+        "p0087-b011"
+      ],
+      "page": 87,
+      "quoteHash": "c451e360bb9ee2bad8a4df007b2a248c79b7c95f3d1197b6e589b36b36962ce9",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Origin Feat"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "You’ve trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target."
+      }
+    ],
+    "title": "Savage Attacker"
+  }
+}

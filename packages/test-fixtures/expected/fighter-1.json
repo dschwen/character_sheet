@@ -11,8 +11,15 @@
     "savingThrow.constitution": 4,
     "skill.athletics": 5,
     "skill.perception": 3,
+    "skill.intimidation": 1,
+    "skill.persuasion": 1,
+    "skill.arcana": 2,
+    "skill.insight": 3,
+    "skill.stealth": 4,
+    "skill.survival": 3,
     "initiative": 2,
     "passive.perception": 13,
+    "speed.walking": 30,
     "hitPoints.maximum": 12,
     "armorClass": 17,
     "srd521.resource.fighter.second-wind.maximum": 2,
@@ -42,6 +49,18 @@
         "diceCount": 1,
         "diceSize": 10,
         "bonusFact": "classLevel.fighter"
+      }
+    }
+  },
+  "savageAttackerAction": {
+    "id": "action.savage-attacker",
+    "available": true,
+    "actionEconomy": "once-per-turn-trigger",
+    "parameters": {
+      "damageReroll": {
+        "rolls": 2,
+        "choose": "either",
+        "appliesTo": "weapon-damage-dice"
       }
     }
   },
