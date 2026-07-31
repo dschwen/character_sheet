@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "fixture-wizard-5",
+  "name": "Mira",
+  "ruleset": {
+    "system": "dnd5e",
+    "edition": "2024",
+    "packages": [
+      {
+        "id": "srd-5.2.1",
+        "version": "0.1.0",
+        "sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87"
+      }
+    ]
+  },
+  "build": {
+    "levels": [
+      {
+        "characterLevel": 1,
+        "classId": "srd521.class.wizard",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 2,
+        "classId": "srd521.class.wizard",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 3,
+        "classId": "srd521.class.wizard",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 4,
+        "classId": "srd521.class.wizard",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 5,
+        "classId": "srd521.class.wizard",
+        "hitPointChoice": "fixed"
+      }
+    ],
+    "abilityScores": {
+      "strength": 8,
+      "dexterity": 14,
+      "constitution": 13,
+      "intelligence": 15,
+      "wisdom": 12,
+      "charisma": 10
+    },
+    "speciesId": "srd521.species.human",
+    "speciesSize": "medium",
+    "backgroundId": "srd521.background.soldier",
+    "backgroundAbilityScoreIncreases": {
+      "strength": 1,
+      "dexterity": 1,
+      "constitution": 1
+    },
+    "subclassId": "srd521.subclass.wizard.evoker",
+    "featAbilityScoreIncreases": {
+      "intelligence": 2
+    },
+    "featIds": [
+      "srd521.feat.origin.savage-attacker",
+      "srd521.feat.origin.skilled",
+      "srd521.feat.general.ability-score-improvement"
+    ],
+    "learnedSpellIds": [
+      "srd521.spell.acid-splash",
+      "srd521.spell.light",
+      "srd521.spell.mage-hand",
+      "srd521.spell.ray-of-frost",
+      "srd521.spell.burning-hands",
+      "srd521.spell.chromatic-orb",
+      "srd521.spell.detect-magic",
+      "srd521.spell.feather-fall",
+      "srd521.spell.mage-armor",
+      "srd521.spell.magic-missile",
+      "srd521.spell.shield",
+      "srd521.spell.sleep",
+      "srd521.spell.thunderwave",
+      "srd521.spell.misty-step",
+      "srd521.spell.scorching-ray",
+      "srd521.spell.shatter",
+      "srd521.spell.web",
+      "srd521.spell.fireball"
+    ],
+    "proficiencyChoices": {
+      "skills": [
+        {
+          "skillId": "srd521.skill.arcana",
+          "sourceId": "srd521.class.wizard"
+        },
+        {
+          "skillId": "srd521.skill.investigation",
+          "sourceId": "srd521.class.wizard"
+        },
+        {
+          "skillId": "srd521.skill.perception",
+          "sourceId": "srd521.species.human"
+        },
+        {
+          "skillId": "srd521.skill.insight",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.persuasion",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.stealth",
+          "sourceId": "srd521.feat.origin.skilled"
+        }
+      ],
+      "expertise": [
+        {
+          "skillId": "srd521.skill.arcana",
+          "sourceId": "srd521.class-feature.wizard.scholar"
+        }
+      ]
+    }
+  },
+  "loadout": {
+    "preparedSpellIds": [
+      "srd521.spell.detect-magic",
+      "srd521.spell.mage-armor",
+      "srd521.spell.magic-missile",
+      "srd521.spell.shield",
+      "srd521.spell.thunderwave",
+      "srd521.spell.misty-step",
+      "srd521.spell.scorching-ray",
+      "srd521.spell.web",
+      "srd521.spell.fireball"
+    ]
+  },
+  "state": {
+    "currentHitPoints": 24,
+    "expendedSpellSlots": {
+      "1": 2,
+      "2": 1,
+      "3": 1
+    },
+    "concentrationSpellId": "srd521.spell.web"
+  },
+  "metadata": {
+    "createdAt": "2026-07-30T00:00:00.000Z",
+    "updatedAt": "2026-07-30T00:00:00.000Z",
+    "revision": 0
+  }
+}

@@ -27,6 +27,8 @@ import type {
   ProficiencyEntry,
   ProficiencyLevel,
   ResourceInstance,
+  SpellcastingSummary,
+  SpellSummary,
   ValidationMessage,
 } from "@dnd/rules-api";
 
@@ -202,6 +204,38 @@ const subclassBodySchema = z
     ),
   })
   .passthrough();
+const wizardProgressionRowSchema = z
+  .object({
+    level: z.number().int().min(1).max(20),
+    cantrips: z.number().int().nonnegative(),
+    preparedSpells: z.number().int().nonnegative(),
+    spellSlots: z.record(z.coerce.number().int().min(1).max(9), z.number().int().nonnegative()),
+  })
+  .passthrough();
+const wizardClassBodySchema = z
+  .object({
+    spellcastingAbility: z.literal("intelligence"),
+    spellbookStartingSpells: z.number().int().positive(),
+    spellbookSpellsPerLevel: z.number().int().positive(),
+    spellList: z.array(z.string().min(1)),
+    progression: z.array(wizardProgressionRowSchema),
+  })
+  .passthrough();
+const spellBodySchema = z
+  .object({
+    level: z.number().int().min(0).max(9),
+    school: z.string().min(1),
+    classes: z.array(z.string().min(1)),
+    wizardSpell: z.boolean(),
+    ritual: z.boolean(),
+    castingTime: z.string().min(1),
+    range: z.string().min(1),
+    duration: z.string().min(1),
+    concentration: z.boolean(),
+    attackType: z.enum(["melee", "ranged"]).nullable(),
+    savingThrows: z.array(z.string().min(1)),
+  })
+  .passthrough();
 const tableBodySchema = z.object({ entries: z.record(z.number()) });
 const rechargeRuleSchema = z
   .object({
@@ -275,6 +309,8 @@ interface EngineState {
   readonly d20Tests: Record<string, D20TestSummary>;
   readonly inventory: InventoryItemSummary[];
   readonly attacks: AttackSummary[];
+  readonly spells: SpellSummary[];
+  spellcasting?: SpellcastingSummary;
 }
 
 interface PackageIndex {
@@ -638,10 +674,15 @@ function validateProgressionSelections(
     classLevelCounts.set(level.classId, (classLevelCounts.get(level.classId) ?? 0) + 1);
   }
   const fighterLevel = classLevelCounts.get("srd521.class.fighter") ?? 0;
+  const wizardLevel = classLevelCounts.get("srd521.class.wizard") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
       : index.entities.get(character.build.subclassId);
+  const subclassParentId =
+    subclass?.kind === "subclass"
+      ? subclassBodySchema.parse(subclass.body).parentClassId
+      : undefined;
   if (fighterLevel >= 3 && character.build.subclassId === undefined) {
     addValidation(
       state,
@@ -650,11 +691,27 @@ function validateProgressionSelections(
       ["build.subclassId"],
     );
   }
-  if (fighterLevel < 3 && character.build.subclassId !== undefined) {
+  if (fighterLevel < 3 && subclassParentId === "srd521.class.fighter") {
     addValidation(
       state,
       "FIGHTER_SUBCLASS_LEVEL_REQUIRED",
       "A Fighter subclass requires Fighter level 3.",
+      ["build.subclassId"],
+    );
+  }
+  if (wizardLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "WIZARD_SUBCLASS_REQUIRED",
+      "A Wizard of level 3 or higher must select a Wizard subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (wizardLevel < 3 && subclassParentId === "srd521.class.wizard") {
+    addValidation(
+      state,
+      "WIZARD_SUBCLASS_LEVEL_REQUIRED",
+      "A Wizard subclass requires Wizard level 3.",
       ["build.subclassId"],
     );
   }
@@ -667,11 +724,14 @@ function validateProgressionSelections(
     );
   } else if (
     subclass?.kind === "subclass" &&
-    subclassBodySchema.parse(subclass.body).parentClassId !== "srd521.class.fighter"
+    (classLevelCounts.get(subclassParentId ?? "") ?? 0) === 0
   ) {
-    addValidation(state, "SUBCLASS_CLASS_MISMATCH", `${subclass.id} is not a Fighter subclass.`, [
-      "build.subclassId",
-    ]);
+    addValidation(
+      state,
+      "SUBCLASS_CLASS_MISMATCH",
+      `${subclass.id} does not match any of the character's classes.`,
+      ["build.subclassId"],
+    );
   }
 
   const characterLevel = character.build.levels.length;
@@ -679,20 +739,30 @@ function validateProgressionSelections(
     const feat = index.entities.get(featId);
     return feat?.kind === "feat" && featBodySchema.parse(feat.body).category === "general";
   });
-  const fighter = index.entities.get("srd521.class.fighter");
-  const grantedGeneralFeatChoices =
-    fighter?.kind === "class"
-      ? classBodySchema
-          .parse(fighter.body)
-          .progression.filter((row) => row.level <= fighterLevel)
+  const grantedGeneralFeatChoices = [...classLevelCounts.entries()].reduce(
+    (count, [classId, classLevel]) => {
+      const classEntity = index.entities.get(classId);
+      if (classEntity?.kind !== "class") {
+        return count;
+      }
+      return (
+        count +
+        classBodySchema
+          .parse(classEntity.body)
+          .progression.filter((row) => row.level <= classLevel)
           .flatMap((row) => row.features)
           .filter((feature) => feature.name === "Ability Score Improvement").length
-      : 0;
+      );
+    },
+    0,
+  );
   if (selectedGeneralFeats.length !== grantedGeneralFeatChoices) {
     addValidation(
       state,
-      "FIGHTER_GENERAL_FEAT_CHOICE_COUNT",
-      `Fighter level ${String(fighterLevel)} grants ${String(grantedGeneralFeatChoices)} General feat choice.`,
+      classLevelCounts.size === 1 && fighterLevel > 0
+        ? "FIGHTER_GENERAL_FEAT_CHOICE_COUNT"
+        : "GENERAL_FEAT_CHOICE_COUNT",
+      `This class progression grants ${String(grantedGeneralFeatChoices)} General feat choice.`,
       ["build.featIds"],
     );
   }
@@ -1497,6 +1567,287 @@ function evaluateHitPoints(
       "state.currentHitPoints",
     ]);
   }
+}
+
+function evaluateSpellcasting(
+  character: CharacterDocument,
+  classLevels: ReadonlyMap<string, number>,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  const wizardClassId = "srd521.class.wizard";
+  const wizardLevel = classLevels.get(wizardClassId) ?? 0;
+  if (wizardLevel === 0) {
+    return;
+  }
+  const classEntity = index.entities.get(wizardClassId);
+  if (classEntity?.kind !== "class") {
+    addValidation(state, "WIZARD_CLASS_ENTITY_MISSING", "The Wizard class entity is not loaded.", [
+      "build.levels",
+    ]);
+    return;
+  }
+  const classBody = wizardClassBodySchema.parse(classEntity.body);
+  const progression = classBody.progression.find((row) => row.level === wizardLevel);
+  if (progression === undefined) {
+    addValidation(
+      state,
+      "WIZARD_PROGRESSION_MISSING",
+      `The Wizard progression has no level ${String(wizardLevel)} row.`,
+      ["build.levels"],
+    );
+    return;
+  }
+  const abilityModifier = requireNumber(
+    state.facts["ability.intelligence.modifier"] ?? null,
+    "Wizard spellcasting ability modifier",
+  );
+  const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
+  const attackBonus = abilityModifier + proficiencyBonus;
+  const saveDifficultyClass = 8 + abilityModifier + proficiencyBonus;
+  const classSources = entitySourceReferences(classEntity);
+  const attackTraceId = "spellcasting.wizard.attackBonus";
+  state.facts[attackTraceId] = attackBonus;
+  state.values[attackTraceId] = { value: attackBonus, traceId: attackTraceId };
+  state.traces[attackTraceId] = {
+    id: attackTraceId,
+    result: attackBonus,
+    nodes: [
+      {
+        id: `${attackTraceId}.sum`,
+        operation: "add-ability-and-proficiency",
+        inputs: [abilityModifier, proficiencyBonus],
+        output: attackBonus,
+      },
+    ],
+    sourceReferences: classSources,
+  };
+  const saveTraceId = "spellcasting.wizard.saveDifficultyClass";
+  state.facts[saveTraceId] = saveDifficultyClass;
+  state.values[saveTraceId] = { value: saveDifficultyClass, traceId: saveTraceId };
+  state.traces[saveTraceId] = {
+    id: saveTraceId,
+    result: saveDifficultyClass,
+    nodes: [
+      {
+        id: `${saveTraceId}.sum`,
+        operation: "add-spell-save-base-ability-and-proficiency",
+        inputs: [8, abilityModifier, proficiencyBonus],
+        output: saveDifficultyClass,
+      },
+    ],
+    sourceReferences: classSources,
+  };
+
+  const slots = Object.entries(progression.spellSlots)
+    .map(([level, maximum]) => {
+      const expended = character.state.expendedSpellSlots[level] ?? 0;
+      const current = Math.max(0, maximum - expended);
+      const traceId = `spellcasting.wizard.slots.${level}`;
+      const maximumTraceId = `${traceId}.maximum`;
+      state.facts[`${traceId}.maximum`] = maximum;
+      state.facts[`${traceId}.current`] = current;
+      state.values[`${traceId}.maximum`] = { value: maximum, traceId: maximumTraceId };
+      state.values[`${traceId}.current`] = { value: current, traceId };
+      state.traces[maximumTraceId] = {
+        id: maximumTraceId,
+        result: maximum,
+        nodes: [
+          {
+            id: `${maximumTraceId}.progression`,
+            operation: "lookup-class-progression",
+            inputs: [wizardLevel, Number(level)],
+            output: maximum,
+          },
+        ],
+        sourceReferences: classSources,
+      };
+      state.traces[traceId] = {
+        id: traceId,
+        result: current,
+        nodes: [
+          {
+            id: `${traceId}.subtract-expended`,
+            operation: "subtract-expended-spell-slots",
+            inputs: [maximum, expended],
+            output: current,
+          },
+        ],
+        sourceReferences: classSources,
+      };
+      if (expended > maximum) {
+        addValidation(
+          state,
+          "SPELL_SLOTS_EXPENDED_ABOVE_MAXIMUM",
+          `Expended level ${level} spell slots exceed the maximum of ${String(maximum)}.`,
+          [`state.expendedSpellSlots.${level}`],
+        );
+      }
+      return { level: Number(level), maximum, expended, current, traceId };
+    })
+    .sort((left, right) => left.level - right.level);
+  for (const level of Object.keys(character.state.expendedSpellSlots)) {
+    if (!(level in progression.spellSlots)) {
+      addValidation(
+        state,
+        "SPELL_SLOT_LEVEL_UNAVAILABLE",
+        `Wizard level ${String(wizardLevel)} has no level ${level} spell slots.`,
+        [`state.expendedSpellSlots.${level}`],
+      );
+    }
+  }
+
+  const spellList = new Set(classBody.spellList);
+  const prepared = new Set(character.loadout.preparedSpellIds);
+  const learned = new Set(character.build.learnedSpellIds);
+  const maximumSpellLevel = Math.max(...Object.keys(progression.spellSlots).map(Number));
+  if (learned.size !== character.build.learnedSpellIds.length) {
+    addValidation(
+      state,
+      "DUPLICATE_LEARNED_SPELL",
+      "The spellbook cannot contain duplicate spell selections.",
+      ["build.learnedSpellIds"],
+    );
+  }
+  if (prepared.size !== character.loadout.preparedSpellIds.length) {
+    addValidation(state, "DUPLICATE_PREPARED_SPELL", "Prepared spell selections must be unique.", [
+      "loadout.preparedSpellIds",
+    ]);
+  }
+  let learnedCantrips = 0;
+  let learnedLeveledSpells = 0;
+  for (const [position, spellId] of character.build.learnedSpellIds.entries()) {
+    const entity = index.entities.get(spellId);
+    if (entity?.kind !== "spell") {
+      addValidation(
+        state,
+        "LEARNED_SPELL_ENTITY_MISSING",
+        `Learned spell ${spellId} is not loaded.`,
+        [`build.learnedSpellIds.${String(position)}`],
+      );
+      continue;
+    }
+    const body = spellBodySchema.parse(entity.body);
+    if (!spellList.has(spellId) || !body.wizardSpell) {
+      addValidation(
+        state,
+        "SPELL_NOT_ON_WIZARD_LIST",
+        `${spellId} is not on the Wizard spell list.`,
+        [`build.learnedSpellIds.${String(position)}`],
+      );
+    }
+    if (body.level > maximumSpellLevel) {
+      addValidation(
+        state,
+        "WIZARD_SPELL_LEVEL_UNAVAILABLE",
+        `${spellId} requires level ${String(body.level)} spell slots.`,
+        [`build.learnedSpellIds.${String(position)}`],
+      );
+    }
+    if (body.level === 0) {
+      learnedCantrips += 1;
+    } else {
+      learnedLeveledSpells += 1;
+    }
+    state.spells.push({
+      id: spellId,
+      name: entity.name.en ?? spellId,
+      level: body.level,
+      school: body.school,
+      prepared: prepared.has(spellId),
+      ritual: body.ritual,
+      concentration: body.concentration,
+      castingTime: body.castingTime,
+      range: body.range,
+      duration: body.duration,
+      ...(body.attackType === null ? {} : { attackType: body.attackType }),
+      savingThrows: body.savingThrows,
+      sources: entitySourceReferences(entity),
+    });
+  }
+  for (const [position, spellId] of character.loadout.preparedSpellIds.entries()) {
+    const entity = index.entities.get(spellId);
+    if (!learned.has(spellId)) {
+      addValidation(
+        state,
+        "PREPARED_SPELL_NOT_IN_SPELLBOOK",
+        `${spellId} is prepared but not recorded in the spellbook.`,
+        [`loadout.preparedSpellIds.${String(position)}`],
+      );
+    }
+    if (entity?.kind === "spell" && spellBodySchema.parse(entity.body).level === 0) {
+      addValidation(
+        state,
+        "CANTRIP_CANNOT_BE_PREPARED",
+        `${spellId} is a cantrip and does not use a prepared-spell selection.`,
+        [`loadout.preparedSpellIds.${String(position)}`],
+      );
+    }
+  }
+  if (prepared.size !== progression.preparedSpells) {
+    addValidation(
+      state,
+      "WIZARD_PREPARED_SPELL_COUNT",
+      `Wizard level ${String(wizardLevel)} requires ${String(progression.preparedSpells)} prepared spells.`,
+      ["loadout.preparedSpellIds"],
+    );
+  }
+  if (learnedCantrips !== progression.cantrips) {
+    addValidation(
+      state,
+      "WIZARD_CANTRIP_COUNT",
+      `Wizard level ${String(wizardLevel)} knows ${String(progression.cantrips)} cantrips.`,
+      ["build.learnedSpellIds"],
+    );
+  }
+  const spellbookMinimum =
+    classBody.spellbookStartingSpells +
+    classBody.spellbookSpellsPerLevel * Math.max(0, wizardLevel - 1);
+  if (learnedLeveledSpells < spellbookMinimum) {
+    addValidation(
+      state,
+      "WIZARD_SPELLBOOK_BELOW_MINIMUM",
+      `Wizard level ${String(wizardLevel)} has at least ${String(spellbookMinimum)} level 1+ spells in the spellbook.`,
+      ["build.learnedSpellIds"],
+    );
+  }
+  if (character.state.concentrationSpellId !== undefined) {
+    const concentration = index.entities.get(character.state.concentrationSpellId);
+    if (
+      concentration?.kind !== "spell" ||
+      !spellBodySchema.parse(concentration.body).concentration
+    ) {
+      addValidation(
+        state,
+        "CONCENTRATION_SPELL_INVALID",
+        `${character.state.concentrationSpellId} is not a loaded Concentration spell.`,
+        ["state.concentrationSpellId"],
+      );
+    } else if (!learned.has(character.state.concentrationSpellId)) {
+      addValidation(
+        state,
+        "CONCENTRATION_SPELL_NOT_KNOWN",
+        `${character.state.concentrationSpellId} is not in the Wizard's spellbook.`,
+        ["state.concentrationSpellId"],
+      );
+    }
+  }
+  state.spells.sort(
+    (left, right) => left.level - right.level || left.name.localeCompare(right.name),
+  );
+  state.spellcasting = {
+    classId: wizardClassId,
+    ability: classBody.spellcastingAbility,
+    abilityModifier,
+    attackBonus,
+    saveDifficultyClass,
+    cantripsKnown: progression.cantrips,
+    preparedSpellLimit: progression.preparedSpells,
+    spellbookMinimum,
+    slots,
+    attackTraceId,
+    saveTraceId,
+  };
 }
 
 function grantedFeatureIds(classLevels: Map<string, number>, index: PackageIndex): Set<string> {
@@ -2347,6 +2698,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     d20Tests: {},
     inventory: [],
     attacks: [],
+    spells: [],
   };
   validatePackagePins(character, index, state);
   const origins = resolveOrigins(character, index, state);
@@ -2371,6 +2723,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     ...ruleRollEffects(rules, state, index, granted),
   ]);
   evaluateHitPoints(character, index, state);
+  evaluateSpellcasting(character, classLevels, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
@@ -2391,6 +2744,8 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     d20Tests: state.d20Tests,
     inventory: state.inventory,
     attacks: state.attacks,
+    ...(state.spellcasting === undefined ? {} : { spellcasting: state.spellcasting }),
+    spells: state.spells,
     actions: state.actions,
     resources: state.resources,
     resistances: [...state.resistances].sort(),

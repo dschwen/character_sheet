@@ -1,0 +1,15 @@
+{
+  "name": "@dnd/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean"
+  },
+  "dependencies": {
+    "@dnd/character-model": "workspace:^",
+    "@dnd/content-schema": "workspace:^",
+    "@dnd/rules-api": "workspace:^",
+    "@dnd/rules-core": "workspace:^"
+  }
+}

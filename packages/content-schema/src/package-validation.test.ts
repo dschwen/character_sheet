@@ -19,7 +19,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(104);
+    expect(parsedEntities).toHaveLength(141);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -39,6 +39,10 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.subclass.fighter.champion");
     expect(entityIds).toContain("srd521.subclass-feature.fighter.champion.improved-critical");
     expect(entityIds).toContain("srd521.feat.general.ability-score-improvement");
+    expect(entityIds).toContain("srd521.class.wizard");
+    expect(entityIds).toContain("srd521.subclass.wizard.evoker");
+    expect(entityIds).toContain("srd521.spell.fireball");
+    expect(entityIds).toContain("srd521.spell.web");
   });
 
   it("validates the acquired source manifest against the pinned artifact", () => {
@@ -184,5 +188,39 @@ describe("bootstrap content package", () => {
       target: "action.savage-attacker",
       automationLevel: "roll-assisted",
     });
+  });
+
+  it("validates the Wizard class and representative spell slice", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const entities = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities/wizard.json", root), "utf8")));
+    const wizard = entities.find((entity) => entity.id === "srd521.class.wizard");
+    const spells = entities.filter((entity) => entity.kind === "spell");
+    const wizardBody = z
+      .object({
+        spellcastingAbility: z.literal("intelligence"),
+        spellList: z.array(z.string()),
+        progression: z.array(
+          z.object({
+            level: z.number().int(),
+            cantrips: z.number().int(),
+            preparedSpells: z.number().int(),
+            spellSlots: z.record(z.number().int()),
+          }),
+        ),
+      })
+      .parse(wizard?.body);
+
+    expect(entities).toHaveLength(37);
+    expect(spells).toHaveLength(20);
+    expect(wizardBody.spellList).toHaveLength(217);
+    expect(wizardBody.progression[4]).toMatchObject({
+      level: 5,
+      cantrips: 4,
+      preparedSpells: 9,
+      spellSlots: { "1": 4, "2": 3, "3": 2 },
+    });
+    expect(spells.every((spell) => spell.source.length > 0)).toBe(true);
   });
 });

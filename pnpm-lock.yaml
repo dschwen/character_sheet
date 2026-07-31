@@ -40,6 +40,21 @@ importers:
         specifier: ^3.0.8
         version: 3.2.7(@types/node@22.20.1)
 
+  apps/cli:
+    dependencies:
+      '@dnd/character-model':
+        specifier: workspace:^
+        version: link:../../packages/character-model
+      '@dnd/content-schema':
+        specifier: workspace:^
+        version: link:../../packages/content-schema
+      '@dnd/rules-api':
+        specifier: workspace:^
+        version: link:../../packages/rules-api
+      '@dnd/rules-core':
+        specifier: workspace:^
+        version: link:../../packages/rules-core
+
   packages/calculation-trace: {}
 
   packages/character-model:
@@ -85,6 +100,8 @@ importers:
       zod:
         specifier: ^3.24.2
         version: 3.25.76
+
+  packages/test-fixtures: {}
 
 packages:
 

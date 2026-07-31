@@ -1,0 +1,2499 @@
+[
+  {
+    "body": {
+      "armorTraining": [],
+      "hitPointDie": 6,
+      "primaryAbilities": [
+        "intelligence"
+      ],
+      "progression": [
+        {
+          "cantrips": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.wizard.spellcasting",
+              "name": "Spellcasting"
+            },
+            {
+              "entityId": "srd521.class-feature.wizard.ritual-adept",
+              "name": "Ritual Adept"
+            },
+            {
+              "entityId": "srd521.class-feature.wizard.arcane-recovery",
+              "name": "Arcane Recovery"
+            }
+          ],
+          "level": 1,
+          "preparedSpells": 4,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 2
+          }
+        },
+        {
+          "cantrips": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.wizard.scholar",
+              "name": "Scholar"
+            }
+          ],
+          "level": 2,
+          "preparedSpells": 5,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 3
+          }
+        },
+        {
+          "cantrips": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.wizard.wizard-subclass",
+              "name": "Wizard Subclass"
+            }
+          ],
+          "level": 3,
+          "preparedSpells": 6,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 4,
+            "2": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.wizard.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 4,
+          "preparedSpells": 7,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 4,
+            "2": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.wizard.memorize-spell",
+              "name": "Memorize Spell"
+            }
+          ],
+          "level": 5,
+          "preparedSpells": 9,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 6,
+          "preparedSpells": 10,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "features": [],
+          "level": 7,
+          "preparedSpells": 11,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 1
+          }
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 8,
+          "preparedSpells": 12,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "features": [],
+          "level": 9,
+          "preparedSpells": 14,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 10,
+          "preparedSpells": 15,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [],
+          "level": 11,
+          "preparedSpells": 16,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 12,
+          "preparedSpells": 16,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [],
+          "level": 13,
+          "preparedSpells": 17,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 14,
+          "preparedSpells": 18,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [],
+          "level": 15,
+          "preparedSpells": 19,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 16,
+          "preparedSpells": 21,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [],
+          "level": 17,
+          "preparedSpells": 22,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.wizard.spell-mastery",
+              "name": "Spell Mastery"
+            }
+          ],
+          "level": 18,
+          "preparedSpells": 23,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.wizard.epic-boon",
+              "name": "Epic Boon"
+            }
+          ],
+          "level": 19,
+          "preparedSpells": 24,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 2,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.wizard.signature-spells",
+              "name": "Signature Spells"
+            }
+          ],
+          "level": 20,
+          "preparedSpells": 25,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 2,
+            "7": 2,
+            "8": 1,
+            "9": 1
+          }
+        }
+      ],
+      "savingThrowProficiencies": [
+        "intelligence",
+        "wisdom"
+      ],
+      "skillProficiencyChoice": {
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "arcana",
+          "history",
+          "insight",
+          "investigation",
+          "medicine",
+          "nature",
+          "religion"
+        ]
+      },
+      "spellList": [
+        "srd521.spell.acid-splash",
+        "srd521.spell.chill-touch",
+        "srd521.spell.dancing-lights",
+        "srd521.spell.elementalism",
+        "srd521.spell.fire-bolt",
+        "srd521.spell.light",
+        "srd521.spell.mage-hand",
+        "srd521.spell.mending",
+        "srd521.spell.message",
+        "srd521.spell.minor-illusion",
+        "srd521.spell.poison-spray",
+        "srd521.spell.prestidigitation",
+        "srd521.spell.ray-of-frost",
+        "srd521.spell.shocking-grasp",
+        "srd521.spell.true-strike",
+        "srd521.spell.alarm",
+        "srd521.spell.burning-hands",
+        "srd521.spell.charm-person",
+        "srd521.spell.chromatic-orb",
+        "srd521.spell.color-spray",
+        "srd521.spell.comprehend-languages",
+        "srd521.spell.detect-magic",
+        "srd521.spell.disguise-self",
+        "srd521.spell.expeditious-retreat",
+        "srd521.spell.false-life",
+        "srd521.spell.feather-fall",
+        "srd521.spell.find-familiar",
+        "srd521.spell.floating-disk",
+        "srd521.spell.fog-cloud",
+        "srd521.spell.grease",
+        "srd521.spell.hideous-laughter",
+        "srd521.spell.ice-knife",
+        "srd521.spell.identify",
+        "srd521.spell.illusory-script",
+        "srd521.spell.jump",
+        "srd521.spell.longstrider",
+        "srd521.spell.mage-armor",
+        "srd521.spell.magic-missile",
+        "srd521.spell.protection-from-evil-and-good",
+        "srd521.spell.ray-of-sickness",
+        "srd521.spell.shield",
+        "srd521.spell.silent-image",
+        "srd521.spell.sleep",
+        "srd521.spell.thunderwave",
+        "srd521.spell.unseen-servant",
+        "srd521.spell.acid-arrow",
+        "srd521.spell.alter-self",
+        "srd521.spell.arcane-lock",
+        "srd521.spell.arcanist-s-magic-aura",
+        "srd521.spell.augury",
+        "srd521.spell.blindness-deafness",
+        "srd521.spell.blur",
+        "srd521.spell.continual-flame",
+        "srd521.spell.darkness",
+        "srd521.spell.darkvision",
+        "srd521.spell.detect-thoughts",
+        "srd521.spell.dragon-s-breath",
+        "srd521.spell.enhance-ability",
+        "srd521.spell.enlarge-reduce",
+        "srd521.spell.flaming-sphere",
+        "srd521.spell.gentle-repose",
+        "srd521.spell.gust-of-wind",
+        "srd521.spell.hold-person",
+        "srd521.spell.invisibility",
+        "srd521.spell.knock",
+        "srd521.spell.levitate",
+        "srd521.spell.locate-object",
+        "srd521.spell.magic-mouth",
+        "srd521.spell.magic-weapon",
+        "srd521.spell.mind-spike",
+        "srd521.spell.mirror-image",
+        "srd521.spell.misty-step",
+        "srd521.spell.ray-of-enfeeblement",
+        "srd521.spell.rope-trick",
+        "srd521.spell.scorching-ray",
+        "srd521.spell.see-invisibility",
+        "srd521.spell.shatter",
+        "srd521.spell.spider-climb",
+        "srd521.spell.suggestion",
+        "srd521.spell.web",
+        "srd521.spell.animate-dead",
+        "srd521.spell.bestow-curse",
+        "srd521.spell.blink",
+        "srd521.spell.clairvoyance",
+        "srd521.spell.counterspell",
+        "srd521.spell.dispel-magic",
+        "srd521.spell.fear",
+        "srd521.spell.fireball",
+        "srd521.spell.fly",
+        "srd521.spell.gaseous-form",
+        "srd521.spell.glyph-of-warding",
+        "srd521.spell.haste",
+        "srd521.spell.hypnotic-pattern",
+        "srd521.spell.lightning-bolt",
+        "srd521.spell.magic-circle",
+        "srd521.spell.major-image",
+        "srd521.spell.nondetection",
+        "srd521.spell.phantom-steed",
+        "srd521.spell.protection-from-energy",
+        "srd521.spell.remove-curse",
+        "srd521.spell.sending",
+        "srd521.spell.sleet-storm",
+        "srd521.spell.slow",
+        "srd521.spell.speak-with-dead",
+        "srd521.spell.stinking-cloud",
+        "srd521.spell.tiny-hut",
+        "srd521.spell.tongues",
+        "srd521.spell.vampiric-touch",
+        "srd521.spell.water-breathing",
+        "srd521.spell.arcane-eye",
+        "srd521.spell.banishment",
+        "srd521.spell.black-tentacles",
+        "srd521.spell.blight",
+        "srd521.spell.charm-monster",
+        "srd521.spell.confusion",
+        "srd521.spell.conjure-minor-elementals",
+        "srd521.spell.control-water",
+        "srd521.spell.dimension-door",
+        "srd521.spell.divination",
+        "srd521.spell.fabricate",
+        "srd521.spell.faithful-hound",
+        "srd521.spell.fire-shield",
+        "srd521.spell.greater-invisibility",
+        "srd521.spell.hallucinatory-terrain",
+        "srd521.spell.ice-storm",
+        "srd521.spell.locate-creature",
+        "srd521.spell.phantasmal-killer",
+        "srd521.spell.polymorph",
+        "srd521.spell.private-sanctum",
+        "srd521.spell.resilient-sphere",
+        "srd521.spell.secret-chest",
+        "srd521.spell.stone-shape",
+        "srd521.spell.stoneskin",
+        "srd521.spell.vitriolic-sphere",
+        "srd521.spell.wall-of-fire",
+        "srd521.spell.animate-objects",
+        "srd521.spell.arcane-hand",
+        "srd521.spell.cloudkill",
+        "srd521.spell.cone-of-cold",
+        "srd521.spell.conjure-elemental",
+        "srd521.spell.contact-other-plane",
+        "srd521.spell.creation",
+        "srd521.spell.dominate-person",
+        "srd521.spell.dream",
+        "srd521.spell.geas",
+        "srd521.spell.hold-monster",
+        "srd521.spell.legend-lore",
+        "srd521.spell.mislead",
+        "srd521.spell.modify-memory",
+        "srd521.spell.passwall",
+        "srd521.spell.planar-binding",
+        "srd521.spell.scrying",
+        "srd521.spell.seeming",
+        "srd521.spell.summon-dragon",
+        "srd521.spell.telekinesis",
+        "srd521.spell.telepathic-bond",
+        "srd521.spell.teleportation-circle",
+        "srd521.spell.wall-of-force",
+        "srd521.spell.wall-of-stone",
+        "srd521.spell.chain-lightning",
+        "srd521.spell.circle-of-death",
+        "srd521.spell.contingency",
+        "srd521.spell.create-undead",
+        "srd521.spell.disintegrate",
+        "srd521.spell.eyebite",
+        "srd521.spell.flesh-to-stone",
+        "srd521.spell.freezing-sphere",
+        "srd521.spell.globe-of-invulnerability",
+        "srd521.spell.guards-and-wards",
+        "srd521.spell.instant-summons",
+        "srd521.spell.irresistible-dance",
+        "srd521.spell.magic-jar",
+        "srd521.spell.mass-suggestion",
+        "srd521.spell.move-earth",
+        "srd521.spell.programmed-illusion",
+        "srd521.spell.sunbeam",
+        "srd521.spell.true-seeing",
+        "srd521.spell.wall-of-ice",
+        "srd521.spell.arcane-sword",
+        "srd521.spell.delayed-blast-fireball",
+        "srd521.spell.etherealness",
+        "srd521.spell.finger-of-death",
+        "srd521.spell.forcecage",
+        "srd521.spell.magnificent-mansion",
+        "srd521.spell.mirage-arcane",
+        "srd521.spell.plane-shift",
+        "srd521.spell.prismatic-spray",
+        "srd521.spell.project-image",
+        "srd521.spell.reverse-gravity",
+        "srd521.spell.sequester",
+        "srd521.spell.simulacrum",
+        "srd521.spell.symbol",
+        "srd521.spell.teleport",
+        "srd521.spell.antimagic-field",
+        "srd521.spell.antipathy-sympathy",
+        "srd521.spell.befuddlement",
+        "srd521.spell.clone",
+        "srd521.spell.control-weather",
+        "srd521.spell.demiplane",
+        "srd521.spell.dominate-monster",
+        "srd521.spell.incendiary-cloud",
+        "srd521.spell.maze",
+        "srd521.spell.mind-blank",
+        "srd521.spell.power-word-stun",
+        "srd521.spell.sunburst",
+        "srd521.spell.astral-projection",
+        "srd521.spell.foresight",
+        "srd521.spell.gate",
+        "srd521.spell.imprisonment",
+        "srd521.spell.meteor-swarm",
+        "srd521.spell.power-word-kill",
+        "srd521.spell.prismatic-wall",
+        "srd521.spell.shapechange",
+        "srd521.spell.time-stop",
+        "srd521.spell.true-polymorph",
+        "srd521.spell.weird",
+        "srd521.spell.wish"
+      ],
+      "spellbookSpellsPerLevel": 2,
+      "spellbookStartingSpells": 6,
+      "spellcastingAbility": "intelligence",
+      "startingEquipmentText": "Choose A or B: (A) 2 Daggers, Arcane Focus (Quarterstaff), Robe, Spellbook, Scholar’s Pack, and 5 GP; or (B) 55 GP",
+      "weaponProficiencies": [
+        "simple"
+      ]
+    },
+    "id": "srd521.class.wizard",
+    "kind": "class",
+    "name": {
+      "en": "Wizard"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Wizard class progression and spellcasting table from pages 77–79.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0077-b003",
+          "p0077-b004",
+          "p0077-b005",
+          "p0077-b006",
+          "p0077-b007",
+          "p0077-b008",
+          "p0077-b009",
+          "p0077-b010",
+          "p0077-b011",
+          "p0077-b021",
+          "p0077-b018",
+          "p0077-b019",
+          "p0077-b022",
+          "p0077-b020",
+          "p0077-b023",
+          "p0077-b024",
+          "p0077-b025",
+          "p0077-b026",
+          "p0077-b027",
+          "p0077-b028",
+          "p0077-b029",
+          "p0077-b030",
+          "p0077-b031",
+          "p0077-b032",
+          "p0077-b033",
+          "p0077-b034",
+          "p0077-b035",
+          "p0077-b036",
+          "p0077-b037",
+          "p0077-b038",
+          "p0077-b039",
+          "p0077-b040",
+          "p0077-b041",
+          "p0077-b042",
+          "p0077-b043"
+        ],
+        "page": 77,
+        "quoteHash": "ab11703fa4d35f4831b23046be5569f3fe46a13133e12d67703b1e962b9f64e4",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class",
+      "wizard",
+      "spellcaster"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "As a student of arcane magic, you have learned to cast spells. See “Spells” for the rules on spellcasting. The information below details how you use those rules with Wizard spells, which appear in the Wizard spell list later in the class’s description. Cantrips. You know three Wizard cantrips of your choice. Light, Mage Hand, and Ray of Frost are recommended. Whenever you finish a Long Rest, you can replace one of your cantrips from this feature with another Wizard cantrip of your choice. When you reach Wizard levels 4 and 10, you learn another Wizard cantrip of your choice, as shown in the Cantrips column of the Wizard Features table. Spellbook. Your wizardly apprenticeship culminated in the creation of a unique book: your spellbook. It is a Tiny object that weighs 3 pounds, contains 100 pages, and can be read only by you or someone casting Identify. You determine the book’s appearance and materials, such as a gilt-edged tome or a collection of vellum bound with twine. The book contains the level 1+ spells you know. It starts with six level 1 Wizard spells of your choice. Detect Magic, Feather Fall, Mage Armor, Magic Missile, Sleep, and Thunderwave are recommended. Whenever you gain a Wizard level after 1, add two Wizard spells of your choice to your spellbook. Each of these spells must be of a level for which you have spell slots, as shown in the Wizard Features table. The spells are the culmination of arcane research you do regularly. Spell Slots. The Wizard Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest. Prepared Spells of Level 1+. You prepare the list of level 1+ spells that are available for you to cast with this feature. To do so, choose four spells from your spellbook. The chosen spells must be of a level for which you have spell slots. The number of spells on your list increases as you gain Wizard levels, as shown in the Prepared Spells column of the Wizard Features table. Whenever that number increases, choose additional Wizard spells until the number of spells on your list matches the number in the table. The chosen spells must be of a level for which you have spell slots. For example, if you’re a level 3 Wizard, your list of prepared spells can include six spells of levels 1 and 2 in any combination, chosen from your spellbook. If another Wizard feature gives you spells that you always have prepared, those spells don’t count against the number of spells you can prepare with this feature, but those spells otherwise count as Wizard spells for you. Changing Your Prepared Spells. Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells there with spells from your spellbook. Spellcasting Ability. Intelligence is your spellcasting ability for your Wizard spells. Spellcasting Focus. You can use an Arcane Focus or your spellbook as a Spellcasting Focus for your Wizard spells."
+    },
+    "id": "srd521.class-feature.wizard.spellcasting",
+    "kind": "class-feature",
+    "name": {
+      "en": "Spellcasting"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Spellcasting extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0077-b016"
+        ],
+        "page": 77,
+        "quoteHash": "66095cb0f61042ceb9c24f3d5df10d53df4cb8db089d641db6786ca662a6f711",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0078-b005"
+        ],
+        "page": 78,
+        "quoteHash": "2637ee5684052ca7f9340de422b08b67df545e39f81d82a2361953427c9cf230",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You can cast any spell as a Ritual if that spell has the Ritual tag and the spell is in your spellbook. You needn’t have the spell prepared, but you must read from the book to cast a spell in this way."
+    },
+    "id": "srd521.class-feature.wizard.ritual-adept",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ritual Adept"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ritual Adept extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0078-b006",
+          "p0078-b007"
+        ],
+        "page": 78,
+        "quoteHash": "75a0f70de693c44fa2d1aa35d440bc6646e89551174e2c5bd1812c78d60a7801",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You can regain some of your magical energy by studying your spellbook. When you finish a Short Rest, you can choose expended spell slots to recover. The spell slots can have a combined level equal to no more than half your Wizard level (round up), and none of the slots can be level 6 or higher. For example, if you’re a level 4 Wizard, you can recover up to two levels’ worth of spell slots, regaining either one level 2 spell slot or two level 1 spell slots. Once you use this feature, you can’t do so again until you finish a Long Rest."
+    },
+    "id": "srd521.class-feature.wizard.arcane-recovery",
+    "kind": "class-feature",
+    "name": {
+      "en": "Arcane Recovery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Arcane Recovery extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0078-b008"
+        ],
+        "page": 78,
+        "quoteHash": "129b7fc498425f4755d82a6c627f470c5601fb6180dae479716f820a354099a6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 2,
+      "text": "While studying magic, you also specialized in another field of study. Choose one of the following skills in which you have proficiency: Arcana, History, Investigation, Medicine, Nature, or Religion. You have Expertise in the chosen skill."
+    },
+    "id": "srd521.class-feature.wizard.scholar",
+    "kind": "class-feature",
+    "name": {
+      "en": "Scholar"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Scholar extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0078-b009"
+        ],
+        "page": 78,
+        "quoteHash": "27f724e3c3521bc8edba3144cef7816b6f7d625e843d7a70dc059ce1649f6a88",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "You gain a Wizard subclass of your choice. The Evoker subclass is detailed after this class’s description. A subclass is a specialization that grants you features at certain Wizard levels. For the rest"
+    },
+    "id": "srd521.class-feature.wizard.wizard-subclass",
+    "kind": "class-feature",
+    "name": {
+      "en": "Wizard Subclass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Wizard Subclass extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0078-b010"
+        ],
+        "page": 78,
+        "quoteHash": "5e93aa7dea03659e7f54d8d26918c02943a447e065315f386811ecb686f90acd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 4,
+      "text": "You gain the Ability Score Improvement feat (see “Feats”) or another feat of your choice for which you qualify. You gain this feature again at Wizard levels 8, 12, and 16."
+    },
+    "id": "srd521.class-feature.wizard.ability-score-improvement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ability Score Improvement extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0079-b003"
+        ],
+        "page": 79,
+        "quoteHash": "c2abc84ab629706f7e1ce7c9666037885110a5ad01478a23ed7c7cb4e657a320",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 5,
+      "text": "Whenever you finish a Short Rest, you can study your spellbook and replace one of the level 1+ Wizard spells you have prepared for your Spellcasting feature with another level 1+ spell from the book."
+    },
+    "id": "srd521.class-feature.wizard.memorize-spell",
+    "kind": "class-feature",
+    "name": {
+      "en": "Memorize Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Memorize Spell extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0079-b004"
+        ],
+        "page": 79,
+        "quoteHash": "5d355890b117440ecf7c0c4c456d84f4a28e081bac561bdb090dd1d57913aeac",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 18,
+      "text": "You have achieved such mastery over certain spells that you can cast them at will. Choose a level 1 and a level 2 spell in your spellbook that have a casting time of an action. You always have those spells prepared, and you can cast them at their lowest level without expending a spell slot. To cast either spell at a higher level, you must expend a spell slot. Whenever you finish a Long Rest, you can study your spellbook and replace one of those spells with an eligible spell of the same level from the book."
+    },
+    "id": "srd521.class-feature.wizard.spell-mastery",
+    "kind": "class-feature",
+    "name": {
+      "en": "Spell Mastery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Spell Mastery extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0079-b005"
+        ],
+        "page": 79,
+        "quoteHash": "7f1758b6f465ee5325cd6eb37c42856f44ca70446706d1765ef1c6ca5fd6f0ea",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 19,
+      "text": "You gain an Epic Boon feat (see “Feats”) or another feat of your choice for which you qualify. Boon of Spell Recall is recommended."
+    },
+    "id": "srd521.class-feature.wizard.epic-boon",
+    "kind": "class-feature",
+    "name": {
+      "en": "Epic Boon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Epic Boon extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0079-b006"
+        ],
+        "page": 79,
+        "quoteHash": "513394f48a38c1609bda03345106aaa29bbd6345f4a2c57a89cbdf5b7ec4f6f8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 20,
+      "text": "Choose two level 3 spells in your spellbook as your signature spells. You always have these spells prepared, and you can cast each of them once at level 3 without expending a spell slot. When you do so, you can’t cast them in this way again until you finish a Short or Long Rest. To cast either spell at a higher level, you must expend a spell slot."
+    },
+    "id": "srd521.class-feature.wizard.signature-spells",
+    "kind": "class-feature",
+    "name": {
+      "en": "Signature Spells"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Signature Spells extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0079-b007"
+        ],
+        "page": 79,
+        "quoteHash": "834a75e83a1fb42124731e4cf6e2a92bbbfda3310c2c40c54f47466da78e371b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "description": "Your studies focus on magic that creates powerful elemental effects such as bitter cold, searing flame, rolling thunder, crackling lightning, and burning acid. Some Evokers find employment in military forces, serving as artillery to blast armies from afar. Others use their power to protect others, while some seek their own gain.",
+      "parentClassId": "srd521.class.wizard",
+      "progression": [
+        {
+          "features": [
+            "srd521.subclass-feature.wizard.evoker.evocation-savant"
+          ],
+          "level": 3
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.wizard.evoker.potent-cantrip"
+          ],
+          "level": 3
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.wizard.evoker.sculpt-spells"
+          ],
+          "level": 6
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.wizard.evoker.empowered-evocation"
+          ],
+          "level": 10
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.wizard.evoker.overchannel"
+          ],
+          "level": 14
+        }
+      ]
+    },
+    "id": "srd521.subclass.wizard.evoker",
+    "kind": "subclass",
+    "name": {
+      "en": "Evoker"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Evoker subclass extracted from page 82.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0082-b030",
+          "p0082-b032"
+        ],
+        "page": 82,
+        "quoteHash": "c8aca209809cb9ddbdcc52739c0d1684828d6ebc9b9dad83d02103e846cc30fd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass",
+      "wizard",
+      "evoker"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "Choose two Wizard spells from the Evocation school, each of which must be no higher than level 2, and add them to your spellbook for free. In addition, whenever you gain access to a new level of spell slots in this class, you can add one Wizard spell from the Evocation school to your spellbook for free. The chosen spell must be of a level for which you have spell slots."
+    },
+    "id": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Evocation Savant"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Evocation Savant extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0082-b033"
+        ],
+        "page": 82,
+        "quoteHash": "097a3bcf7973ec29e17e8ae909969292a89ad66fc05829557f2a635ab5d262c7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "Your damaging cantrips affect even creatures that avoid the brunt of the effect. When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on a saving throw against the cantrip, the target takes half the cantrip’s damage (if any) but suffers no additional effect from the cantrip."
+    },
+    "id": "srd521.subclass-feature.wizard.evoker.potent-cantrip",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Potent Cantrip"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Potent Cantrip extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0082-b034"
+        ],
+        "page": 82,
+        "quoteHash": "34427346fc14ea3368076a4945d7f2171e075fbb784f172f84c6c0128c478ac7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 6,
+      "text": "You can create pockets of relative safety within the effects of your evocations. When you cast an Evocation spell that affects other creatures that you can see, you can choose a number of them equal to 1 plus the spell’s level. The chosen creatures automatically succeed on their saving throws against the spell, and they take no damage if they would normally take half damage on a successful save."
+    },
+    "id": "srd521.subclass-feature.wizard.evoker.sculpt-spells",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Sculpt Spells"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Sculpt Spells extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0082-b035"
+        ],
+        "page": 82,
+        "quoteHash": "ccfbf0598439b66d588679dfab6c244cb7ebf49eedfa0925b483c406709c86b5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 10,
+      "text": "Whenever you cast a Wizard spell from the Evocation school, you can add your Intelligence modifier to one damage roll of that spell."
+    },
+    "id": "srd521.subclass-feature.wizard.evoker.empowered-evocation",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Empowered Evocation"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Empowered Evocation extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0082-b036"
+        ],
+        "page": 82,
+        "quoteHash": "f32bbcd60b820bcd5d904d894bf54ca0d3785a2ab7c5c3ebd9016936a88d12ba",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "level": 14,
+      "text": "You can increase the power of your spells. When you cast a Wizard spell with a spell slot of levels 1–5 that deals damage, you can deal maximum damage with that spell on the turn you cast it. The first time you do so, you suffer no adverse effect. If you use this feature again before you finish a Long Rest, you take 2d12 Necrotic damage for each level of the spell slot immediately after you cast it. This damage ignores Resistance and Immunity. Each time you use this feature again before finishing a Long Rest, the Necrotic damage per spell level increases by 1d12."
+    },
+    "id": "srd521.subclass-feature.wizard.evoker.overchannel",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Overchannel"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Overchannel extracted from the Wizard class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0082-b037"
+        ],
+        "page": 82,
+        "quoteHash": "4675efa45d5b3a580eb26da73991469e58507dbbfe0b9dd237ced1d983a2219d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 1,
+          "diceSize": 6,
+          "type": "acid"
+        }
+      ],
+      "description": "You create an acidic bubble at a point within range, where it explodes in a 5-foot-radius Sphere. Each creature in that Sphere must succeed on a Dexterity saving throw or take 1d6 Acid damage. Cantrip Upgrade. The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "level": 0,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.acid-splash",
+    "kind": "spell",
+    "name": {
+      "en": "Acid Splash"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0107-b005",
+          "p0107-b006",
+          "p0107-b007"
+        ],
+        "page": 107,
+        "quoteHash": "1b61dc1db637c4dfc77bcdd0cbb546f959eb556efcdac1bdb34ab0816e9a6081",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 3,
+          "diceSize": 6,
+          "type": "fire"
+        }
+      ],
+      "description": "A thin sheet of flames shoots forth from you. Each creature in a 15-foot Cone makes a Dexterity saving throw, taking 3d6 Fire damage on a failed save or half as much damage on a successful one. Flammable objects in the Cone that aren’t being worn or carried start burning. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell slot level above 1.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "level": 1,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.burning-hands",
+    "kind": "spell",
+    "name": {
+      "en": "Burning Hands"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0114-b006",
+          "p0114-b007",
+          "p0114-b008"
+        ],
+        "page": 114,
+        "quoteHash": "2178a80a9fb897b703f4b5ee17caaf7f9239e50298246e63f785ad9db491fbeb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a diamond worth 50+ GP",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You hurl an orb of energy at a target within range. Choose Acid, Cold, Fire, Lightning, Poison, or Thunder for the type of orb you create, and then make a ranged spell attack against the target. On a hit, the target takes 3d8 damage of the chosen type. If you roll the same number on two or more of the d8s, the orb leaps to a different target of your choice within 30 feet of the target. Make an attack roll against the new target, and make a new damage roll. The orb can’t leap again unless you cast the spell with a level 2+ spell slot. Using a Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 1. The orb can leap a maximum number of times equal to the level of the slot expended, and a creature can be targeted only once by each casting of this spell.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "level": 1,
+      "range": "90 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.chromatic-orb",
+    "kind": "spell",
+    "name": {
+      "en": "Chromatic Orb"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0115-b009",
+          "p0115-b010",
+          "p0115-b011",
+          "p0115-b012"
+        ],
+        "page": 115,
+        "quoteHash": "73710b1b9f6c0773ecdf99922e4eaad471d31374c48bf96196878bcf08aefc04",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Reaction, which you take when you see a creature within 60 feet of yourself casting a spell with Verbal, Somatic, or Material components",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": false
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You attempt to interrupt a creature in the process of casting a spell. The creature makes a Constitution saving throw. On a failed save, the spell dissipates with no effect, and the action, Bonus Action, or Reaction used to cast it is wasted. If that spell was cast with a spell slot, the slot isn’t expended.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "level": 3,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "constitution"
+      ],
+      "school": "abjuration",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.counterspell",
+    "kind": "spell",
+    "name": {
+      "en": "Counterspell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0120-b029",
+          "p0120-b030",
+          "p0120-b031",
+          "p0120-b032"
+        ],
+        "page": 120,
+        "quoteHash": "d76c48d38fe427d00dd8ed1b97b4850ed41889dee355a01d46a88e100a2928ca",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "abjuration",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action or Ritual",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "For the duration, you sense the presence of magical effects within 30 feet of yourself. If you sense such effects, you can take the Magic action to see a faint aura around any visible creature or object in the area that bears the magic, and if an effect was created by a spell, you learn the spell’s school of magic. The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin sheet of lead.",
+      "duration": "Concentration, up to 10 minutes",
+      "hasHigherLevelEffect": false,
+      "level": 1,
+      "range": "Self",
+      "ritual": true,
+      "savingThrows": [],
+      "school": "divination",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.detect-magic",
+    "kind": "spell",
+    "name": {
+      "en": "Detect Magic"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0123-b006",
+          "p0123-b007",
+          "p0123-b008"
+        ],
+        "page": 123,
+        "quoteHash": "750eb0196e208f603f488d826932303d8ebb95a42dcd44211ba01da6acc15cff",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "divination",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Reaction, which you take when you or a creature you can see within 60 feet of you falls",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a small feather or piece of down",
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "Choose up to five falling creatures within range. A falling creature’s rate of descent slows to 60 feet per round until the spell ends. If a creature lands before the spell ends, the creature takes no damage from the fall, and the spell ends for that creature.",
+      "duration": "1 minute",
+      "hasHigherLevelEffect": false,
+      "level": 1,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "transmutation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.feather-fall",
+    "kind": "spell",
+    "name": {
+      "en": "Feather Fall"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0130-b005",
+          "p0130-b006",
+          "p0130-b007",
+          "p0130-b008"
+        ],
+        "page": 130,
+        "quoteHash": "d112fd9e651fe7b5fb08752c175fe596948fd2edcc3c99645bbbc42eb71bf0d9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "transmutation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a ball of bat guano and sulfur",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 8,
+          "diceSize": 6,
+          "type": "fire"
+        }
+      ],
+      "description": "A bright streak flashes from you to a point you choose within range and then blossoms with a low roar into a fiery explosion. Each creature in a 20-foot-radius Sphere centered on that point makes a Dexterity saving throw, taking 8d6 Fire damage on a failed save or half as much damage on a successful one. Flammable objects in the area that aren’t being worn or carried start burning. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell slot level above 3.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "level": 3,
+      "range": "150 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.fireball",
+    "kind": "spell",
+    "name": {
+      "en": "Fireball"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0131-b009",
+          "p0131-b010",
+          "p0131-b011"
+        ],
+        "page": 131,
+        "quoteHash": "fabef831b3b015da1a3b8631961ff34fc2ad91b9c07dbefc39513d718a786655",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a feather",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You touch a willing creature. For the duration, the target gains a Fly Speed of 60 feet and can hover. When the spell ends, the target falls if it is still aloft unless it can stop the fall. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 3.",
+      "duration": "Concentration, up to 10 minutes",
+      "hasHigherLevelEffect": true,
+      "level": 3,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "transmutation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.fly",
+    "kind": "spell",
+    "name": {
+      "en": "Fly"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0133-b008",
+          "p0133-b009",
+          "p0133-b010"
+        ],
+        "page": 133,
+        "quoteHash": "8301f0a22d4989718b8668cfbc19eef68de81b084711a1f1d8d80f99c8917c70",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "transmutation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "cleric",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a firefly or phosphorescent moss",
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You touch one Large or smaller object that isn’t being worn or carried by someone else. Until the spell ends, the object sheds Bright Light in a 20-foot radius and Dim Light for an additional 20 feet. The light can be colored as you like. Covering the object with something opaque blocks the light. The spell ends if you cast it again.",
+      "duration": "1 hour",
+      "hasHigherLevelEffect": false,
+      "level": 0,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.light",
+    "kind": "spell",
+    "name": {
+      "en": "Light"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0144-b014",
+          "p0144-b015",
+          "p0144-b016"
+        ],
+        "page": 144,
+        "quoteHash": "45557fdd817b4fb7c049dde5b7a21998fa7b60d03984a932437f8618e274a287",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a piece of cured leather",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You touch a willing creature who isn’t wearing armor. Until the spell ends, the target’s base AC becomes 13 plus its Dexterity modifier. The spell ends early if the target dons armor.",
+      "duration": "8 hours",
+      "hasHigherLevelEffect": false,
+      "level": 1,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.mage-armor",
+    "kind": "spell",
+    "name": {
+      "en": "Mage Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0145-b011",
+          "p0145-b012",
+          "p0145-b013"
+        ],
+        "page": 145,
+        "quoteHash": "43243a009ce59e6e0c2de40bc39e94f35c6aa41eda97eba54c1b6a2425511283",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "abjuration",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "A spectral, floating hand appears at a point you choose within range. The hand lasts for the duration. The hand vanishes if it is ever more than 30 feet away from you or if you cast this spell again. When you cast the spell, you can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. As a Magic action on your later turns, you can control the hand thus again. As part of that action, you can move the hand up to 30 feet. The hand can’t attack, activate magic items, or carry more than 10 pounds.",
+      "duration": "1 minute",
+      "hasHigherLevelEffect": false,
+      "level": 0,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "conjuration",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.mage-hand",
+    "kind": "spell",
+    "name": {
+      "en": "Mage Hand"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0145-b014",
+          "p0145-b015",
+          "p0145-b016"
+        ],
+        "page": 145,
+        "quoteHash": "da3e6c49a1ab52d3a810561751ace71a347ff281e36bcd820e822528836af67e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "conjuration",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You create three glowing darts of magical force. Each dart strikes a creature of your choice that you can see within range. A dart deals 1d4 + 1 Force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several. Using a Higher-Level Spell Slot. The spell creates one more dart for each spell slot level above 1.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "level": 1,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.magic-missile",
+    "kind": "spell",
+    "name": {
+      "en": "Magic Missile"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0146-b009",
+          "p0146-b010",
+          "p0146-b011"
+        ],
+        "page": 146,
+        "quoteHash": "8adea8aa2c3014f1d6b4a126908a83aecb2c7818bd31bed8436d5060dff1abaa",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Bonus Action",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space you can see.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "level": 2,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "conjuration",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.misty-step",
+    "kind": "spell",
+    "name": {
+      "en": "Misty Step"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0150-b009",
+          "p0150-b010",
+          "p0150-b011"
+        ],
+        "page": 150,
+        "quoteHash": "604c62d21c2dea3fad554decbf757aac59367aac0682b28706b04ceca52d7b77",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "conjuration",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 1,
+          "diceSize": 8,
+          "type": "cold"
+        }
+      ],
+      "description": "A frigid beam of blue-white light streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, it takes 1d8 Cold damage, and its Speed is reduced by 10 feet until the start of your next turn. Cantrip Upgrade. The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "level": 0,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.ray-of-frost",
+    "kind": "spell",
+    "name": {
+      "en": "Ray of Frost"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0157-b023",
+          "p0157-b024",
+          "p0157-b025"
+        ],
+        "page": 157,
+        "quoteHash": "dd3459e34a09555a8c0442984120cc9e7e0a7c0e54a70fbc219ee8d5deae62ff",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 2,
+          "diceSize": 6,
+          "type": "fire"
+        }
+      ],
+      "description": "You hurl three fiery rays. You can hurl them at one target within range or at several. Make a ranged spell attack for each ray. On a hit, the target takes 2d6 Fire damage. Using a Higher-Level Spell Slot. You create one additional ray for each spell slot level above 2.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "level": 2,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.scorching-ray",
+    "kind": "spell",
+    "name": {
+      "en": "Scorching Ray"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0159-b019",
+          "p0159-b020",
+          "p0159-b021"
+        ],
+        "page": 159,
+        "quoteHash": "d3e930db6bc76bd17cc482cb11831767754e079d76c82080cabd25f88f7e7446",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a chip of mica",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 3,
+          "diceSize": 8,
+          "type": "thunder"
+        }
+      ],
+      "description": "A loud noise erupts from a point of your choice within range. Each creature in a 10-foot-radius Sphere centered there makes a Constitution saving throw, taking 3d8 Thunder damage on a failed save or half as much damage on a successful one. A Construct has Disadvantage on the save. A nonmagical object that isn’t being worn or carried also takes the damage if it’s in the spell’s area. Using a Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 2.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "level": 2,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "constitution"
+      ],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.shatter",
+    "kind": "spell",
+    "name": {
+      "en": "Shatter"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0161-b013",
+          "p0161-b014",
+          "p0161-b015"
+        ],
+        "page": 161,
+        "quoteHash": "62e98a383b9e6229b92019a486b76e40d1bafe8743f12751349afa52efe5b7eb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Reaction, which you take when you are hit by an attack roll or targeted by the Magic Missile spell",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "An imperceptible barrier of magical force protects you. Until the start of your next turn, you have a +5 bonus to AC, including against the triggering attack, and you take no damage from Magic Missile.",
+      "duration": "1 round",
+      "hasHigherLevelEffect": false,
+      "level": 1,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.shield",
+    "kind": "spell",
+    "name": {
+      "en": "Shield"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0161-b016",
+          "p0161-b017",
+          "p0161-b018",
+          "p0161-b019"
+        ],
+        "page": 161,
+        "quoteHash": "924016928c428c6fcf6f91b85f3b80d17355fd2cbd510539f39134ee980a0bbf",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0162-b002"
+        ],
+        "page": 162,
+        "quoteHash": "44ffa2f7967005d9a3f1f187b538d68f0fa71904970bfeeab26b681e0bc152eb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "abjuration",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a pinch of sand or rose petals",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Each creature of your choice in a 5-foot-radius Sphere centered on a point within range must succeed on a Wisdom saving throw or have the Incapacitated condition until the end of its next turn, at which point it must repeat the save. If the target fails the second save, the target has the Unconscious condition for the duration. The spell ends on a target if it takes damage or someone within 5 feet of it takes an action to shake it out of the spell’s effect. Creatures that don’t sleep, such as elves, or that have Immunity to the Exhaustion condition automatically succeed on saves against this spell.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "level": 1,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "wisdom"
+      ],
+      "school": "enchantment",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.sleep",
+    "kind": "spell",
+    "name": {
+      "en": "Sleep"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0163-b003",
+          "p0163-b004",
+          "p0163-b005"
+        ],
+        "page": 163,
+        "quoteHash": "ce914a57df7503b74c6a6679e3d9f6bdd16f1569a7d03dd9a954966f3fbe3c87",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "enchantment",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 2,
+          "diceSize": 8,
+          "type": "thunder"
+        }
+      ],
+      "description": "You unleash a wave of thunderous energy. Each creature in a 15-foot Cube originating from you makes a Constitution saving throw. On a failed save, a creature takes 2d8 Thunder damage and is pushed 10 feet away from you. On a successful save, a creature takes half as much damage only. In addition, unsecured objects that are entirely within the Cube are pushed 10 feet away from you, and a thunderous boom is audible within 300 feet. Using a Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 1.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "level": 1,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [
+        "constitution"
+      ],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.thunderwave",
+    "kind": "spell",
+    "name": {
+      "en": "Thunderwave"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0169-b006",
+          "p0169-b007",
+          "p0169-b008",
+          "p0169-b009"
+        ],
+        "page": 169,
+        "quoteHash": "f198b2a6ffd48a6aa5b8606097b295e94a7750c42b095056a8390c9fc2f883d5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a bit of spiderweb",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [
+        {
+          "diceCount": 2,
+          "diceSize": 4,
+          "type": "fire"
+        }
+      ],
+      "description": "You conjure a mass of sticky webbing at a point within range. The webs fill a 20-foot Cube there for the duration. The webs are Difficult Terrain, and the area within them is Lightly Obscured. If the webs aren’t anchored between two solid masses (such as walls or trees) or layered across a floor, wall, or ceiling, the web collapses on itself, and the spell ends at the start of your next turn. Webs layered over a flat surface have a depth of 5 feet. The first time a creature enters the webs on a turn or starts its turn there, it must succeed on a Dexterity saving throw or have the Restrained condition while in the webs or until it breaks free. A creature Restrained by the webs can take an action to make a Strength (Athletics) check against your spell save DC. If it succeeds, it is no longer Restrained. The webs are flammable. Any 5-foot Cube of webs exposed to fire burns away in 1 round, dealing 2d4 Fire damage to any creature that starts its turn in the fire.",
+      "duration": "Concentration, up to 1 hour",
+      "hasHigherLevelEffect": false,
+      "level": 2,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "conjuration",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.web",
+    "kind": "spell",
+    "name": {
+      "en": "Web"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0174-b004",
+          "p0174-b005",
+          "p0174-b006"
+        ],
+        "page": 174,
+        "quoteHash": "fcfeb64ebe4698429d9a556f6440c1dcf5e213672d9334e6aac8f2978fcf98ec",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "conjuration",
+      "wizard"
+    ]
+  }
+]

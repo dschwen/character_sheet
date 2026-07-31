@@ -1,4 +1,4 @@
-import type { CalculationTrace, JsonValue } from "@dnd/calculation-trace";
+import type { CalculationTrace, JsonValue, SourceReference } from "@dnd/calculation-trace";
 import type { CharacterDocument, CharacterState } from "@dnd/character-model";
 import type { AuthoringIr, ContentEntity, PackageManifest } from "@dnd/content-schema";
 
@@ -146,6 +146,44 @@ export interface AttackSummary {
   traceId: string;
 }
 
+export interface SpellSlotSummary {
+  level: number;
+  maximum: number;
+  expended: number;
+  current: number;
+  traceId: string;
+}
+
+export interface SpellcastingSummary {
+  classId: string;
+  ability: string;
+  abilityModifier: number;
+  attackBonus: number;
+  saveDifficultyClass: number;
+  cantripsKnown: number;
+  preparedSpellLimit: number;
+  spellbookMinimum: number;
+  slots: SpellSlotSummary[];
+  attackTraceId: string;
+  saveTraceId: string;
+}
+
+export interface SpellSummary {
+  id: string;
+  name: string;
+  level: number;
+  school: string;
+  prepared: boolean;
+  ritual: boolean;
+  concentration: boolean;
+  castingTime: string;
+  range: string;
+  duration: string;
+  attackType?: "melee" | "ranged";
+  savingThrows: string[];
+  sources: SourceReference[];
+}
+
 export type RestEvent = "short-rest" | "long-rest";
 
 export interface HitDieSpend {
@@ -191,6 +229,22 @@ export interface ActionTransitionProposal {
   traces: Readonly<Record<string, CalculationTrace>>;
 }
 
+export interface SpellCastRequest {
+  spellId: string;
+  slotLevel?: number;
+  asRitual?: boolean;
+}
+
+export interface SpellCastTransitionProposal {
+  kind: "spell-cast";
+  spellId: string;
+  applicable: boolean;
+  changes: StateChange[];
+  nextState: CharacterState;
+  validations: ValidationMessage[];
+  traces: Readonly<Record<string, CalculationTrace>>;
+}
+
 export interface CharacterEvaluation {
   facts: Readonly<Record<string, JsonValue>>;
   values: Readonly<Record<StatId, DerivedValue>>;
@@ -198,6 +252,8 @@ export interface CharacterEvaluation {
   d20Tests: Readonly<Record<string, D20TestSummary>>;
   inventory: InventoryItemSummary[];
   attacks: AttackSummary[];
+  spellcasting?: SpellcastingSummary;
+  spells: SpellSummary[];
   actions: ActionSummary[];
   resources: ResourceInstance[];
   resistances: string[];
