@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "fixture-cleric-5",
+  "name": "Elara",
+  "ruleset": {
+    "system": "dnd5e",
+    "edition": "2024",
+    "packages": [
+      {
+        "id": "srd-5.2.1",
+        "version": "0.1.0",
+        "sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87"
+      }
+    ]
+  },
+  "build": {
+    "levels": [
+      {
+        "characterLevel": 1,
+        "classId": "srd521.class.cleric",
+        "hitPointChoice": "fixed",
+        "selectedFeatureChoices": [
+          {
+            "choiceId": "srd521.choice.cleric.divine-order",
+            "optionIds": ["srd521.option.cleric.divine-order.protector"]
+          }
+        ]
+      },
+      {
+        "characterLevel": 2,
+        "classId": "srd521.class.cleric",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 3,
+        "classId": "srd521.class.cleric",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 4,
+        "classId": "srd521.class.cleric",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 5,
+        "classId": "srd521.class.cleric",
+        "hitPointChoice": "fixed"
+      }
+    ],
+    "abilityScores": {
+      "strength": 13,
+      "dexterity": 10,
+      "constitution": 14,
+      "intelligence": 8,
+      "wisdom": 15,
+      "charisma": 12
+    },
+    "speciesId": "srd521.species.human",
+    "speciesSize": "medium",
+    "backgroundId": "srd521.background.soldier",
+    "backgroundAbilityScoreIncreases": {
+      "strength": 1,
+      "dexterity": 1,
+      "constitution": 1
+    },
+    "subclassId": "srd521.subclass.cleric.life-domain",
+    "featAbilityScoreIncreases": {
+      "wisdom": 2
+    },
+    "featIds": [
+      "srd521.feat.origin.savage-attacker",
+      "srd521.feat.origin.skilled",
+      "srd521.feat.general.ability-score-improvement"
+    ],
+    "learnedSpellIds": [
+      "srd521.spell.guidance",
+      "srd521.spell.light",
+      "srd521.spell.sacred-flame",
+      "srd521.spell.thaumaturgy"
+    ],
+    "proficiencyChoices": {
+      "skills": [
+        {
+          "skillId": "srd521.skill.insight",
+          "sourceId": "srd521.class.cleric"
+        },
+        {
+          "skillId": "srd521.skill.religion",
+          "sourceId": "srd521.class.cleric"
+        },
+        {
+          "skillId": "srd521.skill.perception",
+          "sourceId": "srd521.species.human"
+        },
+        {
+          "skillId": "srd521.skill.arcana",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.persuasion",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.stealth",
+          "sourceId": "srd521.feat.origin.skilled"
+        }
+      ]
+    }
+  },
+  "loadout": {
+    "preparedSpellIds": [
+      "srd521.spell.bane",
+      "srd521.spell.detect-magic",
+      "srd521.spell.guiding-bolt",
+      "srd521.spell.healing-word",
+      "srd521.spell.shield-of-faith",
+      "srd521.spell.hold-person",
+      "srd521.spell.prayer-of-healing",
+      "srd521.spell.spiritual-weapon",
+      "srd521.spell.spirit-guardians"
+    ],
+    "inventory": [
+      {
+        "id": "chain-mail-1",
+        "entityId": "srd521.equipment.armor.heavy.chain-mail",
+        "quantity": 1
+      },
+      {
+        "id": "shield-1",
+        "entityId": "srd521.equipment.shield",
+        "quantity": 1
+      },
+      {
+        "id": "mace-1",
+        "entityId": "srd521.equipment.weapon.mace",
+        "quantity": 1
+      }
+    ],
+    "equippedItemIds": ["chain-mail-1", "shield-1", "mace-1"]
+  },
+  "state": {
+    "currentHitPoints": 30,
+    "expendedResources": {
+      "srd521.resource.cleric.channel-divinity": 1
+    },
+    "expendedSpellSlots": {
+      "1": 2,
+      "2": 1,
+      "3": 1
+    },
+    "concentrationSpellId": "srd521.spell.spirit-guardians"
+  },
+  "metadata": {
+    "createdAt": "2026-08-01T00:00:00.000Z",
+    "updatedAt": "2026-08-01T00:00:00.000Z",
+    "revision": 0
+  }
+}

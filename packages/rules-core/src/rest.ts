@@ -368,6 +368,9 @@ function proposeLongRest(
     );
   }
   for (const [level, expended] of Object.entries(character.state.expendedSpellSlots)) {
+    const slotTraceId = evaluation.spellcasting?.slots.find(
+      (slot) => slot.level === Number(level),
+    )?.traceId;
     nextState.expendedSpellSlots[level] = 0;
     recordChange(
       changes,
@@ -378,9 +381,9 @@ function proposeLongRest(
       "A Long Rest restores all expended spell slots.",
       "restore-all-spell-slots",
       [expended, Number(level)],
-      evaluation.traces[`spellcasting.wizard.slots.${level}`]?.sourceReferences ?? [
-        restSources["long-rest"],
-      ],
+      (slotTraceId === undefined
+        ? undefined
+        : evaluation.traces[slotTraceId]?.sourceReferences) ?? [restSources["long-rest"]],
     );
   }
   nextState.temporaryHitPoints = 0;

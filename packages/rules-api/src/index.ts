@@ -162,7 +162,8 @@ export interface SpellcastingSummary {
   saveDifficultyClass: number;
   cantripsKnown: number;
   preparedSpellLimit: number;
-  spellbookMinimum: number;
+  alwaysPreparedSpells: number;
+  spellbookMinimum?: number;
   slots: SpellSlotSummary[];
   attackTraceId: string;
   saveTraceId: string;

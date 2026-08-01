@@ -1,0 +1,51 @@
+{
+  "id": "srd521.subclass-feature.cleric.life-domain.preserve-life",
+  "kind": "subclass-feature",
+  "level": 3,
+  "parentId": "srd521.subclass.cleric.life-domain",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-preserve-life",
+      "parameters": {
+        "actionEconomy": "magic-action",
+        "resourceId": "srd521.resource.cleric.channel-divinity",
+        "spends": 1
+      },
+      "target": "action.preserve-life",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.cleric.channel-divinity"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets and saving throws remain roll-assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0040-b028"
+      ],
+      "page": 40,
+      "quoteHash": "d9b64173c3ed04f75dec29e3fbc832dec40e5eed451a9ba0a800e3a5f26bab47",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "As a Magic action, you present your Holy Symbol and expend a use of your Channel Divinity to evoke healing energy that can restore a number of Hit Points equal to five times your Cleric level. Choose Bloodied creatures within 30 feet of yourself (which can include you), and divide those Hit Points among them. This feature can restore a creature to no more than half its Hit Point maximum."
+      }
+    ],
+    "title": "Preserve Life"
+  }
+}

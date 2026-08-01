@@ -55,10 +55,15 @@ function printSummary(name: string, level: number, evaluation: CharacterEvaluati
   );
   if (evaluation.spellcasting !== undefined) {
     const casting = evaluation.spellcasting;
+    const preparedCount = evaluation.spells.filter((spell) => spell.prepared).length;
+    const preparedText =
+      casting.alwaysPreparedSpells === 0
+        ? `${String(preparedCount)}/${String(casting.preparedSpellLimit)}`
+        : `${String(preparedCount)} (${String(casting.preparedSpellLimit)} selected + ` +
+          `${String(casting.alwaysPreparedSpells)} always)`;
     console.log(
       `Spells ${signed(casting.attackBonus)} attack, DC ${String(casting.saveDifficultyClass)}  ` +
-        `prepared ${String(evaluation.spells.filter((spell) => spell.prepared).length)}` +
-        `/${String(casting.preparedSpellLimit)}`,
+        `prepared ${preparedText}`,
     );
     console.log(
       `Slots ${casting.slots

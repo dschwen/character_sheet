@@ -19,7 +19,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(141);
+    expect(parsedEntities).toHaveLength(179);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -43,6 +43,9 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.subclass.wizard.evoker");
     expect(entityIds).toContain("srd521.spell.fireball");
     expect(entityIds).toContain("srd521.spell.web");
+    expect(entityIds).toContain("srd521.class.cleric");
+    expect(entityIds).toContain("srd521.subclass.cleric.life-domain");
+    expect(entityIds).toContain("srd521.spell.spirit-guardians");
   });
 
   it("validates the acquired source manifest against the pinned artifact", () => {
@@ -222,5 +225,57 @@ describe("bootstrap content package", () => {
       spellSlots: { "1": 4, "2": 3, "3": 2 },
     });
     expect(spells.every((spell) => spell.source.length > 0)).toBe(true);
+  });
+
+  it("validates Cleric, Life Domain, and Channel Divinity authoring IR", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const entities = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities/cleric.json", root), "utf8")));
+    const channelDivinity = authoringIrSchema.parse(
+      JSON.parse(readFileSync(new URL("authoring-ir/cleric.channel-divinity.json", root), "utf8")),
+    );
+    const preserveLife = authoringIrSchema.parse(
+      JSON.parse(
+        readFileSync(new URL("authoring-ir/life-domain.preserve-life.json", root), "utf8"),
+      ),
+    );
+    const cleric = entities.find((entity) => entity.id === "srd521.class.cleric");
+    const clericBody = z
+      .object({
+        spellcastingAbility: z.literal("wisdom"),
+        spellPreparation: z.literal("full-list"),
+        spellList: z.array(z.string()),
+        progression: z.array(
+          z.object({
+            level: z.number().int(),
+            channelDivinity: z.number().int(),
+            cantrips: z.number().int(),
+            preparedSpells: z.number().int(),
+            spellSlots: z.record(z.number().int()),
+          }),
+        ),
+      })
+      .parse(cleric?.body);
+
+    expect(entities).toHaveLength(38);
+    expect(entities.filter((entity) => entity.kind === "spell")).toHaveLength(17);
+    expect(clericBody.spellList).toHaveLength(109);
+    expect(clericBody.progression[4]).toMatchObject({
+      level: 5,
+      channelDivinity: 2,
+      cantrips: 4,
+      preparedSpells: 9,
+      spellSlots: { "1": 4, "2": 3, "3": 2 },
+    });
+    expect(channelDivinity.proposedRules.map((rule) => rule.type)).toEqual([
+      "grant-resource",
+      "grant-action",
+      "grant-action",
+    ]);
+    expect(preserveLife).toMatchObject({
+      kind: "subclass-feature",
+      parentId: "srd521.subclass.cleric.life-domain",
+    });
   });
 });

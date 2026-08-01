@@ -1,0 +1,509 @@
+{
+  "classId": "srd521.class.cleric",
+  "clericSpellListEntries": 109,
+  "coreTraits": {
+    "armorTraining": [
+      "light",
+      "medium",
+      "shield"
+    ],
+    "hitPointDie": 8,
+    "primaryAbilities": [
+      "wisdom"
+    ],
+    "savingThrowProficiencies": [
+      "wisdom",
+      "charisma"
+    ],
+    "skillProficiencyChoice": {
+      "maximum": 2,
+      "minimum": 2,
+      "options": [
+        "history",
+        "insight",
+        "medicine",
+        "persuasion",
+        "religion"
+      ]
+    },
+    "startingEquipmentText": "Choose A or B: (A) Chain Shirt, Shield, Mace, Holy Symbol, Priest’s Pack, and 7 GP; or (B) 110 GP",
+    "weaponProficiencies": [
+      "simple"
+    ]
+  },
+  "extractedClassFeatures": 11,
+  "extractedLifeDomainFeatures": 5,
+  "generatedEntities": [
+    "srd521.class.cleric",
+    "srd521.class-feature.cleric.spellcasting",
+    "srd521.class-feature.cleric.divine-order",
+    "srd521.class-feature.cleric.channel-divinity",
+    "srd521.class-feature.cleric.cleric-subclass",
+    "srd521.class-feature.cleric.ability-score-improvement",
+    "srd521.class-feature.cleric.sear-undead",
+    "srd521.class-feature.cleric.blessed-strikes",
+    "srd521.class-feature.cleric.divine-intervention",
+    "srd521.class-feature.cleric.improved-blessed-strikes",
+    "srd521.class-feature.cleric.epic-boon",
+    "srd521.class-feature.cleric.greater-divine-intervention",
+    "srd521.option.cleric.divine-order.protector",
+    "srd521.option.cleric.divine-order.thaumaturge",
+    "srd521.table.cleric.channel-divinity",
+    "srd521.subclass.cleric.life-domain",
+    "srd521.subclass-feature.cleric.life-domain.disciple-of-life",
+    "srd521.subclass-feature.cleric.life-domain.life-domain-spells",
+    "srd521.subclass-feature.cleric.life-domain.preserve-life",
+    "srd521.subclass-feature.cleric.life-domain.blessed-healer",
+    "srd521.subclass-feature.cleric.life-domain.supreme-healing",
+    "srd521.spell.aid",
+    "srd521.spell.bane",
+    "srd521.spell.bless",
+    "srd521.spell.cure-wounds",
+    "srd521.spell.guidance",
+    "srd521.spell.guiding-bolt",
+    "srd521.spell.healing-word",
+    "srd521.spell.hold-person",
+    "srd521.spell.lesser-restoration",
+    "srd521.spell.mass-healing-word",
+    "srd521.spell.prayer-of-healing",
+    "srd521.spell.revivify",
+    "srd521.spell.sacred-flame",
+    "srd521.spell.shield-of-faith",
+    "srd521.spell.spirit-guardians",
+    "srd521.spell.spiritual-weapon",
+    "srd521.spell.thaumaturgy"
+  ],
+  "progression": [
+    {
+      "cantrips": 3,
+      "channel_divinity": 0,
+      "feature_names": [
+        "Spellcasting",
+        "Divine Order"
+      ],
+      "level": 1,
+      "prepared_spells": 4,
+      "proficiency_bonus": 2,
+      "spell_slots": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 3,
+      "channel_divinity": 2,
+      "feature_names": [
+        "Channel Divinity"
+      ],
+      "level": 2,
+      "prepared_spells": 5,
+      "proficiency_bonus": 2,
+      "spell_slots": [
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 3,
+      "channel_divinity": 2,
+      "feature_names": [
+        "Cleric Subclass"
+      ],
+      "level": 3,
+      "prepared_spells": 6,
+      "proficiency_bonus": 2,
+      "spell_slots": [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 4,
+      "channel_divinity": 2,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 4,
+      "prepared_spells": 7,
+      "proficiency_bonus": 2,
+      "spell_slots": [
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 4,
+      "channel_divinity": 2,
+      "feature_names": [
+        "Sear Undead"
+      ],
+      "level": 5,
+      "prepared_spells": 9,
+      "proficiency_bonus": 3,
+      "spell_slots": [
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 4,
+      "channel_divinity": 3,
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 6,
+      "prepared_spells": 10,
+      "proficiency_bonus": 3,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 4,
+      "channel_divinity": 3,
+      "feature_names": [
+        "Blessed Strikes"
+      ],
+      "level": 7,
+      "prepared_spells": 11,
+      "proficiency_bonus": 3,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 4,
+      "channel_divinity": 3,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 8,
+      "prepared_spells": 12,
+      "proficiency_bonus": 3,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 4,
+      "channel_divinity": 3,
+      "feature_names": [],
+      "level": 9,
+      "prepared_spells": 14,
+      "proficiency_bonus": 4,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 3,
+      "feature_names": [
+        "Divine Intervention"
+      ],
+      "level": 10,
+      "prepared_spells": 15,
+      "proficiency_bonus": 4,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 3,
+      "feature_names": [],
+      "level": 11,
+      "prepared_spells": 16,
+      "proficiency_bonus": 4,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 3,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 12,
+      "prepared_spells": 16,
+      "proficiency_bonus": 4,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 3,
+      "feature_names": [],
+      "level": 13,
+      "prepared_spells": 17,
+      "proficiency_bonus": 5,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 3,
+      "feature_names": [
+        "Improved Blessed Strikes"
+      ],
+      "level": 14,
+      "prepared_spells": 17,
+      "proficiency_bonus": 5,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 3,
+      "feature_names": [],
+      "level": 15,
+      "prepared_spells": 18,
+      "proficiency_bonus": 5,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 3,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 16,
+      "prepared_spells": 18,
+      "proficiency_bonus": 5,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 3,
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 17,
+      "prepared_spells": 19,
+      "proficiency_bonus": 6,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 4,
+      "feature_names": [],
+      "level": 18,
+      "prepared_spells": 20,
+      "proficiency_bonus": 6,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        3,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 4,
+      "feature_names": [
+        "Epic Boon"
+      ],
+      "level": 19,
+      "prepared_spells": 21,
+      "proficiency_bonus": 6,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "cantrips": 5,
+      "channel_divinity": 4,
+      "feature_names": [
+        "Greater Divine Intervention"
+      ],
+      "level": 20,
+      "prepared_spells": 22,
+      "proficiency_bonus": 6,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        3,
+        2,
+        2,
+        1,
+        1
+      ]
+    }
+  ],
+  "progressionRows": 20,
+  "representativeSpells": [
+    "srd521.spell.aid",
+    "srd521.spell.bane",
+    "srd521.spell.bless",
+    "srd521.spell.cure-wounds",
+    "srd521.spell.guidance",
+    "srd521.spell.guiding-bolt",
+    "srd521.spell.healing-word",
+    "srd521.spell.hold-person",
+    "srd521.spell.lesser-restoration",
+    "srd521.spell.mass-healing-word",
+    "srd521.spell.prayer-of-healing",
+    "srd521.spell.revivify",
+    "srd521.spell.sacred-flame",
+    "srd521.spell.shield-of-faith",
+    "srd521.spell.spirit-guardians",
+    "srd521.spell.spiritual-weapon",
+    "srd521.spell.thaumaturgy"
+  ]
+}

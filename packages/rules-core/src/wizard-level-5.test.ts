@@ -44,6 +44,7 @@ describe("evaluateCharacter Wizard level-5 vertical slice", () => {
       saveDifficultyClass: 14,
       cantripsKnown: 4,
       preparedSpellLimit: 9,
+      alwaysPreparedSpells: 0,
       spellbookMinimum: 14,
       slots: [
         { level: 1, maximum: 4, expended: 2, current: 2 },

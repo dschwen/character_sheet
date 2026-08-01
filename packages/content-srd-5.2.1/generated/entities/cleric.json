@@ -1,0 +1,2438 @@
+[
+  {
+    "body": {
+      "armorTraining": [
+        "light",
+        "medium",
+        "shield"
+      ],
+      "divineOrderChoice": {
+        "id": "srd521.choice.cleric.divine-order",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.option.cleric.divine-order.protector",
+          "srd521.option.cleric.divine-order.thaumaturge"
+        ]
+      },
+      "hitPointDie": 8,
+      "primaryAbilities": [
+        "wisdom"
+      ],
+      "progression": [
+        {
+          "cantrips": 3,
+          "channelDivinity": 0,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.spellcasting",
+              "name": "Spellcasting"
+            },
+            {
+              "entityId": "srd521.class-feature.cleric.divine-order",
+              "name": "Divine Order"
+            }
+          ],
+          "level": 1,
+          "preparedSpells": 4,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 2
+          }
+        },
+        {
+          "cantrips": 3,
+          "channelDivinity": 2,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.channel-divinity",
+              "name": "Channel Divinity"
+            }
+          ],
+          "level": 2,
+          "preparedSpells": 5,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 3
+          }
+        },
+        {
+          "cantrips": 3,
+          "channelDivinity": 2,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.cleric-subclass",
+              "name": "Cleric Subclass"
+            }
+          ],
+          "level": 3,
+          "preparedSpells": 6,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 4,
+            "2": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "channelDivinity": 2,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 4,
+          "preparedSpells": 7,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 4,
+            "2": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "channelDivinity": 2,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.sear-undead",
+              "name": "Sear Undead"
+            }
+          ],
+          "level": 5,
+          "preparedSpells": 9,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "channelDivinity": 3,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 6,
+          "preparedSpells": 10,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "channelDivinity": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.blessed-strikes",
+              "name": "Blessed Strikes"
+            }
+          ],
+          "level": 7,
+          "preparedSpells": 11,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 1
+          }
+        },
+        {
+          "cantrips": 4,
+          "channelDivinity": 3,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 8,
+          "preparedSpells": 12,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "channelDivinity": 3,
+          "features": [],
+          "level": 9,
+          "preparedSpells": 14,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.divine-intervention",
+              "name": "Divine Intervention"
+            }
+          ],
+          "level": 10,
+          "preparedSpells": 15,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 3,
+          "features": [],
+          "level": 11,
+          "preparedSpells": 16,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 3,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 12,
+          "preparedSpells": 16,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 3,
+          "features": [],
+          "level": 13,
+          "preparedSpells": 17,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.improved-blessed-strikes",
+              "name": "Improved Blessed Strikes"
+            }
+          ],
+          "level": 14,
+          "preparedSpells": 17,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 3,
+          "features": [],
+          "level": 15,
+          "preparedSpells": 18,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 3,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 16,
+          "preparedSpells": 18,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 3,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 17,
+          "preparedSpells": 19,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 4,
+          "features": [],
+          "level": 18,
+          "preparedSpells": 20,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.epic-boon",
+              "name": "Epic Boon"
+            }
+          ],
+          "level": 19,
+          "preparedSpells": 21,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 2,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "channelDivinity": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.cleric.greater-divine-intervention",
+              "name": "Greater Divine Intervention"
+            }
+          ],
+          "level": 20,
+          "preparedSpells": 22,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 2,
+            "7": 2,
+            "8": 1,
+            "9": 1
+          }
+        }
+      ],
+      "savingThrowProficiencies": [
+        "wisdom",
+        "charisma"
+      ],
+      "skillProficiencyChoice": {
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "history",
+          "insight",
+          "medicine",
+          "persuasion",
+          "religion"
+        ]
+      },
+      "spellList": [
+        "srd521.spell.guidance",
+        "srd521.spell.light",
+        "srd521.spell.mending",
+        "srd521.spell.resistance",
+        "srd521.spell.sacred-flame",
+        "srd521.spell.spare-the-dying",
+        "srd521.spell.thaumaturgy",
+        "srd521.spell.bane",
+        "srd521.spell.bless",
+        "srd521.spell.command",
+        "srd521.spell.create-or-destroy-water",
+        "srd521.spell.cure-wounds",
+        "srd521.spell.detect-evil-and-good",
+        "srd521.spell.detect-magic",
+        "srd521.spell.detect-poison-and-disease",
+        "srd521.spell.guiding-bolt",
+        "srd521.spell.healing-word",
+        "srd521.spell.inflict-wounds",
+        "srd521.spell.protection-from-evil-and-good",
+        "srd521.spell.purify-food-and-drink",
+        "srd521.spell.sanctuary",
+        "srd521.spell.shield-of-faith",
+        "srd521.spell.aid",
+        "srd521.spell.augury",
+        "srd521.spell.blindness-deafness",
+        "srd521.spell.calm-emotions",
+        "srd521.spell.continual-flame",
+        "srd521.spell.enhance-ability",
+        "srd521.spell.find-traps",
+        "srd521.spell.gentle-repose",
+        "srd521.spell.hold-person",
+        "srd521.spell.lesser-restoration",
+        "srd521.spell.locate-object",
+        "srd521.spell.prayer-of-healing",
+        "srd521.spell.protection-from-poison",
+        "srd521.spell.silence",
+        "srd521.spell.spiritual-weapon",
+        "srd521.spell.warding-bond",
+        "srd521.spell.zone-of-truth",
+        "srd521.spell.animate-dead",
+        "srd521.spell.beacon-of-hope",
+        "srd521.spell.bestow-curse",
+        "srd521.spell.clairvoyance",
+        "srd521.spell.create-food-and-water",
+        "srd521.spell.daylight",
+        "srd521.spell.dispel-magic",
+        "srd521.spell.glyph-of-warding",
+        "srd521.spell.magic-circle",
+        "srd521.spell.mass-healing-word",
+        "srd521.spell.meld-into-stone",
+        "srd521.spell.protection-from-energy",
+        "srd521.spell.remove-curse",
+        "srd521.spell.revivify",
+        "srd521.spell.sending",
+        "srd521.spell.speak-with-dead",
+        "srd521.spell.spirit-guardians",
+        "srd521.spell.tongues",
+        "srd521.spell.water-walk",
+        "srd521.spell.aura-of-life",
+        "srd521.spell.banishment",
+        "srd521.spell.control-water",
+        "srd521.spell.death-ward",
+        "srd521.spell.divination",
+        "srd521.spell.freedom-of-movement",
+        "srd521.spell.guardian-of-faith",
+        "srd521.spell.locate-creature",
+        "srd521.spell.stone-shape",
+        "srd521.spell.commune",
+        "srd521.spell.contagion",
+        "srd521.spell.dispel-evil-and-good",
+        "srd521.spell.flame-strike",
+        "srd521.spell.geas",
+        "srd521.spell.greater-restoration",
+        "srd521.spell.hallow",
+        "srd521.spell.insect-plague",
+        "srd521.spell.legend-lore",
+        "srd521.spell.mass-cure-wounds",
+        "srd521.spell.planar-binding",
+        "srd521.spell.raise-dead",
+        "srd521.spell.scrying",
+        "srd521.spell.blade-barrier",
+        "srd521.spell.create-undead",
+        "srd521.spell.find-the-path",
+        "srd521.spell.forbiddance",
+        "srd521.spell.harm",
+        "srd521.spell.heal",
+        "srd521.spell.heroes-feast",
+        "srd521.spell.planar-ally",
+        "srd521.spell.sunbeam",
+        "srd521.spell.true-seeing",
+        "srd521.spell.word-of-recall",
+        "srd521.spell.conjure-celestial",
+        "srd521.spell.divine-word",
+        "srd521.spell.etherealness",
+        "srd521.spell.fire-storm",
+        "srd521.spell.plane-shift",
+        "srd521.spell.regenerate",
+        "srd521.spell.resurrection",
+        "srd521.spell.symbol",
+        "srd521.spell.antimagic-field",
+        "srd521.spell.control-weather",
+        "srd521.spell.earthquake",
+        "srd521.spell.holy-aura",
+        "srd521.spell.sunburst",
+        "srd521.spell.astral-projection",
+        "srd521.spell.gate",
+        "srd521.spell.mass-heal",
+        "srd521.spell.power-word-heal",
+        "srd521.spell.true-resurrection"
+      ],
+      "spellPreparation": "full-list",
+      "spellcastingAbility": "wisdom",
+      "startingEquipmentText": "Choose A or B: (A) Chain Shirt, Shield, Mace, Holy Symbol, Priest’s Pack, and 7 GP; or (B) 110 GP",
+      "weaponProficiencies": [
+        "simple"
+      ]
+    },
+    "id": "srd521.class.cleric",
+    "kind": "class",
+    "name": {
+      "en": "Cleric"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Cleric progression and spellcasting table from pages 36–38.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0036-b003",
+          "p0036-b004",
+          "p0036-b005",
+          "p0036-b006",
+          "p0036-b007",
+          "p0036-b008",
+          "p0036-b009",
+          "p0036-b010",
+          "p0036-b011",
+          "p0036-b024",
+          "p0036-b018",
+          "p0036-b020",
+          "p0036-b022",
+          "p0036-b025",
+          "p0036-b019",
+          "p0036-b021",
+          "p0036-b023",
+          "p0036-b026",
+          "p0036-b027",
+          "p0036-b028",
+          "p0036-b029",
+          "p0036-b030",
+          "p0036-b031",
+          "p0036-b032",
+          "p0036-b033",
+          "p0036-b034",
+          "p0036-b035",
+          "p0036-b036",
+          "p0036-b037",
+          "p0036-b038",
+          "p0036-b039",
+          "p0036-b040",
+          "p0036-b041",
+          "p0036-b042",
+          "p0036-b043",
+          "p0036-b044",
+          "p0036-b045"
+        ],
+        "page": 36,
+        "quoteHash": "db39cab9f6687887082ef5571d83aa550e74ec9143611c0022ece3f408b2d054",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class",
+      "cleric",
+      "spellcaster"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You have learned to cast spells through prayer and meditation. See “Spells” for the rules on spellcasting. The information below details how you use those rules with Cleric spells, which appear on the Cleric spell list later in the class’s description. Cantrips. You know three cantrips of your choice from the Cleric spell list. Guidance, Sacred Flame, and Thaumaturgy are recommended. Whenever you gain a Cleric level, you can replace one of your cantrips with another cantrip of your choice from the Cleric spell list. When you reach Cleric levels 4 and 10, you learn another cantrip of your choice from the Cleric spell list, as shown in the Cantrips column of the Cleric Features table. Spell Slots. The Cleric Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest. Prepared Spells of Level 1+. You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose four level 1 spells from the Cleric spell list. Bless, Cure Wounds, Guiding Bolt, and Shield of Faith are recommended. The number of spells on your list increases as you gain Cleric levels, as shown in the Prepared Spells column of the Cleric Features table. Whenever that number increases, choose additional spells from the Cleric spell list until the number of spells on your list matches the number on the table. The chosen spells must be of a level for which you have spell slots. For example, if you’re a level 3 Cleric, your list of prepared spells can include six spells of levels 1 and 2 in any combination. If another Cleric feature gives you spells that you always have prepared, those spells don’t count against the number of spells you can prepare with this feature, but those spells otherwise count as Cleric spells for you. Changing Your Prepared Spells. Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells there with other Cleric spells for which you have spell slots. Spellcasting Ability. Wisdom is your spellcasting ability for your Cleric spells. Spellcasting Focus. You can use a Holy Symbol as a Spellcasting Focus for your Cleric spells."
+    },
+    "id": "srd521.class-feature.cleric.spellcasting",
+    "kind": "class-feature",
+    "name": {
+      "en": "Spellcasting"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Spellcasting extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0036-b016"
+        ],
+        "page": 36,
+        "quoteHash": "871619260f98a95f6d6ea60df434a64fc8e2aeeb35391de5987f69147be0c679",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0037-b002"
+        ],
+        "page": 37,
+        "quoteHash": "4fa590331e72e864f3cc3474548417816626c8ee88e395b68ba96b0ae5e5d367",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You have dedicated yourself to one of the following sacred roles of your choice. Protector. Trained for battle, you gain proficiency with Martial weapons and training with Heavy armor. Thaumaturge. You know one extra cantrip from the Cleric spell list. In addition, your mystical connection to the divine gives you a bonus to your Intelligence (Arcana or Religion) checks. The bonus equals your Wisdom modifier (minimum of +1)."
+    },
+    "id": "srd521.class-feature.cleric.divine-order",
+    "kind": "class-feature",
+    "name": {
+      "en": "Divine Order"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Divine Order extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0037-b003"
+        ],
+        "page": 37,
+        "quoteHash": "c8b9324d43741e66a0d61ea78994f5e72940b41e1d2a944e01a710ce4b37a8b1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 2,
+      "text": "You can channel divine energy directly from the Outer Planes to fuel magical effects. You start with two such effects: Divine Spark and Turn Undead, each of which is described below. Each time you use this class’s Channel Divinity, choose which Channel Divinity effect from this class to create. You gain additional effect options at higher Cleric levels. You can use this class’s Channel Divinity twice. You regain one of its expended uses when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. You gain additional uses when you reach certain Cleric levels, as shown in the Channel Divinity column of the Cleric Features table. If a Channel Divinity effect requires a saving throw, the DC equals the spell save DC from this class’s Spellcasting feature. Divine Spark. As a Magic action, you point your Holy Symbol at another creature you can see within 30 feet of yourself and focus divine energy at it. Roll 1d8 and add your Wisdom modifier. You either restore Hit Points to the creature equal to that total or force the creature to make a Constitution saving throw. On a failed save, the creature takes Necrotic or Radiant damage (your choice) equal to that total. On a successful save, the creature takes half as much damage (round down). You roll an additional d8 when you reach Cleric levels 7 (2d8), 13 (3d8), and 18 (4d8). Turn Undead. As a Magic action, you present your Holy Symbol and censure Undead creatures. Each Undead of your choice within 30 feet of you must make a Wisdom saving throw. If the creature fails its save, it has the Frightened and Incapacitated conditions for 1 minute. For that duration, it tries to move as far from you as it can on its turns. This effect ends early on the creature if it takes any damage, if you have the Incapacitated condition, or if you die."
+    },
+    "id": "srd521.class-feature.cleric.channel-divinity",
+    "kind": "class-feature",
+    "name": {
+      "en": "Channel Divinity"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Channel Divinity extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0037-b004",
+          "p0037-b005"
+        ],
+        "page": 37,
+        "quoteHash": "71a8024cfa579dcb85e9c5c30c08db79d69c31576d6fbeec0367d9429d19e3be",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "You gain a Cleric subclass of your choice. The Life Domain subclass is detailed after this class’s description. A subclass is a specialization that grants you features at certain Cleric levels. For the rest of your career, you gain each of your subclass’s features that are of your Cleric level or lower."
+    },
+    "id": "srd521.class-feature.cleric.cleric-subclass",
+    "kind": "class-feature",
+    "name": {
+      "en": "Cleric Subclass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Cleric Subclass extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0037-b006"
+        ],
+        "page": 37,
+        "quoteHash": "584de44d78ccca8f3b7406d1279c3080610e3dec7227ffcfce68499b009f4225",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 4,
+      "text": "You gain the Ability Score Improvement feat (see “Feats”) or another feat of your choice for which you qualify. You gain this feature again at Cleric levels 8, 12, and 16."
+    },
+    "id": "srd521.class-feature.cleric.ability-score-improvement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ability Score Improvement extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0037-b007"
+        ],
+        "page": 37,
+        "quoteHash": "36f67c5bdc019c1d57dd33efda8317db054f3a81cffe6c5b543ff10bc074267b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 5,
+      "text": "Whenever you use Turn Undead, you can roll a number of d8s equal to your Wisdom modifier (minimum of 1d8) and add the rolls together. Each Undead that fails its saving throw against that use of Turn Undead takes Radiant damage equal to the roll’s total. This damage doesn’t end the turn effect."
+    },
+    "id": "srd521.class-feature.cleric.sear-undead",
+    "kind": "class-feature",
+    "name": {
+      "en": "Sear Undead"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Sear Undead extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0037-b008"
+        ],
+        "page": 37,
+        "quoteHash": "42721ebdb60fbf9a97c6a1485c459b0b2d71bb462379d321c83ba9ca87f93691",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 7,
+      "text": "Divine power infuses you in battle. You gain one of the following options of your choice (if you get either option from a Cleric subclass in an older book, use only the option you choose for this feature). Divine Strike. Once on each of your turns when you hit a creature with an attack roll using a weapon, you can cause the target to take an extra 1d8 Necrotic or Radiant damage (your choice). Potent Spellcasting. Add your Wisdom modifier to the damage you deal with any Cleric cantrip."
+    },
+    "id": "srd521.class-feature.cleric.blessed-strikes",
+    "kind": "class-feature",
+    "name": {
+      "en": "Blessed Strikes"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Blessed Strikes extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0038-b002"
+        ],
+        "page": 38,
+        "quoteHash": "c7fb49e610b3673eb29fc7075a0f0995fdec85e91dbc3351faf13b06e2ae7f3d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 10,
+      "text": "You can call on your deity or pantheon to intervene on your behalf. As a Magic action, choose any Cleric spell of level 5 or lower that doesn’t require a Reaction to cast. As part of the same action, you cast that spell without expending a spell slot or needing Material components. You can’t use this feature again until you finish a Long Rest."
+    },
+    "id": "srd521.class-feature.cleric.divine-intervention",
+    "kind": "class-feature",
+    "name": {
+      "en": "Divine Intervention"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Divine Intervention extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0038-b003"
+        ],
+        "page": 38,
+        "quoteHash": "bdc1add78dd8981601451b2d631c6180b0bb4158217e29e108be9be4693ade96",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 14,
+      "text": "The option you chose for Blessed Strikes grows more powerful. Divine Strike. The extra damage of your Divine Strike increases to 2d8. Potent Spellcasting. When you cast a Cleric cantrip and deal damage to a creature with it, you can give vitality to yourself or another creature within 60 feet of yourself, granting a number of Temporary Hit Points equal to twice your Wisdom modifier."
+    },
+    "id": "srd521.class-feature.cleric.improved-blessed-strikes",
+    "kind": "class-feature",
+    "name": {
+      "en": "Improved Blessed Strikes"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Improved Blessed Strikes extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0038-b004"
+        ],
+        "page": 38,
+        "quoteHash": "784bf6590222a85d32388ed6fbbac0090da33142a86ad9a2796bbdc4fcaa3c65",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 19,
+      "text": "You gain an Epic Boon feat (see “Feats”) or another feat of your choice for which you qualify. Boon of Fate is recommended."
+    },
+    "id": "srd521.class-feature.cleric.epic-boon",
+    "kind": "class-feature",
+    "name": {
+      "en": "Epic Boon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Epic Boon extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0038-b005"
+        ],
+        "page": 38,
+        "quoteHash": "5709f58ae324a4514d9a56a3909cf4cc706cd433a076c386a861e123c254dbfe",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 20,
+      "text": "You can call on even more powerful divine intervention. When you use your Divine Intervention feature, you can choose Wish when you select a spell. If you do so, you can’t use Divine Intervention again until you finish 2d4 Long Rests."
+    },
+    "id": "srd521.class-feature.cleric.greater-divine-intervention",
+    "kind": "class-feature",
+    "name": {
+      "en": "Greater Divine Intervention"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Greater Divine Intervention extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0038-b006"
+        ],
+        "page": 38,
+        "quoteHash": "478878fcb2046b40883401a4237cd6d4d5cce19d5aa342fa951edda28f0acd5c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "armorTraining": [
+        "heavy"
+      ],
+      "choiceId": "srd521.choice.cleric.divine-order",
+      "weaponProficiencies": [
+        "martial"
+      ]
+    },
+    "id": "srd521.option.cleric.divine-order.protector",
+    "kind": "class-option",
+    "name": {
+      "en": "Protector"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Protector Divine Order option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0037-b003"
+        ],
+        "page": 37,
+        "quoteHash": "c8b9324d43741e66a0d61ea78994f5e72940b41e1d2a944e01a710ce4b37a8b1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "cleric",
+      "divine-order"
+    ]
+  },
+  {
+    "body": {
+      "additionalCantrips": 1,
+      "choiceId": "srd521.choice.cleric.divine-order",
+      "knowledgeCheckBonusAbility": "wisdom",
+      "knowledgeChecks": [
+        "arcana",
+        "religion"
+      ]
+    },
+    "id": "srd521.option.cleric.divine-order.thaumaturge",
+    "kind": "class-option",
+    "name": {
+      "en": "Thaumaturge"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Thaumaturge Divine Order option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0037-b003"
+        ],
+        "page": 37,
+        "quoteHash": "c8b9324d43741e66a0d61ea78994f5e72940b41e1d2a944e01a710ce4b37a8b1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "cleric",
+      "divine-order"
+    ]
+  },
+  {
+    "body": {
+      "entries": {
+        "1": 0,
+        "10": 3,
+        "11": 3,
+        "12": 3,
+        "13": 3,
+        "14": 3,
+        "15": 3,
+        "16": 3,
+        "17": 3,
+        "18": 4,
+        "19": 4,
+        "2": 2,
+        "20": 4,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 3,
+        "7": 3,
+        "8": 3,
+        "9": 3
+      },
+      "keyType": "class-level",
+      "valueType": "integer"
+    },
+    "id": "srd521.table.cleric.channel-divinity",
+    "kind": "rule-table",
+    "name": {
+      "en": "Cleric Channel Divinity Uses"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the Cleric Features table.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0036-b024",
+          "p0036-b018",
+          "p0036-b020",
+          "p0036-b022",
+          "p0036-b025",
+          "p0036-b019",
+          "p0036-b021",
+          "p0036-b023",
+          "p0036-b026",
+          "p0036-b027",
+          "p0036-b028",
+          "p0036-b029",
+          "p0036-b030",
+          "p0036-b031",
+          "p0036-b032",
+          "p0036-b033",
+          "p0036-b034",
+          "p0036-b035",
+          "p0036-b036",
+          "p0036-b037",
+          "p0036-b038",
+          "p0036-b039",
+          "p0036-b040",
+          "p0036-b041",
+          "p0036-b042",
+          "p0036-b043",
+          "p0036-b044",
+          "p0036-b045"
+        ],
+        "page": 36,
+        "quoteHash": "23ce263ddef5c1bc8a5eb429dfb1dc9d405e45ef84d5db18fec886897182c34d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "rule-table",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {
+        "3": [
+          "srd521.spell.aid",
+          "srd521.spell.bless",
+          "srd521.spell.cure-wounds",
+          "srd521.spell.lesser-restoration"
+        ],
+        "5": [
+          "srd521.spell.mass-healing-word",
+          "srd521.spell.revivify"
+        ],
+        "7": [
+          "srd521.spell.aura-of-life",
+          "srd521.spell.death-ward"
+        ],
+        "9": [
+          "srd521.spell.greater-restoration",
+          "srd521.spell.mass-cure-wounds"
+        ]
+      },
+      "description": "The Life Domain focuses on the positive energy that helps sustain all life in the multiverse. Clerics who tap into this domain are masters of healing, using that life force to cure many hurts. Existence itself relies on the positive energy associated with this domain, so a Cleric of almost any religious tradition might choose it. This domain is particularly associated with agricultural deities, gods of healing or endurance, and gods of home and community. Religious orders of healing also seek the magic of this domain.",
+      "parentClassId": "srd521.class.cleric",
+      "progression": [
+        {
+          "features": [
+            "srd521.subclass-feature.cleric.life-domain.disciple-of-life",
+            "srd521.subclass-feature.cleric.life-domain.life-domain-spells",
+            "srd521.subclass-feature.cleric.life-domain.preserve-life"
+          ],
+          "level": 3
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.cleric.life-domain.blessed-healer"
+          ],
+          "level": 6
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.cleric.life-domain.supreme-healing"
+          ],
+          "level": 17
+        }
+      ]
+    },
+    "id": "srd521.subclass.cleric.life-domain",
+    "kind": "subclass",
+    "name": {
+      "en": "Life Domain"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Life Domain subclass extracted from page 40.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0040-b016",
+          "p0040-b018"
+        ],
+        "page": 40,
+        "quoteHash": "7b85410bcf479272af48188a0bf114c883a56a055d58b928645f400df3803dff",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass",
+      "cleric",
+      "life-domain"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "When a spell you cast with a spell slot restores Hit Points to a creature, that creature regains additional Hit Points on the turn you cast the spell. The additional Hit Points equal 2 plus the spell slot’s level."
+    },
+    "id": "srd521.subclass-feature.cleric.life-domain.disciple-of-life",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Disciple of Life"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Disciple of Life extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0040-b019"
+        ],
+        "page": 40,
+        "quoteHash": "b7f195187150e44d716bd9ff2b4c51ecf4e223d2fe0f00de1320e7a3dd14b668",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "Your connection to this divine domain ensures you always have certain spells ready. When you reach a Cleric level specified in the Life Domain Spells table, you thereafter always have the listed spells prepared. Life Domain Spells Prepared Spells Cleric Level 3 Aid, Bless, Cure Wounds, Lesser Restoration 5 Mass Healing Word, Revivify 7 Aura of Life, Death Ward 9 Greater Restoration, Mass Cure Wounds"
+    },
+    "id": "srd521.subclass-feature.cleric.life-domain.life-domain-spells",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Life Domain Spells"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Life Domain Spells extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0040-b020",
+          "p0040-b021",
+          "p0040-b023",
+          "p0040-b022",
+          "p0040-b024",
+          "p0040-b025",
+          "p0040-b026",
+          "p0040-b027"
+        ],
+        "page": 40,
+        "quoteHash": "bf97fbf6f157556b6a9921fc07226a5596fdb8815b366b9a971a29b53d2c0e36",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "As a Magic action, you present your Holy Symbol and expend a use of your Channel Divinity to evoke healing energy that can restore a number of Hit Points equal to five times your Cleric level. Choose Bloodied creatures within 30 feet of yourself (which can include you), and divide those Hit Points among them. This feature can restore a creature to no more than half its Hit Point maximum."
+    },
+    "id": "srd521.subclass-feature.cleric.life-domain.preserve-life",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Preserve Life"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Preserve Life extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0040-b028"
+        ],
+        "page": 40,
+        "quoteHash": "d9b64173c3ed04f75dec29e3fbc832dec40e5eed451a9ba0a800e3a5f26bab47",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 6,
+      "text": "The healing spells you cast on others heal you as well. Immediately after you cast a spell with a spell slot that restores Hit Points to one or more creatures other than yourself, you regain Hit Points equal to 2 plus the spell slot’s level."
+    },
+    "id": "srd521.subclass-feature.cleric.life-domain.blessed-healer",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Blessed Healer"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Blessed Healer extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0040-b029"
+        ],
+        "page": 40,
+        "quoteHash": "117e53abd88f1c20a2a984c9aa2ddacb38589335e99d6d64bf211b8dd33e6862",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "level": 17,
+      "text": "When you would normally roll one or more dice to restore Hit Points to a creature with a spell or Channel Divinity, don’t roll those dice for the healing; instead use the highest number possible for each die. For example, instead of restoring 2d6 Hit Points to a creature with a spell, you restore 12."
+    },
+    "id": "srd521.subclass-feature.cleric.life-domain.supreme-healing",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Supreme Healing"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Supreme Healing extracted from the Cleric class description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0040-b030"
+        ],
+        "page": 40,
+        "quoteHash": "20ff40e03f3466892fdfd0c75ecf28fef64ddfc8b7e13c6f5b60b2f12cf41554",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": true,
+        "materialText": "a strip of white cloth",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "Choose up to three creatures within range. Each target’s Hit Point maximum and current Hit Points increase by 5 for the duration. Using a Higher-Level Spell Slot. Each target’s Hit Points increase by 5 for each spell slot level above 2.",
+      "duration": "8 hours",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 2,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration"
+    },
+    "id": "srd521.spell.aid",
+    "kind": "spell",
+    "name": {
+      "en": "Aid"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0107-b008",
+          "p0107-b009",
+          "p0107-b010"
+        ],
+        "page": 107,
+        "quoteHash": "09f36abcd0a2933809c408d7f89556c9a21ef54b661e126cfb2f7d2372f63cc6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "abjuration",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "cleric",
+        "warlock"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": true,
+        "materialText": "a drop of blood",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Up to three creatures of your choice that you can see within range must each make a Charisma saving throw. Whenever a target that fails this save makes an attack roll or a saving throw before the spell ends, the target must subtract 1d4 from the attack roll or save. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 1.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [
+        "charisma"
+      ],
+      "school": "enchantment"
+    },
+    "id": "srd521.spell.bane",
+    "kind": "spell",
+    "name": {
+      "en": "Bane"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0112-b003",
+          "p0112-b004",
+          "p0112-b005"
+        ],
+        "page": 112,
+        "quoteHash": "69339f1c50bb97c693b1ae57686e7dc0c67fcbed3b66008ee776c2e8848dccd5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "enchantment",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "cleric",
+        "paladin"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": true,
+        "materialText": "a Holy Symbol worth 5+ GP",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You bless up to three creatures within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target adds 1d4 to the attack roll or save. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 1.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "enchantment"
+    },
+    "id": "srd521.spell.bless",
+    "kind": "spell",
+    "name": {
+      "en": "Bless"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0113-b010",
+          "p0113-b011",
+          "p0113-b012",
+          "p0113-b013"
+        ],
+        "page": 113,
+        "quoteHash": "19fecfe1b3a354fe50bc92c09185744fec1cf7df7b7784da61c3f2a226078ba5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "enchantment",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases by 2d8 for each spell slot level above 1.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration"
+    },
+    "id": "srd521.spell.cure-wounds",
+    "kind": "spell",
+    "name": {
+      "en": "Cure Wounds"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0121-b025",
+          "p0121-b026",
+          "p0121-b027"
+        ],
+        "page": 121,
+        "quoteHash": "95dc7ac269f8d05065df2466c02d7d8c729e640030964e5359d032417047c62e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "abjuration",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "cleric",
+        "druid"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You touch a willing creature and choose a skill. Until the spell ends, the creature adds 1d4 to any ability check using the chosen skill.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "divination"
+    },
+    "id": "srd521.spell.guidance",
+    "kind": "spell",
+    "name": {
+      "en": "Guidance"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0138-b004",
+          "p0138-b005",
+          "p0138-b006"
+        ],
+        "page": 138,
+        "quoteHash": "2024839d625db5725d3a480e6ab25c845bba4ef281e133f1400b7f25c743d4b6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "divination",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "cleric"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 4,
+          "diceSize": 6,
+          "type": "radiant"
+        }
+      ],
+      "description": "You hurl a bolt of light toward a creature within range. Make a ranged spell attack against the target. On a hit, it takes 4d6 Radiant damage, and the next attack roll made against it before the end of your next turn has Advantage. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell slot level above 1.",
+      "duration": "1 round",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation"
+    },
+    "id": "srd521.spell.guiding-bolt",
+    "kind": "spell",
+    "name": {
+      "en": "Guiding Bolt"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0138-b007",
+          "p0138-b008",
+          "p0138-b009",
+          "p0138-b010"
+        ],
+        "page": 138,
+        "quoteHash": "4f1bc771965301ea1fe5cdd47e6ee82198c91ba7aba9ecda0e8ba66ae0416d98",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "evocation",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Bonus Action",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "A creature of your choice that you can see within range regains Hit Points equal to 2d4 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases by 2d4 for each spell slot level above 1.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration"
+    },
+    "id": "srd521.spell.healing-word",
+    "kind": "spell",
+    "name": {
+      "en": "Healing Word"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0139-b024",
+          "p0139-b025",
+          "p0139-b026"
+        ],
+        "page": 139,
+        "quoteHash": "a236617f0b2d6283d0bf9616c36a924842c4aeca2b4b1b7f38a76bfa88f01be4",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "abjuration",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": true,
+        "materialText": "a straight piece of iron",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Choose a Humanoid that you can see within range. The target must succeed on a Wisdom saving throw or have the Paralyzed condition for the duration. At the end of each of its turns, the target repeats the save, ending the spell on itself on a success. Using a Higher-Level Spell Slot. You can target one additional Humanoid for each spell slot level above 2.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 2,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "wisdom"
+      ],
+      "school": "enchantment"
+    },
+    "id": "srd521.spell.hold-person",
+    "kind": "spell",
+    "name": {
+      "en": "Hold Person"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0141-b004",
+          "p0141-b005",
+          "p0141-b006"
+        ],
+        "page": 141,
+        "quoteHash": "45dab82b55fcf5e4a9671989d2cc08bf32c6fbe63825f876792faec54850562d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "enchantment",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Bonus Action",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You touch a creature and end one condition on it: Blinded, Deafened, Paralyzed, or Poisoned.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 2,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration"
+    },
+    "id": "srd521.spell.lesser-restoration",
+    "kind": "spell",
+    "name": {
+      "en": "Lesser Restoration"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0144-b007",
+          "p0144-b008",
+          "p0144-b009"
+        ],
+        "page": 144,
+        "quoteHash": "52ea0c54ade19b13be12d6b772ab5de0769d197d39a33d394c2fa3d0069af6fb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "abjuration",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Bonus Action",
+      "classes": [
+        "bard",
+        "cleric"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "Up to six creatures of your choice that you can see within range regain Hit Points equal to 2d4 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases by 1d4 for each spell slot level above 3.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 3,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration"
+    },
+    "id": "srd521.spell.mass-healing-word",
+    "kind": "spell",
+    "name": {
+      "en": "Mass Healing Word"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0148-b002",
+          "p0148-b003",
+          "p0148-b004"
+        ],
+        "page": 148,
+        "quoteHash": "0c9a16c3df13900e3d1e57370e7e53359cdfd959a57599ab7f50ddd1c033a598",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "abjuration",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "10 minutes",
+      "classes": [
+        "cleric",
+        "paladin"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "Up to five creatures of your choice who remain within range for the spell’s entire casting gain the benefits of a Short Rest and also regain 2d8 Hit Points. A creature can’t be affected by this spell again until that creature finishes a Long Rest. Using a Higher-Level Spell Slot. The healing increases by 1d8 for each spell slot level above 2.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 2,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration"
+    },
+    "id": "srd521.spell.prayer-of-healing",
+    "kind": "spell",
+    "name": {
+      "en": "Prayer of Healing"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0154-b012",
+          "p0154-b013",
+          "p0154-b014",
+          "p0154-b015"
+        ],
+        "page": 154,
+        "quoteHash": "5f79bd5b8e04826fe01856169ab1b8a481c19ffbd33d6fcbf2fdcd0709f18a22",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "abjuration",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": true,
+        "materialText": "a diamond worth 300+ GP, which the spell consumes",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You touch a creature that has died within the last minute. That creature revives with 1 Hit Point. This spell can’t revive a creature that has died of old age, nor does it restore any missing body parts.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 3,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "necromancy"
+    },
+    "id": "srd521.spell.revivify",
+    "kind": "spell",
+    "name": {
+      "en": "Revivify"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0159-b006",
+          "p0159-b007",
+          "p0159-b008",
+          "p0159-b009"
+        ],
+        "page": 159,
+        "quoteHash": "651f77f361b4fe8325826ee0c07bd5190a9516bfb152e256e1e4928e682fbde7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "necromancy",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "cleric"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 1,
+          "diceSize": 8,
+          "type": "radiant"
+        }
+      ],
+      "description": "Flame-like radiance descends on a creature that you can see within range. The target must succeed on a Dexterity saving throw or take 1d8 Radiant damage. The target gains no benefit from Half Cover or Three-Quarters Cover for this save. Cantrip Upgrade. The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "evocation"
+    },
+    "id": "srd521.spell.sacred-flame",
+    "kind": "spell",
+    "name": {
+      "en": "Sacred Flame"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0159-b013",
+          "p0159-b014",
+          "p0159-b015"
+        ],
+        "page": 159,
+        "quoteHash": "d07d1bf69f07bd87a7eb3331b09e0aaaec9d40d4e81bc0bbbc78b90c70edfd4a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "evocation",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Bonus Action",
+      "classes": [
+        "cleric",
+        "paladin"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": true,
+        "materialText": "a prayer scroll",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "A shimmering field surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.",
+      "duration": "Concentration, up to 10 minutes",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 1,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration"
+    },
+    "id": "srd521.spell.shield-of-faith",
+    "kind": "spell",
+    "name": {
+      "en": "Shield of Faith"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0162-b003",
+          "p0162-b004",
+          "p0162-b005"
+        ],
+        "page": 162,
+        "quoteHash": "57a1b0cf332727684446497505f82af3c19558d838e894eaea7cd630e03f82a6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "abjuration",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "cleric"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": true,
+        "materialText": "a prayer scroll",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [
+        {
+          "diceCount": 3,
+          "diceSize": 8,
+          "type": "radiant"
+        },
+        {
+          "diceCount": 3,
+          "diceSize": 8,
+          "type": "necrotic"
+        }
+      ],
+      "description": "Protective spirits flit around you in a 15-foot Emanation for the duration. If you are good or neutral, their spectral form appears angelic or fey (your choice). If you are evil, they appear fiendish. When you cast this spell, you can designate creatures to be unaffected by it. Any other creature’s Speed is halved in the Emanation, and whenever the Emanation enters a creature’s space and whenever a creature enters the Emanation or ends its turn there, the creature must make a Wisdom saving throw. On a failed save, the creature takes 3d8 Radiant damage (if you are good or neutral) or 3d8 Necrotic damage (if you are evil). On a successful save, the creature takes half as much damage. A creature makes this save only once per turn. Using a Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 3.",
+      "duration": "Concentration, up to 10 minutes",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 3,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [
+        "wisdom"
+      ],
+      "school": "conjuration"
+    },
+    "id": "srd521.spell.spirit-guardians",
+    "kind": "spell",
+    "name": {
+      "en": "Spirit Guardians"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0164-b018",
+          "p0164-b019",
+          "p0164-b020"
+        ],
+        "page": 164,
+        "quoteHash": "900cfaae849e443cf9d26f9dcb58f2d411a76b8989c5614ff59f5cd859d5ab4e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0165-b002"
+        ],
+        "page": 165,
+        "quoteHash": "6630d5a67f52dc0f9a04702e87b186aaa9753f4ae04c5abc21b25746fb6d2241",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "conjuration",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "castingTime": "Bonus Action",
+      "classes": [
+        "cleric"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You create a floating, spectral force that resembles a weapon of your choice and lasts for the duration. The force appears within range in a space of your choice, and you can immediately make one melee spell attack against one creature within 5 feet of the force. On a hit, the target takes Force damage equal to 1d8 plus your spellcasting ability modifier. As a Bonus Action on your later turns, you can move the force up to 20 feet and repeat the attack against a creature within 5 feet of it. Using a Higher-Level Spell Slot. The damage increases by 1d8 for every slot level above 2.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 2,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation"
+    },
+    "id": "srd521.spell.spiritual-weapon",
+    "kind": "spell",
+    "name": {
+      "en": "Spiritual Weapon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0165-b003",
+          "p0165-b004",
+          "p0165-b005"
+        ],
+        "page": 165,
+        "quoteHash": "dfdbec2e91597121f29ee71fbefe89433a10be2063bbbf63580291a0eb75f2a1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "evocation",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "cleric"
+      ],
+      "clericSpell": true,
+      "components": {
+        "material": false,
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You manifest a minor wonder within range. You create one of the effects below within range. If you cast this spell multiple times, you can have up to three of its 1-minute effects active at a time. Altered Eyes. You alter the appearance of your eyes for 1 minute. Booming Voice. Your voice booms up to three times as loud as normal for 1 minute. For the duration, you have Advantage on Charisma (Intimidation) checks. Fire Play. You cause flames to flicker, brighten, dim, or change color for 1 minute. Invisible Hand. You instantaneously cause an unlocked door or window to fly open or slam shut. Phantom Sound. You create an instantaneous sound that originates from a point of your choice within range, such as a rumble of thunder, the cry of a raven, or ominous whispers. Tremors. You cause harmless tremors in the ground for 1 minute.",
+      "duration": "Up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "transmutation"
+    },
+    "id": "srd521.spell.thaumaturgy",
+    "kind": "spell",
+    "name": {
+      "en": "Thaumaturgy"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Cleric spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0169-b003",
+          "p0169-b004",
+          "p0169-b005"
+        ],
+        "page": 169,
+        "quoteHash": "01a95a5c27f95b321e1846a7163521fce84c9ea01b499302ab4454058db033b0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "transmutation",
+      "cleric"
+    ]
+  }
+]

@@ -610,6 +610,7 @@
         "srd521.spell.weird",
         "srd521.spell.wish"
       ],
+      "spellPreparation": "spellbook",
       "spellbookSpellsPerLevel": 2,
       "spellbookStartingSpells": 6,
       "spellcastingAbility": "intelligence",

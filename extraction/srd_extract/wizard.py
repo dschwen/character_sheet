@@ -372,7 +372,7 @@ def _spell_signature(text: str) -> tuple[int, str, list[str]] | None:
 def _parse_casting_metadata(text: str) -> dict[str, Any]:
     match = re.fullmatch(
         r"Casting Time: (?P<casting_time>.+?) Range: (?P<range>.+?) "
-        r"Components: (?P<components>.+?) Duration: (?P<duration>.+)",
+        r"Components?: (?P<components>.+?) Duration: (?P<duration>.+)",
         text,
     )
     if match is None:
@@ -528,6 +528,7 @@ def _class_entity(
         "body": {
             **traits,
             "spellcastingAbility": "intelligence",
+            "spellPreparation": "spellbook",
             "spellbookStartingSpells": 6,
             "spellbookSpellsPerLevel": 2,
             "spellList": [

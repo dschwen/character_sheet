@@ -13,6 +13,7 @@ character JSON document to the local CLI:
 ```bash
 corepack pnpm build
 corepack pnpm character packages/test-fixtures/characters/fighter-5.json
+corepack pnpm character packages/test-fixtures/characters/cleric-5.json
 corepack pnpm character packages/test-fixtures/characters/wizard-5.json
 ```
 
@@ -139,6 +140,25 @@ This parser validates all 20 Wizard progression rows, captures the 217-entry Wiz
 extracts the Evoker subclass, and generates 20 source-linked representative spell entities with
 structured casting, component, duration, attack, save, damage, Concentration, and Ritual fields.
 
+Generate Cleric content from pages 36–40 using the already extracted spell descriptions:
+
+```bash
+.venv/bin/python -m srd_extract.pipeline \
+  --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
+  --out generated/extraction/srd-5.2.1-cleric \
+  --pages 36-40 \
+  --overlays
+
+.venv/bin/python -m srd_extract.cleric \
+  --class-extraction generated/extraction/srd-5.2.1-cleric \
+  --spell-extraction generated/extraction/srd-5.2.1-spells \
+  --output packages/content-srd-5.2.1/generated
+```
+
+The Cleric parser validates all 20 progression rows, the 109-entry class spell list, Divine Order,
+Life Domain and its always-prepared spell table, Channel Divinity scaling, and 17 source-linked
+representative divine spells.
+
 Generate the Human and Soldier origin slice from pages 83, 86, and 87:
 
 ```bash
@@ -169,14 +189,14 @@ Generate the structured weapon and armor entities from SRD pages 91–92:
   --output packages/content-srd-5.2.1/generated
 ```
 
-The rules kernel evaluates reviewed level-1 Barbarian, level-1/level-5 Human Soldier Fighter, and
-level-5 Human Soldier Wizard fixtures in its integration suite. Results include origin and feat
-ability increases, subclass features, species size and speed, typed skill and saving-throw
-proficiencies, d20-test roll states, Initiative, Passive Perception, inventory, armor and Shield
-candidates, weapon attacks and damage, Wizard spellbook and preparation validation, spell slots,
-spell attacks and save DC, Weapon Mastery metadata, attacks per Attack action, critical-hit
-thresholds, Hit Points, feature resources, conditional actions, resistances, validations, coverage
-warnings, and calculation traces.
+The rules kernel evaluates reviewed level-1 Barbarian and level-5 Fighter, Cleric, and Wizard
+fixtures in its integration suite. Results include origin and feat ability increases, subclass
+features, species size and speed, typed skill and saving-throw proficiencies, d20-test roll states,
+Initiative, Passive Perception, inventory, armor and Shield candidates, weapon attacks and damage,
+spellbook and full-list preparation models, always-prepared domain spells, spell slots, spell
+attacks and save DC, Weapon Mastery metadata, attacks per Attack action, critical-hit thresholds,
+Hit Points, feature resources, conditional actions, resistances, validations, coverage warnings,
+and calculation traces.
 
 The rules kernel also exposes atomic Short Rest, Long Rest, action-use, and spell-cast proposals.
 Transition processing validates explicit dice results and available spell slots, previews

@@ -1,13 +1,13 @@
 {
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 141,
+    "STRUCTURED": 179,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
     "VERIFIED": 0
   },
   "generatedAt": null,
-  "note": "Barbarian, Fighter through level 5, Wizard source content, Human, Soldier, equipment, and 20 representative spells. Proposed executable rules remain under review.",
+  "note": "Barbarian, Cleric through level 5, Fighter through level 5, Wizard through level 5, Human, Soldier, equipment, and representative spells.",
   "package": "srd-5.2.1"
 }
