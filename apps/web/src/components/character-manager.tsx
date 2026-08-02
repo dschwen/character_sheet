@@ -10,6 +10,7 @@ import {
 import type {
   ActionSummary,
   ActionUseRequest,
+  AttackSummary,
   CharacterEvaluation,
   LoadedRulesPackage,
   SpellCastRequest,
@@ -41,7 +42,7 @@ import {
   setHeroicInspiration,
   setTemporaryHitPoints,
 } from "../lib/play-state";
-import { rollD20, type D20RollRequest, type D20RollResult } from "../lib/dice-roll";
+import { rollD20, rollDice, type D20RollRequest, type DiceRollResult } from "../lib/dice-roll";
 
 const storageKey = "dnd-character-manager.document.v1";
 const tabs = ["overview", "play", "combat", "spells", "features", "diagnostics"] as const;
@@ -69,6 +70,13 @@ interface ActionRequirements {
   diceCount?: number;
   diceSize?: number;
   minimumSpend?: number;
+}
+
+interface CastFeedback {
+  spell: SpellSummary;
+  asRitual: boolean;
+  slotLevel?: number;
+  slotsRemaining?: number;
 }
 
 function objectValue(value: unknown): Readonly<Record<string, unknown>> | undefined {
@@ -104,6 +112,26 @@ function errorMessage(error: unknown): string {
 
 function traceLabel(traceId: string): string {
   return titleCase(traceId.replaceAll(".", "-"));
+}
+
+function rollExpression(result: DiceRollResult): string {
+  if (result.kind === "d20") {
+    return `${String(result.kept)} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))} = ${String(result.total)}`;
+  }
+  if (result.modifier === 0) return `Total ${String(result.total)}`;
+  const diceTotal = result.dice.reduce((total, die) => total + die, 0);
+  return `${String(diceTotal)} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))} = ${String(result.total)}`;
+}
+
+function rollDetail(result: DiceRollResult): string {
+  if (result.kind === "d20") {
+    return result.dice.length === 1 ? "1d20" : `2d20 rolled: ${result.dice.map(String).join(", ")}`;
+  }
+  return `${String(result.diceCount)}d${String(result.diceSize)} rolled: ${result.dice.map(String).join(", ")}`;
+}
+
+function spellDamageRolls(spell: SpellSummary): SpellSummary["damage"] {
+  return (spell as Partial<Pick<SpellSummary, "damage">>).damage ?? [];
 }
 
 function Section({
@@ -180,7 +208,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
-  const [latestRoll, setLatestRoll] = useState<D20RollResult>();
+  const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
+  const [castFeedback, setCastFeedback] = useState<CastFeedback>();
   const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -222,6 +251,88 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
   function performRoll(request: D20RollRequest): void {
     setLatestRoll(rollD20(request));
+  }
+
+  function rollAttackDamage(attack: AttackSummary, critical = false): void {
+    const { diceCount, diceSize, bonus, flat = 0 } = attack.damage;
+    if (diceCount === undefined || diceSize === undefined) {
+      setNotice(`${attack.name} has no structured damage dice to roll.`);
+      return;
+    }
+    setLatestRoll(
+      rollDice({
+        label: `${attack.name}${critical ? " critical" : ""} damage · ${titleCase(attack.damage.type)}`,
+        diceCount: critical ? diceCount * 2 : diceCount,
+        diceSize,
+        modifier: bonus + flat,
+      }),
+    );
+  }
+
+  function rollSpellDamage(spell: SpellSummary, damage: SpellSummary["damage"][number]): void {
+    setLatestRoll(
+      rollDice({
+        label: `${spell.name} · ${titleCase(damage.type)} damage`,
+        diceCount: damage.diceCount,
+        diceSize: damage.diceSize,
+      }),
+    );
+  }
+
+  function spellRollControls(spell: SpellSummary): React.ReactNode {
+    const spellcasting = evaluation?.spellcasting;
+    const damageRolls = spellDamageRolls(spell);
+    if (spellcasting === undefined) return null;
+    if (
+      spell.attackType === undefined &&
+      damageRolls.length === 0 &&
+      spell.savingThrows.length === 0
+    )
+      return null;
+    return (
+      <div className="spell-roll-actions">
+        {spell.attackType === undefined ? null : (
+          <button
+            type="button"
+            onClick={(event) => {
+              if (event.shiftKey) {
+                setSelectedTraceId(spellcasting.attackTraceId);
+              } else {
+                performRoll({
+                  label: `${spell.name} spell attack`,
+                  modifier: spellcasting.attackBonus,
+                  mode: "normal",
+                });
+              }
+            }}
+            title="Roll spell attack · Shift-click to inspect calculation"
+          >
+            Attack {signed(spellcasting.attackBonus)}
+          </button>
+        )}
+        {damageRolls.map((damage, index) => (
+          <button
+            key={`${damage.type}-${String(index)}`}
+            type="button"
+            onClick={() => {
+              rollSpellDamage(spell, damage);
+            }}
+            title={
+              spell.hasHigherLevelEffect
+                ? "Roll listed base damage; higher-level scaling is not included"
+                : "Roll listed spell damage"
+            }
+          >
+            {String(damage.diceCount)}d{String(damage.diceSize)} {titleCase(damage.type)}
+          </button>
+        ))}
+        {spell.savingThrows.map((ability) => (
+          <span key={ability}>
+            {ability.slice(0, 3).toUpperCase()} save · DC {String(spellcasting.saveDifficultyClass)}
+          </span>
+        ))}
+      </div>
+    );
   }
 
   function selectFixture(filename: string): void {
@@ -402,12 +513,24 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
   function castSpell(spell: SpellSummary, asRitual: boolean): void {
     const request: SpellCastRequest = { spellId: spell.id, asRitual };
-    if (spell.level > 0 && !asRitual) request.slotLevel = selectedSlotLevel(spell);
+    const slotLevel = spell.level > 0 && !asRitual ? selectedSlotLevel(spell) : undefined;
+    if (slotLevel !== undefined) request.slotLevel = slotLevel;
     try {
       const proposal = proposeSpellCast({ character, packages: [rulesPackage] }, request);
+      if (proposal.applicable) {
+        const slot = evaluation?.spellcasting?.slots.find(
+          (candidate) => candidate.level === slotLevel,
+        );
+        setCastFeedback({
+          spell,
+          asRitual,
+          ...(slotLevel === undefined ? {} : { slotLevel }),
+          ...(slot === undefined ? {} : { slotsRemaining: Math.max(0, slot.current - 1) }),
+        });
+      }
       applyTransition(
         proposal,
-        `${spell.name}${asRitual ? " was cast as a ritual" : " was cast"}.`,
+        `${spell.name}${asRitual ? " was cast as a ritual" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.`,
       );
     } catch (error) {
       setNotice(`Spell cast failed: ${errorMessage(error)}`);
@@ -495,24 +618,22 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         {latestRoll === undefined ? null : (
           <div className="dice-result" role="status" aria-live="polite">
             <div
-              className={`dice-face${latestRoll.kept === 20 ? " critical" : ""}${latestRoll.kept === 1 ? " fumble" : ""}`}
-              aria-label={`Kept die ${String(latestRoll.kept)}`}
+              className={`dice-face${latestRoll.kind === "dice-pool" ? " pool" : ""}${latestRoll.kind === "d20" && latestRoll.kept >= (latestRoll.criticalThreshold ?? 20) ? " critical" : ""}${latestRoll.kind === "d20" && latestRoll.kept === 1 ? " fumble" : ""}`}
+              aria-label={
+                latestRoll.kind === "d20"
+                  ? `Kept die ${String(latestRoll.kept)}`
+                  : `Dice total ${String(latestRoll.total)}`
+              }
             >
-              {String(latestRoll.kept)}
+              {String(latestRoll.kind === "d20" ? latestRoll.kept : latestRoll.total)}
             </div>
             <div>
               <span>
-                {latestRoll.label} · {titleCase(latestRoll.mode)}
+                {latestRoll.label}
+                {latestRoll.kind === "d20" ? ` · ${titleCase(latestRoll.mode)}` : ""}
               </span>
-              <strong>
-                {String(latestRoll.kept)} {latestRoll.modifier >= 0 ? "+" : "−"}{" "}
-                {String(Math.abs(latestRoll.modifier))} = {String(latestRoll.total)}
-              </strong>
-              <small>
-                {latestRoll.dice.length === 1
-                  ? "1d20"
-                  : `2d20 rolled: ${latestRoll.dice.map(String).join(", ")}`}
-              </small>
+              <strong>{rollExpression(latestRoll)}</strong>
+              <small>{rollDetail(latestRoll)}</small>
             </div>
             <button
               type="button"
@@ -886,27 +1007,68 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
                 {evaluation.spellcasting === undefined ? null : (
                   <Section title="Cast a spell" eyebrow="Spell-slot transitions">
+                    {castFeedback === undefined ? null : (
+                      <div className="cast-feedback" role="status" aria-live="polite">
+                        <span aria-hidden="true">✓</span>
+                        <div>
+                          <small>Cast confirmed</small>
+                          <strong>{castFeedback.spell.name}</strong>
+                          <p>
+                            {castFeedback.asRitual
+                              ? "Ritual · no spell slot spent"
+                              : castFeedback.slotLevel === undefined
+                                ? "Cantrip · no spell slot spent"
+                                : `Level ${String(castFeedback.slotLevel)} slot spent · ${String(castFeedback.slotsRemaining ?? 0)} remaining`}
+                            {castFeedback.spell.concentration ? " · Concentration started" : ""}
+                          </p>
+                          {castFeedback.slotLevel !== undefined &&
+                          castFeedback.slotLevel > castFeedback.spell.level &&
+                          spellDamageRolls(castFeedback.spell).length > 0 ? (
+                            <em>
+                              Damage buttons show listed base dice; upcast scaling is not yet
+                              structured.
+                            </em>
+                          ) : null}
+                          {spellRollControls(castFeedback.spell)}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCastFeedback(undefined);
+                          }}
+                          aria-label="Dismiss cast confirmation"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
                     <div className="play-spell-list">
                       {evaluation.spells.map((spell) => {
                         const eligibleSlots =
                           evaluation.spellcasting?.slots.filter(
                             (slot) => slot.level >= spell.level,
                           ) ?? [];
+                        const slotLevel = selectedSlotLevel(spell);
+                        const selectedSlot = eligibleSlots.find((slot) => slot.level === slotLevel);
+                        const canCast =
+                          spell.level === 0 || (spell.prepared && (selectedSlot?.current ?? 0) > 0);
                         return (
                           <div key={spell.id}>
-                            <span>
+                            <div className="spell-summary">
                               <strong>{spell.name}</strong>
                               <small>
-                                {spell.level === 0 ? "Cantrip" : `Level ${String(spell.level)}`} ·{" "}
-                                {spell.prepared ? "Prepared" : "Not prepared"}
+                                {spell.level === 0
+                                  ? "Cantrip · Always available"
+                                  : `Level ${String(spell.level)} · ${spell.prepared ? "Prepared" : "Not prepared"}`}
                                 {spell.concentration ? " · Concentration" : ""}
                               </small>
-                            </span>
-                            <div>
+                              {spellRollControls(spell)}
+                            </div>
+                            <div className="spell-cast-controls">
                               {spell.level === 0 ? null : (
                                 <select
                                   aria-label={`Slot level for ${spell.name}`}
-                                  value={String(selectedSlotLevel(spell))}
+                                  value={String(slotLevel)}
                                   onChange={(event) => {
                                     setSpellLevels((current) => ({
                                       ...current,
@@ -915,7 +1077,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   }}
                                 >
                                   {eligibleSlots.map((slot) => (
-                                    <option key={slot.level} value={slot.level}>
+                                    <option
+                                      key={slot.level}
+                                      value={slot.level}
+                                      disabled={slot.current === 0}
+                                    >
                                       Level {String(slot.level)} · {String(slot.current)} left
                                     </option>
                                   ))}
@@ -924,6 +1090,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               <button
                                 className="button primary compact"
                                 type="button"
+                                disabled={!canCast}
                                 onClick={() => {
                                   castSpell(spell, false);
                                 }}
@@ -1065,25 +1232,57 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           {evaluation.attacks.map((attack) => (
                             <tr key={attack.id}>
                               <td>
+                                <strong>{attack.name}</strong>
+                                <small>
+                                  {titleCase(attack.attackType)} ·{" "}
+                                  {attack.properties.map(titleCase).join(", ")}
+                                </small>
+                              </td>
+                              <td>
                                 <TraceButton
+                                  className="roll-cell"
                                   traceId={attack.traceId}
                                   onSelect={setSelectedTraceId}
                                   roll={{
                                     label: `${attack.name} attack`,
                                     modifier: attack.attackBonus,
                                     mode: "normal",
+                                    criticalThreshold: attack.criticalHitThreshold,
                                   }}
                                   onRoll={performRoll}
                                 >
-                                  {attack.name}
+                                  <strong>{signed(attack.attackBonus)}</strong>
+                                  <small>Roll attack</small>
                                 </TraceButton>
-                                <small>
-                                  {titleCase(attack.attackType)} ·{" "}
-                                  {attack.properties.map(titleCase).join(", ")}
-                                </small>
                               </td>
-                              <td>{signed(attack.attackBonus)}</td>
-                              <td>{damageText(attack.damage)}</td>
+                              <td>
+                                <div className="damage-rolls">
+                                  <button
+                                    type="button"
+                                    onClick={(event) => {
+                                      if (event.shiftKey) {
+                                        setSelectedTraceId(attack.damage.traceId);
+                                      } else {
+                                        rollAttackDamage(attack);
+                                      }
+                                    }}
+                                    title="Roll damage · Shift-click to inspect calculation"
+                                  >
+                                    <strong>{damageText(attack.damage)}</strong>
+                                    <small>Roll damage</small>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="critical-roll"
+                                    onClick={() => {
+                                      rollAttackDamage(attack, true);
+                                    }}
+                                    title="Roll critical-hit damage"
+                                  >
+                                    Crit
+                                  </button>
+                                </div>
+                              </td>
                               <td>
                                 {attack.range === undefined
                                   ? "Reach"
@@ -1215,6 +1414,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           <small>
                             {spell.castingTime} · {spell.range} · {spell.duration}
                           </small>
+                          {spellRollControls(spell)}
                         </div>
                       ))}
                     </div>

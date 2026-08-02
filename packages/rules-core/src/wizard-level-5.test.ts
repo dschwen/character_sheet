@@ -60,12 +60,19 @@ describe("evaluateCharacter Wizard level-5 vertical slice", () => {
       school: "evocation",
       concentration: false,
       savingThrows: ["dexterity"],
+      damage: [{ diceCount: 8, diceSize: 6, type: "fire" }],
+      hasHigherLevelEffect: true,
       sources: [expect.objectContaining({ page: 131 })],
     });
     expect(evaluation.spells.find((spell) => spell.id === "srd521.spell.web")).toMatchObject({
       prepared: true,
       concentration: true,
       sources: [expect.objectContaining({ page: 174 })],
+    });
+    expect(
+      evaluation.spells.find((spell) => spell.id === "srd521.spell.acid-splash"),
+    ).toMatchObject({
+      damage: [{ diceCount: 2, diceSize: 6, type: "acid" }],
     });
     const attackTrace = evaluation.traces[evaluation.spellcasting?.attackTraceId ?? ""];
     expect(attackTrace?.result).toBe(6);

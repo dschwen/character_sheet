@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { rollD20, type RandomSource } from "./dice-roll";
+import { rollD20, rollDice, type RandomSource } from "./dice-roll";
 
 function sequence(...values: number[]): RandomSource {
   let index = 0;
@@ -12,6 +12,7 @@ describe("d20 rolls", () => {
     expect(
       rollD20({ label: "Strength check", modifier: 3, mode: "normal" }, sequence(0.45)),
     ).toEqual({
+      kind: "d20",
       label: "Strength check",
       modifier: 3,
       mode: "normal",
@@ -37,5 +38,22 @@ describe("d20 rolls", () => {
     expect(() =>
       rollD20({ label: "Initiative", modifier: 0, mode: "normal" }, sequence(1)),
     ).toThrow(RangeError);
+  });
+
+  it("rolls arbitrary damage dice and adds a modifier once", () => {
+    expect(
+      rollDice(
+        { label: "Greatsword damage", diceCount: 2, diceSize: 6, modifier: 3 },
+        sequence(0, 0.99),
+      ),
+    ).toEqual({
+      kind: "dice-pool",
+      label: "Greatsword damage",
+      diceCount: 2,
+      diceSize: 6,
+      modifier: 3,
+      dice: [1, 6],
+      total: 10,
+    });
   });
 });

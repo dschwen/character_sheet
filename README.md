@@ -20,10 +20,12 @@ derived value, and import or export the canonical character JSON. Click an abili
 Initiative, attack, or spell-attack value to roll it; Shift-click a derived value to inspect its
 calculation instead. The Play view tracks damage,
 healing, Temporary Hit Points, Heroic Inspiration, Exhaustion, Concentration, rests, modeled feature
-uses, and spell-slot expenditure. Every change advances the document revision, persists locally,
-and can be undone once. Imported characters stay in the browser's local storage; the app has no
-account, server, or database dependency. A production build is emitted as a static site in
-`apps/web/out` by `corepack pnpm build`.
+uses, and spell-slot expenditure. Weapon rows provide attack, damage, and critical-damage rolls.
+Spells expose structured attack, damage, and saving-throw details, while cast confirmations report
+the slot spent, remaining slots, and Concentration changes. Every state change advances the
+document revision, persists locally, and can be undone once. Imported characters stay in the
+browser's local storage; the app has no account, server, or database dependency. A production build
+is emitted as a static site in `apps/web/out` by `corepack pnpm build`.
 
 Choose **New character** to open the guided Fighter builder. It creates rules-valid Fighters from
 levels 1–5 with Human, Soldier, Champion progression, ability assignment, unique skill choices,

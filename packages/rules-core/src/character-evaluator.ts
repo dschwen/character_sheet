@@ -312,6 +312,17 @@ const spellBodySchema = z
     concentration: z.boolean(),
     attackType: z.enum(["melee", "ranged"]).nullable(),
     savingThrows: z.array(z.string().min(1)),
+    damage: z
+      .array(
+        z.object({
+          diceCount: z.number().int().positive(),
+          diceSize: z.number().int().positive(),
+          type: z.string().min(1),
+        }),
+      )
+      .nullish()
+      .transform((damage) => damage ?? []),
+    hasHigherLevelEffect: z.boolean().default(false),
   })
   .passthrough();
 const tableBodySchema = z.object({ entries: z.record(z.number()) });
@@ -2533,6 +2544,16 @@ function evaluateSpellcasting(
       continue;
     }
     const body = spellBodySchema.parse(entity.body);
+    const cantripDamageMultiplier =
+      body.level !== 0
+        ? 1
+        : character.build.levels.length >= 17
+          ? 4
+          : character.build.levels.length >= 11
+            ? 3
+            : character.build.levels.length >= 5
+              ? 2
+              : 1;
     state.spells.push({
       id: spellId,
       name: entity.name.en ?? spellId,
@@ -2546,6 +2567,11 @@ function evaluateSpellcasting(
       duration: body.duration,
       ...(body.attackType === null ? {} : { attackType: body.attackType }),
       savingThrows: body.savingThrows,
+      damage: body.damage.map((damage) => ({
+        ...damage,
+        diceCount: damage.diceCount * cantripDamageMultiplier,
+      })),
+      hasHigherLevelEffect: body.hasHigherLevelEffect,
       sources: entitySourceReferences(entity),
     });
   }

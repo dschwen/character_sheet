@@ -171,6 +171,12 @@ export interface SpellcastingSummary {
   saveTraceId: string;
 }
 
+export interface SpellDamageSummary {
+  diceCount: number;
+  diceSize: number;
+  type: string;
+}
+
 export interface SpellSummary {
   id: string;
   name: string;
@@ -184,6 +190,8 @@ export interface SpellSummary {
   duration: string;
   attackType?: "melee" | "ranged";
   savingThrows: string[];
+  damage: SpellDamageSummary[];
+  hasHigherLevelEffect: boolean;
   sources: SourceReference[];
 }
 

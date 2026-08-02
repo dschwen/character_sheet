@@ -234,6 +234,10 @@ a:focus-visible {
   color: white;
   background: var(--red);
 }
+.dice-face.pool {
+  color: #173c32;
+  background: #f3dca7;
+}
 
 .character-hero {
   position: relative;
@@ -754,7 +758,7 @@ button.vital-card:hover {
   background: #fbfaf6;
 }
 .play-action-list > div > span,
-.play-spell-list > div > span {
+.spell-summary {
   display: grid;
   gap: 3px;
 }
@@ -764,7 +768,7 @@ button.vital-card:hover {
   font-size: 10px;
 }
 .action-inputs,
-.play-spell-list > div > div {
+.spell-cast-controls {
   display: flex;
   align-items: end;
   gap: 6px;
@@ -780,6 +784,82 @@ button.vital-card:hover {
 .play-spell-list select {
   height: 34px;
   font-size: 11px;
+}
+.cast-feedback {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 24px;
+  gap: 11px;
+  align-items: start;
+  margin-bottom: 12px;
+  padding: 13px;
+  border: 1px solid #b9d2c8;
+  border-radius: 8px;
+  color: #173c32;
+  background: #edf7f3;
+}
+.cast-feedback > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background: var(--green);
+  font-weight: 800;
+}
+.cast-feedback > div {
+  display: grid;
+  gap: 2px;
+}
+.cast-feedback small {
+  color: var(--green-bright);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.cast-feedback p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.cast-feedback em {
+  margin-top: 5px;
+  color: #8a6229;
+  font-size: 10px;
+}
+.cast-feedback > button {
+  padding: 0;
+  color: var(--muted);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 19px;
+}
+.spell-roll-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  margin-top: 5px;
+}
+.spell-roll-actions button,
+.spell-roll-actions span {
+  padding: 4px 7px;
+  color: var(--green);
+  border: 1px solid #c8d8d1;
+  border-radius: 5px;
+  background: #f3f8f5;
+  font-size: 9px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.spell-roll-actions button {
+  cursor: pointer;
+}
+.spell-roll-actions button:hover {
+  border-color: var(--green-bright);
+  background: white;
 }
 
 .table-wrap {
@@ -806,6 +886,9 @@ td {
 td:first-child {
   display: grid;
 }
+td:first-child > strong {
+  font-weight: 800;
+}
 td:first-child button {
   padding: 0;
   font-weight: 800;
@@ -818,6 +901,52 @@ td:first-child small {
   margin-top: 3px;
   color: var(--muted);
   font-size: 10px;
+}
+.roll-cell {
+  display: grid;
+  gap: 2px;
+  padding: 5px 7px;
+  color: var(--green);
+  border: 1px solid #c8d8d1;
+  border-radius: 6px;
+  background: #f3f8f5;
+  cursor: pointer;
+  text-align: center;
+}
+.roll-cell:hover,
+.damage-rolls button:hover {
+  border-color: var(--green-bright);
+  background: white;
+}
+.roll-cell small,
+.damage-rolls small {
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 650;
+}
+.damage-rolls {
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+}
+.damage-rolls button {
+  display: grid;
+  gap: 2px;
+  padding: 5px 7px;
+  color: var(--ink);
+  border: 1px solid #d9d5c9;
+  border-radius: 6px;
+  background: #fbfaf5;
+  cursor: pointer;
+  text-align: left;
+}
+.damage-rolls .critical-roll {
+  display: block;
+  color: #8b3026;
+  background: #fff5f3;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 .item-list > div,
 .spell-list > div {
@@ -920,6 +1049,9 @@ td:first-child small {
   grid-template-columns: 1fr auto;
 }
 .spell-list > div > small {
+  grid-column: 1 / -1;
+}
+.spell-list > div > .spell-roll-actions {
   grid-column: 1 / -1;
 }
 .spell-badges {
