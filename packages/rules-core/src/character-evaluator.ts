@@ -208,6 +208,7 @@ const spellcastingSubclassBodySchema = subclassBodySchema.and(
   z
     .object({
       alwaysPreparedSpells: z.record(z.array(z.string().min(1))).default({}),
+      alwaysPreparedSpellChoices: z.record(z.record(z.array(z.string().min(1)))).default({}),
     })
     .passthrough(),
 );
@@ -226,6 +227,7 @@ const spellcastingClassBodySchema = z
     spellbookStartingSpells: z.number().int().positive().optional(),
     spellbookSpellsPerLevel: z.number().int().positive().optional(),
     spellList: z.array(z.string().min(1)),
+    alwaysPreparedSpells: z.record(z.array(z.string().min(1))).default({}),
     progression: z.array(spellcastingProgressionRowSchema),
   })
   .passthrough();
@@ -683,6 +685,7 @@ function validateProgressionSelections(
   const fighterLevel = classLevelCounts.get("srd521.class.fighter") ?? 0;
   const wizardLevel = classLevelCounts.get("srd521.class.wizard") ?? 0;
   const clericLevel = classLevelCounts.get("srd521.class.cleric") ?? 0;
+  const druidLevel = classLevelCounts.get("srd521.class.druid") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -739,6 +742,22 @@ function validateProgressionSelections(
       ["build.subclassId"],
     );
   }
+  if (druidLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "DRUID_SUBCLASS_REQUIRED",
+      "A Druid of level 3 or higher must select a Druid subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (druidLevel < 3 && subclassParentId === "srd521.class.druid") {
+    addValidation(
+      state,
+      "DRUID_SUBCLASS_LEVEL_REQUIRED",
+      "A Druid subclass requires Druid level 3.",
+      ["build.subclassId"],
+    );
+  }
   const divineOrderSelections = character.build.levels
     .flatMap((level) => level.selectedFeatureChoices)
     .filter((choice) => choice.choiceId === "srd521.choice.cleric.divine-order")
@@ -760,6 +779,60 @@ function validateProgressionSelections(
       state,
       "CLERIC_DIVINE_ORDER_OPTION_INVALID",
       "The selected Divine Order is not supported by the loaded Cleric content.",
+      ["build.levels"],
+    );
+  }
+  const primalOrderSelections = character.build.levels
+    .flatMap((level) => level.selectedFeatureChoices)
+    .filter((choice) => choice.choiceId === "srd521.choice.druid.primal-order")
+    .flatMap((choice) => choice.optionIds);
+  if (druidLevel > 0 && primalOrderSelections.length !== 1) {
+    addValidation(
+      state,
+      "DRUID_PRIMAL_ORDER_CHOICE_COUNT",
+      "A Druid must select exactly one Primal Order.",
+      ["build.levels"],
+    );
+  }
+  const primalOrderOptions = new Set([
+    "srd521.option.druid.primal-order.magician",
+    "srd521.option.druid.primal-order.warden",
+  ]);
+  if (primalOrderSelections.some((optionId) => !primalOrderOptions.has(optionId))) {
+    addValidation(
+      state,
+      "DRUID_PRIMAL_ORDER_OPTION_INVALID",
+      "The selected Primal Order is not supported by the loaded Druid content.",
+      ["build.levels"],
+    );
+  }
+  const landSelections = character.build.levels
+    .flatMap((level) => level.selectedFeatureChoices)
+    .filter((choice) => choice.choiceId === "srd521.choice.druid.circle-of-land")
+    .flatMap((choice) => choice.optionIds);
+  if (
+    druidLevel >= 3 &&
+    character.build.subclassId === "srd521.subclass.druid.circle-of-the-land" &&
+    landSelections.length !== 1
+  ) {
+    addValidation(
+      state,
+      "DRUID_CIRCLE_LAND_CHOICE_COUNT",
+      "A Circle of the Land Druid must select exactly one land type.",
+      ["build.levels"],
+    );
+  }
+  const landOptions = new Set([
+    "srd521.option.druid.land.arid",
+    "srd521.option.druid.land.polar",
+    "srd521.option.druid.land.temperate",
+    "srd521.option.druid.land.tropical",
+  ]);
+  if (landSelections.some((optionId) => !landOptions.has(optionId))) {
+    addValidation(
+      state,
+      "DRUID_CIRCLE_LAND_OPTION_INVALID",
+      "The selected Circle of the Land type is not supported by the loaded Druid content.",
       ["build.levels"],
     );
   }
@@ -959,6 +1032,10 @@ function resolveEquipment(
   );
   if (selectedClassOptions.has("srd521.option.cleric.divine-order.protector")) {
     armorTraining.add("heavy");
+    weaponProficiencies.add("martial");
+  }
+  if (selectedClassOptions.has("srd521.option.druid.primal-order.warden")) {
+    armorTraining.add("medium");
     weaponProficiencies.add("martial");
   }
   const items = character.loadout.inventory.map((item): ResolvedInventoryItem => {
@@ -1767,11 +1844,27 @@ function evaluateSpellcasting(
       : index.entities.get(character.build.subclassId);
   const subclassBody =
     subclass?.kind === "subclass" ? spellcastingSubclassBodySchema.parse(subclass.body) : undefined;
-  const alwaysPrepared = new Set(
-    Object.entries(subclassBody?.alwaysPreparedSpells ?? {}).flatMap(([level, spellIds]) =>
+  const selectedOptionIds = new Set(
+    character.build.levels
+      .flatMap((level) => level.selectedFeatureChoices)
+      .flatMap((choice) => choice.optionIds),
+  );
+  const alwaysPrepared = new Set([
+    ...Object.entries(classBody.alwaysPreparedSpells).flatMap(([level, spellIds]) =>
       Number(level) <= classLevel ? spellIds : [],
     ),
-  );
+    ...Object.entries(subclassBody?.alwaysPreparedSpells ?? {}).flatMap(([level, spellIds]) =>
+      Number(level) <= classLevel ? spellIds : [],
+    ),
+    ...Object.entries(subclassBody?.alwaysPreparedSpellChoices ?? {}).flatMap(
+      ([optionId, spellsByLevel]) =>
+        selectedOptionIds.has(optionId)
+          ? Object.entries(spellsByLevel).flatMap(([level, spellIds]) =>
+              Number(level) <= classLevel ? spellIds : [],
+            )
+          : [],
+    ),
+  ]);
   const prepared = new Set([...selectedPrepared, ...alwaysPrepared]);
   const displayedSpellIds =
     classBody.spellPreparation === "spellbook"
@@ -1896,13 +1989,11 @@ function evaluateSpellcasting(
       ["loadout.preparedSpellIds"],
     );
   }
-  const divineOrderCantrips = character.build.levels
-    .flatMap((level) => level.selectedFeatureChoices)
-    .flatMap((choice) => choice.optionIds)
-    .includes("srd521.option.cleric.divine-order.thaumaturge")
-    ? 1
-    : 0;
-  const expectedCantrips = progression.cantrips + divineOrderCantrips;
+  const additionalOrderCantrips = [
+    "srd521.option.cleric.divine-order.thaumaturge",
+    "srd521.option.druid.primal-order.magician",
+  ].filter((optionId) => selectedOptionIds.has(optionId)).length;
+  const expectedCantrips = progression.cantrips + additionalOrderCantrips;
   if (learnedCantrips !== expectedCantrips) {
     addValidation(
       state,

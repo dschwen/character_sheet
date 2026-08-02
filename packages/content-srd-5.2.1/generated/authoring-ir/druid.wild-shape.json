@@ -1,0 +1,109 @@
+{
+  "id": "srd521.class-feature.druid.wild-shape",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.druid",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.druid"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.druid.wild-shape"
+      },
+      "id": "wild-shape-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": 1,
+            "event": "short-rest"
+          },
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.druid.wild-shape",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-wild-shape",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "resourceId": "srd521.resource.druid.wild-shape",
+        "spends": 1
+      },
+      "target": "action.wild-shape",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.druid.wild-shape"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Beast forms and targets remain player- or roll-assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0042-b006",
+        "p0042-b007",
+        "p0042-b008",
+        "p0042-b010",
+        "p0042-b012",
+        "p0042-b014",
+        "p0042-b009",
+        "p0042-b011",
+        "p0042-b013",
+        "p0042-b015",
+        "p0042-b016",
+        "p0042-b017"
+      ],
+      "page": 42,
+      "quoteHash": "78330029f3c6fc7f292a97eff3ff73b6f8565f1a8db78669d5ab65594c1d9bbb",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0043-b002",
+        "p0043-b003",
+        "p0043-b004",
+        "p0043-b005",
+        "p0043-b006",
+        "p0043-b007"
+      ],
+      "page": 43,
+      "quoteHash": "928982b869a49743771740e7a7af9db91a295b0e3103a5608c3b6fc7e9acf5e0",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "The power of nature allows you to assume the form of an animal. As a Bonus Action, you shape-shift into a Beast form that you have learned for this feature (see “Known Forms” below). You stay in that form for a number of hours equal to half your Druid level or until you use Wild Shape again, have the Incapacitated condition, or die. You can also leave the form early as a Bonus Action. Number of Uses. You can use Wild Shape twice. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. You gain additional uses when you reach certain Druid levels, as shown in the Wild Shape column of the Druid Features table. Known Forms. You know four Beast forms for this feature, chosen from among Beast stat blocks that have a maximum Challenge Rating of 1/4 and that lack a Fly Speed (see “Animals” in “Monsters” for stat block options). The Rat, Riding Horse, Spider, and Wolf are recommended. Whenever you finish a Long Rest, you can replace one of your known forms with another eligible form. When you reach certain Druid levels, your number of known forms and the maximum Challenge Rating for those forms increases, as shown in the Beast Shapes table. In addition, starting at level 8, you can adopt a form that has a Fly Speed. When choosing known forms, you may look in other sources for eligible Beasts if the Game Master permits you to do so."
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "by the Beast’s stat block, but you retain your creature type; Hit Points; Hit Point Dice; Intelligence, Wisdom, and Charisma scores; class features; languages; and feats. You also retain your skill and saving throw proficiencies and use your Proficiency Bonus for them, in addition to gaining the proficiencies of the creature. If a skill or saving throw modifier in the Beast’s stat block is higher than yours, use the one in the stat block. No Spellcasting. You can’t cast spells, but shape-"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "mined by the form’s limbs rather than your own. In addition, you choose whether your equipment falls in your space, merges into your new form, or is worn by it. Worn equipment functions as normal, but the GM decides whether it’s practical for the new form to wear a piece of equipment based on the creature’s size and shape. Your equipment doesn’t change size or shape to match the new form, and any equipment that the new form can’t wear must either fall to the ground or merge with the form. Equipment that merges with the form has no effect while you’re in that form."
+      }
+    ],
+    "title": "Wild Shape"
+  }
+}

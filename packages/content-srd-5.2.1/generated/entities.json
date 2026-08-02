@@ -11000,5 +11000,2576 @@
       "transmutation",
       "cleric"
     ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {
+        "1": [
+          "srd521.spell.speak-with-animals"
+        ]
+      },
+      "armorTraining": [
+        "light",
+        "shield"
+      ],
+      "hitPointDie": 8,
+      "primalOrderChoice": {
+        "id": "srd521.choice.druid.primal-order",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.option.druid.primal-order.magician",
+          "srd521.option.druid.primal-order.warden"
+        ]
+      },
+      "primaryAbilities": [
+        "wisdom"
+      ],
+      "progression": [
+        {
+          "cantrips": 2,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.spellcasting",
+              "name": "Spellcasting"
+            },
+            {
+              "entityId": "srd521.class-feature.druid.druidic",
+              "name": "Druidic"
+            },
+            {
+              "entityId": "srd521.class-feature.druid.primal-order",
+              "name": "Primal Order"
+            }
+          ],
+          "level": 1,
+          "preparedSpells": 4,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 2
+          },
+          "wildShape": 0
+        },
+        {
+          "cantrips": 2,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.wild-shape",
+              "name": "Wild Shape"
+            },
+            {
+              "entityId": "srd521.class-feature.druid.wild-companion",
+              "name": "Wild Companion"
+            }
+          ],
+          "level": 2,
+          "preparedSpells": 5,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 3
+          },
+          "wildShape": 2
+        },
+        {
+          "cantrips": 2,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.druid-subclass",
+              "name": "Druid Subclass"
+            }
+          ],
+          "level": 3,
+          "preparedSpells": 6,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 4,
+            "2": 2
+          },
+          "wildShape": 2
+        },
+        {
+          "cantrips": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 4,
+          "preparedSpells": 7,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 4,
+            "2": 3
+          },
+          "wildShape": 2
+        },
+        {
+          "cantrips": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.wild-resurgence",
+              "name": "Wild Resurgence"
+            }
+          ],
+          "level": 5,
+          "preparedSpells": 9,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 2
+          },
+          "wildShape": 2
+        },
+        {
+          "cantrips": 3,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 6,
+          "preparedSpells": 10,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.elemental-fury",
+              "name": "Elemental Fury"
+            }
+          ],
+          "level": 7,
+          "preparedSpells": 11,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 1
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 3,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 8,
+          "preparedSpells": 12,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 3,
+          "features": [],
+          "level": 9,
+          "preparedSpells": 14,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 1
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 10,
+          "preparedSpells": 15,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 4,
+          "features": [],
+          "level": 11,
+          "preparedSpells": 16,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 12,
+          "preparedSpells": 16,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 4,
+          "features": [],
+          "level": 13,
+          "preparedSpells": 17,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 14,
+          "preparedSpells": 17,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.improved-elemental-fury",
+              "name": "Improved Elemental Fury"
+            }
+          ],
+          "level": 15,
+          "preparedSpells": 18,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 16,
+          "preparedSpells": 18,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1
+          },
+          "wildShape": 3
+        },
+        {
+          "cantrips": 4,
+          "features": [],
+          "level": 17,
+          "preparedSpells": 19,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          },
+          "wildShape": 4
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.beast-spells",
+              "name": "Beast Spells"
+            }
+          ],
+          "level": 18,
+          "preparedSpells": 20,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          },
+          "wildShape": 4
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.epic-boon",
+              "name": "Epic Boon"
+            }
+          ],
+          "level": 19,
+          "preparedSpells": 21,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 2,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          },
+          "wildShape": 4
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.druid.archdruid",
+              "name": "Archdruid"
+            }
+          ],
+          "level": 20,
+          "preparedSpells": 22,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 2,
+            "7": 2,
+            "8": 1,
+            "9": 1
+          },
+          "wildShape": 4
+        }
+      ],
+      "savingThrowProficiencies": [
+        "intelligence",
+        "wisdom"
+      ],
+      "skillProficiencyChoice": {
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "animal handling",
+          "arcana",
+          "insight",
+          "medicine",
+          "nature",
+          "perception",
+          "religion",
+          "survival"
+        ]
+      },
+      "spellList": [
+        "srd521.spell.druidcraft",
+        "srd521.spell.elementalism",
+        "srd521.spell.guidance",
+        "srd521.spell.mending",
+        "srd521.spell.message",
+        "srd521.spell.poison-spray",
+        "srd521.spell.produce-flame",
+        "srd521.spell.resistance",
+        "srd521.spell.shillelagh",
+        "srd521.spell.spare-the-dying",
+        "srd521.spell.starry-wisp",
+        "srd521.spell.animal-friendship",
+        "srd521.spell.charm-person",
+        "srd521.spell.create-or-destroy-water",
+        "srd521.spell.cure-wounds",
+        "srd521.spell.detect-magic",
+        "srd521.spell.detect-poison-and-disease",
+        "srd521.spell.entangle",
+        "srd521.spell.faerie-fire",
+        "srd521.spell.fog-cloud",
+        "srd521.spell.goodberry",
+        "srd521.spell.healing-word",
+        "srd521.spell.ice-knife",
+        "srd521.spell.jump",
+        "srd521.spell.longstrider",
+        "srd521.spell.protection-from-evil-and-good",
+        "srd521.spell.purify-food-and-drink",
+        "srd521.spell.speak-with-animals",
+        "srd521.spell.thunderwave",
+        "srd521.spell.aid",
+        "srd521.spell.animal-messenger",
+        "srd521.spell.augury",
+        "srd521.spell.barkskin",
+        "srd521.spell.continual-flame",
+        "srd521.spell.darkvision",
+        "srd521.spell.enhance-ability",
+        "srd521.spell.enlarge-reduce",
+        "srd521.spell.find-traps",
+        "srd521.spell.flame-blade",
+        "srd521.spell.flaming-sphere",
+        "srd521.spell.gust-of-wind",
+        "srd521.spell.heat-metal",
+        "srd521.spell.hold-person",
+        "srd521.spell.lesser-restoration",
+        "srd521.spell.locate-animals-or-plants",
+        "srd521.spell.locate-object",
+        "srd521.spell.moonbeam",
+        "srd521.spell.pass-without-trace",
+        "srd521.spell.protection-from-poison",
+        "srd521.spell.spike-growth",
+        "srd521.spell.call-lightning",
+        "srd521.spell.conjure-animals",
+        "srd521.spell.daylight",
+        "srd521.spell.dispel-magic",
+        "srd521.spell.meld-into-stone",
+        "srd521.spell.plant-growth",
+        "srd521.spell.protection-from-energy",
+        "srd521.spell.revivify",
+        "srd521.spell.sleet-storm",
+        "srd521.spell.speak-with-plants",
+        "srd521.spell.water-breathing",
+        "srd521.spell.water-walk",
+        "srd521.spell.wind-wall",
+        "srd521.spell.blight",
+        "srd521.spell.charm-monster",
+        "srd521.spell.confusion",
+        "srd521.spell.conjure-minor-elementals",
+        "srd521.spell.conjure-woodland-beings",
+        "srd521.spell.control-water",
+        "srd521.spell.divination",
+        "srd521.spell.dominate-beast",
+        "srd521.spell.fire-shield",
+        "srd521.spell.freedom-of-movement",
+        "srd521.spell.giant-insect",
+        "srd521.spell.hallucinatory-terrain",
+        "srd521.spell.ice-storm",
+        "srd521.spell.locate-creature",
+        "srd521.spell.polymorph",
+        "srd521.spell.stone-shape",
+        "srd521.spell.stoneskin",
+        "srd521.spell.wall-of-fire",
+        "srd521.spell.antilife-shell",
+        "srd521.spell.awaken",
+        "srd521.spell.commune-with-nature",
+        "srd521.spell.cone-of-cold",
+        "srd521.spell.conjure-elemental",
+        "srd521.spell.contagion",
+        "srd521.spell.geas",
+        "srd521.spell.greater-restoration",
+        "srd521.spell.insect-plague",
+        "srd521.spell.mass-cure-wounds",
+        "srd521.spell.planar-binding",
+        "srd521.spell.reincarnate",
+        "srd521.spell.scrying",
+        "srd521.spell.tree-stride",
+        "srd521.spell.wall-of-stone",
+        "srd521.spell.conjure-fey",
+        "srd521.spell.find-the-path",
+        "srd521.spell.flesh-to-stone",
+        "srd521.spell.heal",
+        "srd521.spell.heroes-feast",
+        "srd521.spell.move-earth",
+        "srd521.spell.sunbeam",
+        "srd521.spell.transport-via-plants",
+        "srd521.spell.wall-of-thorns",
+        "srd521.spell.wind-walk",
+        "srd521.spell.fire-storm",
+        "srd521.spell.mirage-arcane",
+        "srd521.spell.plane-shift",
+        "srd521.spell.regenerate",
+        "srd521.spell.reverse-gravity",
+        "srd521.spell.symbol",
+        "srd521.spell.animal-shapes",
+        "srd521.spell.antipathy-sympathy",
+        "srd521.spell.befuddlement",
+        "srd521.spell.control-weather",
+        "srd521.spell.earthquake",
+        "srd521.spell.incendiary-cloud",
+        "srd521.spell.sunburst",
+        "srd521.spell.tsunami",
+        "srd521.spell.foresight",
+        "srd521.spell.shapechange",
+        "srd521.spell.storm-of-vengeance",
+        "srd521.spell.true-resurrection"
+      ],
+      "spellPreparation": "full-list",
+      "spellcastingAbility": "wisdom",
+      "startingEquipmentText": "Choose A or B: (A) Leather Armor, Shield, Sickle, Druidic Focus (Quarterstaff), Explorer’s Pack, Herbalism Kit, and 9 GP; or (B) 50 GP",
+      "toolProficiencies": [
+        "Herbalism Kit"
+      ],
+      "weaponProficiencies": [
+        "simple"
+      ]
+    },
+    "id": "srd521.class.druid",
+    "kind": "class",
+    "name": {
+      "en": "Druid"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Druid progression and spellcasting table from pages 41–44.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0041-b003",
+          "p0041-b004",
+          "p0041-b005",
+          "p0041-b006",
+          "p0041-b007",
+          "p0041-b008",
+          "p0041-b009",
+          "p0041-b010",
+          "p0041-b011",
+          "p0041-b012",
+          "p0041-b024",
+          "p0041-b019",
+          "p0041-b021",
+          "p0041-b022",
+          "p0041-b025",
+          "p0041-b020",
+          "p0041-b023",
+          "p0041-b026",
+          "p0041-b027",
+          "p0041-b028",
+          "p0041-b029",
+          "p0041-b030",
+          "p0041-b031",
+          "p0041-b032",
+          "p0041-b033",
+          "p0041-b034",
+          "p0041-b035",
+          "p0041-b036",
+          "p0041-b037",
+          "p0041-b038",
+          "p0041-b039",
+          "p0041-b040",
+          "p0041-b041",
+          "p0041-b042",
+          "p0041-b043",
+          "p0041-b044",
+          "p0041-b045",
+          "p0041-b046",
+          "p0041-b047"
+        ],
+        "page": 41,
+        "quoteHash": "613fc2e5565d9aed9d84af2cbf13daf78aa2e4e2e4ab9be926dccf56718eb1e9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class",
+      "druid",
+      "spellcaster"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You have learned to cast spells through studying the mystical forces of nature. See “Spells” for the rules on spellcasting. The information below details how you use those rules with Druid spells, which appear on the Druid spell list later in the class’s description. Cantrips. You know two cantrips of your choice from the Druid spell list. Druidcraft and Produce Flame are recommended. Whenever you gain a Druid level, you can replace one of your cantrips with another cantrip of your choice from the Druid spell list. When you reach Druid levels 4 and 10, you learn another cantrip of your choice from the Druid spell list, as shown in the Cantrips column of the Druid Features table. Spell Slots. The Druid Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest. Prepared Spells of Level 1+. You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose four level 1 spells from the Druid spell list. Animal Friendship, Cure Wounds, Faerie Fire, and Thunderwave are recommended. The number of spells on your list increases as you gain Druid levels, as shown in the Prepared Spells column of the Druid Features table. Whenever that number increases, choose additional spells from the Druid spell list until the number of spells on your list matches the number on the table. The chosen spells must be of a level for which you have spell slots. For example, if you’re a level 3 Druid, your list of prepared spells can include six spells of levels 1 and 2 in any combination. If another Druid feature gives you spells that you always have prepared, those spells don’t count against the number of spells you can prepare with this feature, but those spells otherwise count as Druid spells for you. Changing Your Prepared Spells. Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells with other Druid spells for which you have spell slots. Spellcasting Ability. Wisdom is your spellcasting ability for your Druid spells. Spellcasting Focus. You can use a Druidic Focus as a Spellcasting Focus for your Druid spells."
+    },
+    "id": "srd521.class-feature.druid.spellcasting",
+    "kind": "class-feature",
+    "name": {
+      "en": "Spellcasting"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Spellcasting extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0041-b017"
+        ],
+        "page": 41,
+        "quoteHash": "c4ec01290e28b7aac8375548583f147f94cb5325e1d5dbb94e1f7fc02b0b15e3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0042-b002"
+        ],
+        "page": 42,
+        "quoteHash": "b93585ab1bbfb887faff7283e5cb5bbd1b8a741e321f077b0333ae82409800d5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You know Druidic, the secret language of Druids. While learning this ancient tongue, you also unlocked the magic of communicating with animals; you always have the Speak with Animals spell prepared. You can use Druidic to leave hidden messages. You and others who know Druidic automatically spot such a message. Others spot the message’s presence with a successful DC 15 Intelligence (Investigation) check but can’t decipher it without magic."
+    },
+    "id": "srd521.class-feature.druid.druidic",
+    "kind": "class-feature",
+    "name": {
+      "en": "Druidic"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Druidic extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0042-b003",
+          "p0042-b004"
+        ],
+        "page": 42,
+        "quoteHash": "9c6e84202faee91140b6b119d2aff07139148e770bd524f503848540f1093c07",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You have dedicated yourself to one of the following sacred roles of your choice. Magician. You know one extra cantrip from the Druid spell list. In addition, your mystical connection to nature gives you a bonus to your Intelligence (Arcana or Nature) checks. The bonus equals your Wisdom modifier (minimum bonus of +1). Warden. Trained for battle, you gain proficiency with Martial weapons and training with Medium armor."
+    },
+    "id": "srd521.class-feature.druid.primal-order",
+    "kind": "class-feature",
+    "name": {
+      "en": "Primal Order"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Primal Order extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0042-b005"
+        ],
+        "page": 42,
+        "quoteHash": "dac06fc69245030346b2aea48a438961839cfcf4574f0f9dd235e103ab91e01a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 2,
+      "text": "The power of nature allows you to assume the form of an animal. As a Bonus Action, you shape-shift into a Beast form that you have learned for this feature (see “Known Forms” below). You stay in that form for a number of hours equal to half your Druid level or until you use Wild Shape again, have the Incapacitated condition, or die. You can also leave the form early as a Bonus Action. Number of Uses. You can use Wild Shape twice. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. You gain additional uses when you reach certain Druid levels, as shown in the Wild Shape column of the Druid Features table. Known Forms. You know four Beast forms for this feature, chosen from among Beast stat blocks that have a maximum Challenge Rating of 1/4 and that lack a Fly Speed (see “Animals” in “Monsters” for stat block options). The Rat, Riding Horse, Spider, and Wolf are recommended. Whenever you finish a Long Rest, you can replace one of your known forms with another eligible form. When you reach certain Druid levels, your number of known forms and the maximum Challenge Rating for those forms increases, as shown in the Beast Shapes table. In addition, starting at level 8, you can adopt a form that has a Fly Speed. When choosing known forms, you may look in other sources for eligible Beasts if the Game Master permits you to do so. Beast Shapes Druid Known Max Fly Speed Level Forms CR 2 4 1/4 No 4 6 1/2 No 8 8 1 Yes Rules While Shape-Shifted. While in a form, you retain your personality, memories, and ability to speak, and the following rules apply: Temporary Hit Points. When you assume a Wild Shape form, you gain a number of Temporary Hit Points equal to your Druid level. Game Statistics. Your game statistics are replaced by the Beast’s stat block, but you retain your creature type; Hit Points; Hit Point Dice; Intelligence, Wisdom, and Charisma scores; class features; languages; and feats. You also retain your skill and saving throw proficiencies and use your Proficiency Bonus for them, in addition to gaining the proficiencies of the creature. If a skill or saving throw modifier in the Beast’s stat block is higher than yours, use the one in the stat block. No Spellcasting. You can’t cast spells, but shape- shifting doesn’t break your Concentration or otherwise interfere with a spell you’ve already cast. Objects. Your ability to handle objects is deter- mined by the form’s limbs rather than your own. In addition, you choose whether your equipment falls in your space, merges into your new form, or is worn by it. Worn equipment functions as normal, but the GM decides whether it’s practical for the new form to wear a piece of equipment based on the creature’s size and shape. Your equipment doesn’t change size or shape to match the new form, and any equipment that the new form can’t wear must either fall to the ground or merge with the form. Equipment that merges with the form has no effect while you’re in that form."
+    },
+    "id": "srd521.class-feature.druid.wild-shape",
+    "kind": "class-feature",
+    "name": {
+      "en": "Wild Shape"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Wild Shape extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0042-b006",
+          "p0042-b007",
+          "p0042-b008",
+          "p0042-b010",
+          "p0042-b012",
+          "p0042-b014",
+          "p0042-b009",
+          "p0042-b011",
+          "p0042-b013",
+          "p0042-b015",
+          "p0042-b016",
+          "p0042-b017"
+        ],
+        "page": 42,
+        "quoteHash": "78330029f3c6fc7f292a97eff3ff73b6f8565f1a8db78669d5ab65594c1d9bbb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0043-b002",
+          "p0043-b003",
+          "p0043-b004",
+          "p0043-b005",
+          "p0043-b006",
+          "p0043-b007"
+        ],
+        "page": 43,
+        "quoteHash": "928982b869a49743771740e7a7af9db91a295b0e3103a5608c3b6fc7e9acf5e0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 2,
+      "text": "You can summon a nature spirit that assumes an animal form to aid you. As a Magic action, you can expend a spell slot or a use of Wild Shape to cast the Find Familiar spell without Material components. When you cast the spell in this way, the familiar is Fey and disappears when you finish a Long Rest."
+    },
+    "id": "srd521.class-feature.druid.wild-companion",
+    "kind": "class-feature",
+    "name": {
+      "en": "Wild Companion"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Wild Companion extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b008"
+        ],
+        "page": 43,
+        "quoteHash": "7afba3f4b3cb16d4552c6fce151a819d7329b2115760984c9f14212d6cd6dcba",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "You gain a Druid subclass of your choice. The Circle of the Land subclass is detailed after this class’s description. A subclass is a specialization that grants you features at certain Druid levels. For the rest of your career, you gain each of your subclass’s features that are of your Druid level or lower."
+    },
+    "id": "srd521.class-feature.druid.druid-subclass",
+    "kind": "class-feature",
+    "name": {
+      "en": "Druid Subclass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Druid Subclass extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b009"
+        ],
+        "page": 43,
+        "quoteHash": "6d4db2a54a4b01e72862827a64545b8d694dc1dc9fd7273d39dc7b6b5969262f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 4,
+      "text": "You gain the Ability Score Improvement feat (see “Feats”) or another feat of your choice for which you qualify. You gain this feature again at Druid levels 8, 12, and 16."
+    },
+    "id": "srd521.class-feature.druid.ability-score-improvement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ability Score Improvement extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b010"
+        ],
+        "page": 43,
+        "quoteHash": "6f9d863beb728f77d517e5dfbfea4e6513c570a55c49580cf1800416bb154a07",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 5,
+      "text": "Once on each of your turns, if you have no uses of Wild Shape left, you can give yourself one use by expending a spell slot (no action required). In addition, you can expend one use of Wild Shape (no action required) to give yourself a level 1 spell slot, but you can’t do so again until you finish a Long Rest."
+    },
+    "id": "srd521.class-feature.druid.wild-resurgence",
+    "kind": "class-feature",
+    "name": {
+      "en": "Wild Resurgence"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Wild Resurgence extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b011"
+        ],
+        "page": 43,
+        "quoteHash": "b6b9d145eb2dc78cef9a983b82833fa0d6ecaaad80233644ce8d20e15820c3f0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 7,
+      "text": "The might of the elements flows through you. You gain one of the following options of your choice. Potent Spellcasting. Add your Wisdom modifier to the damage you deal with any Druid cantrip. Primal Strike. Once on each of your turns when you hit a creature with an attack roll using a weapon or a Beast form’s attack in Wild Shape, you can cause the target to take an extra 1d8 Cold, Fire, Lightning, or Thunder damage (choose when you hit)."
+    },
+    "id": "srd521.class-feature.druid.elemental-fury",
+    "kind": "class-feature",
+    "name": {
+      "en": "Elemental Fury"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Elemental Fury extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b012"
+        ],
+        "page": 43,
+        "quoteHash": "1114df58ab22e2b89c6b1be6d8638dc4dcf1466035c4c7105d2e430544e16928",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 15,
+      "text": "The option you chose for Elemental Fury grows more powerful, as detailed below. Potent Spellcasting. When you cast a Druid cantrip with a range of 10 feet or greater, the spell’s range increases by 300 feet. Primal Strike. The extra damage of your Primal Strike increases to 2d8."
+    },
+    "id": "srd521.class-feature.druid.improved-elemental-fury",
+    "kind": "class-feature",
+    "name": {
+      "en": "Improved Elemental Fury"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Improved Elemental Fury extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b013"
+        ],
+        "page": 43,
+        "quoteHash": "6725b6ecc3d0c2a8bb33b1088c5ba4a6728d296b638e57a0b96d0132af820c02",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 18,
+      "text": "While using Wild Shape, you can cast spells in Beast form, except for any spell that has a Material component with a cost specified or that consumes its Material component."
+    },
+    "id": "srd521.class-feature.druid.beast-spells",
+    "kind": "class-feature",
+    "name": {
+      "en": "Beast Spells"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beast Spells extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b014"
+        ],
+        "page": 43,
+        "quoteHash": "dfd6d0bd4ef33a3e99ab91d6e80544bcfbfd561ff9058075a9227c32090fb972",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 19,
+      "text": "You gain an Epic Boon feat (see “Feats”) or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended."
+    },
+    "id": "srd521.class-feature.druid.epic-boon",
+    "kind": "class-feature",
+    "name": {
+      "en": "Epic Boon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Epic Boon extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b015"
+        ],
+        "page": 43,
+        "quoteHash": "6602cea0841b8531a53dfe6573cf082d227110f2ae69433c059cd93c626035fe",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 20,
+      "text": "The vitality of nature constantly blooms within you, granting you the following benefits. Evergreen Wild Shape. Whenever you roll Initiative and have no uses of Wild Shape left, you regain one expended use of it. Nature Magician. You can convert uses of Wild Shape into a spell slot (no action required). Choose a number of your unexpended uses of Wild Shape and convert them into a single spell slot, with each use contributing 2 spell levels. For example, if you convert two uses of Wild Shape, you produce a level 4 spell slot. Once you use this benefit, you can’t do so again until you finish a Long Rest. Longevity. The primal magic that you wield causes you to age more slowly. For every ten years that pass, your body ages only one year. This section presents the Druid spell list. The spells are organized by spell level and then alphabetized, and each spell’s school of magic is listed. In the Special column, C means the spell requires Concentration, R means it’s a Ritual, and M means it requires a specific Material component."
+    },
+    "id": "srd521.class-feature.druid.archdruid",
+    "kind": "class-feature",
+    "name": {
+      "en": "Archdruid"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Archdruid extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b016"
+        ],
+        "page": 43,
+        "quoteHash": "d4624e6571cf9b947dbe88c9eda205c0106ee5324e27860da003ef78ad3059c7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0044-b003"
+        ],
+        "page": 44,
+        "quoteHash": "84cc35309db50bcbb812c5ceee94458c947c1e7a50577db3ace6326c2c87657d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "additionalCantrips": 1,
+      "choiceId": "srd521.choice.druid.primal-order",
+      "knowledgeCheckBonusAbility": "wisdom",
+      "knowledgeChecks": [
+        "arcana",
+        "nature"
+      ]
+    },
+    "id": "srd521.option.druid.primal-order.magician",
+    "kind": "class-option",
+    "name": {
+      "en": "Magician"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Magician Primal Order option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0042-b005"
+        ],
+        "page": 42,
+        "quoteHash": "dac06fc69245030346b2aea48a438961839cfcf4574f0f9dd235e103ab91e01a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "druid",
+      "primal-order"
+    ]
+  },
+  {
+    "body": {
+      "armorTraining": [
+        "medium"
+      ],
+      "choiceId": "srd521.choice.druid.primal-order",
+      "weaponProficiencies": [
+        "martial"
+      ]
+    },
+    "id": "srd521.option.druid.primal-order.warden",
+    "kind": "class-option",
+    "name": {
+      "en": "Warden"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Warden Primal Order option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0042-b005"
+        ],
+        "page": 42,
+        "quoteHash": "dac06fc69245030346b2aea48a438961839cfcf4574f0f9dd235e103ab91e01a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "druid",
+      "primal-order"
+    ]
+  },
+  {
+    "body": {
+      "entries": {
+        "1": 0,
+        "10": 3,
+        "11": 3,
+        "12": 3,
+        "13": 3,
+        "14": 3,
+        "15": 3,
+        "16": 3,
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "2": 2,
+        "20": 4,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 3,
+        "7": 3,
+        "8": 3,
+        "9": 3
+      },
+      "keyType": "class-level",
+      "valueType": "integer"
+    },
+    "id": "srd521.table.druid.wild-shape",
+    "kind": "rule-table",
+    "name": {
+      "en": "Druid Wild Shape Uses"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the Druid Features table.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0041-b024",
+          "p0041-b019",
+          "p0041-b021",
+          "p0041-b022",
+          "p0041-b025",
+          "p0041-b020",
+          "p0041-b023",
+          "p0041-b026",
+          "p0041-b027",
+          "p0041-b028",
+          "p0041-b029",
+          "p0041-b030",
+          "p0041-b031",
+          "p0041-b032",
+          "p0041-b033",
+          "p0041-b034",
+          "p0041-b035",
+          "p0041-b036",
+          "p0041-b037",
+          "p0041-b038",
+          "p0041-b039",
+          "p0041-b040",
+          "p0041-b041",
+          "p0041-b042",
+          "p0041-b043",
+          "p0041-b044",
+          "p0041-b045",
+          "p0041-b046",
+          "p0041-b047"
+        ],
+        "page": 41,
+        "quoteHash": "7cffd3b9a1469f0bdd19d46f6e0fe5ba2df03f3c33c59215981f617d6a6d8645",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "rule-table",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpellChoices": {
+        "srd521.option.druid.land.arid": {
+          "3": [
+            "srd521.spell.blur",
+            "srd521.spell.burning-hands",
+            "srd521.spell.fire-bolt"
+          ],
+          "5": [
+            "srd521.spell.fireball"
+          ],
+          "7": [
+            "srd521.spell.blight"
+          ],
+          "9": [
+            "srd521.spell.wall-of-stone"
+          ]
+        },
+        "srd521.option.druid.land.polar": {
+          "3": [
+            "srd521.spell.fog-cloud",
+            "srd521.spell.hold-person",
+            "srd521.spell.ray-of-frost"
+          ],
+          "5": [
+            "srd521.spell.sleet-storm"
+          ],
+          "7": [
+            "srd521.spell.ice-storm"
+          ],
+          "9": [
+            "srd521.spell.cone-of-cold"
+          ]
+        },
+        "srd521.option.druid.land.temperate": {
+          "3": [
+            "srd521.spell.misty-step",
+            "srd521.spell.shocking-grasp",
+            "srd521.spell.sleep"
+          ],
+          "5": [
+            "srd521.spell.lightning-bolt"
+          ],
+          "7": [
+            "srd521.spell.freedom-of-movement"
+          ],
+          "9": [
+            "srd521.spell.tree-stride"
+          ]
+        },
+        "srd521.option.druid.land.tropical": {
+          "3": [
+            "srd521.spell.acid-splash",
+            "srd521.spell.ray-of-sickness",
+            "srd521.spell.web"
+          ],
+          "5": [
+            "srd521.spell.stinking-cloud"
+          ],
+          "7": [
+            "srd521.spell.polymorph"
+          ],
+          "9": [
+            "srd521.spell.insect-plague"
+          ]
+        }
+      },
+      "alwaysPreparedSpells": {},
+      "description": "The Circle of the Land comprises mystics and sages who safeguard ancient knowledge and rites. These Druids meet within sacred circles of trees or standing stones to whisper primal secrets in Druidic. The circle’s wisest members preside as the chief priests of their communities.",
+      "landChoice": {
+        "id": "srd521.choice.druid.circle-of-land",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.option.druid.land.arid",
+          "srd521.option.druid.land.polar",
+          "srd521.option.druid.land.temperate",
+          "srd521.option.druid.land.tropical"
+        ]
+      },
+      "parentClassId": "srd521.class.druid",
+      "progression": [
+        {
+          "features": [
+            "srd521.subclass-feature.druid.circle-of-the-land.circle-of-the-land-spells",
+            "srd521.subclass-feature.druid.circle-of-the-land.land-s-aid"
+          ],
+          "level": 3
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.druid.circle-of-the-land.natural-recovery"
+          ],
+          "level": 6
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.druid.circle-of-the-land.nature-s-ward"
+          ],
+          "level": 10
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.druid.circle-of-the-land.nature-s-sanctuary"
+          ],
+          "level": 14
+        }
+      ]
+    },
+    "id": "srd521.subclass.druid.circle-of-the-land",
+    "kind": "subclass",
+    "name": {
+      "en": "Circle of the Land"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Circle of the Land subclass extracted from page 46.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b002",
+          "p0046-b004"
+        ],
+        "page": 46,
+        "quoteHash": "9ff1475d1fe330dcc6e47f98fd739d678b07647cc9188020237e54ae326b149c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass",
+      "druid",
+      "circle-of-the-land"
+    ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {
+        "3": [
+          "srd521.spell.blur",
+          "srd521.spell.burning-hands",
+          "srd521.spell.fire-bolt"
+        ],
+        "5": [
+          "srd521.spell.fireball"
+        ],
+        "7": [
+          "srd521.spell.blight"
+        ],
+        "9": [
+          "srd521.spell.wall-of-stone"
+        ]
+      },
+      "choiceId": "srd521.choice.druid.circle-of-land"
+    },
+    "id": "srd521.option.druid.land.arid",
+    "kind": "subclass-option",
+    "name": {
+      "en": "Arid"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Arid Land Circle spell option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b006",
+          "p0046-b007",
+          "p0046-b008",
+          "p0046-b009",
+          "p0046-b010",
+          "p0046-b011"
+        ],
+        "page": 46,
+        "quoteHash": "22872694fe3a79b26dd9644e0087cf6fad19111cfa8e0118b944f6ebad894784",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-option",
+      "druid",
+      "circle-of-the-land"
+    ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {
+        "3": [
+          "srd521.spell.fog-cloud",
+          "srd521.spell.hold-person",
+          "srd521.spell.ray-of-frost"
+        ],
+        "5": [
+          "srd521.spell.sleet-storm"
+        ],
+        "7": [
+          "srd521.spell.ice-storm"
+        ],
+        "9": [
+          "srd521.spell.cone-of-cold"
+        ]
+      },
+      "choiceId": "srd521.choice.druid.circle-of-land"
+    },
+    "id": "srd521.option.druid.land.polar",
+    "kind": "subclass-option",
+    "name": {
+      "en": "Polar"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Polar Land Circle spell option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b012",
+          "p0046-b013",
+          "p0046-b014",
+          "p0046-b015",
+          "p0046-b016",
+          "p0046-b017"
+        ],
+        "page": 46,
+        "quoteHash": "58d39fffa2723d3d51ff71e77fcf1918eae15c5ce2818a03029aba022c420685",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-option",
+      "druid",
+      "circle-of-the-land"
+    ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {
+        "3": [
+          "srd521.spell.misty-step",
+          "srd521.spell.shocking-grasp",
+          "srd521.spell.sleep"
+        ],
+        "5": [
+          "srd521.spell.lightning-bolt"
+        ],
+        "7": [
+          "srd521.spell.freedom-of-movement"
+        ],
+        "9": [
+          "srd521.spell.tree-stride"
+        ]
+      },
+      "choiceId": "srd521.choice.druid.circle-of-land"
+    },
+    "id": "srd521.option.druid.land.temperate",
+    "kind": "subclass-option",
+    "name": {
+      "en": "Temperate"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Temperate Land Circle spell option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b018",
+          "p0046-b019",
+          "p0046-b020",
+          "p0046-b021",
+          "p0046-b022",
+          "p0046-b023"
+        ],
+        "page": 46,
+        "quoteHash": "9cb3a290bdb6fce7fcb8609238ee662b41c1a7e3fa336529ca137a3791a747b9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-option",
+      "druid",
+      "circle-of-the-land"
+    ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {
+        "3": [
+          "srd521.spell.acid-splash",
+          "srd521.spell.ray-of-sickness",
+          "srd521.spell.web"
+        ],
+        "5": [
+          "srd521.spell.stinking-cloud"
+        ],
+        "7": [
+          "srd521.spell.polymorph"
+        ],
+        "9": [
+          "srd521.spell.insect-plague"
+        ]
+      },
+      "choiceId": "srd521.choice.druid.circle-of-land"
+    },
+    "id": "srd521.option.druid.land.tropical",
+    "kind": "subclass-option",
+    "name": {
+      "en": "Tropical"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Tropical Land Circle spell option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b024",
+          "p0046-b025",
+          "p0046-b026",
+          "p0046-b027",
+          "p0046-b028",
+          "p0046-b029"
+        ],
+        "page": 46,
+        "quoteHash": "5b15e2612ba5f46c96d8607bf4a14a36a28bf6c964a492840582b12ce9a7da94",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-option",
+      "druid",
+      "circle-of-the-land"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "Whenever you finish a Long Rest, choose one type of land: arid, polar, temperate, or tropical. Consult the table below that corresponds to the chosen type; you have the spells listed for your Druid level and lower prepared. Arid Land Druid Level Circle Spells 3 Blur, Burning Hands, Fire Bolt 5 Fireball 7 Blight 9 Wall of Stone Polar Land Druid Level Circle Spells 3 Fog Cloud, Hold Person, Ray of Frost 5 Sleet Storm 7 Ice Storm 9 Cone of Cold Temperate Land Druid Level Circle Spells 3 Misty Step, Shocking Grasp, Sleep 5 Lightning Bolt 7 Freedom of Movement 9 Tree Stride Tropical Land Druid Level Circle Spells 3 Acid Splash, Ray of Sickness, Web 5 Stinking Cloud 7 Polymorph 9 Insect Plague"
+    },
+    "id": "srd521.subclass-feature.druid.circle-of-the-land.circle-of-the-land-spells",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Circle of the Land Spells"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Circle of the Land Spells extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b005",
+          "p0046-b006",
+          "p0046-b007",
+          "p0046-b008",
+          "p0046-b009",
+          "p0046-b010",
+          "p0046-b011",
+          "p0046-b012",
+          "p0046-b013",
+          "p0046-b014",
+          "p0046-b015",
+          "p0046-b016",
+          "p0046-b017",
+          "p0046-b018",
+          "p0046-b019",
+          "p0046-b020",
+          "p0046-b021",
+          "p0046-b022",
+          "p0046-b023",
+          "p0046-b024",
+          "p0046-b025",
+          "p0046-b026",
+          "p0046-b027",
+          "p0046-b028",
+          "p0046-b029"
+        ],
+        "page": 46,
+        "quoteHash": "3142e966a344fb8ccad3432b39c0fd876e3ebadb9c430ce1b3dfb277cd2bc0f8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "As a Magic action, you can expend a use of your Wild Shape and choose a point within 60 feet of yourself. Vitality-giving flowers and life-draining thorns appear for a moment in a 10-foot-radius Sphere centered on that point. Each creature of your choice in the Sphere must make a Constitution saving throw against your spell save DC, taking 2d6 Necrotic damage on a failed save or half as much damage on a successful one. One creature of your choice in that area regains 2d6 Hit Points. The damage and healing increase by 1d6 when you reach Druid levels 10 (3d6) and 14 (4d6)."
+    },
+    "id": "srd521.subclass-feature.druid.circle-of-the-land.land-s-aid",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Land’s Aid"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Land’s Aid extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b030"
+        ],
+        "page": 46,
+        "quoteHash": "85dc6e084a0fdcf6e01e93bae3aa513cfd10ff8b2bde9bc97467f9a5cd9c2e10",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 6,
+      "text": "You can cast one of the level 1+ spells that you have prepared from your Circle Spells feature without expending a spell slot, and you must finish a Long Rest before you do so again. In addition, when you finish a Short Rest, you can choose expended spell slots to recover. The spell slots can have a combined level that is equal to or less than half your Druid level (round up), and none of them can be level 6+. For example, if you’re a level 6 Druid, you can recover up to three levels’ worth of spell slots. You can recover a level 3 spell slot, a level 2 and a level 1 spell slot, or three level 1 spell slots. Once you recover spell slots with this feature, you can’t do so again until you finish a Long Rest."
+    },
+    "id": "srd521.subclass-feature.druid.circle-of-the-land.natural-recovery",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Natural Recovery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Natural Recovery extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b031"
+        ],
+        "page": 46,
+        "quoteHash": "8a850e96cfae3ab956afb96ecf5e407272e8e9e86dc236e86894543da6465bf6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 10,
+      "text": "You are immune to the Poisoned condition, and you have Resistance to a damage type associated with your current land choice in the Circle Spells feature, as shown in the Nature’s Ward table. Nature’s Ward Land Type Land Type Resistance Resistance Arid Fire Temperate Lightning Polar Cold Tropical Poison"
+    },
+    "id": "srd521.subclass-feature.druid.circle-of-the-land.nature-s-ward",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Nature’s Ward"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Nature’s Ward extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b032",
+          "p0046-b033",
+          "p0046-b034",
+          "p0046-b037",
+          "p0046-b035",
+          "p0046-b038",
+          "p0046-b036",
+          "p0046-b039"
+        ],
+        "page": 46,
+        "quoteHash": "931898ba29978e2cde393a89952eb47599553f83aef578a5a89fc80a19dced59",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "level": 14,
+      "text": "As a Magic action, you can expend a use of your Wild Shape and cause spectral trees and vines to appear in a 15-foot Cube on the ground within 120 feet of yourself. They last there for 1 minute or until you have the Incapacitated condition or die. You and your allies have Half Cover while in that area, and your allies gain the current Resistance of your Nature’s Ward while there. As a Bonus Action, you can move the Cube up to 60 feet to ground within 120 feet of yourself."
+    },
+    "id": "srd521.subclass-feature.druid.circle-of-the-land.nature-s-sanctuary",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Nature’s Sanctuary"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Nature’s Sanctuary extracted from the Druid description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0046-b040"
+        ],
+        "page": 46,
+        "quoteHash": "cb01e1292706a909f3d591218f790492a384670fc73c814b7dd6dc1c2c145997",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "druid"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [
+        {
+          "diceCount": 3,
+          "diceSize": 10,
+          "type": "lightning"
+        }
+      ],
+      "description": "A storm cloud appears at a point within range that you can see above yourself. It takes the shape of a Cylinder that is 10 feet tall with a 60-foot radius. When you cast the spell, choose a point you can see under the cloud. A lightning bolt shoots from the cloud to that point. Each creature within 5 feet of that point makes a Dexterity saving throw, taking 3d10 Lightning damage on a failed save or half as much damage on a successful one. Until the spell ends, you can take a Magic action to call down lightning in that way again, targeting the same point or a different one. If you’re outdoors in a storm when you cast this spell, the spell gives you control over that storm instead of creating a new one. Under such conditions, the spell’s damage increases by 1d10. Using a Higher-Level Spell Slot. The damage increases by 1d10 for each spell slot level above 3.",
+      "druidSpell": true,
+      "duration": "Concentration, up to 10 minutes",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 3,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "conjuration"
+    },
+    "id": "srd521.spell.call-lightning",
+    "kind": "spell",
+    "name": {
+      "en": "Call Lightning"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0114-b009",
+          "p0114-b010",
+          "p0114-b011",
+          "p0114-b012"
+        ],
+        "page": 114,
+        "quoteHash": "dadb5975bfe1cc7252f304c4329113f19e4acfa45ba9177d8152f6aee4652b24",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "conjuration",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "druid"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "Whispering to the spirits of nature, you create one of the following effects within range. Weather Sensor. You create a Tiny, harmless sensory effect that predicts what the weather will be at your location for the next 24 hours. The effect might manifest as a golden orb for clear skies, a cloud for rain, falling snowflakes for snow, and so on. This effect persists for 1 round. Bloom. You instantly make a flower blossom, a seed pod open, or a leaf bud bloom. Sensory Effect. You create a harmless sensory effect, such as falling leaves, spectral dancing fairies, a gentle breeze, the sound of an animal, or the faint odor of skunk. The effect must fit in a 5-foot Cube. Fire Play. You light or snuff out a candle, a torch, or a campfire.",
+      "druidSpell": true,
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "transmutation"
+    },
+    "id": "srd521.spell.druidcraft",
+    "kind": "spell",
+    "name": {
+      "en": "Druidcraft"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0126-b013",
+          "p0126-b014",
+          "p0126-b015"
+        ],
+        "page": 126,
+        "quoteHash": "934ecf614f9c1d1e4e21e6cc3a4cf241346c0f1793f456d6a32777b37804cbff",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "transmutation",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "druid",
+        "ranger"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Grasping plants sprout from the ground in a 20-foot square within range. For the duration, these plants turn the ground in the area into Difficult Terrain. They disappear when the spell ends. Each creature (other than you) in the area when you cast the spell must succeed on a Strength saving throw or have the Restrained condition until the spell ends. A Restrained creature can take an action to make a Strength (Athletics) check against your spell save DC. On a success, it frees itself from the grasping plants and is no longer Restrained by them.",
+      "druidSpell": true,
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 1,
+      "range": "90 feet",
+      "ritual": false,
+      "savingThrows": [
+        "strength"
+      ],
+      "school": "conjuration"
+    },
+    "id": "srd521.spell.entangle",
+    "kind": "spell",
+    "name": {
+      "en": "Entangle"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0128-b007",
+          "p0128-b008",
+          "p0128-b009",
+          "p0128-b010"
+        ],
+        "page": 128,
+        "quoteHash": "cda1266bce089b912ce67679aa45ebcdebef417b38f9334e9d424fbc4f6fc65a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "conjuration",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "druid"
+      ],
+      "components": {
+        "material": false,
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Objects in a 20-foot Cube within range are outlined in blue, green, or violet light (your choice). Each creature in the Cube is also outlined if it fails a Dexterity saving throw. For the duration, objects and affected creatures shed Dim Light in a 10-foot radius and can’t benefit from the Invisible condition. Attack rolls against an affected creature or object have Advantage if the attacker can see it.",
+      "druidSpell": true,
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 1,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "evocation"
+    },
+    "id": "srd521.spell.faerie-fire",
+    "kind": "spell",
+    "name": {
+      "en": "Faerie Fire"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0129-b012",
+          "p0129-b013",
+          "p0129-b014"
+        ],
+        "page": 129,
+        "quoteHash": "e2434535416c370b4f385e847059e10e577cd9f96d4906e02cb8654b1d5f1ebe",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "evocation",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "druid",
+        "ranger",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You create a 20-foot-radius Sphere of fog centered on a point within range. The Sphere is Heavily Obscured. It lasts for the duration or until a strong wind (such as one created by Gust of Wind) disperses it. Using a Higher-Level Spell Slot. The fog’s radius increases by 20 feet for each spell slot level above 1.",
+      "druidSpell": true,
+      "duration": "Concentration, up to 1 hour",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "conjuration"
+    },
+    "id": "srd521.spell.fog-cloud",
+    "kind": "spell",
+    "name": {
+      "en": "Fog Cloud"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0133-b011",
+          "p0133-b012",
+          "p0133-b013"
+        ],
+        "page": 133,
+        "quoteHash": "294551921a7402339a94db541065edd8304476d935a3d62256a4b5867de8ce1e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "conjuration",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "druid"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a moonseed leaf",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [
+        {
+          "diceCount": 2,
+          "diceSize": 10,
+          "type": "radiant"
+        }
+      ],
+      "description": "A silvery beam of pale light shines down in a 5-foot-radius, 40-foot-high Cylinder centered on a point within range. Until the spell ends, Dim Light fills the Cylinder, and you can take a Magic action on later turns to move the Cylinder up to 60 feet. When the Cylinder appears, each creature in it makes a Constitution saving throw. On a failed save, a creature takes 2d10 Radiant damage, and if the creature is shape-shifted (as a result of the Polymorph spell, for example), it reverts to its true form and can’t shape-shift until it leaves the Cylinder. On a successful save, a creature takes half as much damage only. A creature also makes this save when the spell’s area moves into its space and when it enters the spell’s area or ends its turn there. A creature makes this save only once per turn. Using a Higher-Level Spell Slot. The damage increases by 1d10 for each spell slot level above 2.",
+      "druidSpell": true,
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 2,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [
+        "constitution"
+      ],
+      "school": "evocation"
+    },
+    "id": "srd521.spell.moonbeam",
+    "kind": "spell",
+    "name": {
+      "en": "Moonbeam"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0150-b015",
+          "p0150-b016"
+        ],
+        "page": 150,
+        "quoteHash": "c2defb6599c362abbbd7c860dd78c2b2f5047be478c412bc03ff84142856318c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0151-b002"
+        ],
+        "page": 151,
+        "quoteHash": "6334a2023a11eaae4f9d0998a52a7634e9e67991cf77800052ce6cfb06006bc4",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "evocation",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "druid",
+        "ranger"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "ashes from burned mistletoe",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You radiate a concealing aura in a 30-foot Emanation for the duration. While in the aura, you and each creature you choose have a +10 bonus to Dexterity (Stealth) checks and leave no tracks.",
+      "druidSpell": true,
+      "duration": "Concentration, up to 1 hour",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 2,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "abjuration"
+    },
+    "id": "srd521.spell.pass-without-trace",
+    "kind": "spell",
+    "name": {
+      "en": "Pass without Trace"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0151-b014",
+          "p0151-b015",
+          "p0151-b016"
+        ],
+        "page": 151,
+        "quoteHash": "d8444565ce47c48c0a72ca81f09370cce2a472a6c591ce1a7a398a047482fc78",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "abjuration",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Bonus Action",
+      "classes": [
+        "druid"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 1,
+          "diceSize": 8,
+          "type": "fire"
+        }
+      ],
+      "description": "A flickering flame appears in your hand and remains there for the duration. While there, the flame emits no heat and ignites nothing, and it sheds Bright Light in a 20-foot radius and Dim Light for an additional 20 feet. The spell ends if you cast it again. Until the spell ends, you can take a Magic action to hurl fire at a creature or an object within 60 feet of you. Make a ranged spell attack. On a hit, the target takes 1d8 Fire damage. Cantrip Upgrade. The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
+      "druidSpell": true,
+      "duration": "10 minutes",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "conjuration"
+    },
+    "id": "srd521.spell.produce-flame",
+    "kind": "spell",
+    "name": {
+      "en": "Produce Flame"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0156-b007",
+          "p0156-b008",
+          "p0156-b009"
+        ],
+        "page": 156,
+        "quoteHash": "a987e243a45979a79b24a29424f8b1a207867f1c1add13735f276043ccd13fa2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "conjuration",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Bonus Action",
+      "classes": [
+        "druid"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "mistletoe",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "A Club or Quarterstaff you are holding is imbued with nature’s power. For the duration, you can use your spellcasting ability instead of Strength for the attack and damage rolls of melee attacks using that weapon, and the weapon’s damage die becomes a d8. If the attack deals damage, it can be Force damage or the weapon’s normal damage type (your choice). The spell ends early if you cast it again or if you let go of the weapon. Cantrip Upgrade. The damage die changes when you reach levels 5 (d10), 11 (d12), and 17 (2d6).",
+      "druidSpell": true,
+      "duration": "1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "transmutation"
+    },
+    "id": "srd521.spell.shillelagh",
+    "kind": "spell",
+    "name": {
+      "en": "Shillelagh"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0162-b006",
+          "p0162-b007",
+          "p0162-b008"
+        ],
+        "page": 162,
+        "quoteHash": "0d0fdcbc1fdde1d2964b9856be2ebd5567e183b5c5d4f9c378d955542b87ca3c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "transmutation",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a miniature umbrella",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Until the spell ends, sleet falls in a 40-foot-tall, 20-foot-radius Cylinder centered on a point you choose within range. The area is Heavily Obscured, and exposed flames in the area are doused. Ground in the Cylinder is Difficult Terrain. When a creature enters the Cylinder for the first time on a turn or starts its turn there, it must succeed on a Dexterity saving throw or have the Prone condition and lose Concentration.",
+      "druidSpell": true,
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 3,
+      "range": "150 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "conjuration"
+    },
+    "id": "srd521.spell.sleet-storm",
+    "kind": "spell",
+    "name": {
+      "en": "Sleet Storm"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0163-b006",
+          "p0163-b007",
+          "p0163-b008",
+          "p0163-b009"
+        ],
+        "page": 163,
+        "quoteHash": "a430f05f53c2a0a74054ac3242116f5b4a078437e43b8373a6aee2438dc47a92",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "conjuration",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action or Ritual",
+      "classes": [
+        "bard",
+        "druid",
+        "ranger",
+        "warlock"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "For the duration, you can comprehend and verbally communicate with Beasts, and you can use any of the Influence action’s skill options with them. Most Beasts have little to say about topics that don’t pertain to survival or companionship, but at minimum, a Beast can give you information about nearby locations and monsters, including whatever it has perceived within the past day.",
+      "druidSpell": true,
+      "duration": "10 minutes",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 1,
+      "range": "Self",
+      "ritual": true,
+      "savingThrows": [],
+      "school": "divination"
+    },
+    "id": "srd521.spell.speak-with-animals",
+    "kind": "spell",
+    "name": {
+      "en": "Speak with Animals"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0164-b002",
+          "p0164-b003",
+          "p0164-b004"
+        ],
+        "page": 164,
+        "quoteHash": "9306e9a4054b8573450030fa4b70682e4da2366b887a87a279f4f7db4344ed59",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "divination",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action or Ritual",
+      "classes": [
+        "druid",
+        "ranger",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a short reed",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "This spell grants up to ten willing creatures of your choice within range the ability to breathe underwater until the spell ends. Affected creatures also retain their normal mode of respiration.",
+      "druidSpell": true,
+      "duration": "24 hours",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 3,
+      "range": "30 feet",
+      "ritual": true,
+      "savingThrows": [],
+      "school": "transmutation"
+    },
+    "id": "srd521.spell.water-breathing",
+    "kind": "spell",
+    "name": {
+      "en": "Water Breathing"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Druid spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0173-b014",
+          "p0173-b015",
+          "p0173-b016"
+        ],
+        "page": 173,
+        "quoteHash": "73ba10705005821fc60449736169022e4ea2a71367fb80cafdc95687abd579e1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "transmutation",
+      "druid"
+    ]
   }
 ]

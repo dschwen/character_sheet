@@ -1,0 +1,51 @@
+{
+  "id": "srd521.subclass-feature.druid.circle-of-the-land.land-s-aid",
+  "kind": "subclass-feature",
+  "level": 3,
+  "parentId": "srd521.subclass.druid.circle-of-the-land",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-lands-aid",
+      "parameters": {
+        "actionEconomy": "magic-action",
+        "resourceId": "srd521.resource.druid.wild-shape",
+        "spends": 1
+      },
+      "target": "action.lands-aid",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.druid.wild-shape"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Beast forms and targets remain player- or roll-assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0046-b030"
+      ],
+      "page": 46,
+      "quoteHash": "85dc6e084a0fdcf6e01e93bae3aa513cfd10ff8b2bde9bc97467f9a5cd9c2e10",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "As a Magic action, you can expend a use of your Wild Shape and choose a point within 60 feet of yourself. Vitality-giving flowers and life-draining thorns appear for a moment in a 10-foot-radius Sphere centered on that point. Each creature of your choice in the Sphere must make a Constitution saving throw against your spell save DC, taking 2d6 Necrotic damage on a failed save or half as much damage on a successful one. One creature of your choice in that area regains 2d6 Hit Points. The damage and healing increase by 1d6 when you reach Druid levels 10 (3d6) and 14 (4d6)."
+      }
+    ],
+    "title": "Land’s Aid"
+  }
+}

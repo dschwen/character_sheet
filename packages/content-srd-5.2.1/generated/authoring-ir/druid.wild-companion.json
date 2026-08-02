@@ -1,0 +1,51 @@
+{
+  "id": "srd521.class-feature.druid.wild-companion",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.druid",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-wild-companion",
+      "parameters": {
+        "actionEconomy": "magic-action",
+        "resourceId": "srd521.resource.druid.wild-shape",
+        "spends": 1
+      },
+      "target": "action.wild-companion",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.druid.wild-shape"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Beast forms and targets remain player- or roll-assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0043-b008"
+      ],
+      "page": 43,
+      "quoteHash": "7afba3f4b3cb16d4552c6fce151a819d7329b2115760984c9f14212d6cd6dcba",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can summon a nature spirit that assumes an animal form to aid you. As a Magic action, you can expend a spell slot or a use of Wild Shape to cast the Find Familiar spell without Material components. When you cast the spell in this way, the familiar is Fey and disappears when you finish a Long Rest."
+      }
+    ],
+    "title": "Wild Companion"
+  }
+}
