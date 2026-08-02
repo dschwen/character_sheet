@@ -1,0 +1,47 @@
+{
+  "id": "srd521.subclass-feature.rogue.thief.second-story-work",
+  "kind": "subclass-feature",
+  "level": 3,
+  "parentId": "srd521.subclass.rogue.thief",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "ref",
+        "path": "speed.walking"
+      },
+      "id": "thief-climb-speed",
+      "parameters": {},
+      "target": "speed.climb",
+      "type": "add-candidate-calculation"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, turn state, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0064-b006"
+      ],
+      "page": 64,
+      "quoteHash": "dd3a02270beb60273bdb37fb96655a4938021fd0f89fa42cdffcb21021057e70",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You’ve trained to get into especially hard-to-reach places, granting you these benefits. Climber. You gain a Climb Speed equal to your Speed. Jumper. You can determine your jump distance using your Dexterity rather than your Strength."
+      }
+    ],
+    "title": "Second-Story Work"
+  }
+}

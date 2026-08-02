@@ -1,0 +1,1469 @@
+[
+  {
+    "body": {
+      "armorTraining": [
+        "light"
+      ],
+      "conditionalWeaponProficiencies": [
+        {
+          "attackType": "melee",
+          "category": "martial",
+          "requiredProperties": [
+            "finesse"
+          ]
+        },
+        {
+          "attackType": "melee",
+          "category": "martial",
+          "requiredProperties": [
+            "light"
+          ]
+        }
+      ],
+      "featureSaveAbility": "dexterity",
+      "hitPointDie": 8,
+      "primaryAbilities": [
+        "dexterity"
+      ],
+      "progression": [
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.expertise",
+              "name": "Expertise"
+            },
+            {
+              "entityId": "srd521.class-feature.rogue.sneak-attack",
+              "name": "Sneak Attack"
+            },
+            {
+              "entityId": "srd521.class-feature.rogue.thieves-cant",
+              "name": "Thieves’ Cant"
+            },
+            {
+              "entityId": "srd521.class-feature.rogue.weapon-mastery",
+              "name": "Weapon Mastery"
+            }
+          ],
+          "level": 1,
+          "proficiencyBonus": 2,
+          "sneakAttack": {
+            "diceCount": 1,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.cunning-action",
+              "name": "Cunning Action"
+            }
+          ],
+          "level": 2,
+          "proficiencyBonus": 2,
+          "sneakAttack": {
+            "diceCount": 1,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.rogue-subclass",
+              "name": "Rogue Subclass"
+            },
+            {
+              "entityId": "srd521.class-feature.rogue.steady-aim",
+              "name": "Steady Aim"
+            }
+          ],
+          "level": 3,
+          "proficiencyBonus": 2,
+          "sneakAttack": {
+            "diceCount": 2,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 4,
+          "proficiencyBonus": 2,
+          "sneakAttack": {
+            "diceCount": 2,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.cunning-strike",
+              "name": "Cunning Strike"
+            },
+            {
+              "entityId": "srd521.class-feature.rogue.uncanny-dodge",
+              "name": "Uncanny Dodge"
+            }
+          ],
+          "level": 5,
+          "proficiencyBonus": 3,
+          "sneakAttack": {
+            "diceCount": 3,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Expertise"
+            }
+          ],
+          "level": 6,
+          "proficiencyBonus": 3,
+          "sneakAttack": {
+            "diceCount": 3,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.evasion",
+              "name": "Evasion"
+            },
+            {
+              "entityId": "srd521.class-feature.rogue.reliable-talent",
+              "name": "Reliable Talent"
+            }
+          ],
+          "level": 7,
+          "proficiencyBonus": 3,
+          "sneakAttack": {
+            "diceCount": 4,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 8,
+          "proficiencyBonus": 3,
+          "sneakAttack": {
+            "diceCount": 4,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 9,
+          "proficiencyBonus": 4,
+          "sneakAttack": {
+            "diceCount": 5,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 10,
+          "proficiencyBonus": 4,
+          "sneakAttack": {
+            "diceCount": 5,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.improved-cunning-strike",
+              "name": "Improved Cunning Strike"
+            }
+          ],
+          "level": 11,
+          "proficiencyBonus": 4,
+          "sneakAttack": {
+            "diceCount": 6,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 12,
+          "proficiencyBonus": 4,
+          "sneakAttack": {
+            "diceCount": 6,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 13,
+          "proficiencyBonus": 5,
+          "sneakAttack": {
+            "diceCount": 7,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.devious-strikes",
+              "name": "Devious Strikes"
+            }
+          ],
+          "level": 14,
+          "proficiencyBonus": 5,
+          "sneakAttack": {
+            "diceCount": 7,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.slippery-mind",
+              "name": "Slippery Mind"
+            }
+          ],
+          "level": 15,
+          "proficiencyBonus": 5,
+          "sneakAttack": {
+            "diceCount": 8,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 16,
+          "proficiencyBonus": 5,
+          "sneakAttack": {
+            "diceCount": 8,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 17,
+          "proficiencyBonus": 6,
+          "sneakAttack": {
+            "diceCount": 9,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.elusive",
+              "name": "Elusive"
+            }
+          ],
+          "level": 18,
+          "proficiencyBonus": 6,
+          "sneakAttack": {
+            "diceCount": 9,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.epic-boon",
+              "name": "Epic Boon"
+            }
+          ],
+          "level": 19,
+          "proficiencyBonus": 6,
+          "sneakAttack": {
+            "diceCount": 10,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        },
+        {
+          "features": [
+            {
+              "entityId": "srd521.class-feature.rogue.stroke-of-luck",
+              "name": "Stroke of Luck"
+            }
+          ],
+          "level": 20,
+          "proficiencyBonus": 6,
+          "sneakAttack": {
+            "diceCount": 10,
+            "diceSize": 6
+          },
+          "weaponMastery": 2
+        }
+      ],
+      "savingThrowProficiencies": [
+        "dexterity",
+        "intelligence"
+      ],
+      "skillProficiencyChoice": {
+        "maximum": 4,
+        "minimum": 4,
+        "options": [
+          "acrobatics",
+          "athletics",
+          "deception",
+          "insight",
+          "intimidation",
+          "investigation",
+          "perception",
+          "persuasion",
+          "sleight of hand",
+          "stealth"
+        ]
+      },
+      "startingEquipmentText": "Choose A or B: (A) Leather Armor, 2 Daggers, Short­sword, Shortbow, 20 Arrows, Quiver, Thieves’ Tools, Burglar’s Pack, and 8 GP; or (B) 100 GP",
+      "toolProficiencies": [
+        "Thieves’ Tools"
+      ],
+      "weaponProficiencies": [
+        "simple"
+      ]
+    },
+    "id": "srd521.class.rogue",
+    "kind": "class",
+    "name": {
+      "en": "Rogue"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Rogue progression and Sneak Attack table from pages 61–63.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0061-b011",
+          "p0061-b012",
+          "p0061-b013",
+          "p0061-b014",
+          "p0061-b015",
+          "p0061-b016",
+          "p0061-b017",
+          "p0061-b018",
+          "p0061-b019",
+          "p0061-b020",
+          "p0061-b021"
+        ],
+        "page": 61,
+        "quoteHash": "20bc3b8ec30980234c8e78a42e10e0b1c50badb46c2407e83b8a438b829f4cca",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0062-b009",
+          "p0062-b011",
+          "p0062-b010",
+          "p0062-b012",
+          "p0062-b013",
+          "p0062-b014",
+          "p0062-b015",
+          "p0062-b016",
+          "p0062-b017",
+          "p0062-b018",
+          "p0062-b019",
+          "p0062-b020",
+          "p0062-b021",
+          "p0062-b022",
+          "p0062-b023",
+          "p0062-b024",
+          "p0062-b025",
+          "p0062-b026",
+          "p0062-b027",
+          "p0062-b028",
+          "p0062-b029",
+          "p0062-b030",
+          "p0062-b031"
+        ],
+        "page": 62,
+        "quoteHash": "eb75ae4179a4c71d8b0b13ffbc3951b83b7313b46b6b5ca47b88fae461432f0c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class",
+      "rogue",
+      "martial",
+      "expertise"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You gain Expertise in two of your skill proficiencies of your choice. Sleight of Hand and Stealth are recommended if you have proficiency in them. At Rogue level 6, you gain Expertise in two more of your skill proficiencies of your choice."
+    },
+    "id": "srd521.class-feature.rogue.expertise",
+    "kind": "class-feature",
+    "name": {
+      "en": "Expertise"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Expertise extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0061-b026"
+        ],
+        "page": 61,
+        "quoteHash": "e659c8fb866172ba5b0f671fdba80758305591fc74167464021791c909ae3c7c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You know how to strike subtly and exploit a foe’s distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack roll if you have Advantage on the roll and the attack uses a Finesse or a Ranged weapon. The extra damage’s type is the same as the weapon’s type. You don’t need Advantage on the attack roll if at least one of your allies is within 5 feet of the target, the ally doesn’t have the Incapacitated condition, and you don’t have Disadvantage on the attack roll. The extra damage increases as you gain Rogue levels, as shown in the Sneak Attack column of the Rogue Features table."
+    },
+    "id": "srd521.class-feature.rogue.sneak-attack",
+    "kind": "class-feature",
+    "name": {
+      "en": "Sneak Attack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Sneak Attack extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0061-b027"
+        ],
+        "page": 61,
+        "quoteHash": "8ae5529b71986a052ce1f411bfee78175eb09f69ef7550e1b59156499dce9af0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0062-b002"
+        ],
+        "page": 62,
+        "quoteHash": "57a081b4b1d6a352eca460dd26eb73ebf7637794e7a477b33b7446c86ced91da",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You picked up various languages in the communities where you plied your roguish talents. You know Thieves’ Cant and one other language of your choice, which you choose from the language tables in “Character Creation.”"
+    },
+    "id": "srd521.class-feature.rogue.thieves-cant",
+    "kind": "class-feature",
+    "name": {
+      "en": "Thieves’ Cant"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Thieves’ Cant extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0062-b003"
+        ],
+        "page": 62,
+        "quoteHash": "28582e503726d6a12b2d0e514104b2648e033774a1f6688465f923e16b62fa23",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "Your training with weapons allows you to use the mastery properties of two kinds of weapons of your choice with which you have proficiency, such as Daggers and Shortbows. Whenever you finish a Long Rest, you can change the kinds of weapons you chose. For example, you could switch to using the mastery properties of Scimitars and Shortswords."
+    },
+    "id": "srd521.class-feature.rogue.weapon-mastery",
+    "kind": "class-feature",
+    "name": {
+      "en": "Weapon Mastery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Weapon Mastery extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0062-b004",
+          "p0062-b005"
+        ],
+        "page": 62,
+        "quoteHash": "4736d69e596842ded74c00d7b374cc05d9ffed4025343bac509b28b5abfbadb5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 2,
+      "text": "Your quick thinking and agility allow you to move and act quickly. On your turn, you can take one of the following actions as a Bonus Action: Dash, Disengage, or Hide."
+    },
+    "id": "srd521.class-feature.rogue.cunning-action",
+    "kind": "class-feature",
+    "name": {
+      "en": "Cunning Action"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Cunning Action extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0062-b006"
+        ],
+        "page": 62,
+        "quoteHash": "3f132fb477a6cc1b10327de023af74d9ffc26dd866d63141efb2b7124de41235",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "You gain a Rogue subclass of your choice. The Thief subclass is detailed after this class’s description. A subclass is a specialization that grants you features at certain Rogue levels. For the rest of your career, you gain each of your subclass’s features that are of your Rogue level or lower."
+    },
+    "id": "srd521.class-feature.rogue.rogue-subclass",
+    "kind": "class-feature",
+    "name": {
+      "en": "Rogue Subclass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Rogue Subclass extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0062-b007"
+        ],
+        "page": 62,
+        "quoteHash": "c6b6ad1c5321ef41ec7e4f982a7648e0d74e098019fab8ee6f58436febe0d655",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn. You can use this feature only if you haven’t moved during this turn, and after you use it, your Speed is 0 until the end of the current turn."
+    },
+    "id": "srd521.class-feature.rogue.steady-aim",
+    "kind": "class-feature",
+    "name": {
+      "en": "Steady Aim"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Steady Aim extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0062-b008"
+        ],
+        "page": 62,
+        "quoteHash": "cdfab49d3f9912d7eb966561a3719b9f36bf125f54462dbbf8ce5b51c00769fd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 4,
+      "text": "You gain the Ability Score Improvement feat (see “Feats”) or another feat of your choice for which you qualify. You gain this feature again at Rogue levels 8, 10, 12, and 16."
+    },
+    "id": "srd521.class-feature.rogue.ability-score-improvement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ability Score Improvement extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b002"
+        ],
+        "page": 63,
+        "quoteHash": "9a01a6f322af34946d4301484bd233f75a65886f732091a1e394923f39196c3a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 5,
+      "text": "You’ve developed cunning ways to use your Sneak Attack. When you deal Sneak Attack damage, you can add one of the following Cunning Strike effects. Each effect has a die cost, which is the number of Sneak Attack damage dice you must forgo to add the effect. You remove the die before rolling, and the effect occurs immediately after the attack’s damage is dealt. For example, if you add the Poison effect, remove 1d6 from the Sneak Attack’s damage before rolling. If a Cunning Strike effect requires a saving throw, the DC equals 8 plus your Dexterity modifier and Proficiency Bonus. Poison (Cost: 1d6). You add a toxin to your strike, forcing the target to make a Constitution saving throw. On a failed save, the target has the Poisoned condition for 1 minute. At the end of each of its turns, the Poisoned target repeats the save, ending the effect on itself on a success. To use this effect, you must have a Poisoner’s Kit on your person. Trip (Cost: 1d6). If the target is Large or smaller, it must succeed on a Dexterity saving throw or have the Prone condition. Withdraw (Cost: 1d6). Immediately after the attack, you move up to half your Speed without provoking Opportunity Attacks."
+    },
+    "id": "srd521.class-feature.rogue.cunning-strike",
+    "kind": "class-feature",
+    "name": {
+      "en": "Cunning Strike"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Cunning Strike extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b003"
+        ],
+        "page": 63,
+        "quoteHash": "b00ecbfcaa9012073187a4c8dc9a164a134a456d7c444ae4e47b48570a516471",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 5,
+      "text": "When an attacker that you can see hits you with an attack roll, you can take a Reaction to halve the attack’s damage against you (round down)."
+    },
+    "id": "srd521.class-feature.rogue.uncanny-dodge",
+    "kind": "class-feature",
+    "name": {
+      "en": "Uncanny Dodge"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Uncanny Dodge extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b004"
+        ],
+        "page": 63,
+        "quoteHash": "6b49c73703a811e20c2f1f885abfc19c2158f94d6456250cfb52ea12db01534a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 7,
+      "text": "You can nimbly dodge out of the way of certain dangers. When you’re subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you instead take no damage if you succeed on the saving throw and only half damage if you fail. You can’t use this feature if you have the Incapacitated condition."
+    },
+    "id": "srd521.class-feature.rogue.evasion",
+    "kind": "class-feature",
+    "name": {
+      "en": "Evasion"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Evasion extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b005"
+        ],
+        "page": 63,
+        "quoteHash": "9fd0ee968b787d2a2c4e3ea7f724f3caa0f61500874393896b316053387d157c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 7,
+      "text": "Whenever you make an ability check that uses one of your skill or tool proficiencies, you can treat a d20 roll of 9 or lower as a 10."
+    },
+    "id": "srd521.class-feature.rogue.reliable-talent",
+    "kind": "class-feature",
+    "name": {
+      "en": "Reliable Talent"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Reliable Talent extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b006"
+        ],
+        "page": 63,
+        "quoteHash": "e96e3454db8363bd7c624b05447d049ae139547a760009ba72bc2e289aba129d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 11,
+      "text": "You can use up to two Cunning Strike effects when you deal Sneak Attack damage, paying the die cost for each effect."
+    },
+    "id": "srd521.class-feature.rogue.improved-cunning-strike",
+    "kind": "class-feature",
+    "name": {
+      "en": "Improved Cunning Strike"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Improved Cunning Strike extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b007"
+        ],
+        "page": 63,
+        "quoteHash": "01e6c813cceabeb28f29bbc49b3ed1270263d4e8020012705f3ac7716a7dd653",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 14,
+      "text": "You’ve practiced new ways to use your Sneak Attack deviously. The following effects are now among your Cunning Strike options. Daze (Cost: 2d6). The target must succeed on a Constitution saving throw, or on its next turn, it can do only one of the following: move or take an action or a Bonus Action. Knock Out (Cost: 6d6). The target must succeed on a Constitution saving throw, or it has the Unconscious condition for 1 minute or until it takes any damage. The Unconscious target repeats the save at the end of each of its turns, ending the effect on itself on a success. Obscure (Cost: 3d6). The target must succeed on a Dexterity saving throw, or it has the Blinded condition until the end of its next turn."
+    },
+    "id": "srd521.class-feature.rogue.devious-strikes",
+    "kind": "class-feature",
+    "name": {
+      "en": "Devious Strikes"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Devious Strikes extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b008"
+        ],
+        "page": 63,
+        "quoteHash": "dde324e5fd803da7e1b44b300fd5534e1fd4a4d31bc0e7f4f4f4f43328100bbb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 15,
+      "text": "Your cunning mind is exceptionally difficult to control. You gain proficiency in Wisdom and Charisma saving throws."
+    },
+    "id": "srd521.class-feature.rogue.slippery-mind",
+    "kind": "class-feature",
+    "name": {
+      "en": "Slippery Mind"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Slippery Mind extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b009"
+        ],
+        "page": 63,
+        "quoteHash": "e5a3056d7d076c7eb3d08d60b92d416f15c4e7248f7d263ad548de40453df338",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 18,
+      "text": "You’re so evasive that attackers rarely gain the upper hand against you. No attack roll can have Advantage against you unless you have the Incapacitated condition."
+    },
+    "id": "srd521.class-feature.rogue.elusive",
+    "kind": "class-feature",
+    "name": {
+      "en": "Elusive"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Elusive extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b010"
+        ],
+        "page": 63,
+        "quoteHash": "8ecdaf15a11b603947b57a5afe5418f7635a20bbb2a6f1be35eb24b68875eff5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 19,
+      "text": "You gain an Epic Boon feat (see “Feats”) or another feat of your choice for which you qualify. Boon of the Night Spirit is recommended."
+    },
+    "id": "srd521.class-feature.rogue.epic-boon",
+    "kind": "class-feature",
+    "name": {
+      "en": "Epic Boon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Epic Boon extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b011"
+        ],
+        "page": 63,
+        "quoteHash": "51d98dc22e8758456d0a03b04b342b5c7f0b80319c83c048224403fffdb51599",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 20,
+      "text": "You have a marvelous knack for succeeding when you need to. If you fail a D20 Test, you can turn the roll into a 20. Once you use this feature, you can’t use it again until you finish a Short or Long Rest."
+    },
+    "id": "srd521.class-feature.rogue.stroke-of-luck",
+    "kind": "class-feature",
+    "name": {
+      "en": "Stroke of Luck"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Stroke of Luck extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b012"
+        ],
+        "page": 63,
+        "quoteHash": "047166587119654c666f65ae5d5c805182520f25fb2be3081da2b6848c600148",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "entries": {
+        "1": 1,
+        "10": 5,
+        "11": 6,
+        "12": 6,
+        "13": 7,
+        "14": 7,
+        "15": 8,
+        "16": 8,
+        "17": 9,
+        "18": 9,
+        "19": 10,
+        "2": 1,
+        "20": 10,
+        "3": 2,
+        "4": 2,
+        "5": 3,
+        "6": 3,
+        "7": 4,
+        "8": 4,
+        "9": 5
+      },
+      "keyType": "class-level",
+      "valueType": "integer"
+    },
+    "id": "srd521.table.rogue.sneak-attack-dice",
+    "kind": "rule-table",
+    "name": {
+      "en": "Rogue Sneak Attack Dice"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the Rogue class progression table.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0062-b009",
+          "p0062-b011",
+          "p0062-b010",
+          "p0062-b012",
+          "p0062-b013",
+          "p0062-b014",
+          "p0062-b015",
+          "p0062-b016",
+          "p0062-b017",
+          "p0062-b018",
+          "p0062-b019",
+          "p0062-b020",
+          "p0062-b021",
+          "p0062-b022",
+          "p0062-b023",
+          "p0062-b024",
+          "p0062-b025",
+          "p0062-b026",
+          "p0062-b027",
+          "p0062-b028",
+          "p0062-b029",
+          "p0062-b030",
+          "p0062-b031"
+        ],
+        "page": 62,
+        "quoteHash": "eb75ae4179a4c71d8b0b13ffbc3951b83b7313b46b6b5ca47b88fae461432f0c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "rule-table",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.rogue.cunning-strike",
+      "condition": "poisoned",
+      "costDice": 1,
+      "requires": "poisoners-kit",
+      "savingThrow": "constitution"
+    },
+    "id": "srd521.option.rogue.cunning-strike.poison",
+    "kind": "class-option",
+    "name": {
+      "en": "Poison"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Poison Cunning Strike option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b003"
+        ],
+        "page": 63,
+        "quoteHash": "b00ecbfcaa9012073187a4c8dc9a164a134a456d7c444ae4e47b48570a516471",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "rogue",
+      "cunning-strike"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.rogue.cunning-strike",
+      "condition": "prone",
+      "costDice": 1,
+      "maximumTargetSize": "large",
+      "savingThrow": "dexterity"
+    },
+    "id": "srd521.option.rogue.cunning-strike.trip",
+    "kind": "class-option",
+    "name": {
+      "en": "Trip"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Trip Cunning Strike option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b003"
+        ],
+        "page": 63,
+        "quoteHash": "b00ecbfcaa9012073187a4c8dc9a164a134a456d7c444ae4e47b48570a516471",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "rogue",
+      "cunning-strike"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.rogue.cunning-strike",
+      "costDice": 1,
+      "movementSpeedFraction": 0.5,
+      "provokesOpportunityAttacks": false
+    },
+    "id": "srd521.option.rogue.cunning-strike.withdraw",
+    "kind": "class-option",
+    "name": {
+      "en": "Withdraw"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Withdraw Cunning Strike option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0063-b003"
+        ],
+        "page": 63,
+        "quoteHash": "b00ecbfcaa9012073187a4c8dc9a164a134a456d7c444ae4e47b48570a516471",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "rogue",
+      "cunning-strike"
+    ]
+  },
+  {
+    "body": {
+      "description": "A mix of burglar, treasure hunter, and explorer, you are the epitome of an adventurer. In addition to improving your agility and stealth, you gain abilities useful for delving into ruins and getting maximum benefit from the magic items you find there.",
+      "parentClassId": "srd521.class.rogue",
+      "progression": [
+        {
+          "features": [
+            "srd521.subclass-feature.rogue.thief.fast-hands",
+            "srd521.subclass-feature.rogue.thief.second-story-work"
+          ],
+          "level": 3
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.rogue.thief.supreme-sneak"
+          ],
+          "level": 9
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.rogue.thief.use-magic-device"
+          ],
+          "level": 13
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.rogue.thief.thief-s-reflexes"
+          ],
+          "level": 17
+        }
+      ]
+    },
+    "id": "srd521.subclass.rogue.thief",
+    "kind": "subclass",
+    "name": {
+      "en": "Thief"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Thief subclass extracted from page 64.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b002",
+          "p0064-b004"
+        ],
+        "page": 64,
+        "quoteHash": "60e2e71119ee5addbff0158c3a6eaadfa1f0916fcf4032b82f511d7ded03601c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass",
+      "rogue",
+      "thief"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "As a Bonus Action, you can do one of the following. Sleight of Hand. Make a Dexterity (Sleight of Hand) check to pick a lock or disarm a trap with Thieves’ Tools or to pick a pocket. Use an Object. Take the Utilize action, or take the Magic action to use a magic item that requires that action."
+    },
+    "id": "srd521.subclass-feature.rogue.thief.fast-hands",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Fast Hands"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Fast Hands extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b005"
+        ],
+        "page": 64,
+        "quoteHash": "801b6ac65812ca4f7607735fb7c7cf574af6c484cfc3fb3784be4397f54438f5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "You’ve trained to get into especially hard-to-reach places, granting you these benefits. Climber. You gain a Climb Speed equal to your Speed. Jumper. You can determine your jump distance using your Dexterity rather than your Strength."
+    },
+    "id": "srd521.subclass-feature.rogue.thief.second-story-work",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Second-Story Work"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Second-Story Work extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b006"
+        ],
+        "page": 64,
+        "quoteHash": "dd3a02270beb60273bdb37fb96655a4938021fd0f89fa42cdffcb21021057e70",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 9,
+      "text": "You gain the following Cunning Strike option. Stealth Attack (Cost: 1d6). If you have the Hide action’s Invisible condition, this attack doesn’t end that condition on you if you end the turn behind Three-Quarters Cover or Total Cover."
+    },
+    "id": "srd521.subclass-feature.rogue.thief.supreme-sneak",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Supreme Sneak"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Supreme Sneak extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b007"
+        ],
+        "page": 64,
+        "quoteHash": "5ceb983035e364dee20e5541e6d59a9fc3335a215518e3291301cf37479e44b2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 13,
+      "text": "You’ve learned how to maximize use of magic items, granting you the following benefits. Attunement. You can attune to up to four magic items at once. Charges. Whenever you use a magic item property that expends charges, roll 1d6. On a roll of 6, you use the property without expending the charges. Scrolls. You can use any Spell Scroll, using Intelligence as your spellcasting ability for the spell. If the spell is a cantrip or a level 1 spell, you can cast it reliably. If the scroll contains a higher-level spell, you must first succeed on an Intelligence (Arcana) check (DC 10 plus the spell’s level). On a successful check, you cast the spell from the scroll. On a failed check, the scroll disintegrates."
+    },
+    "id": "srd521.subclass-feature.rogue.thief.use-magic-device",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Use Magic Device"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Use Magic Device extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b008"
+        ],
+        "page": 64,
+        "quoteHash": "5c767b579c2939bcd819f88fcae29c46a8f90ea83d4a4f03823d7176dd13c966",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "rogue"
+    ]
+  },
+  {
+    "body": {
+      "level": 17,
+      "text": "You are adept at laying ambushes and quickly escaping danger. You can take two turns during the first round of any combat. You take your first turn at your normal Initiative and your second turn at your Initiative minus 10."
+    },
+    "id": "srd521.subclass-feature.rogue.thief.thief-s-reflexes",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Thief’s Reflexes"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Thief’s Reflexes extracted from the Rogue description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b009"
+        ],
+        "page": 64,
+        "quoteHash": "7d24ec7d3ab60b47d002fcc27b2a9828fb36ecaccca10817f1a99d7b4b7aded3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "rogue"
+    ]
+  }
+]

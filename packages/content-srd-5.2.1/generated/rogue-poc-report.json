@@ -1,0 +1,266 @@
+{
+  "authoringIr": [
+    "rogue.sneak-attack.json",
+    "rogue.cunning-action.json",
+    "rogue.steady-aim.json",
+    "rogue.cunning-strike.json",
+    "rogue.uncanny-dodge.json",
+    "thief.fast-hands.json",
+    "thief.second-story-work.json"
+  ],
+  "classId": "srd521.class.rogue",
+  "coreTraits": {
+    "armorTraining": [
+      "light"
+    ],
+    "conditionalWeaponProficiencies": [
+      {
+        "attackType": "melee",
+        "category": "martial",
+        "requiredProperties": [
+          "finesse"
+        ]
+      },
+      {
+        "attackType": "melee",
+        "category": "martial",
+        "requiredProperties": [
+          "light"
+        ]
+      }
+    ],
+    "hitPointDie": 8,
+    "primaryAbilities": [
+      "dexterity"
+    ],
+    "savingThrowProficiencies": [
+      "dexterity",
+      "intelligence"
+    ],
+    "skillProficiencyChoice": {
+      "maximum": 4,
+      "minimum": 4,
+      "options": [
+        "acrobatics",
+        "athletics",
+        "deception",
+        "insight",
+        "intimidation",
+        "investigation",
+        "perception",
+        "persuasion",
+        "sleight of hand",
+        "stealth"
+      ]
+    },
+    "startingEquipmentText": "Choose A or B: (A) Leather Armor, 2 Daggers, Short­sword, Shortbow, 20 Arrows, Quiver, Thieves’ Tools, Burglar’s Pack, and 8 GP; or (B) 100 GP",
+    "toolProficiencies": [
+      "Thieves’ Tools"
+    ],
+    "weaponProficiencies": [
+      "simple"
+    ]
+  },
+  "extractedClassFeatures": 18,
+  "extractedThiefFeatures": 5,
+  "generatedEntities": [
+    "srd521.class.rogue",
+    "srd521.class-feature.rogue.expertise",
+    "srd521.class-feature.rogue.sneak-attack",
+    "srd521.class-feature.rogue.thieves-cant",
+    "srd521.class-feature.rogue.weapon-mastery",
+    "srd521.class-feature.rogue.cunning-action",
+    "srd521.class-feature.rogue.rogue-subclass",
+    "srd521.class-feature.rogue.steady-aim",
+    "srd521.class-feature.rogue.ability-score-improvement",
+    "srd521.class-feature.rogue.cunning-strike",
+    "srd521.class-feature.rogue.uncanny-dodge",
+    "srd521.class-feature.rogue.evasion",
+    "srd521.class-feature.rogue.reliable-talent",
+    "srd521.class-feature.rogue.improved-cunning-strike",
+    "srd521.class-feature.rogue.devious-strikes",
+    "srd521.class-feature.rogue.slippery-mind",
+    "srd521.class-feature.rogue.elusive",
+    "srd521.class-feature.rogue.epic-boon",
+    "srd521.class-feature.rogue.stroke-of-luck",
+    "srd521.table.rogue.sneak-attack-dice",
+    "srd521.option.rogue.cunning-strike.poison",
+    "srd521.option.rogue.cunning-strike.trip",
+    "srd521.option.rogue.cunning-strike.withdraw",
+    "srd521.subclass.rogue.thief",
+    "srd521.subclass-feature.rogue.thief.fast-hands",
+    "srd521.subclass-feature.rogue.thief.second-story-work",
+    "srd521.subclass-feature.rogue.thief.supreme-sneak",
+    "srd521.subclass-feature.rogue.thief.use-magic-device",
+    "srd521.subclass-feature.rogue.thief.thief-s-reflexes"
+  ],
+  "progression": [
+    {
+      "feature_names": [
+        "Expertise",
+        "Sneak Attack",
+        "Thieves’ Cant",
+        "Weapon Mastery"
+      ],
+      "level": 1,
+      "proficiency_bonus": 2,
+      "sneak_attack_dice": 1
+    },
+    {
+      "feature_names": [
+        "Cunning Action"
+      ],
+      "level": 2,
+      "proficiency_bonus": 2,
+      "sneak_attack_dice": 1
+    },
+    {
+      "feature_names": [
+        "Rogue Subclass",
+        "Steady Aim"
+      ],
+      "level": 3,
+      "proficiency_bonus": 2,
+      "sneak_attack_dice": 2
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 4,
+      "proficiency_bonus": 2,
+      "sneak_attack_dice": 2
+    },
+    {
+      "feature_names": [
+        "Cunning Strike",
+        "Uncanny Dodge"
+      ],
+      "level": 5,
+      "proficiency_bonus": 3,
+      "sneak_attack_dice": 3
+    },
+    {
+      "feature_names": [
+        "Expertise"
+      ],
+      "level": 6,
+      "proficiency_bonus": 3,
+      "sneak_attack_dice": 3
+    },
+    {
+      "feature_names": [
+        "Evasion",
+        "Reliable Talent"
+      ],
+      "level": 7,
+      "proficiency_bonus": 3,
+      "sneak_attack_dice": 4
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 8,
+      "proficiency_bonus": 3,
+      "sneak_attack_dice": 4
+    },
+    {
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 9,
+      "proficiency_bonus": 4,
+      "sneak_attack_dice": 5
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 10,
+      "proficiency_bonus": 4,
+      "sneak_attack_dice": 5
+    },
+    {
+      "feature_names": [
+        "Improved Cunning Strike"
+      ],
+      "level": 11,
+      "proficiency_bonus": 4,
+      "sneak_attack_dice": 6
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 12,
+      "proficiency_bonus": 4,
+      "sneak_attack_dice": 6
+    },
+    {
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 13,
+      "proficiency_bonus": 5,
+      "sneak_attack_dice": 7
+    },
+    {
+      "feature_names": [
+        "Devious Strikes"
+      ],
+      "level": 14,
+      "proficiency_bonus": 5,
+      "sneak_attack_dice": 7
+    },
+    {
+      "feature_names": [
+        "Slippery Mind"
+      ],
+      "level": 15,
+      "proficiency_bonus": 5,
+      "sneak_attack_dice": 8
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 16,
+      "proficiency_bonus": 5,
+      "sneak_attack_dice": 8
+    },
+    {
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 17,
+      "proficiency_bonus": 6,
+      "sneak_attack_dice": 9
+    },
+    {
+      "feature_names": [
+        "Elusive"
+      ],
+      "level": 18,
+      "proficiency_bonus": 6,
+      "sneak_attack_dice": 9
+    },
+    {
+      "feature_names": [
+        "Epic Boon"
+      ],
+      "level": 19,
+      "proficiency_bonus": 6,
+      "sneak_attack_dice": 10
+    },
+    {
+      "feature_names": [
+        "Stroke of Luck"
+      ],
+      "level": 20,
+      "proficiency_bonus": 6,
+      "sneak_attack_dice": 10
+    }
+  ],
+  "progressionRows": 20
+}

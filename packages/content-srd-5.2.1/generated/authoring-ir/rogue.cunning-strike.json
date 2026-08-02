@@ -1,0 +1,96 @@
+{
+  "id": "srd521.class-feature.rogue.cunning-strike",
+  "kind": "class-feature",
+  "level": 5,
+  "parentId": "srd521.class.rogue",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "cunning-strike-poison",
+      "parameters": {
+        "actionEconomy": "on-sneak-attack",
+        "requirements": [
+          "poisoners-kit"
+        ],
+        "savingThrow": {
+          "ability": "constitution",
+          "difficultyClassFact": "classFeature.rogue.saveDifficultyClass"
+        },
+        "sneakAttackDiceCost": 1
+      },
+      "target": "action.cunning-strike.poison",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "cunning-strike-trip",
+      "parameters": {
+        "actionEconomy": "on-sneak-attack",
+        "requirements": [
+          "target-large-or-smaller"
+        ],
+        "savingThrow": {
+          "ability": "dexterity",
+          "difficultyClassFact": "classFeature.rogue.saveDifficultyClass"
+        },
+        "sneakAttackDiceCost": 1
+      },
+      "target": "action.cunning-strike.trip",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "cunning-strike-withdraw",
+      "parameters": {
+        "actionEconomy": "on-sneak-attack",
+        "movement": {
+          "provokesOpportunityAttacks": false,
+          "speedFraction": 0.5
+        },
+        "sneakAttackDiceCost": 1
+      },
+      "target": "action.cunning-strike.withdraw",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, turn state, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0063-b003"
+      ],
+      "page": 63,
+      "quoteHash": "b00ecbfcaa9012073187a4c8dc9a164a134a456d7c444ae4e47b48570a516471",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You’ve developed cunning ways to use your Sneak Attack. When you deal Sneak Attack damage, you can add one of the following Cunning Strike effects. Each effect has a die cost, which is the number of Sneak Attack damage dice you must forgo to add the effect. You remove the die before rolling, and the effect occurs immediately after the attack’s damage is dealt. For example, if you add the Poison effect, remove 1d6 from the Sneak Attack’s damage before rolling. If a Cunning Strike effect requires a saving throw, the DC equals 8 plus your Dexterity modifier and Proficiency Bonus. Poison (Cost: 1d6). You add a toxin to your strike, forcing the target to make a Constitution saving throw. On a failed save, the target has the Poisoned condition for 1 minute. At the end of each of its turns, the Poisoned target repeats the save, ending the effect on itself on a success. To use this effect, you must have a Poisoner’s Kit on your person. Trip (Cost: 1d6). If the target is Large or smaller, it must succeed on a Dexterity saving throw or have the Prone condition. Withdraw (Cost: 1d6). Immediately after the attack, you move up to half your Speed without provoking Opportunity Attacks."
+      }
+    ],
+    "title": "Cunning Strike"
+  }
+}

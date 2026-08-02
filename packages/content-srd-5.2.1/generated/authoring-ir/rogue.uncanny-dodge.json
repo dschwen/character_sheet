@@ -1,0 +1,53 @@
+{
+  "id": "srd521.class-feature.rogue.uncanny-dodge",
+  "kind": "class-feature",
+  "level": 5,
+  "parentId": "srd521.class.rogue",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-uncanny-dodge",
+      "parameters": {
+        "actionEconomy": "reaction",
+        "damageReductionFraction": 0.5,
+        "requirements": [
+          "visible-attacker-hit-with-attack-roll"
+        ]
+      },
+      "target": "action.uncanny-dodge",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, turn state, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0063-b004"
+      ],
+      "page": 63,
+      "quoteHash": "6b49c73703a811e20c2f1f885abfc19c2158f94d6456250cfb52ea12db01534a",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "When an attacker that you can see hits you with an attack roll, you can take a Reaction to halve the attack’s damage against you (round down)."
+      }
+    ],
+    "title": "Uncanny Dodge"
+  }
+}

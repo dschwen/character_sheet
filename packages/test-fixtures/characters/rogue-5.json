@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "fixture-rogue-5",
+  "name": "Mira",
+  "ruleset": {
+    "system": "dnd5e",
+    "edition": "2024",
+    "packages": [
+      {
+        "id": "srd-5.2.1",
+        "version": "0.1.0",
+        "sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87"
+      }
+    ]
+  },
+  "build": {
+    "levels": [
+      {
+        "characterLevel": 1,
+        "classId": "srd521.class.rogue",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 2,
+        "classId": "srd521.class.rogue",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 3,
+        "classId": "srd521.class.rogue",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 4,
+        "classId": "srd521.class.rogue",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 5,
+        "classId": "srd521.class.rogue",
+        "hitPointChoice": "fixed"
+      }
+    ],
+    "abilityScores": {
+      "strength": 10,
+      "dexterity": 15,
+      "constitution": 14,
+      "intelligence": 13,
+      "wisdom": 12,
+      "charisma": 8
+    },
+    "speciesId": "srd521.species.human",
+    "speciesSize": "medium",
+    "backgroundId": "srd521.background.soldier",
+    "backgroundAbilityScoreIncreases": {
+      "dexterity": 2,
+      "constitution": 1
+    },
+    "subclassId": "srd521.subclass.rogue.thief",
+    "featAbilityScoreIncreases": {
+      "dexterity": 2
+    },
+    "featIds": [
+      "srd521.feat.origin.savage-attacker",
+      "srd521.feat.origin.skilled",
+      "srd521.feat.general.ability-score-improvement"
+    ],
+    "proficiencyChoices": {
+      "skills": [
+        {
+          "skillId": "srd521.skill.acrobatics",
+          "sourceId": "srd521.class.rogue"
+        },
+        {
+          "skillId": "srd521.skill.investigation",
+          "sourceId": "srd521.class.rogue"
+        },
+        {
+          "skillId": "srd521.skill.sleight-of-hand",
+          "sourceId": "srd521.class.rogue"
+        },
+        {
+          "skillId": "srd521.skill.stealth",
+          "sourceId": "srd521.class.rogue"
+        },
+        {
+          "skillId": "srd521.skill.perception",
+          "sourceId": "srd521.species.human"
+        },
+        {
+          "skillId": "srd521.skill.arcana",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.insight",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.persuasion",
+          "sourceId": "srd521.feat.origin.skilled"
+        }
+      ],
+      "expertise": [
+        {
+          "skillId": "srd521.skill.sleight-of-hand",
+          "sourceId": "srd521.class-feature.rogue.expertise"
+        },
+        {
+          "skillId": "srd521.skill.stealth",
+          "sourceId": "srd521.class-feature.rogue.expertise"
+        }
+      ]
+    }
+  },
+  "loadout": {
+    "inventory": [
+      {
+        "id": "studded-leather-1",
+        "entityId": "srd521.equipment.armor.light.studded-leather-armor",
+        "quantity": 1
+      },
+      {
+        "id": "daggers-1",
+        "entityId": "srd521.equipment.weapon.dagger",
+        "quantity": 2
+      },
+      {
+        "id": "shortsword-1",
+        "entityId": "srd521.equipment.weapon.shortsword",
+        "quantity": 1
+      },
+      {
+        "id": "shortbow-1",
+        "entityId": "srd521.equipment.weapon.shortbow",
+        "quantity": 1
+      }
+    ],
+    "equippedItemIds": ["studded-leather-1", "daggers-1", "shortsword-1", "shortbow-1"],
+    "selectedWeaponMasteryIds": [
+      "srd521.equipment.weapon.dagger",
+      "srd521.equipment.weapon.shortbow"
+    ]
+  },
+  "state": {
+    "currentHitPoints": 30
+  },
+  "metadata": {
+    "createdAt": "2026-08-02T00:00:00.000Z",
+    "updatedAt": "2026-08-02T00:00:00.000Z",
+    "revision": 0
+  }
+}

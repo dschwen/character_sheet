@@ -1,0 +1,78 @@
+{
+  "id": "srd521.class-feature.rogue.cunning-action",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.rogue",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "id": "cunning-action-dash",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "grantsAction": "dash"
+      },
+      "target": "action.cunning-action.dash",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    },
+    {
+      "automationLevel": "sheet-automated",
+      "id": "cunning-action-disengage",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "grantsAction": "disengage"
+      },
+      "target": "action.cunning-action.disengage",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    },
+    {
+      "automationLevel": "sheet-automated",
+      "id": "cunning-action-hide",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "grantsAction": "hide"
+      },
+      "target": "action.cunning-action.hide",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, turn state, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0062-b006"
+      ],
+      "page": 62,
+      "quoteHash": "3f132fb477a6cc1b10327de023af74d9ffc26dd866d63141efb2b7124de41235",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Your quick thinking and agility allow you to move and act quickly. On your turn, you can take one of the following actions as a Bonus Action: Dash, Disengage, or Hide."
+      }
+    ],
+    "title": "Cunning Action"
+  }
+}

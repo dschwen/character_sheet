@@ -106,6 +106,13 @@ const classBodySchema = z
           .optional(),
         focusPoints: z.number().int().nonnegative().optional(),
         unarmoredMovement: z.number().int().nonnegative().optional(),
+        sneakAttack: z
+          .object({
+            diceCount: z.number().int().positive(),
+            diceSize: z.number().int().positive(),
+          })
+          .strict()
+          .optional(),
         features: z.array(
           z.object({
             name: z.string(),
@@ -302,6 +309,25 @@ const actionParametersSchema = z
     spends: z.number().int().positive().optional(),
     resourceId: z.string().min(1).optional(),
     spellId: z.string().min(1).optional(),
+    extraDamage: z
+      .object({
+        diceSize: z.number().int().positive(),
+        type: z.string().min(1),
+        frequency: z.string().min(1),
+      })
+      .strict()
+      .optional(),
+    requirements: z.array(z.string().min(1)).optional(),
+    setsSpeed: z.number().nonnegative().optional(),
+    sneakAttackDiceCost: z.number().int().positive().optional(),
+    savingThrow: z
+      .object({
+        ability: z.enum(abilities),
+        difficultyClassFact: z.string().min(1),
+      })
+      .strict()
+      .optional(),
+    damageReductionFraction: z.number().positive().max(1).optional(),
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     healing: z
       .union([
@@ -739,6 +765,7 @@ function validateProgressionSelections(
   const monkLevel = classLevelCounts.get("srd521.class.monk") ?? 0;
   const paladinLevel = classLevelCounts.get("srd521.class.paladin") ?? 0;
   const rangerLevel = classLevelCounts.get("srd521.class.ranger") ?? 0;
+  const rogueLevel = classLevelCounts.get("srd521.class.rogue") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -856,6 +883,22 @@ function validateProgressionSelections(
       ["build.subclassId"],
     );
   }
+  if (rogueLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "ROGUE_SUBCLASS_REQUIRED",
+      "A Rogue of level 3 or higher must select a Rogue subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (rogueLevel < 3 && subclassParentId === "srd521.class.rogue") {
+    addValidation(
+      state,
+      "ROGUE_SUBCLASS_LEVEL_REQUIRED",
+      "A Rogue subclass requires Rogue level 3.",
+      ["build.subclassId"],
+    );
+  }
   const divineOrderSelections = character.build.levels
     .flatMap((level) => level.selectedFeatureChoices)
     .filter((choice) => choice.choiceId === "srd521.choice.cleric.divine-order")
@@ -970,6 +1013,18 @@ function validateProgressionSelections(
       state,
       "RANGER_DEFT_EXPLORER_EXPERTISE_COUNT",
       "A Ranger of level 2 or higher selects one proficient skill for Deft Explorer Expertise.",
+      ["build.proficiencyChoices.expertise"],
+    );
+  }
+  const rogueExpertise = character.build.proficiencyChoices.expertise.filter(
+    (choice) => choice.sourceId === "srd521.class-feature.rogue.expertise",
+  );
+  const expectedRogueExpertise = rogueLevel >= 6 ? 4 : rogueLevel > 0 ? 2 : 0;
+  if (rogueExpertise.length !== expectedRogueExpertise) {
+    addValidation(
+      state,
+      "ROGUE_EXPERTISE_CHOICE_COUNT",
+      `A Rogue of level ${String(rogueLevel)} requires ${String(expectedRogueExpertise)} Expertise selections.`,
       ["build.proficiencyChoices.expertise"],
     );
   }
@@ -3145,6 +3200,44 @@ function evaluateConditionalRules(
       if (parameters.spellId !== undefined) {
         actionParameters.spellId = parameters.spellId;
       }
+      if (parameters.extraDamage !== undefined && rule.expression !== undefined) {
+        const damageTraceId = `${rule.target ?? rule.id}.extraDamage.diceCount`;
+        const damageTrace = evaluateExpression(
+          rule.expression,
+          damageTraceId,
+          state,
+          index,
+          granted,
+          resourceAmounts,
+        );
+        const diceCount = requireNumber(damageTrace.result as JsonScalar, damageTraceId);
+        state.traces[damageTraceId] = withRuleSource(damageTrace, ir);
+        state.facts[damageTraceId] = diceCount;
+        state.values[damageTraceId] = { value: diceCount, traceId: damageTraceId };
+        actionParameters.extraDamage = { ...parameters.extraDamage, diceCount };
+      }
+      if (parameters.requirements !== undefined) {
+        actionParameters.requirements = parameters.requirements;
+      }
+      if (parameters.setsSpeed !== undefined) {
+        actionParameters.setsSpeed = parameters.setsSpeed;
+      }
+      if (parameters.sneakAttackDiceCost !== undefined) {
+        actionParameters.sneakAttackDiceCost = parameters.sneakAttackDiceCost;
+      }
+      if (parameters.savingThrow !== undefined) {
+        const difficultyClass = requireNumber(
+          state.facts[parameters.savingThrow.difficultyClassFact] ?? null,
+          parameters.savingThrow.difficultyClassFact,
+        );
+        actionParameters.savingThrow = {
+          ability: parameters.savingThrow.ability,
+          difficultyClass,
+        };
+      }
+      if (parameters.damageReductionFraction !== undefined) {
+        actionParameters.damageReductionFraction = parameters.damageReductionFraction;
+      }
       if (parameters.variableSpend !== undefined) {
         actionParameters.variableSpend = parameters.variableSpend;
       }
@@ -3259,6 +3352,35 @@ function evaluateConditionalRules(
   }
 }
 
+function evaluateMovementRules(
+  rules: { ir: AuthoringIr; rule: DraftRule }[],
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  for (const { ir, rule } of rules) {
+    if (
+      rule.type !== "add-candidate-calculation" ||
+      rule.target?.startsWith("speed.") !== true ||
+      rule.expression === undefined
+    ) {
+      continue;
+    }
+    if (
+      rule.when !== undefined &&
+      evaluatePredicate(rule.when, `${rule.target}.applicable`, state, index, granted).result !==
+        true
+    ) {
+      continue;
+    }
+    const trace = evaluateExpression(rule.expression, rule.target, state, index, granted);
+    const value = requireNumber(trace.result as JsonScalar, rule.target);
+    state.traces[rule.target] = withRuleSource(trace, ir);
+    state.facts[rule.target] = value;
+    state.values[rule.target] = { value, traceId: rule.target };
+  }
+}
+
 function validateActiveState(character: CharacterDocument, state: EngineState): void {
   if (
     state.facts["state.rage.active"] === true &&
@@ -3330,6 +3452,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateFeatureSaveDifficultyClass(character, index, state);
   const equipment = resolveEquipment(character, index, state);
   evaluateWalkingSpeed(character, index, state);
+  evaluateMovementRules(rules, granted, index, state);
   evaluateD20Tests(character, origins, index, state, input.context, [
     ...equipment.rollEffects,
     ...ruleRollEffects(rules, state, index, granted),

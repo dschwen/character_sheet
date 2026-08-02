@@ -19,7 +19,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(312);
+    expect(parsedEntities).toHaveLength(341);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -33,6 +33,10 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.subclass.ranger.hunter");
     expect(entityIds).toContain("srd521.option.ranger.hunters-prey.colossus-slayer");
     expect(entityIds).toContain("srd521.spell.hunter-s-mark");
+    expect(entityIds).toContain("srd521.class.rogue");
+    expect(entityIds).toContain("srd521.subclass.rogue.thief");
+    expect(entityIds).toContain("srd521.table.rogue.sneak-attack-dice");
+    expect(entityIds).toContain("srd521.option.rogue.cunning-strike.withdraw");
     expect(entityIds).toContain("srd521.class-feature.barbarian.improved-brutal-strike.level-17");
     expect(entityIds).toContain("srd521.table.barbarian.rages");
     expect(entityIds).toContain("srd521.table.barbarian.rage-damage");

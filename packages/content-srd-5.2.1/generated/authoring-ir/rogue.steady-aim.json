@@ -1,0 +1,54 @@
+{
+  "id": "srd521.class-feature.rogue.steady-aim",
+  "kind": "class-feature",
+  "level": 3,
+  "parentId": "srd521.class.rogue",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-steady-aim",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "grantsAction": "advantage-on-next-attack",
+        "requirements": [
+          "has-not-moved-this-turn"
+        ],
+        "setsSpeed": 0
+      },
+      "target": "action.steady-aim",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, turn state, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0062-b008"
+      ],
+      "page": 62,
+      "quoteHash": "cdfab49d3f9912d7eb966561a3719b9f36bf125f54462dbbf8ce5b51c00769fd",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn. You can use this feature only if you haven’t moved during this turn, and after you use it, your Speed is 0 until the end of the current turn."
+      }
+    ],
+    "title": "Steady Aim"
+  }
+}

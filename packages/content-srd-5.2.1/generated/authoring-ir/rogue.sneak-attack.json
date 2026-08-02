@@ -1,0 +1,78 @@
+{
+  "id": "srd521.class-feature.rogue.sneak-attack",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.rogue",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.rogue"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.rogue.sneak-attack-dice"
+      },
+      "id": "use-sneak-attack",
+      "parameters": {
+        "actionEconomy": "on-hit",
+        "extraDamage": {
+          "diceSize": 6,
+          "frequency": "once-per-turn",
+          "type": "weapon-damage-type"
+        },
+        "requirements": [
+          "finesse-or-ranged-weapon",
+          "advantage-or-adjacent-ally"
+        ]
+      },
+      "target": "action.sneak-attack",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, turn state, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0061-b027"
+      ],
+      "page": 61,
+      "quoteHash": "8ae5529b71986a052ce1f411bfee78175eb09f69ef7550e1b59156499dce9af0",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0062-b002"
+      ],
+      "page": 62,
+      "quoteHash": "57a081b4b1d6a352eca460dd26eb73ebf7637794e7a477b33b7446c86ced91da",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You know how to strike subtly and exploit a foe’s distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "roll if you have Advantage on the roll and the attack uses a Finesse or a Ranged weapon. The extra damage’s type is the same as the weapon’s type. You don’t need Advantage on the attack roll if at least one of your allies is within 5 feet of the target, the ally doesn’t have the Incapacitated condition, and you don’t have Disadvantage on the attack roll. The extra damage increases as you gain Rogue levels, as shown in the Sneak Attack column of the Rogue Features table."
+      }
+    ],
+    "title": "Sneak Attack"
+  }
+}
