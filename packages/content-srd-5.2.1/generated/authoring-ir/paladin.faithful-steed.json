@@ -1,0 +1,69 @@
+{
+  "id": "srd521.class-feature.paladin.faithful-steed",
+  "kind": "class-feature",
+  "level": 5,
+  "parentId": "srd521.class.paladin",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 1
+      },
+      "id": "free-find-steed-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.paladin.free-find-steed",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-free-find-steed",
+      "parameters": {
+        "actionEconomy": "magic-action",
+        "resourceId": "srd521.resource.paladin.free-find-steed",
+        "spends": 1
+      },
+      "target": "action.free-find-steed",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.paladin.free-find-steed"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, attack triggers, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0055-b006"
+      ],
+      "page": 55,
+      "quoteHash": "deadbc509ad3754d625f165893889c88de5b2095f4bcbdcb3e7b970ca363da69",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can call on the aid of an otherworldly steed. You always have the Find Steed spell prepared. You can also cast the spell once without expending a spell slot, and you regain the ability to do so when you finish a Long Rest."
+      }
+    ],
+    "title": "Faithful Steed"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "id": "srd521.class-feature.paladin.lay-on-hands",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.paladin",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.paladin"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.paladin.lay-on-hands"
+      },
+      "id": "lay-on-hands-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.paladin.lay-on-hands",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "use-lay-on-hands",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "healing": {
+          "perResourcePoint": 1
+        },
+        "resourceId": "srd521.resource.paladin.lay-on-hands",
+        "variableSpend": {
+          "minimum": 1
+        }
+      },
+      "target": "action.lay-on-hands",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.paladin.lay-on-hands"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, attack triggers, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0053-b017"
+      ],
+      "page": 53,
+      "quoteHash": "097593e084817daec7a731639b2c949366320cc4a2771e7ef0e5a6831da8679d",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0054-b005"
+      ],
+      "page": 54,
+      "quoteHash": "3cf0a7bdaa0c0d670072ac4c55d0cee554f3af5a95bcee24ce3fb984c1aa30ab",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Your blessed touch can heal wounds. You have a pool of healing power that replenishes when you finish a Long Rest. With that pool, you can restore a total number of Hit Points equal to five times your Paladin level."
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "As a Bonus Action, you can touch a creature (which could be yourself) and draw power from the pool of healing to restore a number of Hit Points to that creature, up to the maximum amount remaining in the pool. You can also expend 5 Hit Points from the pool of healing power to remove the Poisoned condition from the creature; those points don’t also restore Hit Points to the creature."
+      }
+    ],
+    "title": "Lay On Hands"
+  }
+}

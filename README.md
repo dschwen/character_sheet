@@ -16,6 +16,7 @@ corepack pnpm character packages/test-fixtures/characters/fighter-5.json
 corepack pnpm character packages/test-fixtures/characters/cleric-5.json
 corepack pnpm character packages/test-fixtures/characters/druid-5.json
 corepack pnpm character packages/test-fixtures/characters/monk-5.json
+corepack pnpm character packages/test-fixtures/characters/paladin-5.json
 corepack pnpm character packages/test-fixtures/characters/wizard-5.json
 ```
 
@@ -198,6 +199,25 @@ The Monk parser validates all 20 progression rows, captures Martial Arts, Focus 
 Unarmored Movement scaling, extracts the Warrior of the Open Hand, and generates source-linked
 authoring IR for the supported level-1–5 resource, defense, attack, and action mechanics.
 
+Generate Paladin content from pages 53–57 using the shared spell-description extraction:
+
+```bash
+.venv/bin/python -m srd_extract.pipeline \
+  --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
+  --out generated/extraction/srd-5.2.1-paladin \
+  --pages 53-57 \
+  --overlays
+
+.venv/bin/python -m srd_extract.paladin \
+  --class-extraction generated/extraction/srd-5.2.1-paladin \
+  --spell-extraction generated/extraction/srd-5.2.1-spells \
+  --output packages/content-srd-5.2.1/generated
+```
+
+The Paladin parser validates all 20 progression rows, the 38-entry class spell list, Lay On Hands
+and Channel Divinity scaling, the Oath of Devotion and its always-prepared spells, and five
+source-linked representative sacred spells.
+
 Generate the Human and Soldier origin slice from pages 83, 86, and 87:
 
 ```bash
@@ -228,15 +248,15 @@ Generate the structured weapon and armor entities from SRD pages 91–92:
   --output packages/content-srd-5.2.1/generated
 ```
 
-The rules kernel evaluates reviewed level-1 Barbarian and level-5 Fighter, Cleric, Druid, Monk, and
-Wizard fixtures in its integration suite. Results include origin and feat ability increases,
-subclass features, species size and speed, typed skill and saving-throw proficiencies, d20-test roll
-states, Initiative, Passive Perception, inventory, armor and Shield candidates, weapon and Martial
-Arts attacks and damage, spellbook and full-list preparation models, class- and subclass-granted
-always-prepared spells, selectable Circle of the Land spells, spell slots, spell attacks and save
-DC, Weapon Mastery metadata, attacks per Attack action, critical-hit thresholds, Hit Points,
-feature resources, conditional actions, resistances, validations, coverage warnings, and
-calculation traces.
+The rules kernel evaluates reviewed level-1 Barbarian and level-5 Fighter, Cleric, Druid, Monk,
+Paladin, and Wizard fixtures in its integration suite. Results include origin and feat ability
+increases, subclass features, species size and speed, typed skill and saving-throw proficiencies,
+d20-test roll states, Initiative, Passive Perception, inventory, armor and Shield candidates,
+weapon and Martial Arts attacks and damage, spellbook and full-list preparation models, class- and
+subclass-granted always-prepared spells, selectable Circle of the Land spells, spell slots, spell
+attacks and save DC, Weapon Mastery metadata, attacks per Attack action, critical-hit thresholds,
+Hit Points, feature resources, variable resource spending, conditional actions, resistances,
+validations, coverage warnings, and calculation traces.
 
 The rules kernel also exposes atomic Short Rest, Long Rest, action-use, and spell-cast proposals.
 Transition processing validates explicit dice results and available spell slots, previews

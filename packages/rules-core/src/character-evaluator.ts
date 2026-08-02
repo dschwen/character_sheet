@@ -301,13 +301,18 @@ const actionParametersSchema = z
     actionEconomy: z.string().optional(),
     spends: z.number().int().positive().optional(),
     resourceId: z.string().min(1).optional(),
+    variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     healing: z
-      .object({
-        diceCount: z.number().int().positive(),
-        diceSize: z.number().int().positive(),
-        bonusFact: z.string().min(1),
-      })
-      .strict()
+      .union([
+        z
+          .object({
+            diceCount: z.number().int().positive(),
+            diceSize: z.number().int().positive(),
+            bonusFact: z.string().min(1),
+          })
+          .strict(),
+        z.object({ perResourcePoint: z.number().positive() }).strict(),
+      ])
       .optional(),
     damageReroll: z
       .object({
@@ -731,6 +736,7 @@ function validateProgressionSelections(
   const clericLevel = classLevelCounts.get("srd521.class.cleric") ?? 0;
   const druidLevel = classLevelCounts.get("srd521.class.druid") ?? 0;
   const monkLevel = classLevelCounts.get("srd521.class.monk") ?? 0;
+  const paladinLevel = classLevelCounts.get("srd521.class.paladin") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -815,6 +821,22 @@ function validateProgressionSelections(
     addValidation(state, "MONK_SUBCLASS_LEVEL_REQUIRED", "A Monk subclass requires Monk level 3.", [
       "build.subclassId",
     ]);
+  }
+  if (paladinLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "PALADIN_SUBCLASS_REQUIRED",
+      "A Paladin of level 3 or higher must select a Paladin subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (paladinLevel < 3 && subclassParentId === "srd521.class.paladin") {
+    addValidation(
+      state,
+      "PALADIN_SUBCLASS_LEVEL_REQUIRED",
+      "A Paladin subclass requires Paladin level 3.",
+      ["build.subclassId"],
+    );
   }
   const divineOrderSelections = character.build.levels
     .flatMap((level) => level.selectedFeatureChoices)
@@ -3052,6 +3074,9 @@ function evaluateConditionalRules(
       }
       if (parameters.resourceId !== undefined) {
         actionParameters.resourceId = parameters.resourceId;
+      }
+      if (parameters.variableSpend !== undefined) {
+        actionParameters.variableSpend = parameters.variableSpend;
       }
       if (parameters.healing !== undefined) {
         actionParameters.healing = parameters.healing;

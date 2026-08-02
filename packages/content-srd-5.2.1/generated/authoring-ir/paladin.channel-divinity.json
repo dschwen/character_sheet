@@ -1,0 +1,95 @@
+{
+  "id": "srd521.class-feature.paladin.channel-divinity",
+  "kind": "class-feature",
+  "level": 3,
+  "parentId": "srd521.class.paladin",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.paladin"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.paladin.channel-divinity"
+      },
+      "id": "channel-divinity-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": 1,
+            "event": "short-rest"
+          },
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.paladin.channel-divinity",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-divine-sense",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "resourceId": "srd521.resource.paladin.channel-divinity",
+        "spends": 1
+      },
+      "target": "action.divine-sense",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.paladin.channel-divinity"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, attack triggers, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0054-b011",
+        "p0054-b003",
+        "p0054-b004"
+      ],
+      "page": 54,
+      "quoteHash": "facbcda8f70409aa66a5f6a2a3c7f6a98e89d4ddefaeafdb9db821d9589a2abd",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0055-b002"
+      ],
+      "page": 55,
+      "quoteHash": "e4ca282ae0f7f2b26dfe7cbb6d9972342d0290e2d8423d0e4c42e6233a937753",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can channel divine energy directly from the Outer Planes, using it to fuel magical effects. You start with one such effect: Divine Sense, which is described below. Other Paladin features give additional Channel Divinity effect options. Each time you use this class’s Channel Divinity, you choose which effect from this class to create. You can use this class’s Channel Divinity twice. You regain one of its expended uses when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. You gain an additional use when you reach Paladin level 11."
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "A Paladin tries to hold to the highest standards of conduct, but even the most dedicated are fallible. Sometimes a Paladin transgresses their oath. A Paladin who has broken a vow typically seeks absolution, spending an all-night vigil as a sign of penitence or undertaking a fast. After a rite of forgiveness, the Paladin starts fresh. If your Paladin unrepentantly violates their oath, talk to your GM. Your Paladin should probably take a more appropriate subclass or even abandon the class and adopt another one."
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "If a Channel Divinity effect requires a saving throw, the DC equals the spell save DC from this class’s Spellcasting feature. Divine Sense. As a Bonus Action, you can open your awareness to detect Celestials, Fiends, and Undead. For the next 10 minutes or until you have the Incapacitated condition, you know the location of any creature of those types within 60 feet of yourself, and you know its creature type. Within the same radius, you also detect the presence of any place or object that has been consecrated or desecrated, as with the Hallow spell."
+      }
+    ],
+    "title": "Channel Divinity"
+  }
+}

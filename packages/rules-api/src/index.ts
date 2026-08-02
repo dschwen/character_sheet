@@ -218,6 +218,7 @@ export interface StateTransitionProposal {
 export interface ActionUseRequest {
   actionId: string;
   rolls?: number[];
+  amount?: number;
 }
 
 export interface ActionTransitionProposal {

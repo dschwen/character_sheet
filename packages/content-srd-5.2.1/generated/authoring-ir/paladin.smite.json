@@ -1,0 +1,69 @@
+{
+  "id": "srd521.class-feature.paladin.paladin-s-smite",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.paladin",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 1
+      },
+      "id": "free-divine-smite-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.paladin.free-divine-smite",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-free-divine-smite",
+      "parameters": {
+        "actionEconomy": "on-hit",
+        "resourceId": "srd521.resource.paladin.free-divine-smite",
+        "spends": 1
+      },
+      "target": "action.free-divine-smite",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.paladin.free-divine-smite"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, attack triggers, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0054-b010"
+      ],
+      "page": 54,
+      "quoteHash": "548799c8c3d9594584e48f0fe7c7f15a89d310e199c15de2a02166814d8750c8",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You always have the Divine Smite spell prepared. In addition, you can cast it without expending a spell slot, but you must finish a Long Rest before you can cast it in this way again."
+      }
+    ],
+    "title": "Paladin’s Smite"
+  }
+}

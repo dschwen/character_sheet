@@ -19,7 +19,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(249);
+    expect(parsedEntities).toHaveLength(280);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -27,6 +27,8 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.subclass.druid.circle-of-the-land");
     expect(entityIds).toContain("srd521.class.monk");
     expect(entityIds).toContain("srd521.subclass.monk.warrior-of-the-open-hand");
+    expect(entityIds).toContain("srd521.class.paladin");
+    expect(entityIds).toContain("srd521.subclass.paladin.oath-of-devotion");
     expect(entityIds).toContain("srd521.class-feature.barbarian.improved-brutal-strike.level-17");
     expect(entityIds).toContain("srd521.table.barbarian.rages");
     expect(entityIds).toContain("srd521.table.barbarian.rage-damage");

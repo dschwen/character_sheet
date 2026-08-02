@@ -1,0 +1,51 @@
+{
+  "id": "srd521.subclass-feature.paladin.oath-of-devotion.sacred-weapon",
+  "kind": "subclass-feature",
+  "level": 3,
+  "parentId": "srd521.subclass.paladin.oath-of-devotion",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-sacred-weapon",
+      "parameters": {
+        "actionEconomy": "part-of-attack-action",
+        "resourceId": "srd521.resource.paladin.channel-divinity",
+        "spends": 1
+      },
+      "target": "action.sacred-weapon",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.paladin.channel-divinity"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, attack triggers, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0056-b055"
+      ],
+      "page": 56,
+      "quoteHash": "dcb971e62cd3f67f4f647152ed922a540f885f5e4db139e2171937c96e06b942",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "When you take the Attack action, you can expend one use of your Channel Divinity to imbue one Melee weapon that you are holding with positive energy. For 10 minutes or until you use this feature again, you add your Charisma modifier to attack rolls you make with that weapon (minimum bonus of +1), and each time you hit with it, you cause it to deal its normal damage type or Radiant damage. The weapon also emits Bright Light in a 20-foot radius and Dim Light 20 feet beyond that. You can end this effect early (no action required). This effect also ends if you aren’t carrying the weapon."
+      }
+    ],
+    "title": "Sacred Weapon"
+  }
+}

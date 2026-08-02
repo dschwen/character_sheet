@@ -16,23 +16,32 @@ const actionUseRequestSchema = z
   .object({
     actionId: z.string().min(1),
     rolls: z.array(z.number().int().positive()).default([]),
+    amount: z.number().int().positive().optional(),
   })
   .strict();
 
 const stateActionParametersSchema = z
   .object({
-    spends: z.number().int().positive(),
+    spends: z.number().int().positive().optional(),
+    variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     resourceId: z.string().min(1),
     healing: z
-      .object({
-        diceCount: z.number().int().positive(),
-        diceSize: z.number().int().positive(),
-        bonusFact: z.string().min(1),
-      })
-      .strict()
+      .union([
+        z
+          .object({
+            diceCount: z.number().int().positive(),
+            diceSize: z.number().int().positive(),
+            bonusFact: z.string().min(1),
+          })
+          .strict(),
+        z.object({ perResourcePoint: z.number().positive() }).strict(),
+      ])
       .optional(),
   })
-  .passthrough();
+  .passthrough()
+  .refine(
+    (parameters) => (parameters.spends === undefined) !== (parameters.variableSpend === undefined),
+  );
 
 function cloneState(state: CharacterState): CharacterState {
   return {
@@ -129,30 +138,55 @@ export function proposeAction(
   }
   if (parsedParameters.success) {
     const healing = parsedParameters.data.healing;
-    if (healing === undefined && request.rolls.length > 0) {
+    const diceHealing = healing !== undefined && "diceCount" in healing ? healing : undefined;
+    if (diceHealing === undefined && request.rolls.length > 0) {
       addValidation(
         validations,
         "ACTION_ROLLS_NOT_EXPECTED",
         `${request.actionId} does not accept dice rolls.`,
         ["request.rolls"],
       );
-    } else if (healing !== undefined && request.rolls.length !== healing.diceCount) {
+    } else if (diceHealing !== undefined && request.rolls.length !== diceHealing.diceCount) {
       addValidation(
         validations,
         "ACTION_ROLL_COUNT_INVALID",
-        `${request.actionId} requires ${String(healing.diceCount)} d${String(healing.diceSize)} roll.`,
+        `${request.actionId} requires ${String(diceHealing.diceCount)} d${String(diceHealing.diceSize)} roll.`,
         ["request.rolls"],
       );
     }
     for (const [index, roll] of request.rolls.entries()) {
-      if (healing !== undefined && roll > healing.diceSize) {
+      if (diceHealing !== undefined && roll > diceHealing.diceSize) {
         addValidation(
           validations,
           "ACTION_ROLL_OUT_OF_RANGE",
-          `A d${String(healing.diceSize)} roll cannot be ${String(roll)}.`,
+          `A d${String(diceHealing.diceSize)} roll cannot be ${String(roll)}.`,
           [`request.rolls.${String(index)}`],
         );
       }
+    }
+    if (parsedParameters.data.variableSpend !== undefined) {
+      if (request.amount === undefined) {
+        addValidation(
+          validations,
+          "ACTION_SPEND_AMOUNT_REQUIRED",
+          `${request.actionId} requires an amount to spend.`,
+          ["request.amount"],
+        );
+      } else if (request.amount < parsedParameters.data.variableSpend.minimum) {
+        addValidation(
+          validations,
+          "ACTION_SPEND_AMOUNT_BELOW_MINIMUM",
+          `${request.actionId} must spend at least ${String(parsedParameters.data.variableSpend.minimum)}.`,
+          ["request.amount"],
+        );
+      }
+    } else if (request.amount !== undefined) {
+      addValidation(
+        validations,
+        "ACTION_SPEND_AMOUNT_NOT_EXPECTED",
+        `${request.actionId} does not accept a variable spend amount.`,
+        ["request.amount"],
+      );
     }
   }
   if (
@@ -172,14 +206,21 @@ export function proposeAction(
   }
 
   const parameters = parsedParameters.data;
+  const spend = parameters.variableSpend === undefined ? parameters.spends : request.amount;
+  if (spend === undefined) {
+    throw new TypeError("Validated action spend amount is missing");
+  }
   const resource = evaluation.resources.find((candidate) => candidate.id === parameters.resourceId);
-  const bonus =
-    parameters.healing === undefined ? undefined : evaluation.facts[parameters.healing.bonusFact];
+  const diceHealing =
+    parameters.healing !== undefined && "diceCount" in parameters.healing
+      ? parameters.healing
+      : undefined;
+  const bonus = diceHealing === undefined ? undefined : evaluation.facts[diceHealing.bonusFact];
   const maximumHitPoints =
     parameters.healing === undefined ? undefined : evaluation.values["hitPoints.maximum"]?.value;
   if (
     resource === undefined ||
-    (parameters.healing !== undefined &&
+    (diceHealing !== undefined &&
       (typeof bonus !== "number" || typeof maximumHitPoints !== "number"))
   ) {
     addValidation(
@@ -198,18 +239,40 @@ export function proposeAction(
       traces: {},
     };
   }
+  if (resource.current < spend) {
+    addValidation(
+      validations,
+      "ACTION_RESOURCE_AMOUNT_INSUFFICIENT",
+      `${request.actionId} cannot spend ${String(spend)}; only ${String(resource.current)} remain.`,
+      ["request.amount"],
+    );
+    return {
+      kind: "action",
+      actionId: request.actionId,
+      applicable: false,
+      changes: [],
+      nextState: originalState,
+      validations,
+      traces: {},
+    };
+  }
 
   const nextState = cloneState(character.state);
   const changes: StateChange[] = [];
   const traces: Record<string, CalculationTrace> = {};
   const sourceTrace = evaluation.traces[action.traceId];
   let healedHitPoints = character.state.currentHitPoints;
-  if (
-    parameters.healing !== undefined &&
-    typeof bonus === "number" &&
-    typeof maximumHitPoints === "number"
-  ) {
-    const healing = request.rolls.reduce((total, roll) => total + roll, 0) + bonus;
+  if (parameters.healing !== undefined && typeof maximumHitPoints === "number") {
+    const perResourcePoint =
+      "perResourcePoint" in parameters.healing ? parameters.healing.perResourcePoint : undefined;
+    if (perResourcePoint !== undefined && typeof perResourcePoint !== "number") {
+      throw new TypeError("Action healing per resource point must be numeric");
+    }
+    const healing =
+      perResourcePoint === undefined
+        ? request.rolls.reduce((total, roll) => total + roll, 0) +
+          (typeof bonus === "number" ? bonus : 0)
+        : spend * perResourcePoint;
     healedHitPoints = Math.min(
       maximumHitPoints,
       character.state.currentHitPoints + Math.max(0, healing),
@@ -223,12 +286,18 @@ export function proposeAction(
       healedHitPoints,
       `${request.actionId} restores Hit Points.`,
       "apply-action-healing",
-      [character.state.currentHitPoints, ...request.rolls, bonus, maximumHitPoints],
+      [
+        character.state.currentHitPoints,
+        ...request.rolls,
+        ...(typeof bonus === "number" ? [bonus] : []),
+        ...(typeof perResourcePoint === "number" ? [spend, perResourcePoint] : []),
+        maximumHitPoints,
+      ],
       sourceTrace,
     );
   }
   const expendedBefore = character.state.expendedResources[parameters.resourceId] ?? 0;
-  const expendedAfter = Math.min(resource.maximum, expendedBefore + parameters.spends);
+  const expendedAfter = expendedBefore + spend;
   nextState.expendedResources[parameters.resourceId] = expendedAfter;
   recordChange(
     changes,
@@ -236,9 +305,9 @@ export function proposeAction(
     `state.expendedResources.${parameters.resourceId}`,
     expendedBefore,
     expendedAfter,
-    `${request.actionId} expends ${String(parameters.spends)} use.`,
+    `${request.actionId} expends ${String(spend)} use.`,
     "spend-action-resource",
-    [expendedBefore, parameters.spends, resource.maximum],
+    [expendedBefore, spend, resource.maximum],
     sourceTrace,
   );
   if (healedHitPoints > character.state.currentHitPoints) {
