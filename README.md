@@ -16,7 +16,9 @@ corepack pnpm web
 
 Open `http://localhost:3000`. The app includes all reviewed character fixtures and lets you switch
 between them, inspect overview/combat/spell/feature views, open the calculation trace behind a
-derived value, and import or export the canonical character JSON. The Play view tracks damage,
+derived value, and import or export the canonical character JSON. Click an ability, skill,
+Initiative, attack, or spell-attack value to roll it; Shift-click a derived value to inspect its
+calculation instead. The Play view tracks damage,
 healing, Temporary Hit Points, Heroic Inspiration, Exhaustion, Concentration, rests, modeled feature
 uses, and spell-slot expenditure. Every change advances the document revision, persists locally,
 and can be undone once. Imported characters stay in the browser's local storage; the app has no

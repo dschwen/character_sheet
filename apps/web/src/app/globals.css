@@ -169,6 +169,71 @@ a:focus-visible {
   cursor: pointer;
   font-size: 20px;
 }
+.dice-result {
+  position: fixed;
+  z-index: 20;
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  grid-template-columns: 54px minmax(180px, 1fr) 24px;
+  gap: 12px;
+  align-items: center;
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px;
+  color: white;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 12px;
+  background: #173c32;
+  box-shadow: 0 16px 42px rgb(15 30 24 / 28%);
+}
+.dice-result > div:nth-child(2) {
+  display: grid;
+  gap: 3px;
+}
+.dice-result span,
+.dice-result small {
+  color: rgb(255 255 255 / 65%);
+  font-size: 10px;
+}
+.dice-result span {
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.dice-result strong {
+  font:
+    700 22px/1.2 Georgia,
+    serif;
+}
+.dice-result > button {
+  align-self: start;
+  padding: 0;
+  color: rgb(255 255 255 / 65%);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+}
+.dice-face {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  color: #173c32;
+  background: var(--gold-pale);
+  clip-path: polygon(50% 0, 96% 28%, 82% 87%, 50% 100%, 18% 87%, 4% 28%);
+  font:
+    800 20px/1 Georgia,
+    serif;
+}
+.dice-face.critical {
+  color: white;
+  background: #d6a955;
+}
+.dice-face.fumble {
+  color: white;
+  background: var(--red);
+}
 
 .character-hero {
   position: relative;
@@ -319,6 +384,12 @@ button.vital-card:hover {
 .tabs button.active {
   border-bottom-color: var(--green);
   color: var(--green);
+}
+.interaction-hint {
+  margin: -12px 0 18px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
 }
 .count {
   display: grid;
@@ -1690,6 +1761,10 @@ td:first-child small {
   }
 }
 @media (max-width: 760px) {
+  .dice-result {
+    right: 16px;
+    bottom: 16px;
+  }
   .app-header {
     position: static;
     align-items: flex-start;

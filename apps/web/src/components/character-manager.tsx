@@ -41,6 +41,7 @@ import {
   setHeroicInspiration,
   setTemporaryHitPoints,
 } from "../lib/play-state";
+import { rollD20, type D20RollRequest, type D20RollResult } from "../lib/dice-roll";
 
 const storageKey = "dnd-character-manager.document.v1";
 const tabs = ["overview", "play", "combat", "spells", "features", "diagnostics"] as const;
@@ -124,22 +125,39 @@ function Section({
 function TraceButton({
   traceId,
   onSelect,
+  roll,
+  onRoll,
+  inspectOnClick = false,
   className,
   children,
 }: Readonly<{
   traceId: string;
   onSelect: (traceId: string) => void;
+  roll?: D20RollRequest;
+  onRoll?: (request: D20RollRequest) => void;
+  inspectOnClick?: boolean;
   className?: string;
   children: React.ReactNode;
 }>) {
+  const canRoll = roll !== undefined && onRoll !== undefined;
   return (
     <button
       className={className ?? "trace-button"}
       type="button"
-      onClick={() => {
-        onSelect(traceId);
+      onClick={(event) => {
+        if (event.shiftKey || inspectOnClick) {
+          onSelect(traceId);
+        } else if (canRoll) {
+          onRoll(roll);
+        }
       }}
-      title="Inspect calculation"
+      title={
+        canRoll
+          ? "Click to roll · Shift-click to inspect calculation"
+          : inspectOnClick
+            ? "Inspect calculation"
+            : "Shift-click to inspect calculation"
+      }
     >
       {children}
     </button>
@@ -162,6 +180,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
+  const [latestRoll, setLatestRoll] = useState<D20RollResult>();
   const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -200,6 +219,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const evaluation = result.evaluation;
   const statefulActions = evaluation?.actions.filter(supportsStateTransition) ?? [];
   const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
+
+  function performRoll(request: D20RollRequest): void {
+    setLatestRoll(rollD20(request));
+  }
 
   function selectFixture(filename: string): void {
     const fixture = fixtures.find((option) => option.filename === filename);
@@ -469,6 +492,40 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           </div>
         )}
 
+        {latestRoll === undefined ? null : (
+          <div className="dice-result" role="status" aria-live="polite">
+            <div
+              className={`dice-face${latestRoll.kept === 20 ? " critical" : ""}${latestRoll.kept === 1 ? " fumble" : ""}`}
+              aria-label={`Kept die ${String(latestRoll.kept)}`}
+            >
+              {String(latestRoll.kept)}
+            </div>
+            <div>
+              <span>
+                {latestRoll.label} · {titleCase(latestRoll.mode)}
+              </span>
+              <strong>
+                {String(latestRoll.kept)} {latestRoll.modifier >= 0 ? "+" : "−"}{" "}
+                {String(Math.abs(latestRoll.modifier))} = {String(latestRoll.total)}
+              </strong>
+              <small>
+                {latestRoll.dice.length === 1
+                  ? "1d20"
+                  : `2d20 rolled: ${latestRoll.dice.map(String).join(", ")}`}
+              </small>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setLatestRoll(undefined);
+              }}
+              aria-label="Dismiss dice result"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {evaluation === undefined ? (
           <section className="fatal-error">
             <p>Character evaluation failed</p>
@@ -504,7 +561,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 >
                   <span>Armor class</span>
                   <strong>{numericFactText(evaluation, "armorClass")}</strong>
-                  <small>view calculation</small>
+                  <small>shift-click to inspect</small>
                 </TraceButton>
                 <div className="vital-card hp-card">
                   <span>Hit points</span>
@@ -524,10 +581,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   className="vital-card"
                   traceId="initiative"
                   onSelect={setSelectedTraceId}
+                  roll={{
+                    label: "Initiative",
+                    modifier: numericFact(evaluation, "initiative"),
+                    mode: evaluation.d20Tests.initiative?.rollMode ?? "normal",
+                  }}
+                  onRoll={performRoll}
                 >
                   <span>Initiative</span>
                   <strong>{signed(numericFact(evaluation, "initiative"))}</strong>
-                  <small>view calculation</small>
+                  <small>click to roll</small>
                 </TraceButton>
                 <TraceButton
                   className="vital-card"
@@ -539,7 +602,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     {numericFactText(evaluation, "speed.walking")}
                     <small> ft.</small>
                   </strong>
-                  <small>view calculation</small>
+                  <small>shift-click to inspect</small>
                 </TraceButton>
               </div>
             </section>
@@ -561,6 +624,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 </button>
               ))}
             </nav>
+
+            <p className="interaction-hint">
+              Click rollable values to roll · Shift-click derived values to inspect their
+              calculation
+            </p>
 
             {tab === "play" ? (
               <div className="sheet-grid play-grid">
@@ -896,6 +964,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           className="ability-card"
                           traceId={`ability.${ability}.modifier`}
                           onSelect={setSelectedTraceId}
+                          roll={{
+                            label: `${titleCase(ability)} check`,
+                            modifier,
+                            mode: "normal",
+                          }}
+                          onRoll={performRoll}
                         >
                           <span>{ability.slice(0, 3).toUpperCase()}</span>
                           <strong>{signed(modifier)}</strong>
@@ -920,6 +994,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           key={skill.id}
                           traceId={skill.traceId}
                           onSelect={setSelectedTraceId}
+                          roll={{
+                            label: titleCase(skill.id.replace("skill.", "")),
+                            modifier: skill.modifier,
+                            mode: skill.rollMode,
+                          }}
+                          onRoll={performRoll}
                         >
                           <i className={`prof-dot ${skill.proficiency.level}`} aria-hidden="true" />
                           <span>{titleCase(skill.id.replace("skill.", ""))}</span>
@@ -985,7 +1065,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           {evaluation.attacks.map((attack) => (
                             <tr key={attack.id}>
                               <td>
-                                <TraceButton traceId={attack.traceId} onSelect={setSelectedTraceId}>
+                                <TraceButton
+                                  traceId={attack.traceId}
+                                  onSelect={setSelectedTraceId}
+                                  roll={{
+                                    label: `${attack.name} attack`,
+                                    modifier: attack.attackBonus,
+                                    mode: "normal",
+                                  }}
+                                  onRoll={performRoll}
+                                >
                                   {attack.name}
                                 </TraceButton>
                                 <small>
@@ -1052,6 +1141,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         <TraceButton
                           traceId={evaluation.spellcasting.attackTraceId}
                           onSelect={setSelectedTraceId}
+                          roll={{
+                            label: "Spell attack",
+                            modifier: evaluation.spellcasting.attackBonus,
+                            mode: "normal",
+                          }}
+                          onRoll={performRoll}
                         >
                           <span>Spell attack</span>
                           <strong>{signed(evaluation.spellcasting.attackBonus)}</strong>
@@ -1247,7 +1342,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     {Object.keys(evaluation.traces)
                       .sort()
                       .map((traceId) => (
-                        <TraceButton key={traceId} traceId={traceId} onSelect={setSelectedTraceId}>
+                        <TraceButton
+                          key={traceId}
+                          traceId={traceId}
+                          onSelect={setSelectedTraceId}
+                          inspectOnClick
+                        >
                           {traceLabel(traceId)}
                         </TraceButton>
                       ))}
