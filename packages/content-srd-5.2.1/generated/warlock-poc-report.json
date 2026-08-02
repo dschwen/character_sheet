@@ -1,0 +1,338 @@
+{
+  "authoringIr": [
+    "warlock.magical-cunning.json"
+  ],
+  "classId": "srd521.class.warlock",
+  "coreTraits": {
+    "armorTraining": [
+      "light"
+    ],
+    "hitPointDie": 8,
+    "primaryAbilities": [
+      "charisma"
+    ],
+    "savingThrowProficiencies": [
+      "wisdom",
+      "charisma"
+    ],
+    "skillProficiencyChoice": {
+      "maximum": 2,
+      "minimum": 2,
+      "options": [
+        "arcana",
+        "deception",
+        "history",
+        "intimidation",
+        "investigation",
+        "nature",
+        "religion"
+      ]
+    },
+    "startingEquipmentText": "Choose A or B: (A) Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar’s Pack, and 15 GP; or (B) 100 GP",
+    "weaponProficiencies": [
+      "simple"
+    ]
+  },
+  "eldritchInvocations": 28,
+  "extractedClassFeatures": 9,
+  "extractedFiendFeatures": 5,
+  "generatedEntities": [
+    "srd521.class.warlock",
+    "srd521.class-feature.warlock.eldritch-invocations",
+    "srd521.class-feature.warlock.pact-magic",
+    "srd521.class-feature.warlock.magical-cunning",
+    "srd521.class-feature.warlock.warlock-subclass",
+    "srd521.class-feature.warlock.ability-score-improvement",
+    "srd521.class-feature.warlock.contact-patron",
+    "srd521.class-feature.warlock.mystic-arcanum",
+    "srd521.class-feature.warlock.epic-boon",
+    "srd521.class-feature.warlock.eldritch-master",
+    "srd521.option.warlock.invocation.agonizing-blast",
+    "srd521.option.warlock.invocation.armor-of-shadows",
+    "srd521.option.warlock.invocation.ascendant-step",
+    "srd521.option.warlock.invocation.devil-s-sight",
+    "srd521.option.warlock.invocation.devouring-blade",
+    "srd521.option.warlock.invocation.eldritch-mind",
+    "srd521.option.warlock.invocation.eldritch-smite",
+    "srd521.option.warlock.invocation.eldritch-spear",
+    "srd521.option.warlock.invocation.fiendish-vigor",
+    "srd521.option.warlock.invocation.gaze-of-two-minds",
+    "srd521.option.warlock.invocation.gift-of-the-depths",
+    "srd521.option.warlock.invocation.gift-of-the-protectors",
+    "srd521.option.warlock.invocation.investment-of-the-chain-master",
+    "srd521.option.warlock.invocation.lessons-of-the-first-ones",
+    "srd521.option.warlock.invocation.lifedrinker",
+    "srd521.option.warlock.invocation.mask-of-many-faces",
+    "srd521.option.warlock.invocation.master-of-myriad-forms",
+    "srd521.option.warlock.invocation.misty-visions",
+    "srd521.option.warlock.invocation.one-with-shadows",
+    "srd521.option.warlock.invocation.otherworldly-leap",
+    "srd521.option.warlock.invocation.pact-of-the-blade",
+    "srd521.option.warlock.invocation.pact-of-the-chain",
+    "srd521.option.warlock.invocation.pact-of-the-tome",
+    "srd521.option.warlock.invocation.repelling-blast",
+    "srd521.option.warlock.invocation.thirsting-blade",
+    "srd521.option.warlock.invocation.visions-of-distant-realms",
+    "srd521.option.warlock.invocation.whispers-of-the-grave",
+    "srd521.option.warlock.invocation.witch-sight",
+    "srd521.subclass.warlock.fiend-patron",
+    "srd521.subclass-feature.warlock.fiend.dark-one-s-blessing",
+    "srd521.subclass-feature.warlock.fiend.fiend-spells",
+    "srd521.subclass-feature.warlock.fiend.dark-one-s-own-luck",
+    "srd521.subclass-feature.warlock.fiend.fiendish-resilience",
+    "srd521.subclass-feature.warlock.fiend.hurl-through-hell",
+    "srd521.spell.eldritch-blast",
+    "srd521.spell.hellish-rebuke",
+    "srd521.spell.hex",
+    "srd521.spell.prestidigitation",
+    "srd521.spell.stinking-cloud",
+    "srd521.spell.suggestion"
+  ],
+  "progression": [
+    {
+      "cantrips": 2,
+      "eldritch_invocations": 1,
+      "feature_names": [
+        "Eldritch Invocations",
+        "Pact Magic"
+      ],
+      "level": 1,
+      "prepared_spells": 2,
+      "proficiency_bonus": 2,
+      "slot_level": 1,
+      "spell_slots": 1
+    },
+    {
+      "cantrips": 2,
+      "eldritch_invocations": 3,
+      "feature_names": [
+        "Magical Cunning"
+      ],
+      "level": 2,
+      "prepared_spells": 3,
+      "proficiency_bonus": 2,
+      "slot_level": 1,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 2,
+      "eldritch_invocations": 3,
+      "feature_names": [
+        "Warlock Subclass"
+      ],
+      "level": 3,
+      "prepared_spells": 4,
+      "proficiency_bonus": 2,
+      "slot_level": 2,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 3,
+      "eldritch_invocations": 3,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 4,
+      "prepared_spells": 5,
+      "proficiency_bonus": 2,
+      "slot_level": 2,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 3,
+      "eldritch_invocations": 5,
+      "feature_names": [],
+      "level": 5,
+      "prepared_spells": 6,
+      "proficiency_bonus": 3,
+      "slot_level": 3,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 3,
+      "eldritch_invocations": 5,
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 6,
+      "prepared_spells": 7,
+      "proficiency_bonus": 3,
+      "slot_level": 3,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 3,
+      "eldritch_invocations": 6,
+      "feature_names": [],
+      "level": 7,
+      "prepared_spells": 8,
+      "proficiency_bonus": 3,
+      "slot_level": 4,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 3,
+      "eldritch_invocations": 6,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 8,
+      "prepared_spells": 9,
+      "proficiency_bonus": 3,
+      "slot_level": 4,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 3,
+      "eldritch_invocations": 7,
+      "feature_names": [
+        "Contact Patron"
+      ],
+      "level": 9,
+      "prepared_spells": 10,
+      "proficiency_bonus": 4,
+      "slot_level": 5,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 7,
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 10,
+      "prepared_spells": 10,
+      "proficiency_bonus": 4,
+      "slot_level": 5,
+      "spell_slots": 2
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 7,
+      "feature_names": [
+        "Mystic Arcanum (level 6 spell)"
+      ],
+      "level": 11,
+      "prepared_spells": 11,
+      "proficiency_bonus": 4,
+      "slot_level": 5,
+      "spell_slots": 3
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 8,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 12,
+      "prepared_spells": 11,
+      "proficiency_bonus": 4,
+      "slot_level": 5,
+      "spell_slots": 3
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 8,
+      "feature_names": [
+        "Mystic Arcanum (level 7 spell)"
+      ],
+      "level": 13,
+      "prepared_spells": 12,
+      "proficiency_bonus": 5,
+      "slot_level": 5,
+      "spell_slots": 3
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 8,
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 14,
+      "prepared_spells": 12,
+      "proficiency_bonus": 5,
+      "slot_level": 5,
+      "spell_slots": 3
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 9,
+      "feature_names": [
+        "Mystic Arcanum (level 8 spell)"
+      ],
+      "level": 15,
+      "prepared_spells": 13,
+      "proficiency_bonus": 5,
+      "slot_level": 5,
+      "spell_slots": 3
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 9,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 16,
+      "prepared_spells": 13,
+      "proficiency_bonus": 5,
+      "slot_level": 5,
+      "spell_slots": 3
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 9,
+      "feature_names": [
+        "Mystic Arcanum (level 9 spell)"
+      ],
+      "level": 17,
+      "prepared_spells": 14,
+      "proficiency_bonus": 6,
+      "slot_level": 5,
+      "spell_slots": 4
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 10,
+      "feature_names": [],
+      "level": 18,
+      "prepared_spells": 14,
+      "proficiency_bonus": 6,
+      "slot_level": 5,
+      "spell_slots": 4
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 10,
+      "feature_names": [
+        "Epic Boon"
+      ],
+      "level": 19,
+      "prepared_spells": 15,
+      "proficiency_bonus": 6,
+      "slot_level": 5,
+      "spell_slots": 4
+    },
+    {
+      "cantrips": 4,
+      "eldritch_invocations": 10,
+      "feature_names": [
+        "Eldritch Master"
+      ],
+      "level": 20,
+      "prepared_spells": 15,
+      "proficiency_bonus": 6,
+      "slot_level": 5,
+      "spell_slots": 4
+    }
+  ],
+  "progressionRows": 20,
+  "representativeSpells": [
+    "srd521.spell.eldritch-blast",
+    "srd521.spell.hellish-rebuke",
+    "srd521.spell.hex",
+    "srd521.spell.prestidigitation",
+    "srd521.spell.stinking-cloud",
+    "srd521.spell.suggestion"
+  ],
+  "warlockSpellListEntries": 72
+}

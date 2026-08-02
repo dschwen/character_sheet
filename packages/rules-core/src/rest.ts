@@ -263,6 +263,36 @@ function resetDeathSavesAfterHealing(
   }
 }
 
+function restoreShortRestSpellSlots(
+  character: CharacterDocument,
+  evaluation: ReturnType<typeof evaluateCharacter>,
+  nextState: CharacterState,
+  changes: StateChange[],
+  traces: Record<string, CalculationTrace>,
+): void {
+  if (evaluation.spellcasting?.slotRecharge !== "short-rest") {
+    return;
+  }
+  for (const slot of evaluation.spellcasting.slots) {
+    if (slot.expended === 0) {
+      continue;
+    }
+    const level = String(slot.level);
+    nextState.expendedSpellSlots[level] = 0;
+    recordChange(
+      changes,
+      traces,
+      `state.expendedSpellSlots.${level}`,
+      character.state.expendedSpellSlots[level] ?? 0,
+      0,
+      "A Short Rest restores all expended Pact Magic spell slots.",
+      "restore-short-rest-spell-slots",
+      [slot.expended, slot.level, slot.maximum],
+      evaluation.traces[slot.traceId]?.sourceReferences ?? [restSources["short-rest"]],
+    );
+  }
+}
+
 function proposeShortRest(
   character: CharacterDocument,
   request: z.infer<typeof restRequestSchema>,
@@ -326,6 +356,7 @@ function proposeShortRest(
     );
   }
   resourceRecharge("short-rest", character, evaluation, nextState, changes, traces);
+  restoreShortRestSpellSlots(character, evaluation, nextState, changes, traces);
 }
 
 function proposeLongRest(

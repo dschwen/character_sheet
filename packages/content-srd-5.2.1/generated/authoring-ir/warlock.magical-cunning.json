@@ -1,0 +1,75 @@
+{
+  "id": "srd521.class-feature.warlock.magical-cunning",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.warlock",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 1
+      },
+      "id": "magical-cunning-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.warlock.magical-cunning",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "use-magical-cunning",
+      "parameters": {
+        "actionEconomy": "one-minute-rite",
+        "resourceId": "srd521.resource.warlock.magical-cunning",
+        "restoresSpellSlots": {
+          "amountFact": "spellcasting.warlock.pactSlots.maximum",
+          "fraction": 0.5,
+          "round": "up",
+          "slotLevelFact": "spellcasting.warlock.pactSlotLevel"
+        },
+        "spends": 1
+      },
+      "target": "action.magical-cunning",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.warlock.magical-cunning"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "The one-minute rite is represented as an explicit atomic action."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0072-b003"
+      ],
+      "page": 72,
+      "quoteHash": "051bfe769626a15104126b2fbd2d2bc7d6e6d6ed6ab827c0430958638f045678",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can perform an esoteric rite for 1 minute. At the end of it, you regain expended Pact Magic spell slots but no more than a number equal to half your maximum (round up). Once you use this feature, you can’t do so again until you finish a Long Rest."
+      }
+    ],
+    "title": "Magical Cunning"
+  }
+}

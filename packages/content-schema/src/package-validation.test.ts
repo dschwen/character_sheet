@@ -19,7 +19,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(376);
+    expect(parsedEntities).toHaveLength(426);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -41,6 +41,10 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.subclass.sorcerer.draconic-sorcery");
     expect(entityIds).toContain("srd521.option.sorcerer.metamagic.quickened");
     expect(entityIds).toContain("srd521.spell.sorcerous-burst");
+    expect(entityIds).toContain("srd521.class.warlock");
+    expect(entityIds).toContain("srd521.subclass.warlock.fiend-patron");
+    expect(entityIds).toContain("srd521.option.warlock.invocation.pact-of-the-chain");
+    expect(entityIds).toContain("srd521.spell.eldritch-blast");
     expect(entityIds).toContain("srd521.class-feature.barbarian.improved-brutal-strike.level-17");
     expect(entityIds).toContain("srd521.table.barbarian.rages");
     expect(entityIds).toContain("srd521.table.barbarian.rage-damage");

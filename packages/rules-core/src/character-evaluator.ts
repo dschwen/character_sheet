@@ -260,18 +260,39 @@ const spellcastingSubclassBodySchema = subclassBodySchema.and(
     })
     .passthrough(),
 );
+const warlockProgressionBodySchema = z
+  .object({
+    progression: z.array(
+      z.object({
+        level: z.number().int().min(1).max(20),
+        eldritchInvocations: z.number().int().nonnegative(),
+      }),
+    ),
+  })
+  .passthrough();
+const warlockInvocationBodySchema = z
+  .object({
+    choiceId: z.literal("srd521.choice.warlock.eldritch-invocation"),
+    minimumWarlockLevel: z.number().int().min(1).max(20),
+    prerequisiteInvocationIds: z.array(z.string().min(1)).default([]),
+  })
+  .passthrough();
 const spellcastingProgressionRowSchema = z
   .object({
     level: z.number().int().min(1).max(20),
     cantrips: z.number().int().nonnegative(),
     preparedSpells: z.number().int().nonnegative(),
     spellSlots: z.record(z.coerce.number().int().min(1).max(9), z.number().int().nonnegative()),
+    pactSlots: z.number().int().positive().optional(),
+    pactSlotLevel: z.number().int().min(1).max(5).optional(),
   })
   .passthrough();
 const spellcastingClassBodySchema = z
   .object({
     spellcastingAbility: z.enum(abilities),
     spellPreparation: z.enum(["spellbook", "full-list"]).default("spellbook"),
+    spellcastingModel: z.enum(["standard", "pact-magic"]).default("standard"),
+    slotRecharge: z.enum(["long-rest", "short-rest"]).default("long-rest"),
     spellbookStartingSpells: z.number().int().positive().optional(),
     spellbookSpellsPerLevel: z.number().int().positive().optional(),
     spellList: z.array(z.string().min(1)),
@@ -334,6 +355,15 @@ const actionParametersSchema = z
         amountFact: z.string().min(1),
         fraction: z.number().positive().default(1),
         round: z.enum(["down", "up"]).default("down"),
+      })
+      .strict()
+      .optional(),
+    restoresSpellSlots: z
+      .object({
+        amountFact: z.string().min(1),
+        fraction: z.number().positive().default(1),
+        round: z.enum(["down", "up"]).default("down"),
+        slotLevelFact: z.string().min(1),
       })
       .strict()
       .optional(),
@@ -776,6 +806,7 @@ function validateProgressionSelections(
   const rangerLevel = classLevelCounts.get("srd521.class.ranger") ?? 0;
   const rogueLevel = classLevelCounts.get("srd521.class.rogue") ?? 0;
   const sorcererLevel = classLevelCounts.get("srd521.class.sorcerer") ?? 0;
+  const warlockLevel = classLevelCounts.get("srd521.class.warlock") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -922,6 +953,22 @@ function validateProgressionSelections(
       state,
       "SORCERER_SUBCLASS_LEVEL_REQUIRED",
       "A Sorcerer subclass requires Sorcerer level 3.",
+      ["build.subclassId"],
+    );
+  }
+  if (warlockLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "WARLOCK_SUBCLASS_REQUIRED",
+      "A Warlock of level 3 or higher must select a Warlock subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (warlockLevel < 3 && subclassParentId === "srd521.class.warlock") {
+    addValidation(
+      state,
+      "WARLOCK_SUBCLASS_LEVEL_REQUIRED",
+      "A Warlock subclass requires Warlock level 3.",
       ["build.subclassId"],
     );
   }
@@ -1096,6 +1143,74 @@ function validateProgressionSelections(
       "The selected Metamagic option is not supported by the loaded Sorcerer content.",
       ["build.levels"],
     );
+  }
+  const invocationSelections = character.build.levels.flatMap((level, levelIndex) =>
+    level.selectedFeatureChoices
+      .filter((choice) => choice.choiceId === "srd521.choice.warlock.eldritch-invocation")
+      .flatMap((choice) => choice.optionIds.map((optionId) => ({ levelIndex, optionId }))),
+  );
+  const warlockEntity = index.entities.get("srd521.class.warlock");
+  const expectedInvocations =
+    warlockEntity?.kind === "class"
+      ? (warlockProgressionBodySchema
+          .parse(warlockEntity.body)
+          .progression.find((row) => row.level === warlockLevel)?.eldritchInvocations ?? 0)
+      : 0;
+  const invocationIds = invocationSelections.map((selection) => selection.optionId);
+  const selectedInvocationIds = new Set(invocationIds);
+  if (
+    invocationIds.length !== expectedInvocations ||
+    selectedInvocationIds.size !== invocationIds.length
+  ) {
+    addValidation(
+      state,
+      "WARLOCK_ELDRITCH_INVOCATION_CHOICE_COUNT",
+      `A Warlock of level ${String(warlockLevel)} requires ${String(expectedInvocations)} distinct Eldritch Invocation selections.`,
+      ["build.levels"],
+    );
+  }
+  for (const selection of invocationSelections) {
+    const option = index.entities.get(selection.optionId);
+    const parsed =
+      option?.kind === "class-option"
+        ? warlockInvocationBodySchema.safeParse(option.body)
+        : undefined;
+    if (parsed?.success !== true) {
+      addValidation(
+        state,
+        "WARLOCK_ELDRITCH_INVOCATION_OPTION_INVALID",
+        `${selection.optionId} is not a loaded Eldritch Invocation option.`,
+        ["build.levels"],
+      );
+      continue;
+    }
+    const levelAtSelection = character.build.levels
+      .slice(0, selection.levelIndex + 1)
+      .filter((level) => level.classId === "srd521.class.warlock").length;
+    if (levelAtSelection < parsed.data.minimumWarlockLevel) {
+      addValidation(
+        state,
+        "WARLOCK_ELDRITCH_INVOCATION_LEVEL_REQUIRED",
+        `${selection.optionId} requires Warlock level ${String(parsed.data.minimumWarlockLevel)}.`,
+        ["build.levels"],
+      );
+    }
+    const invocationsAvailableAtSelection = new Set(
+      invocationSelections
+        .filter((candidate) => candidate.levelIndex <= selection.levelIndex)
+        .map((candidate) => candidate.optionId),
+    );
+    const missingPrerequisites = parsed.data.prerequisiteInvocationIds.filter(
+      (optionId) => !invocationsAvailableAtSelection.has(optionId),
+    );
+    if (missingPrerequisites.length > 0) {
+      addValidation(
+        state,
+        "WARLOCK_ELDRITCH_INVOCATION_PREREQUISITE_MISSING",
+        `${selection.optionId} requires ${missingPrerequisites.join(", ")}.`,
+        ["build.levels"],
+      );
+    }
   }
   if (character.build.subclassId !== undefined && subclass?.kind !== "subclass") {
     addValidation(
@@ -2458,8 +2573,19 @@ function evaluateSpellcasting(
   state.spells.sort(
     (left, right) => left.level - right.level || left.name.localeCompare(right.name),
   );
+  if (classBody.spellcastingModel === "pact-magic") {
+    const pactSlots =
+      progression.pactSlots ?? slots.reduce((total, slot) => total + slot.maximum, 0);
+    const pactSlotLevel = progression.pactSlotLevel ?? slots[0]?.level;
+    state.facts[`spellcasting.${classSlug}.pactSlots.maximum`] = pactSlots;
+    if (pactSlotLevel !== undefined) {
+      state.facts[`spellcasting.${classSlug}.pactSlotLevel`] = pactSlotLevel;
+    }
+  }
   state.spellcasting = {
     classId,
+    model: classBody.spellcastingModel,
+    slotRecharge: classBody.slotRecharge,
     ability: classBody.spellcastingAbility,
     abilityModifier,
     attackBonus,
@@ -3354,6 +3480,24 @@ function evaluateConditionalRules(
             parameters.restoresResource.round === "up"
               ? Math.ceil(scaledAmount)
               : Math.floor(scaledAmount),
+        };
+      }
+      if (parameters.restoresSpellSlots !== undefined) {
+        const baseAmount = requireNumber(
+          state.facts[parameters.restoresSpellSlots.amountFact] ?? null,
+          parameters.restoresSpellSlots.amountFact,
+        );
+        const slotLevel = requireNumber(
+          state.facts[parameters.restoresSpellSlots.slotLevelFact] ?? null,
+          parameters.restoresSpellSlots.slotLevelFact,
+        );
+        const scaledAmount = baseAmount * parameters.restoresSpellSlots.fraction;
+        actionParameters.restoresSpellSlots = {
+          amount:
+            parameters.restoresSpellSlots.round === "up"
+              ? Math.ceil(scaledAmount)
+              : Math.floor(scaledAmount),
+          slotLevel,
         };
       }
       if (parameters.variableSpend !== undefined) {

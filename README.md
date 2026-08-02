@@ -20,6 +20,7 @@ corepack pnpm character packages/test-fixtures/characters/paladin-5.json
 corepack pnpm character packages/test-fixtures/characters/ranger-5.json
 corepack pnpm character packages/test-fixtures/characters/rogue-5.json
 corepack pnpm character packages/test-fixtures/characters/sorcerer-5.json
+corepack pnpm character packages/test-fixtures/characters/warlock-5.json
 corepack pnpm character packages/test-fixtures/characters/wizard-5.json
 ```
 
@@ -278,6 +279,26 @@ Metamagic options, and all five Draconic Sorcery features. It generates seven so
 representative spells plus authoring IR for Sorcery Points, Innate Sorcery, Sorcerous Restoration,
 Quickened Spell, Subtle Spell, and Draconic Resilience.
 
+Generate Warlock content from pages 70–76 using the shared spell-description extraction:
+
+```bash
+.venv/bin/python -m srd_extract.pipeline \
+  --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
+  --out generated/extraction/srd-5.2.1-warlock \
+  --pages 70-76 \
+  --overlays
+
+.venv/bin/python -m srd_extract.warlock \
+  --class-extraction generated/extraction/srd-5.2.1-warlock \
+  --spell-extraction generated/extraction/srd-5.2.1-spells \
+  --output packages/content-srd-5.2.1/generated
+```
+
+The Warlock parser validates all 20 progression rows, the 72-entry class spell list, all 28
+Eldritch Invocations and their prerequisites, and all five Fiend Patron features. It generates six
+source-linked representative spells and authoring IR for Magical Cunning’s limited Pact-slot
+recovery.
+
 Generate the Human and Soldier origin slice from pages 83, 86, and 87:
 
 ```bash
@@ -309,17 +330,17 @@ Generate the structured weapon and armor entities from SRD pages 91–92:
 ```
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Fighter, Cleric, Druid, Monk,
-Paladin, Ranger, Rogue, Sorcerer, and Wizard fixtures in its integration suite. Results include
-origin and feat ability increases, subclass features, species size and speed, typed skill and saving-throw
+Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite. Results
+include origin and feat ability increases, subclass features, species size and speed, typed skill and saving-throw
 proficiencies, d20-test roll states, Initiative, Passive Perception, inventory, armor and Shield
-candidates, weapon and Martial Arts attacks and damage, spellbook and full-list preparation models,
-class- and subclass-granted always-prepared spells, selectable Circle of the Land spells, spell
-slots, spell attacks and save DC, Weapon Mastery metadata, attacks per Attack action, critical-hit
+candidates, weapon and Martial Arts attacks and damage, spellbook, full-list, and Pact Magic
+models, class- and subclass-granted always-prepared spells, selectable Circle of the Land spells,
+spell slots, spell attacks and save DC, Weapon Mastery metadata, attacks per Attack action, critical-hit
 thresholds, Hit Points, feature resources, variable resource spending and restoration, conditional
 actions, resistances, validations, coverage warnings, and calculation traces.
 
 The rules kernel also exposes atomic Short Rest, Long Rest, action-use, and spell-cast proposals.
 Transition processing validates explicit dice results and available spell slots, previews
-field-level state changes and resource recharge or spending, manages Concentration including
-resource-backed free spell actions, applies Human Resourceful, and preserves a trace without
-mutating the input character.
+field-level state changes and resource recharge or spending, restores Pact Magic on Short Rests,
+manages Concentration including resource-backed free spell actions, applies Human Resourceful, and
+preserves a trace without mutating the input character.

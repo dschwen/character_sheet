@@ -30,6 +30,10 @@ const stateActionParametersSchema = z
       .object({ resourceId: z.string().min(1), amount: z.number().int().positive() })
       .strict()
       .optional(),
+    restoresSpellSlots: z
+      .object({ amount: z.number().int().positive(), slotLevel: z.number().int().min(1).max(9) })
+      .strict()
+      .optional(),
     healing: z
       .union([
         z
@@ -226,6 +230,12 @@ export function proposeAction(
       : evaluation.resources.find(
           (candidate) => candidate.id === parameters.restoresResource?.resourceId,
         );
+  const restoredSpellSlot =
+    parameters.restoresSpellSlots === undefined
+      ? undefined
+      : evaluation.spellcasting?.slots.find(
+          (candidate) => candidate.level === parameters.restoresSpellSlots?.slotLevel,
+        );
   const diceHealing =
     parameters.healing !== undefined && "diceCount" in parameters.healing
       ? parameters.healing
@@ -237,6 +247,7 @@ export function proposeAction(
     resource === undefined ||
     (parameters.spellId !== undefined && spell === undefined) ||
     (parameters.restoresResource !== undefined && restoredResource === undefined) ||
+    (parameters.restoresSpellSlots !== undefined && restoredSpellSlot === undefined) ||
     (diceHealing !== undefined &&
       (typeof bonus !== "number" || typeof maximumHitPoints !== "number"))
   ) {
@@ -356,6 +367,23 @@ export function proposeAction(
       `${request.actionId} restores up to ${String(parameters.restoresResource.amount)} resource points.`,
       "restore-action-resource",
       [restoredBefore, parameters.restoresResource.amount, restoredResource.maximum],
+      sourceTrace,
+    );
+  }
+  if (parameters.restoresSpellSlots !== undefined && restoredSpellSlot !== undefined) {
+    const slotLevel = String(parameters.restoresSpellSlots.slotLevel);
+    const restoredBefore = character.state.expendedSpellSlots[slotLevel] ?? 0;
+    const restoredAfter = Math.max(0, restoredBefore - parameters.restoresSpellSlots.amount);
+    nextState.expendedSpellSlots[slotLevel] = restoredAfter;
+    recordChange(
+      changes,
+      traces,
+      `state.expendedSpellSlots.${slotLevel}`,
+      restoredBefore,
+      restoredAfter,
+      `${request.actionId} restores up to ${String(parameters.restoresSpellSlots.amount)} spell slots.`,
+      "restore-action-spell-slots",
+      [restoredBefore, parameters.restoresSpellSlots.amount, restoredSpellSlot.maximum],
       sourceTrace,
     );
   }

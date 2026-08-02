@@ -156,6 +156,8 @@ export interface SpellSlotSummary {
 
 export interface SpellcastingSummary {
   classId: string;
+  model: "standard" | "pact-magic";
+  slotRecharge: "long-rest" | "short-rest";
   ability: string;
   abilityModifier: number;
   attackBonus: number;

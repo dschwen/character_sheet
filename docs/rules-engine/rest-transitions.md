@@ -13,7 +13,9 @@ A Short Rest proposal:
 - adds the Constitution modifier to each roll, with a minimum of 1 HP per die;
 - caps healing at maximum HP;
 - increments expended Hit Dice;
-- applies only resource rules whose event is `short-rest`.
+- applies only resource rules whose event is `short-rest`;
+- restores all expended spell slots when the active spellcasting model declares Short-Rest slot
+  recharge, as Pact Magic does.
 
 For the level-1 Barbarian fixture, spending one d12 Hit Die and rolling 5 restores up to 8 HP. A
 Short Rest restores one expended Rage use, not every use.
@@ -31,6 +33,7 @@ The modeled Long Rest proposal:
 - expires Temporary Hit Points;
 - reduces Exhaustion by 1;
 - ends Concentration during the required sleep;
+- restores all expended spell slots;
 - applies resource rules whose event is `long-rest`.
 
 Long Rest benefits cite the glossary rule on SRD page 185; Short Rest and Hit Die spending cite page 187. Resource changes retain the source of the feature that defined their recharge rule.
@@ -41,6 +44,6 @@ the rest of the proposal.
 
 ## Current boundary
 
-Ability-score reductions and spell-slot recovery are not yet represented by the character model.
-Rest duration, interruption, the 16-hour interval between Long Rests, food, watch order, and timed
-effect expiration require clock/campaign context and remain outside this proposal.
+Ability-score reductions are not yet represented by the character model. Rest duration,
+interruption, the 16-hour interval between Long Rests, food, watch order, and timed effect
+expiration require clock/campaign context and remain outside this proposal.

@@ -1,0 +1,2634 @@
+[
+  {
+    "body": {
+      "alwaysPreparedSpells": {},
+      "armorTraining": [
+        "light"
+      ],
+      "eldritchInvocationChoice": {
+        "id": "srd521.choice.warlock.eldritch-invocation",
+        "options": [
+          "srd521.option.warlock.invocation.agonizing-blast",
+          "srd521.option.warlock.invocation.armor-of-shadows",
+          "srd521.option.warlock.invocation.ascendant-step",
+          "srd521.option.warlock.invocation.devil-s-sight",
+          "srd521.option.warlock.invocation.devouring-blade",
+          "srd521.option.warlock.invocation.eldritch-mind",
+          "srd521.option.warlock.invocation.eldritch-smite",
+          "srd521.option.warlock.invocation.eldritch-spear",
+          "srd521.option.warlock.invocation.fiendish-vigor",
+          "srd521.option.warlock.invocation.gaze-of-two-minds",
+          "srd521.option.warlock.invocation.gift-of-the-depths",
+          "srd521.option.warlock.invocation.gift-of-the-protectors",
+          "srd521.option.warlock.invocation.investment-of-the-chain-master",
+          "srd521.option.warlock.invocation.lessons-of-the-first-ones",
+          "srd521.option.warlock.invocation.lifedrinker",
+          "srd521.option.warlock.invocation.mask-of-many-faces",
+          "srd521.option.warlock.invocation.master-of-myriad-forms",
+          "srd521.option.warlock.invocation.misty-visions",
+          "srd521.option.warlock.invocation.one-with-shadows",
+          "srd521.option.warlock.invocation.otherworldly-leap",
+          "srd521.option.warlock.invocation.pact-of-the-blade",
+          "srd521.option.warlock.invocation.pact-of-the-chain",
+          "srd521.option.warlock.invocation.pact-of-the-tome",
+          "srd521.option.warlock.invocation.repelling-blast",
+          "srd521.option.warlock.invocation.thirsting-blade",
+          "srd521.option.warlock.invocation.visions-of-distant-realms",
+          "srd521.option.warlock.invocation.whispers-of-the-grave",
+          "srd521.option.warlock.invocation.witch-sight"
+        ]
+      },
+      "hitPointDie": 8,
+      "primaryAbilities": [
+        "charisma"
+      ],
+      "progression": [
+        {
+          "cantrips": 2,
+          "eldritchInvocations": 1,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.warlock.eldritch-invocations",
+              "name": "Eldritch Invocations"
+            },
+            {
+              "entityId": "srd521.class-feature.warlock.pact-magic",
+              "name": "Pact Magic"
+            }
+          ],
+          "level": 1,
+          "pactSlotLevel": 1,
+          "pactSlots": 1,
+          "preparedSpells": 2,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 1
+          }
+        },
+        {
+          "cantrips": 2,
+          "eldritchInvocations": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.warlock.magical-cunning",
+              "name": "Magical Cunning"
+            }
+          ],
+          "level": 2,
+          "pactSlotLevel": 1,
+          "pactSlots": 2,
+          "preparedSpells": 3,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "1": 2
+          }
+        },
+        {
+          "cantrips": 2,
+          "eldritchInvocations": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.warlock.warlock-subclass",
+              "name": "Warlock Subclass"
+            }
+          ],
+          "level": 3,
+          "pactSlotLevel": 2,
+          "pactSlots": 2,
+          "preparedSpells": 4,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "2": 2
+          }
+        },
+        {
+          "cantrips": 3,
+          "eldritchInvocations": 3,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.warlock.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 4,
+          "pactSlotLevel": 2,
+          "pactSlots": 2,
+          "preparedSpells": 5,
+          "proficiencyBonus": 2,
+          "spellSlots": {
+            "2": 2
+          }
+        },
+        {
+          "cantrips": 3,
+          "eldritchInvocations": 5,
+          "features": [],
+          "level": 5,
+          "pactSlotLevel": 3,
+          "pactSlots": 2,
+          "preparedSpells": 6,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "3": 2
+          }
+        },
+        {
+          "cantrips": 3,
+          "eldritchInvocations": 5,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 6,
+          "pactSlotLevel": 3,
+          "pactSlots": 2,
+          "preparedSpells": 7,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "3": 2
+          }
+        },
+        {
+          "cantrips": 3,
+          "eldritchInvocations": 6,
+          "features": [],
+          "level": 7,
+          "pactSlotLevel": 4,
+          "pactSlots": 2,
+          "preparedSpells": 8,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "4": 2
+          }
+        },
+        {
+          "cantrips": 3,
+          "eldritchInvocations": 6,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 8,
+          "pactSlotLevel": 4,
+          "pactSlots": 2,
+          "preparedSpells": 9,
+          "proficiencyBonus": 3,
+          "spellSlots": {
+            "4": 2
+          }
+        },
+        {
+          "cantrips": 3,
+          "eldritchInvocations": 7,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.warlock.contact-patron",
+              "name": "Contact Patron"
+            }
+          ],
+          "level": 9,
+          "pactSlotLevel": 5,
+          "pactSlots": 2,
+          "preparedSpells": 10,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "5": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 7,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 10,
+          "pactSlotLevel": 5,
+          "pactSlots": 2,
+          "preparedSpells": 10,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "5": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 7,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Mystic Arcanum (level 6 spell)"
+            }
+          ],
+          "level": 11,
+          "pactSlotLevel": 5,
+          "pactSlots": 3,
+          "preparedSpells": 11,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "5": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 8,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 12,
+          "pactSlotLevel": 5,
+          "pactSlots": 3,
+          "preparedSpells": 11,
+          "proficiencyBonus": 4,
+          "spellSlots": {
+            "5": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 8,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Mystic Arcanum (level 7 spell)"
+            }
+          ],
+          "level": 13,
+          "pactSlotLevel": 5,
+          "pactSlots": 3,
+          "preparedSpells": 12,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "5": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 8,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 14,
+          "pactSlotLevel": 5,
+          "pactSlots": 3,
+          "preparedSpells": 12,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "5": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 9,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Mystic Arcanum (level 8 spell)"
+            }
+          ],
+          "level": 15,
+          "pactSlotLevel": 5,
+          "pactSlots": 3,
+          "preparedSpells": 13,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "5": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 9,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 16,
+          "pactSlotLevel": 5,
+          "pactSlots": 3,
+          "preparedSpells": 13,
+          "proficiencyBonus": 5,
+          "spellSlots": {
+            "5": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 9,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Mystic Arcanum (level 9 spell)"
+            }
+          ],
+          "level": 17,
+          "pactSlotLevel": 5,
+          "pactSlots": 4,
+          "preparedSpells": 14,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "5": 4
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 10,
+          "features": [],
+          "level": 18,
+          "pactSlotLevel": 5,
+          "pactSlots": 4,
+          "preparedSpells": 14,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "5": 4
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 10,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.warlock.epic-boon",
+              "name": "Epic Boon"
+            }
+          ],
+          "level": 19,
+          "pactSlotLevel": 5,
+          "pactSlots": 4,
+          "preparedSpells": 15,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "5": 4
+          }
+        },
+        {
+          "cantrips": 4,
+          "eldritchInvocations": 10,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.warlock.eldritch-master",
+              "name": "Eldritch Master"
+            }
+          ],
+          "level": 20,
+          "pactSlotLevel": 5,
+          "pactSlots": 4,
+          "preparedSpells": 15,
+          "proficiencyBonus": 6,
+          "spellSlots": {
+            "5": 4
+          }
+        }
+      ],
+      "savingThrowProficiencies": [
+        "wisdom",
+        "charisma"
+      ],
+      "skillProficiencyChoice": {
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "arcana",
+          "deception",
+          "history",
+          "intimidation",
+          "investigation",
+          "nature",
+          "religion"
+        ]
+      },
+      "slotRecharge": "short-rest",
+      "spellList": [
+        "srd521.spell.chill-touch",
+        "srd521.spell.eldritch-blast",
+        "srd521.spell.mage-hand",
+        "srd521.spell.minor-illusion",
+        "srd521.spell.poison-spray",
+        "srd521.spell.prestidigitation",
+        "srd521.spell.true-strike",
+        "srd521.spell.bane",
+        "srd521.spell.charm-person",
+        "srd521.spell.comprehend-languages",
+        "srd521.spell.detect-magic",
+        "srd521.spell.expeditious-retreat",
+        "srd521.spell.hellish-rebuke",
+        "srd521.spell.hex",
+        "srd521.spell.hideous-laughter",
+        "srd521.spell.illusory-script",
+        "srd521.spell.protection-from-evil-and-good",
+        "srd521.spell.speak-with-animals",
+        "srd521.spell.unseen-servant",
+        "srd521.spell.darkness",
+        "srd521.spell.enthrall",
+        "srd521.spell.hold-person",
+        "srd521.spell.invisibility",
+        "srd521.spell.mind-spike",
+        "srd521.spell.mirror-image",
+        "srd521.spell.misty-step",
+        "srd521.spell.ray-of-enfeeblement",
+        "srd521.spell.spider-climb",
+        "srd521.spell.suggestion",
+        "srd521.spell.counterspell",
+        "srd521.spell.dispel-magic",
+        "srd521.spell.fear",
+        "srd521.spell.fly",
+        "srd521.spell.gaseous-form",
+        "srd521.spell.hypnotic-pattern",
+        "srd521.spell.magic-circle",
+        "srd521.spell.major-image",
+        "srd521.spell.remove-curse",
+        "srd521.spell.tongues",
+        "srd521.spell.vampiric-touch",
+        "srd521.spell.banishment",
+        "srd521.spell.blight",
+        "srd521.spell.charm-monster",
+        "srd521.spell.dimension-door",
+        "srd521.spell.hallucinatory-terrain",
+        "srd521.spell.contact-other-plane",
+        "srd521.spell.dream",
+        "srd521.spell.hold-monster",
+        "srd521.spell.mislead",
+        "srd521.spell.planar-binding",
+        "srd521.spell.scrying",
+        "srd521.spell.teleportation-circle",
+        "srd521.spell.circle-of-death",
+        "srd521.spell.create-undead",
+        "srd521.spell.eyebite",
+        "srd521.spell.true-seeing",
+        "srd521.spell.etherealness",
+        "srd521.spell.finger-of-death",
+        "srd521.spell.forcecage",
+        "srd521.spell.plane-shift",
+        "srd521.spell.befuddlement",
+        "srd521.spell.demiplane",
+        "srd521.spell.dominate-monster",
+        "srd521.spell.glibness",
+        "srd521.spell.power-word-stun",
+        "srd521.spell.astral-projection",
+        "srd521.spell.foresight",
+        "srd521.spell.gate",
+        "srd521.spell.imprisonment",
+        "srd521.spell.power-word-kill",
+        "srd521.spell.true-polymorph",
+        "srd521.spell.weird"
+      ],
+      "spellPreparation": "full-list",
+      "spellcastingAbility": "charisma",
+      "spellcastingModel": "pact-magic",
+      "startingEquipmentText": "Choose A or B: (A) Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar’s Pack, and 15 GP; or (B) 100 GP",
+      "weaponProficiencies": [
+        "simple"
+      ]
+    },
+    "id": "srd521.class.warlock",
+    "kind": "class",
+    "name": {
+      "en": "Warlock"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Warlock progression and Pact Magic table from pages 70–71.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b014",
+          "p0070-b015",
+          "p0070-b016",
+          "p0070-b017",
+          "p0070-b018",
+          "p0070-b019",
+          "p0070-b020",
+          "p0070-b021",
+          "p0070-b022"
+        ],
+        "page": 70,
+        "quoteHash": "3da47992d07d05cd9fa448cd978c6fd3d13cfd3a5bdc8838996f96575b06aca9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0071-b005",
+          "p0071-b007",
+          "p0071-b008",
+          "p0071-b009",
+          "p0071-b011",
+          "p0071-b012",
+          "p0071-b006",
+          "p0071-b010",
+          "p0071-b013",
+          "p0071-b014",
+          "p0071-b015",
+          "p0071-b016",
+          "p0071-b017",
+          "p0071-b018",
+          "p0071-b019",
+          "p0071-b020",
+          "p0071-b021",
+          "p0071-b022",
+          "p0071-b023",
+          "p0071-b024",
+          "p0071-b025",
+          "p0071-b026",
+          "p0071-b027",
+          "p0071-b028",
+          "p0071-b029",
+          "p0071-b030",
+          "p0071-b031",
+          "p0071-b032"
+        ],
+        "page": 71,
+        "quoteHash": "043e689ebd43a165e119b3d3009aed1652347d12e374c7264fdccd6e56311cf9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class",
+      "warlock",
+      "spellcaster",
+      "pact-magic"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. You gain one invocation of your choice, such as Pact of the Tome. Invocations are described in the “Eldritch Invocation Options” section later in this class’s description. Prerequisites. If an invocation has a prerequisite, you must meet it to learn that invocation. For example, if an invocation requires you to be a level 5+ Warlock, you can select the invocation once you reach Warlock level 5. Replacing and Gaining Invocations. Whenever you gain a Warlock level, you can replace one of your invocations with another one for which you Warlock Features Proficiency Bonus Class Features Eldritch Invocations Cantrips Prepared Spell Slots Slot Level Level Spells 1 +2 Eldritch Invocations, Pact Magic 1 2 2 1 1 2 +2 Magical Cunning 3 2 3 2 1 3 +2 Warlock Subclass 3 2 4 2 2 4 +2 Ability Score Improvement 3 3 5 2 2 5 +3 — 5 3 6 2 3 6 +3 Subclass feature 5 3 7 2 3 7 +3 — 6 3 8 2 4 8 +3 Ability Score Improvement 6 3 9 2 4 9 +4 Contact Patron 7 3 10 2 5 10 +4 Subclass feature 7 4 10 2 5 11 +4 Mystic Arcanum (level 6 spell) 7 4 11 3 5 12 +4 Ability Score Improvement 8 4 11 3 5 13 +5 Mystic Arcanum (level 7 spell) 8 4 12 3 5 14 +5 Subclass feature 8 4 12 3 5 15 +5 Mystic Arcanum (level 8 spell) 9 4 13 3 5 16 +5 Ability Score Improvement 9 4 13 3 5 17 +6 Mystic Arcanum (level 9 spell) 9 4 14 4 5 18 +6 — 10 4 14 4 5 19 +6 Epic Boon 10 4 15 4 5 20 +6 Eldritch Master 10 4 15 4 5"
+    },
+    "id": "srd521.class-feature.warlock.eldritch-invocations",
+    "kind": "class-feature",
+    "name": {
+      "en": "Eldritch Invocations"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Eldritch Invocations extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b027"
+        ],
+        "page": 70,
+        "quoteHash": "bcd452e0bfecd2ec499bf4a16c15a904841d784827553dbafcbbd8b9f2d4319a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0071-b005",
+          "p0071-b007",
+          "p0071-b008",
+          "p0071-b009",
+          "p0071-b011",
+          "p0071-b012",
+          "p0071-b006",
+          "p0071-b010",
+          "p0071-b013",
+          "p0071-b014",
+          "p0071-b015",
+          "p0071-b016",
+          "p0071-b017",
+          "p0071-b018",
+          "p0071-b019",
+          "p0071-b020",
+          "p0071-b021",
+          "p0071-b022",
+          "p0071-b023",
+          "p0071-b024",
+          "p0071-b025",
+          "p0071-b026",
+          "p0071-b027",
+          "p0071-b028",
+          "p0071-b029",
+          "p0071-b030",
+          "p0071-b031",
+          "p0071-b032"
+        ],
+        "page": 71,
+        "quoteHash": "043e689ebd43a165e119b3d3009aed1652347d12e374c7264fdccd6e56311cf9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "Through occult ceremony, you have formed a pact with a mysterious entity to gain magical powers. The entity is a voice in the shadows—its identity unclear—but its boon to you is concrete: the ability to cast spells. See “Spells” for the rules on spellcasting. The information below details how you use those rules with Warlock spells, which appear in the Warlock spell list later in the class’s description. Cantrips. You know two Warlock cantrips of your choice. Eldritch Blast and Prestidigitation are recommended. Whenever you gain a Warlock level, you can replace one of your cantrips from this feature with another Warlock cantrip of your choice. When you reach Warlock levels 4 and 10, you learn another Warlock cantrip of your choice, as shown in the Cantrips column of the Warlock Features table. against the number of spells you can prepare with this feature, but those spells otherwise count as Warlock spells for you. Changing Your Prepared Spells. Whenever you gain a Warlock level, you can replace one spell on your list with another Warlock spell of an eligible level. Spellcasting Ability. Charisma is the spellcasting ability for your Warlock spells. Spellcasting Focus. You can use an Arcane Focus as a Spellcasting Focus for your Warlock spells."
+    },
+    "id": "srd521.class-feature.warlock.pact-magic",
+    "kind": "class-feature",
+    "name": {
+      "en": "Pact Magic"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Pact Magic extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0071-b003"
+        ],
+        "page": 71,
+        "quoteHash": "8a6d8b6df9fc866b87325bc6007d98b62519311efe0b8a7c5544430b01d7a485",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0072-b002"
+        ],
+        "page": 72,
+        "quoteHash": "410c3fc6c10738f462035a163660decfe3cdd41dbf459f03631e55ea5bd3c8da",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 2,
+      "text": "You can perform an esoteric rite for 1 minute. At the end of it, you regain expended Pact Magic spell slots but no more than a number equal to half your maximum (round up). Once you use this feature, you can’t do so again until you finish a Long Rest."
+    },
+    "id": "srd521.class-feature.warlock.magical-cunning",
+    "kind": "class-feature",
+    "name": {
+      "en": "Magical Cunning"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Magical Cunning extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b003"
+        ],
+        "page": 72,
+        "quoteHash": "051bfe769626a15104126b2fbd2d2bc7d6e6d6ed6ab827c0430958638f045678",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "You gain a Warlock subclass of your choice. The Fiend Patron subclass is detailed after this class’s description. A subclass is a specialization that grants you features at certain Warlock levels. For the rest of your career, you gain each of your subclass’s features that are of your Warlock level or lower."
+    },
+    "id": "srd521.class-feature.warlock.warlock-subclass",
+    "kind": "class-feature",
+    "name": {
+      "en": "Warlock Subclass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Warlock Subclass extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b004"
+        ],
+        "page": 72,
+        "quoteHash": "cf0d181d0c2f668d228432535c1546a6fea8dd392232c3e750dd2b7cbfe75c35",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 4,
+      "text": "You gain the Ability Score Improvement feat (see “Feats”) or another feat of your choice for which you qualify. You gain this feature again at Warlock levels 8, 12, and 16."
+    },
+    "id": "srd521.class-feature.warlock.ability-score-improvement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ability Score Improvement extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b005"
+        ],
+        "page": 72,
+        "quoteHash": "cbd54c15dd0e54c1ef60d355a31134a032f5c7f2def330d9d2aea14da651d796",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 9,
+      "text": "In the past, you usually contacted your patron through intermediaries. Now you can communicate directly; you always have the Contact Other Plane spell prepared. With this feature, you can cast the spell without expending a spell slot to contact your patron, and you automatically succeed on the spell’s saving throw. Once you cast the spell with this feature, you can’t do so in this way again until you finish a Long Rest."
+    },
+    "id": "srd521.class-feature.warlock.contact-patron",
+    "kind": "class-feature",
+    "name": {
+      "en": "Contact Patron"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Contact Patron extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b006"
+        ],
+        "page": 72,
+        "quoteHash": "5888861f70e2124e03a54d80ca82ae04cbbe460926ffe97e1507a6338d0cab2c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 11,
+      "text": "Your patron grants you a magical secret called an arcanum. Choose one level 6 Warlock spell as this arcanum. You can cast your arcanum spell once without expending a spell slot, and you must finish a Long Rest before you can cast it in this way again. As shown in the Warlock Features table, you gain another Warlock spell of your choice that can be cast in this way when you reach Warlock levels 13 (level 7 spell), 15 (level 8 spell), and 17 (level 9 spell). You regain all uses of your Mystic Arcanum when you finish a Long Rest. Whenever you gain a Warlock level, you can replace one of your arcanum spells with another Warlock spell of the same level."
+    },
+    "id": "srd521.class-feature.warlock.mystic-arcanum",
+    "kind": "class-feature",
+    "name": {
+      "en": "Mystic Arcanum"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Mystic Arcanum extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b007",
+          "p0072-b008"
+        ],
+        "page": 72,
+        "quoteHash": "64dc981e8b5fbc1b92baa7f3fbec8be6a1565f32640e2d1583c41c8dd70f7b37",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 19,
+      "text": "You gain an Epic Boon feat (see “Feats”) or another feat of your choice for which you qualify. Boon of Fate is recommended."
+    },
+    "id": "srd521.class-feature.warlock.epic-boon",
+    "kind": "class-feature",
+    "name": {
+      "en": "Epic Boon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Epic Boon extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b009"
+        ],
+        "page": 72,
+        "quoteHash": "5709f58ae324a4514d9a56a3909cf4cc706cd433a076c386a861e123c254dbfe",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 20,
+      "text": "When you use your Magical Cunning feature, you regain all your expended Pact Magic spell slots."
+    },
+    "id": "srd521.class-feature.warlock.eldritch-master",
+    "kind": "class-feature",
+    "name": {
+      "en": "Eldritch Master"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Eldritch Master extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b010"
+        ],
+        "page": 72,
+        "quoteHash": "7ede5517fc5111a1ae8d5cacf625f4e25acf8cde54da480a56a991dddf92b027",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock, a Warlock Cantrip That Deals Damage",
+      "repeatable": true,
+      "text": "Prerequisite: Level 2+ Warlock, a Warlock Cantrip That Deals Damage Choose one of your known Warlock cantrips that deals damage. You can add your Charisma modifier to that spell’s damage rolls. Repeatable. You can gain this invocation more than once. Each time you do so, choose a different eligible cantrip."
+    },
+    "id": "srd521.option.warlock.invocation.agonizing-blast",
+    "kind": "class-option",
+    "name": {
+      "en": "Agonizing Blast"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Agonizing Blast Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b012",
+          "p0072-b013"
+        ],
+        "page": 72,
+        "quoteHash": "ee7730b6f4aa38d2a265ddf4ec52131ad93186f327af047f95c3948f76f85954",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 1,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "",
+      "repeatable": false,
+      "text": "You can cast Mage Armor on yourself without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.armor-of-shadows",
+    "kind": "class-option",
+    "name": {
+      "en": "Armor of Shadows"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Armor of Shadows Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b014"
+        ],
+        "page": 72,
+        "quoteHash": "5dffecae0687dcc2e586b04876a241f19cf87ebc51f19aa7b22babf0f26a73c9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 5,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 5+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 5+ Warlock You can cast Levitate on yourself without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.ascendant-step",
+    "kind": "class-option",
+    "name": {
+      "en": "Ascendant Step"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ascendant Step Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b015",
+          "p0072-b016"
+        ],
+        "page": 72,
+        "quoteHash": "0bbd7f657bfdc76a7cf49f3bdc456705950ef611cd5f075c2692cca6b686670c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 2+ Warlock You can see normally in Dim Light and Darkness— both magical and nonmagical—within 120 feet of yourself."
+    },
+    "id": "srd521.option.warlock.invocation.devil-s-sight",
+    "kind": "class-option",
+    "name": {
+      "en": "Devil’s Sight"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Devil’s Sight Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b017",
+          "p0072-b018"
+        ],
+        "page": 72,
+        "quoteHash": "fdeb6df3d464f069c1d6426b3c79c4948fd797d9a66bde4a63caedde1da83a86",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 12,
+      "prerequisiteInvocationIds": [
+        "srd521.option.warlock.invocation.thirsting-blade"
+      ],
+      "prerequisiteText": "Level 12+ Warlock, Thirsting Blade Invocation",
+      "repeatable": false,
+      "text": "Prerequisite: Level 12+ Warlock, Thirsting Blade Invocation The Extra Attack of your Thirsting Blade invocation confers two extra attacks rather than one."
+    },
+    "id": "srd521.option.warlock.invocation.devouring-blade",
+    "kind": "class-option",
+    "name": {
+      "en": "Devouring Blade"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Devouring Blade Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b019",
+          "p0072-b020"
+        ],
+        "page": 72,
+        "quoteHash": "8af0b9e2806fb424ab778c7f37791ee0a6a2cda332d256a1b5a4a9cac6a8aa37",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 1,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "",
+      "repeatable": false,
+      "text": "You have Advantage on Constitution saving throws that you make to maintain Concentration."
+    },
+    "id": "srd521.option.warlock.invocation.eldritch-mind",
+    "kind": "class-option",
+    "name": {
+      "en": "Eldritch Mind"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Eldritch Mind Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b021"
+        ],
+        "page": 72,
+        "quoteHash": "044a49e92cbea4ac9bf4aae71a3ca6e0c76f10327cc3002dff57ddc220048692",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 5,
+      "prerequisiteInvocationIds": [
+        "srd521.option.warlock.invocation.pact-of-the-blade"
+      ],
+      "prerequisiteText": "Level 5+ Warlock, Pact of the Blade Invocation",
+      "repeatable": false,
+      "text": "Prerequisite: Level 5+ Warlock, Pact of the Blade Invocation Once per turn when you hit a creature with your pact weapon, you can expend a Pact Magic spell slot to deal an extra 1d8 Force damage to the target, plus another 1d8 per level of the spell slot, and you can give the target the Prone condition if it is Huge or smaller."
+    },
+    "id": "srd521.option.warlock.invocation.eldritch-smite",
+    "kind": "class-option",
+    "name": {
+      "en": "Eldritch Smite"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Eldritch Smite Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0072-b022",
+          "p0072-b023"
+        ],
+        "page": 72,
+        "quoteHash": "2ecbd98fecb4b9d50ce4a90cdd3f2a8cf06d84b6bd2e0b1d6f5cd589bbdb80bc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0073-b002"
+        ],
+        "page": 73,
+        "quoteHash": "760298d28f0eff34ba7604ff8192a4c5426986289aae3eceb944abb6fa3a5063",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock, a Warlock Cantrip That Deals Damage",
+      "repeatable": true,
+      "text": "Prerequisite: Level 2+ Warlock, a Warlock Cantrip That Deals Damage Choose one of your known Warlock cantrips that deals damage and has a range of 10+ feet. When you cast that spell, its range increases by a number of feet equal to 30 times your Warlock level. Repeatable. You can gain this invocation more than once. Each time you do so, choose a different eligible cantrip."
+    },
+    "id": "srd521.option.warlock.invocation.eldritch-spear",
+    "kind": "class-option",
+    "name": {
+      "en": "Eldritch Spear"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Eldritch Spear Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b003",
+          "p0073-b004"
+        ],
+        "page": 73,
+        "quoteHash": "4cc5ba9a0bf2e5015689161abd1d280319cfb9cadc8356c1f025b975a4355567",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 2+ Warlock You can cast False Life on yourself without expending a spell slot. When you cast the spell with this feature, you don’t roll the die for the Temporary Hit Points; you automatically get the highest number on the die."
+    },
+    "id": "srd521.option.warlock.invocation.fiendish-vigor",
+    "kind": "class-option",
+    "name": {
+      "en": "Fiendish Vigor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Fiendish Vigor Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b005",
+          "p0073-b006"
+        ],
+        "page": 73,
+        "quoteHash": "9a2f5e3cf13fe54a9f2230491709b0099b8f9f059b29fca32b5b8dfc620a9bdb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 5,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 5+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 5+ Warlock You can use a Bonus Action to touch a willing creature and perceive through its senses until the end of your next turn. As long as the creature is on the same plane of existence as you, you can take a Bonus Action on subsequent turns to maintain this connection, extending the duration until the end of your next turn. The connection ends if you don’t maintain it in this way. While perceiving through the other creature’s senses, you benefit from any special senses possessed by that creature, and you can cast spells as if you were in your space or the other creature’s space if the two of you are within 60 feet of each other."
+    },
+    "id": "srd521.option.warlock.invocation.gaze-of-two-minds",
+    "kind": "class-option",
+    "name": {
+      "en": "Gaze of Two Minds"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Gaze of Two Minds Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b007",
+          "p0073-b008"
+        ],
+        "page": 73,
+        "quoteHash": "7e7eaa9b52be46e84b6f76baf88e85327e69fed15624cf6608c23e4b5206bf31",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 5,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 5+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 5+ Warlock You can breathe underwater, and you gain a Swim Speed equal to your Speed. You can also cast Water Breathing once without expending a spell slot. You regain the ability to cast it in this way again when you finish a Long Rest."
+    },
+    "id": "srd521.option.warlock.invocation.gift-of-the-depths",
+    "kind": "class-option",
+    "name": {
+      "en": "Gift of the Depths"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Gift of the Depths Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b009",
+          "p0073-b010"
+        ],
+        "page": 73,
+        "quoteHash": "4df84f4cd2c83b64174f38447d0badbb65b92a37ac67296504ee0f9a0ae163c2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 9,
+      "prerequisiteInvocationIds": [
+        "srd521.option.warlock.invocation.pact-of-the-tome"
+      ],
+      "prerequisiteText": "Level 9+ Warlock, Pact of the Tome Invocation",
+      "repeatable": false,
+      "text": "Prerequisite: Level 9+ Warlock, Pact of the Tome Invocation A new page appears in your Book of Shadows when you conjure it. With your permission, a creature can take an action to write its name on that page, which can contain a number of names equal to your Charisma modifier (minimum of one name). When any creature whose name is on the page is reduced to 0 Hit Points but not killed outright, the creature magically drops to 1 Hit Point instead. Once this magic is triggered, no creature can benefit from it until you finish a Long Rest. As a Magic action, you can erase a name on the page by touching it."
+    },
+    "id": "srd521.option.warlock.invocation.gift-of-the-protectors",
+    "kind": "class-option",
+    "name": {
+      "en": "Gift of the Protectors"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Gift of the Protectors Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b011",
+          "p0073-b012",
+          "p0073-b013"
+        ],
+        "page": 73,
+        "quoteHash": "c519bf3aeee472478dbc3bfb6d2bc5bad945073847967d95c31154a15b1db4f8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 5,
+      "prerequisiteInvocationIds": [
+        "srd521.option.warlock.invocation.pact-of-the-chain"
+      ],
+      "prerequisiteText": "Level 5+ Warlock, Pact of the Chain Invocation",
+      "repeatable": false,
+      "text": "Prerequisite: Level 5+ Warlock, Pact of the Chain Invocation When you cast Find Familiar, you infuse the summoned familiar with a measure of your eldritch power, granting the creature the following benefits. Aerial or Aquatic. The familiar gains either a Fly Speed or a Swim Speed (your choice) of 40 feet. Quick Attack. As a Bonus Action, you can command the familiar to take the Attack action. Necrotic or Radiant Damage. Whenever the familiar deals Bludgeoning, Piercing, or Slashing damage, you can make it deal Necrotic or Radiant damage instead. Your Save DC. If the familiar forces a creature to make a saving throw, it uses your spell save DC. Resistance. When the familiar takes damage, you can take a Reaction to grant it Resistance against that damage."
+    },
+    "id": "srd521.option.warlock.invocation.investment-of-the-chain-master",
+    "kind": "class-option",
+    "name": {
+      "en": "Investment of the Chain Master"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Investment of the Chain Master Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b014",
+          "p0073-b015"
+        ],
+        "page": 73,
+        "quoteHash": "c45ebac1a4b3a8547ad72efecb4cd3b5e75910e785ceb9f3714ae21577a8b11d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock",
+      "repeatable": true,
+      "text": "Prerequisite: Level 2+ Warlock You have received knowledge from an elder entity of the multiverse, allowing you to gain one Origin feat of your choice (see “Feats”). Repeatable. You can gain this invocation more than once. Each time you do so, choose a different Origin feat."
+    },
+    "id": "srd521.option.warlock.invocation.lessons-of-the-first-ones",
+    "kind": "class-option",
+    "name": {
+      "en": "Lessons of the First Ones"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Lessons of the First Ones Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b016",
+          "p0073-b017"
+        ],
+        "page": 73,
+        "quoteHash": "176e8657547c91d71bcf139394a5343001a0e112b4ea3811ca2fa9497177608a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 9,
+      "prerequisiteInvocationIds": [
+        "srd521.option.warlock.invocation.pact-of-the-blade"
+      ],
+      "prerequisiteText": "Level 9+ Warlock, Pact of the Blade Invocation",
+      "repeatable": false,
+      "text": "Prerequisite: Level 9+ Warlock, Pact of the Blade Invocation Once per turn when you hit a creature with your pact weapon, you can deal an extra 1d6 Necrotic, Psychic, or Radiant damage (your choice) to the creature, and you can expend one of your Hit Point Dice to roll it and regain a number of Hit Points equal to the roll plus your Constitution modifier (minimum of 1 Hit Point)."
+    },
+    "id": "srd521.option.warlock.invocation.lifedrinker",
+    "kind": "class-option",
+    "name": {
+      "en": "Lifedrinker"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Lifedrinker Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b018",
+          "p0073-b019"
+        ],
+        "page": 73,
+        "quoteHash": "9a8d98a36f771bab08694c9c015ea5904d4292e630c90d3189e8ec31a7d7dd79",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 2+ Warlock You can cast Disguise Self without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.mask-of-many-faces",
+    "kind": "class-option",
+    "name": {
+      "en": "Mask of Many Faces"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Mask of Many Faces Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b020",
+          "p0073-b021"
+        ],
+        "page": 73,
+        "quoteHash": "6e31db90549fd4b0cc448e70e07f4605ec2fa84cd6c9c39e8db3fe0efcc2644e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 5,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 5+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 5+ Warlock You can cast Alter Self without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.master-of-myriad-forms",
+    "kind": "class-option",
+    "name": {
+      "en": "Master of Myriad Forms"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Master of Myriad Forms Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0073-b022",
+          "p0073-b023"
+        ],
+        "page": 73,
+        "quoteHash": "1d032e9e98b64e1defb3dc329798425d2491bbf6071964270e8406930017d546",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 2+ Warlock You can cast Silent Image without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.misty-visions",
+    "kind": "class-option",
+    "name": {
+      "en": "Misty Visions"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Misty Visions Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b002",
+          "p0074-b003"
+        ],
+        "page": 74,
+        "quoteHash": "209f5af9094f81c781d3cc75e68c7ea8f3290c1e00191ef5376e7ca7e756a10b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 5,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 5+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 5+ Warlock While you’re in an area of Dim Light or Darkness, you can cast Invisibility on yourself without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.one-with-shadows",
+    "kind": "class-option",
+    "name": {
+      "en": "One with Shadows"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "One with Shadows Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b004",
+          "p0074-b005"
+        ],
+        "page": 74,
+        "quoteHash": "6c8acf3c3f6b6725a0b45cf19a6e0970eac8dd456e3294f752f6e44f81cde4e2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 2+ Warlock You can cast Jump on yourself without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.otherworldly-leap",
+    "kind": "class-option",
+    "name": {
+      "en": "Otherworldly Leap"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Otherworldly Leap Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b006",
+          "p0074-b007"
+        ],
+        "page": 74,
+        "quoteHash": "04c26bc12dde45e98536bcfd5e4d9fcdbcc6da8eb766223081868b00b021eab4",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 1,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "",
+      "repeatable": false,
+      "text": "As a Bonus Action, you can conjure a pact weapon in your hand—a Simple or Martial Melee weapon of your choice with which you bond—or create a bond with a magic weapon you touch; you can’t bond with a magic weapon if someone else is attuned to it or another Warlock is bonded with it. Until the bond ends, you have proficiency with the weapon, and you can use it as a Spellcasting Focus. Whenever you attack with the bonded weapon, you can use your Charisma modifier for the attack and damage rolls instead of using Strength or Dexterity; and you can cause the weapon to deal Necrotic, Psychic, or Radiant damage or its normal damage type. Your bond with the weapon ends if you use this feature’s Bonus Action again, if the weapon is more than 5 feet away from you for 1 minute or more, or if you die. A conjured weapon disappears when the bond ends."
+    },
+    "id": "srd521.option.warlock.invocation.pact-of-the-blade",
+    "kind": "class-option",
+    "name": {
+      "en": "Pact of the Blade"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Pact of the Blade Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b008"
+        ],
+        "page": 74,
+        "quoteHash": "a717f680eff963acef929b690bbdfad171078ad9daa6bd843f99ef6c02858579",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 1,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "",
+      "repeatable": false,
+      "text": "You learn the Find Familiar spell and can cast it as a Magic action without expending a spell slot. When you cast the spell, you choose one of the normal forms for your familiar or one of the following special forms: Imp, Pseudodragon, Quasit, Skeleton, Sphinx of Wonder, Sprite, or Venomous Snake (see “Monsters” for the familiar’s stat block). Additionally, when you take the Attack action, you can forgo one of your own attacks to allow your familiar to make one attack of its own with its Reaction."
+    },
+    "id": "srd521.option.warlock.invocation.pact-of-the-chain",
+    "kind": "class-option",
+    "name": {
+      "en": "Pact of the Chain"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Pact of the Chain Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b009"
+        ],
+        "page": 74,
+        "quoteHash": "7fc21e5153ca0c3265d7a2e9b388d0073ae64f59488b181bfbc2f53731a3bd4c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 1,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "",
+      "repeatable": false,
+      "text": "Stitching together strands of shadow, you conjure forth a book in your hand at the end of a Short or Long Rest. This Book of Shadows (you determine its appearance) contains eldritch magic that only you can access, granting you the benefits below. The book disappears if you conjure another book with this feature or if you die. Cantrips and Rituals. When the book appears, choose three cantrips, and choose two level 1 spells that have the Ritual tag. The spells can be from any class’s spell list, and they must be spells you don’t already have prepared. While the book is on your person, you have the chosen spells prepared, and they function as Warlock spells for you. Spellcasting Focus. You can use the book as a Spellcasting Focus."
+    },
+    "id": "srd521.option.warlock.invocation.pact-of-the-tome",
+    "kind": "class-option",
+    "name": {
+      "en": "Pact of the Tome"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Pact of the Tome Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b010",
+          "p0074-b011"
+        ],
+        "page": 74,
+        "quoteHash": "c8b2af6e992d25a9f7e23e48c5a6b528193e3de268f4f07aad0a67d0d5106adc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 2,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 2+ Warlock, a Warlock Cantrip That Deals Damage via an Attack Roll",
+      "repeatable": true,
+      "text": "Prerequisite: Level 2+ Warlock, a Warlock Cantrip That Deals Damage via an Attack Roll Choose one of your known Warlock cantrips that requires an attack roll. When you hit a Large or smaller creature with that cantrip, you can push the creature up to 10 feet straight away from you. Repeatable. You can gain this invocation more than once. Each time you do so, choose a different eligible cantrip."
+    },
+    "id": "srd521.option.warlock.invocation.repelling-blast",
+    "kind": "class-option",
+    "name": {
+      "en": "Repelling Blast"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Repelling Blast Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b012",
+          "p0074-b013"
+        ],
+        "page": 74,
+        "quoteHash": "b544e55ba068bd23eef75862147f95c0a8d32535896062ebcf1a7b79c538f319",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 5,
+      "prerequisiteInvocationIds": [
+        "srd521.option.warlock.invocation.pact-of-the-blade"
+      ],
+      "prerequisiteText": "Level 5+ Warlock, Pact of the Blade Invocation",
+      "repeatable": false,
+      "text": "Prerequisite: Level 5+ Warlock, Pact of the Blade Invocation You gain the Extra Attack feature for your pact weapon only. With that feature, you can attack twice with the weapon instead of once when you take the Attack action on your turn."
+    },
+    "id": "srd521.option.warlock.invocation.thirsting-blade",
+    "kind": "class-option",
+    "name": {
+      "en": "Thirsting Blade"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Thirsting Blade Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b014",
+          "p0074-b015"
+        ],
+        "page": 74,
+        "quoteHash": "5f52689d519e5cff2964caa12c893307b3a3be0361d6ea77016e9c3cf910708b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 9,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 9+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 9+ Warlock You can cast Arcane Eye without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.visions-of-distant-realms",
+    "kind": "class-option",
+    "name": {
+      "en": "Visions of Distant Realms"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Visions of Distant Realms Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b016",
+          "p0074-b017"
+        ],
+        "page": 74,
+        "quoteHash": "e39c649442e4d796531453cc800c133cd6a0f2643b6fa4eb7e11f35840d3c4a2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 7,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 7+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 7+ Warlock You can cast Speak with Dead without expending a spell slot."
+    },
+    "id": "srd521.option.warlock.invocation.whispers-of-the-grave",
+    "kind": "class-option",
+    "name": {
+      "en": "Whispers of the Grave"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Whispers of the Grave Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b018",
+          "p0074-b019"
+        ],
+        "page": 74,
+        "quoteHash": "a9d9a3c0c88a75861b152c807694c8fba1d8927e380a45ca6144604a16f0356b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "minimumWarlockLevel": 15,
+      "prerequisiteInvocationIds": [],
+      "prerequisiteText": "Level 15+ Warlock",
+      "repeatable": false,
+      "text": "Prerequisite: Level 15+ Warlock You have Truesight with a range of 30 feet."
+    },
+    "id": "srd521.option.warlock.invocation.witch-sight",
+    "kind": "class-option",
+    "name": {
+      "en": "Witch Sight"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Witch Sight Eldritch Invocation option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0074-b020",
+          "p0074-b021"
+        ],
+        "page": 74,
+        "quoteHash": "5122754b8525eaacc13f75a9d8f4e7e9c3685d45ee0b56352f38ce3e8073cbb0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "warlock",
+      "eldritch-invocation"
+    ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {
+        "3": [
+          "srd521.spell.burning-hands",
+          "srd521.spell.command",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.suggestion"
+        ],
+        "5": [
+          "srd521.spell.fireball",
+          "srd521.spell.stinking-cloud"
+        ],
+        "7": [
+          "srd521.spell.fire-shield",
+          "srd521.spell.wall-of-fire"
+        ],
+        "9": [
+          "srd521.spell.geas",
+          "srd521.spell.insect-plague"
+        ]
+      },
+      "description": "Your pact draws on the Lower Planes, the realms of perdition. You might forge a bargain with a demon lord, an archdevil, or another fiend that is especially mighty. That patron’s aims are evil—the corruption or destruction of all things, ultimately including you—and your path is defined by the extent to which you strive against those aims.",
+      "parentClassId": "srd521.class.warlock",
+      "progression": [
+        {
+          "features": [
+            "srd521.subclass-feature.warlock.fiend.dark-one-s-blessing",
+            "srd521.subclass-feature.warlock.fiend.fiend-spells"
+          ],
+          "level": 3
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.warlock.fiend.dark-one-s-own-luck"
+          ],
+          "level": 6
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.warlock.fiend.fiendish-resilience"
+          ],
+          "level": 10
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.warlock.fiend.hurl-through-hell"
+          ],
+          "level": 14
+        }
+      ]
+    },
+    "id": "srd521.subclass.warlock.fiend-patron",
+    "kind": "subclass",
+    "name": {
+      "en": "Fiend Patron"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Fiend Patron subclass extracted from page 76.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0076-b018",
+          "p0076-b019",
+          "p0076-b020"
+        ],
+        "page": 76,
+        "quoteHash": "2149ff390cc80cebc54fed15c6822b8887a90b29405edabed45d6a8c9066b0d7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass",
+      "warlock",
+      "fiend-patron"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "When you reduce an enemy to 0 Hit Points, you gain Temporary Hit Points equal to your Charisma modifier plus your Warlock level (minimum of 1 Temporary Hit Point). You also gain this benefit if someone else reduces an enemy within 10 feet of you to 0 Hit Points."
+    },
+    "id": "srd521.subclass-feature.warlock.fiend.dark-one-s-blessing",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Dark One’s Blessing"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Dark One’s Blessing extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0076-b021"
+        ],
+        "page": 76,
+        "quoteHash": "a6b8df4b8fe3d1651b537fd9ed789d6e1fdfdad6e5ee508183ad311ccd2330f1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "The magic of your patron ensures you always have certain spells ready; when you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared. Fiend Spells Warlock Level Spells 3 Burning Hands, Command, Scorching Ray, Suggestion 5 Fireball, Stinking Cloud 7 Fire Shield, Wall of Fire 9 Geas, Insect Plague"
+    },
+    "id": "srd521.subclass-feature.warlock.fiend.fiend-spells",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Fiend Spells"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Fiend Spells extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0076-b022",
+          "p0076-b023",
+          "p0076-b024",
+          "p0076-b025",
+          "p0076-b026",
+          "p0076-b027",
+          "p0076-b028"
+        ],
+        "page": 76,
+        "quoteHash": "132960b31611664c5373b4ae893dec363c8c455273a51e2f8a9d0489a808aec2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 6,
+      "text": "You can call on your fiendish patron to alter fate in your favor. When you make an ability check or a saving throw, you can use this feature to add 1d10 to your roll. You can do so after seeing the roll but before any of the roll’s effects occur. You can use this feature a number of times equal to your Charisma modifier (minimum of once), but you can use it no more than once per roll. You regain all expended uses when you finish a Long Rest."
+    },
+    "id": "srd521.subclass-feature.warlock.fiend.dark-one-s-own-luck",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Dark One’s Own Luck"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Dark One’s Own Luck extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0076-b029"
+        ],
+        "page": 76,
+        "quoteHash": "af8dc484795c578e517738d6781398aadfd7939bcfa22af6436088c1a1b5c1c1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 10,
+      "text": "Choose one damage type, other than Force, whenever you finish a Short or Long Rest. You have Resistance to that damage type until you choose a different one with this feature."
+    },
+    "id": "srd521.subclass-feature.warlock.fiend.fiendish-resilience",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Fiendish Resilience"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Fiendish Resilience extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0076-b030"
+        ],
+        "page": 76,
+        "quoteHash": "79f74984e5670b0378fb43a505deba6899fc736f605491085936cb1b597b7897",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "level": 14,
+      "text": "Once per turn when you hit a creature with an attack roll, you can try to instantly transport the target through the Lower Planes. The target must succeed on a Charisma saving throw against your spell save DC, or the target disappears and hurtles through a nightmare landscape. The target takes 8d10 Psychic damage if it isn’t a Fiend, and it has the Incapacitated condition until the end of your next turn, when it returns to the space it previously occupied or the nearest unoccupied space. Once you use this feature, you can’t use it again until you finish a Long Rest unless you expend a Pact Magic spell slot (no action required) to restore your use of it."
+    },
+    "id": "srd521.subclass-feature.warlock.fiend.hurl-through-hell",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Hurl Through Hell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Hurl Through Hell extracted from the Warlock description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0076-b031"
+        ],
+        "page": 76,
+        "quoteHash": "395d49c4913b492a49bbdf2f7819e8e775f4b2ceb232ca5747ed79294a32aa1d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "warlock"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You hurl a beam of crackling energy. Make a ranged spell attack against one creature or object in range. On a hit, the target takes 1d10 Force damage. Cantrip Upgrade. The spell creates two beams at level 5, three beams at level 11, and four beams at level 17. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "warlockSpell": true
+    },
+    "id": "srd521.spell.eldritch-blast",
+    "kind": "spell",
+    "name": {
+      "en": "Eldritch Blast"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Warlock spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0127-b005",
+          "p0127-b006",
+          "p0127-b007"
+        ],
+        "page": 127,
+        "quoteHash": "1fd083425ed2ad74c285557b0a382d21d50f7b4f72b5d7362d4abeaac7f7b53c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "evocation",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Reaction, which you take in response to taking damage from a creature that you can see within 60 feet of yourself",
+      "classes": [
+        "warlock"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "The creature that damaged you is momentarily surrounded by green flames. It makes a Dexterity saving throw, taking 2d10 Fire damage on a failed save or half as much damage on a successful one. Using a Higher-Level Spell Slot. The damage increases by 1d10 for each spell slot level above 1.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "evocation",
+      "warlockSpell": true
+    },
+    "id": "srd521.spell.hellish-rebuke",
+    "kind": "spell",
+    "name": {
+      "en": "Hellish Rebuke"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Warlock spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0140-b003",
+          "p0140-b004",
+          "p0140-b005",
+          "p0140-b006"
+        ],
+        "page": 140,
+        "quoteHash": "40c1da6d0a4031317ab894dbc85ecadbf5c8c5e5ff6cbc1e4307a10823aae411",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "evocation",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Bonus Action",
+      "classes": [
+        "warlock"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "the petrified eye of a newt",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You place a curse on a creature that you can see within range. Until the spell ends, you deal an extra 1d6 Necrotic damage to the target whenever you hit it with an attack roll. Also, choose one ability when you cast the spell. The target has Disadvantage on ability checks made with the chosen ability. If the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action on a later turn to curse a new creature. Using a Higher-Level Spell Slot. Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).",
+      "duration": "Concentration, up to 1 hour",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "90 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "enchantment",
+      "warlockSpell": true
+    },
+    "id": "srd521.spell.hex",
+    "kind": "spell",
+    "name": {
+      "en": "Hex"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Warlock spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0140-b015",
+          "p0140-b016",
+          "p0140-b017"
+        ],
+        "page": 140,
+        "quoteHash": "d7d9faeafdc4c27b6af6ef17fec891888f5613db7081a0ae970d325227e7d69d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "enchantment",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You create a magical effect within range. Choose the effect from the options below. If you cast this spell multiple times, you can have up to three of its non-instantaneous effects active at a time. Sensory Effect. You create an instantaneous, harmless sensory effect, such as a shower of sparks, a puff of wind, faint musical notes, or an odd odor. Fire Play. You instantaneously light or snuff out a candle, a torch, or a small campfire. Clean or Soil. You instantaneously clean or soil an object no larger than 1 cubic foot. Minor Sensation. You chill, warm, or flavor up to 1 cubic foot of nonliving material for 1 hour. Magic Mark. You make a color, a small mark, or a symbol appear on an object or a surface for 1 hour. Minor Creation. You create a nonmagical trinket or an illusory image that can fit in your hand. It lasts until the end of your next turn. A trinket can deal no damage and has no monetary worth.",
+      "duration": "Up to 1 hour",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "10 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "transmutation",
+      "warlockSpell": true
+    },
+    "id": "srd521.spell.prestidigitation",
+    "kind": "spell",
+    "name": {
+      "en": "Prestidigitation"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Warlock spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0154-b016",
+          "p0154-b017",
+          "p0154-b018"
+        ],
+        "page": 154,
+        "quoteHash": "39f6468234ffa7c806c664eec4d8264d58fdff79797cd11de439d5b5408ea991",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "transmutation",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a rotten egg",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You create a 20-foot-radius Sphere of yellow, nauseating gas centered on a point within range. The cloud is Heavily Obscured. The cloud lingers in the air for the duration or until a strong wind (such as the one created by Gust of Wind) disperses it. Each creature that starts its turn in the Sphere must succeed on a Constitution saving throw or have the Poisoned condition until the end of the current turn. While Poisoned in this way, the creature can’t take an action or a Bonus Action.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 3,
+      "range": "90 feet",
+      "ritual": false,
+      "savingThrows": [
+        "constitution"
+      ],
+      "school": "conjuration",
+      "warlockSpell": true
+    },
+    "id": "srd521.spell.stinking-cloud",
+    "kind": "spell",
+    "name": {
+      "en": "Stinking Cloud"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Warlock spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0165-b009",
+          "p0165-b010",
+          "p0165-b011",
+          "p0165-b012"
+        ],
+        "page": 165,
+        "quoteHash": "17ee5cf0c0067266ae9f619f355c346dc195ab59111fdd5a57950e127918a96c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "conjuration",
+      "warlock"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a drop of honey",
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You suggest a course of activity—described in no more than 25 words—to one creature you can see within range that can hear and understand you. The suggestion must sound achievable and not involve anything that would obviously deal damage to the target or its allies. For example, you could say, “Fetch the key to the cult’s treasure vault, and give the key to me.” Or you could say, “Stop fighting, leave this library peacefully, and don’t return.” The target must succeed on a Wisdom saving throw or have the Charmed condition for the duration or until you or your allies deal damage to the target. The Charmed target pursues the suggestion to the best of its ability. The suggested activity can continue for the entire duration, but if the suggested activity can be completed in a shorter time, the spell ends for the target upon completing it.",
+      "duration": "Concentration, up to 8 hours",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 2,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [
+        "wisdom"
+      ],
+      "school": "enchantment",
+      "warlockSpell": true
+    },
+    "id": "srd521.spell.suggestion",
+    "kind": "spell",
+    "name": {
+      "en": "Suggestion"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Warlock spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0166-b003",
+          "p0166-b004",
+          "p0166-b005"
+        ],
+        "page": 166,
+        "quoteHash": "7ee5d4b8a72e8e04fc5bc2a083c565034aff84b1a4907252ea33d2ac3241f511",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "enchantment",
+      "warlock"
+    ]
+  }
+]
