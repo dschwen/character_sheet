@@ -301,6 +301,7 @@ const actionParametersSchema = z
     actionEconomy: z.string().optional(),
     spends: z.number().int().positive().optional(),
     resourceId: z.string().min(1).optional(),
+    spellId: z.string().min(1).optional(),
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     healing: z
       .union([
@@ -737,6 +738,7 @@ function validateProgressionSelections(
   const druidLevel = classLevelCounts.get("srd521.class.druid") ?? 0;
   const monkLevel = classLevelCounts.get("srd521.class.monk") ?? 0;
   const paladinLevel = classLevelCounts.get("srd521.class.paladin") ?? 0;
+  const rangerLevel = classLevelCounts.get("srd521.class.ranger") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -838,6 +840,22 @@ function validateProgressionSelections(
       ["build.subclassId"],
     );
   }
+  if (rangerLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "RANGER_SUBCLASS_REQUIRED",
+      "A Ranger of level 3 or higher must select a Ranger subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (rangerLevel < 3 && subclassParentId === "srd521.class.ranger") {
+    addValidation(
+      state,
+      "RANGER_SUBCLASS_LEVEL_REQUIRED",
+      "A Ranger subclass requires Ranger level 3.",
+      ["build.subclassId"],
+    );
+  }
   const divineOrderSelections = character.build.levels
     .flatMap((level) => level.selectedFeatureChoices)
     .filter((choice) => choice.choiceId === "srd521.choice.cleric.divine-order")
@@ -914,6 +932,45 @@ function validateProgressionSelections(
       "DRUID_CIRCLE_LAND_OPTION_INVALID",
       "The selected Circle of the Land type is not supported by the loaded Druid content.",
       ["build.levels"],
+    );
+  }
+  const huntersPreySelections = character.build.levels
+    .flatMap((level) => level.selectedFeatureChoices)
+    .filter((choice) => choice.choiceId === "srd521.choice.ranger.hunters-prey")
+    .flatMap((choice) => choice.optionIds);
+  if (
+    rangerLevel >= 3 &&
+    character.build.subclassId === "srd521.subclass.ranger.hunter" &&
+    huntersPreySelections.length !== 1
+  ) {
+    addValidation(
+      state,
+      "RANGER_HUNTERS_PREY_CHOICE_COUNT",
+      "A Hunter Ranger must select exactly one Hunter’s Prey option.",
+      ["build.levels"],
+    );
+  }
+  const huntersPreyOptions = new Set([
+    "srd521.option.ranger.hunters-prey.colossus-slayer",
+    "srd521.option.ranger.hunters-prey.horde-breaker",
+  ]);
+  if (huntersPreySelections.some((optionId) => !huntersPreyOptions.has(optionId))) {
+    addValidation(
+      state,
+      "RANGER_HUNTERS_PREY_OPTION_INVALID",
+      "The selected Hunter’s Prey option is not supported by the loaded Ranger content.",
+      ["build.levels"],
+    );
+  }
+  const deftExplorerExpertise = character.build.proficiencyChoices.expertise.filter(
+    (choice) => choice.sourceId === "srd521.class-feature.ranger.deft-explorer",
+  );
+  if (rangerLevel >= 2 && deftExplorerExpertise.length !== 1) {
+    addValidation(
+      state,
+      "RANGER_DEFT_EXPLORER_EXPERTISE_COUNT",
+      "A Ranger of level 2 or higher selects one proficient skill for Deft Explorer Expertise.",
+      ["build.proficiencyChoices.expertise"],
     );
   }
   if (character.build.subclassId !== undefined && subclass?.kind !== "subclass") {
@@ -1590,6 +1647,16 @@ function evaluateD20Tests(
         "SKILL_PROFICIENCY_SOURCE_NOT_GRANTED",
         `${choice.sourceId} does not grant a skill choice to this character.`,
         ["build.proficiencyChoices.skills"],
+      );
+    }
+  }
+  for (const choice of character.build.proficiencyChoices.expertise) {
+    if (!selectedSkillIds.has(choice.skillId)) {
+      addValidation(
+        state,
+        "EXPERTISE_REQUIRES_PROFICIENCY",
+        `${choice.skillId} must be proficient before it can gain Expertise.`,
+        ["build.proficiencyChoices.expertise"],
       );
     }
   }
@@ -3074,6 +3141,9 @@ function evaluateConditionalRules(
       }
       if (parameters.resourceId !== undefined) {
         actionParameters.resourceId = parameters.resourceId;
+      }
+      if (parameters.spellId !== undefined) {
+        actionParameters.spellId = parameters.spellId;
       }
       if (parameters.variableSpend !== undefined) {
         actionParameters.variableSpend = parameters.variableSpend;

@@ -25,6 +25,7 @@ const stateActionParametersSchema = z
     spends: z.number().int().positive().optional(),
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     resourceId: z.string().min(1),
+    spellId: z.string().min(1).optional(),
     healing: z
       .union([
         z
@@ -211,6 +212,10 @@ export function proposeAction(
     throw new TypeError("Validated action spend amount is missing");
   }
   const resource = evaluation.resources.find((candidate) => candidate.id === parameters.resourceId);
+  const spell =
+    parameters.spellId === undefined
+      ? undefined
+      : evaluation.spells.find((candidate) => candidate.id === parameters.spellId);
   const diceHealing =
     parameters.healing !== undefined && "diceCount" in parameters.healing
       ? parameters.healing
@@ -220,13 +225,14 @@ export function proposeAction(
     parameters.healing === undefined ? undefined : evaluation.values["hitPoints.maximum"]?.value;
   if (
     resource === undefined ||
+    (parameters.spellId !== undefined && spell === undefined) ||
     (diceHealing !== undefined &&
       (typeof bonus !== "number" || typeof maximumHitPoints !== "number"))
   ) {
     addValidation(
       validations,
       "ACTION_TRANSITION_FACT_MISSING",
-      `${request.actionId} is missing a required resource or healing fact.`,
+      `${request.actionId} is missing a required resource, spell, or healing fact.`,
       ["request.actionId"],
     );
     return {
@@ -310,6 +316,21 @@ export function proposeAction(
     [expendedBefore, spend, resource.maximum],
     sourceTrace,
   );
+  if (spell?.concentration === true) {
+    const concentrationBefore = character.state.concentrationSpellId ?? null;
+    nextState.concentrationSpellId = spell.id;
+    recordChange(
+      changes,
+      traces,
+      "state.concentrationSpellId",
+      concentrationBefore,
+      spell.id,
+      `${request.actionId} starts Concentration and ends any previous Concentration.`,
+      "start-concentration",
+      [concentrationBefore, spell.id],
+      sourceTrace,
+    );
+  }
   if (healedHitPoints > character.state.currentHitPoints) {
     for (const field of ["deathSaveSuccesses", "deathSaveFailures"] as const) {
       nextState[field] = 0;

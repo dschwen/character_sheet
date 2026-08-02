@@ -1,0 +1,74 @@
+{
+  "id": "srd521.class-feature.ranger.favored-enemy",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.ranger",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.ranger"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.ranger.favored-enemy"
+      },
+      "id": "favored-enemy-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.ranger.favored-enemy",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-favored-enemy",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "resourceId": "srd521.resource.ranger.favored-enemy",
+        "spellId": "srd521.spell.hunter-s-mark",
+        "spends": 1
+      },
+      "target": "action.free-hunters-mark",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.ranger.favored-enemy"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets and situational attack requirements remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0058-b004"
+      ],
+      "page": 58,
+      "quoteHash": "d4779e56bb65db03971e2dceeb67faca1b55b29fb1e795e7803ced8426632f71",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You always have the Hunter’s Mark spell prepared. You can cast it twice without expending a spell slot, and you regain all expended uses of this ability when you finish a Long Rest. The number of times you can cast the spell without a spell slot increases when you reach certain Ranger levels, as shown in the Favored Enemy column of the Ranger Features table."
+      }
+    ],
+    "title": "Favored Enemy"
+  }
+}
