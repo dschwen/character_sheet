@@ -2,13 +2,26 @@
 
 A deterministic, versioned D&D SRD 5.2.1 rules engine and character manager. The repository
 currently provides strict schemas, reproducible source extraction, a validated content package,
-reviewable authoring IR, and a traced declarative rules evaluator with atomic state-transition
-proposals.
+reviewable authoring IR, a traced declarative rules evaluator with atomic state-transition
+proposals, and a local-first web character sheet.
 
 ## Use it now
 
-A web interface is not required to evaluate or validate a character. Build once, then pass a
-character JSON document to the local CLI:
+Install the workspace and start the web interface:
+
+```bash
+corepack pnpm install
+corepack pnpm web
+```
+
+Open `http://localhost:3000`. The app includes all reviewed character fixtures and lets you switch
+between them, inspect overview/combat/spell/feature views, open the calculation trace behind a
+derived value, and import or export the canonical character JSON. Imported characters stay in the
+browser's local storage; the app has no account, server, or database dependency. A production build
+is emitted as a static site in `apps/web/out` by `corepack pnpm build`.
+
+The CLI remains useful for automation and does not require the web interface. Build once, then pass
+a character JSON document to it:
 
 ```bash
 corepack pnpm build
@@ -32,11 +45,10 @@ resources, validations, and calculation traces:
 corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 ```
 
-Today, character JSON is the source document: copy one of the reviewed fixtures, give it a new ID
-and name, and edit its choices and play-state. The schemas reject malformed documents, and the
-engine reports rules-invalid choices without changing the input. A web app is still needed for a
-friendly choice-by-choice builder, local persistence, and an interactive play sheet, but it will
-call the same engine exercised by this CLI.
+Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
+name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
+reports rules-invalid choices without changing the input. The web app is currently a read-only
+sheet; the choice-by-choice character builder and play-state controls are the next frontend slices.
 
 ## Requirements
 

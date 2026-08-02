@@ -4,10 +4,12 @@ dist/
 .venv/
 .turbo/
 .next/
+out/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 __pycache__/
 *.pyc
+*.tsbuildinfo
 sources/**/source.pdf
 /generated/
