@@ -328,6 +328,15 @@ const actionParametersSchema = z
       .strict()
       .optional(),
     damageReductionFraction: z.number().positive().max(1).optional(),
+    restoresResource: z
+      .object({
+        resourceId: z.string().min(1),
+        amountFact: z.string().min(1),
+        fraction: z.number().positive().default(1),
+        round: z.enum(["down", "up"]).default("down"),
+      })
+      .strict()
+      .optional(),
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     healing: z
       .union([
@@ -766,6 +775,7 @@ function validateProgressionSelections(
   const paladinLevel = classLevelCounts.get("srd521.class.paladin") ?? 0;
   const rangerLevel = classLevelCounts.get("srd521.class.ranger") ?? 0;
   const rogueLevel = classLevelCounts.get("srd521.class.rogue") ?? 0;
+  const sorcererLevel = classLevelCounts.get("srd521.class.sorcerer") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -899,6 +909,22 @@ function validateProgressionSelections(
       ["build.subclassId"],
     );
   }
+  if (sorcererLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "SORCERER_SUBCLASS_REQUIRED",
+      "A Sorcerer of level 3 or higher must select a Sorcerer subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (sorcererLevel < 3 && subclassParentId === "srd521.class.sorcerer") {
+    addValidation(
+      state,
+      "SORCERER_SUBCLASS_LEVEL_REQUIRED",
+      "A Sorcerer subclass requires Sorcerer level 3.",
+      ["build.subclassId"],
+    );
+  }
   const divineOrderSelections = character.build.levels
     .flatMap((level) => level.selectedFeatureChoices)
     .filter((choice) => choice.choiceId === "srd521.choice.cleric.divine-order")
@@ -1026,6 +1052,49 @@ function validateProgressionSelections(
       "ROGUE_EXPERTISE_CHOICE_COUNT",
       `A Rogue of level ${String(rogueLevel)} requires ${String(expectedRogueExpertise)} Expertise selections.`,
       ["build.proficiencyChoices.expertise"],
+    );
+  }
+  const metamagicSelections = character.build.levels
+    .flatMap((level) => level.selectedFeatureChoices)
+    .filter((choice) => choice.choiceId === "srd521.choice.sorcerer.metamagic")
+    .flatMap((choice) => choice.optionIds);
+  if (sorcererLevel < 2 && metamagicSelections.length > 0) {
+    addValidation(
+      state,
+      "SORCERER_METAMAGIC_LEVEL_REQUIRED",
+      "Metamagic selections require Sorcerer level 2.",
+      ["build.levels"],
+    );
+  }
+  if (
+    sorcererLevel >= 2 &&
+    (metamagicSelections.length !== 2 || new Set(metamagicSelections).size !== 2)
+  ) {
+    addValidation(
+      state,
+      "SORCERER_METAMAGIC_CHOICE_COUNT",
+      "A Sorcerer of levels 2–9 selects exactly two Metamagic options.",
+      ["build.levels"],
+    );
+  }
+  const metamagicOptions = new Set([
+    "srd521.option.sorcerer.metamagic.careful",
+    "srd521.option.sorcerer.metamagic.distant",
+    "srd521.option.sorcerer.metamagic.empowered",
+    "srd521.option.sorcerer.metamagic.extended",
+    "srd521.option.sorcerer.metamagic.heightened",
+    "srd521.option.sorcerer.metamagic.quickened",
+    "srd521.option.sorcerer.metamagic.seeking",
+    "srd521.option.sorcerer.metamagic.subtle",
+    "srd521.option.sorcerer.metamagic.transmuted",
+    "srd521.option.sorcerer.metamagic.twinned",
+  ]);
+  if (metamagicSelections.some((optionId) => !metamagicOptions.has(optionId))) {
+    addValidation(
+      state,
+      "SORCERER_METAMAGIC_OPTION_INVALID",
+      "The selected Metamagic option is not supported by the loaded Sorcerer content.",
+      ["build.levels"],
     );
   }
   if (character.build.subclassId !== undefined && subclass?.kind !== "subclass") {
@@ -1917,6 +1986,8 @@ function hitPointBase(
 
 function evaluateHitPoints(
   character: CharacterDocument,
+  rules: { ir: AuthoringIr; rule: DraftRule }[],
+  granted: ReadonlySet<string>,
   index: PackageIndex,
   state: EngineState,
 ): void {
@@ -1956,6 +2027,39 @@ function evaluateHitPoints(
       })),
     );
   });
+  for (const { ir, rule } of rules) {
+    if (
+      rule.type !== "add-modifier" ||
+      rule.target !== "hitPoints.maximum" ||
+      rule.expression === undefined
+    ) {
+      continue;
+    }
+    if (
+      rule.when !== undefined &&
+      evaluatePredicate(rule.when, `${rule.id}.hit-points-applicable`, state, index, granted)
+        .result !== true
+    ) {
+      continue;
+    }
+    const modifierTrace = evaluateExpression(
+      rule.expression,
+      `hitPoints.maximum.${rule.id}`,
+      state,
+      index,
+      granted,
+    );
+    const modifier = requireNumber(modifierTrace.result as JsonScalar, rule.id);
+    maximum += modifier;
+    nodes.push({
+      id: `hitPoints.maximum.${rule.id}.apply`,
+      operation: "apply-hit-point-modifier",
+      inputs: [modifier],
+      output: modifier,
+      label: ir.text.title,
+    });
+    sources.push(...sourceReferences(ir));
+  }
   const traceId = "hitPoints.maximum";
   nodes.push({
     id: `${traceId}.total`,
@@ -3238,6 +3342,20 @@ function evaluateConditionalRules(
       if (parameters.damageReductionFraction !== undefined) {
         actionParameters.damageReductionFraction = parameters.damageReductionFraction;
       }
+      if (parameters.restoresResource !== undefined) {
+        const baseAmount = requireNumber(
+          state.facts[parameters.restoresResource.amountFact] ?? null,
+          parameters.restoresResource.amountFact,
+        );
+        const scaledAmount = baseAmount * parameters.restoresResource.fraction;
+        actionParameters.restoresResource = {
+          resourceId: parameters.restoresResource.resourceId,
+          amount:
+            parameters.restoresResource.round === "up"
+              ? Math.ceil(scaledAmount)
+              : Math.floor(scaledAmount),
+        };
+      }
       if (parameters.variableSpend !== undefined) {
         actionParameters.variableSpend = parameters.variableSpend;
       }
@@ -3446,6 +3564,10 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     granted.add(character.build.backgroundId);
   }
   character.build.featIds.forEach((featId) => granted.add(featId));
+  character.build.levels
+    .flatMap((level) => level.selectedFeatureChoices)
+    .flatMap((choice) => choice.optionIds)
+    .forEach((optionId) => granted.add(optionId));
   const rules = applicableRules(index, granted);
   evaluateAbilities(state);
   evaluateProficiency(state);
@@ -3457,7 +3579,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     ...equipment.rollEffects,
     ...ruleRollEffects(rules, state, index, granted),
   ]);
-  evaluateHitPoints(character, index, state);
+  evaluateHitPoints(character, rules, granted, index, state);
   evaluateSpellcasting(character, classLevels, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment);

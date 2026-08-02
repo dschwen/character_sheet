@@ -1,0 +1,86 @@
+{
+  "id": "srd521.class-feature.sorcerer.innate-sorcery",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.sorcerer",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 2
+      },
+      "id": "innate-sorcery-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.sorcerer.innate-sorcery",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-innate-sorcery",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "resourceId": "srd521.resource.sorcerer.innate-sorcery",
+        "spends": 1
+      },
+      "target": "action.innate-sorcery",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.sorcerer.innate-sorcery"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Spell targets and encounter effects remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0065-b004"
+      ],
+      "page": 65,
+      "quoteHash": "096ec76e1831309172a5e9a5eebbe4d6403addd35eca8b148a5f81c91dcaa6fa",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0066-b002",
+        "p0066-b003"
+      ],
+      "page": 66,
+      "quoteHash": "ecb0315b3e09d70c7ddaae845c03b25235c840b7937db8040f904e507c3d149a",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "An event in your past left an indelible mark on you, infusing you with simmering magic. As a Bonus Action, you can unleash that magic for 1 minute, during which you gain the following benefits:"
+      },
+      {
+        "kind": "ListNode",
+        "text": "The spell save DC of your Sorcerer spells increases by 1. • You have Advantage on the attack rolls of Sorcerer spells you cast."
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "You can use this feature twice, and you regain all expended uses of it when you finish a Long Rest."
+      }
+    ],
+    "title": "Innate Sorcery"
+  }
+}

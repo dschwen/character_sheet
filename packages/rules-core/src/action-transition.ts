@@ -26,6 +26,10 @@ const stateActionParametersSchema = z
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     resourceId: z.string().min(1),
     spellId: z.string().min(1).optional(),
+    restoresResource: z
+      .object({ resourceId: z.string().min(1), amount: z.number().int().positive() })
+      .strict()
+      .optional(),
     healing: z
       .union([
         z
@@ -216,6 +220,12 @@ export function proposeAction(
     parameters.spellId === undefined
       ? undefined
       : evaluation.spells.find((candidate) => candidate.id === parameters.spellId);
+  const restoredResource =
+    parameters.restoresResource === undefined
+      ? undefined
+      : evaluation.resources.find(
+          (candidate) => candidate.id === parameters.restoresResource?.resourceId,
+        );
   const diceHealing =
     parameters.healing !== undefined && "diceCount" in parameters.healing
       ? parameters.healing
@@ -226,6 +236,7 @@ export function proposeAction(
   if (
     resource === undefined ||
     (parameters.spellId !== undefined && spell === undefined) ||
+    (parameters.restoresResource !== undefined && restoredResource === undefined) ||
     (diceHealing !== undefined &&
       (typeof bonus !== "number" || typeof maximumHitPoints !== "number"))
   ) {
@@ -328,6 +339,23 @@ export function proposeAction(
       `${request.actionId} starts Concentration and ends any previous Concentration.`,
       "start-concentration",
       [concentrationBefore, spell.id],
+      sourceTrace,
+    );
+  }
+  if (parameters.restoresResource !== undefined && restoredResource !== undefined) {
+    const restoredBefore =
+      character.state.expendedResources[parameters.restoresResource.resourceId] ?? 0;
+    const restoredAfter = Math.max(0, restoredBefore - parameters.restoresResource.amount);
+    nextState.expendedResources[parameters.restoresResource.resourceId] = restoredAfter;
+    recordChange(
+      changes,
+      traces,
+      `state.expendedResources.${parameters.restoresResource.resourceId}`,
+      restoredBefore,
+      restoredAfter,
+      `${request.actionId} restores up to ${String(parameters.restoresResource.amount)} resource points.`,
+      "restore-action-resource",
+      [restoredBefore, parameters.restoresResource.amount, restoredResource.maximum],
       sourceTrace,
     );
   }

@@ -1,0 +1,75 @@
+{
+  "id": "srd521.class-feature.sorcerer.sorcerous-restoration",
+  "kind": "class-feature",
+  "level": 5,
+  "parentId": "srd521.class.sorcerer",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 1
+      },
+      "id": "sorcerous-restoration-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.sorcerer.sorcerous-restoration",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "use-sorcerous-restoration",
+      "parameters": {
+        "actionEconomy": "after-short-rest",
+        "resourceId": "srd521.resource.sorcerer.sorcerous-restoration",
+        "restoresResource": {
+          "amountFact": "classLevel.sorcerer",
+          "fraction": 0.5,
+          "resourceId": "srd521.resource.sorcerer.sorcery-points",
+          "round": "down"
+        },
+        "spends": 1
+      },
+      "target": "action.sorcerous-restoration",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.sorcerer.sorcerous-restoration"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Spell targets and encounter effects remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0066-b021"
+      ],
+      "page": 66,
+      "quoteHash": "1fa184dc503bbfb9743da41d450cd8d892c2e0e128b3ed186a3e85234a4331db",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "When you finish a Short Rest, you can regain expended Sorcery Points, but no more than a number equal to half your Sorcerer level (round down). Once you use this feature, you can’t do so again until you finish a Long Rest."
+      }
+    ],
+    "title": "Sorcerous Restoration"
+  }
+}

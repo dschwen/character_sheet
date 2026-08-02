@@ -20451,5 +20451,2169 @@
       "subclass-feature",
       "rogue"
     ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {},
+      "armorTraining": [],
+      "hitPointDie": 6,
+      "metamagicChoice": {
+        "id": "srd521.choice.sorcerer.metamagic",
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "srd521.option.sorcerer.metamagic.careful",
+          "srd521.option.sorcerer.metamagic.distant",
+          "srd521.option.sorcerer.metamagic.empowered",
+          "srd521.option.sorcerer.metamagic.extended",
+          "srd521.option.sorcerer.metamagic.heightened",
+          "srd521.option.sorcerer.metamagic.quickened",
+          "srd521.option.sorcerer.metamagic.seeking",
+          "srd521.option.sorcerer.metamagic.subtle",
+          "srd521.option.sorcerer.metamagic.transmuted",
+          "srd521.option.sorcerer.metamagic.twinned"
+        ]
+      },
+      "primaryAbilities": [
+        "charisma"
+      ],
+      "progression": [
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.sorcerer.spellcasting",
+              "name": "Spellcasting"
+            },
+            {
+              "entityId": "srd521.class-feature.sorcerer.innate-sorcery",
+              "name": "Innate Sorcery"
+            }
+          ],
+          "level": 1,
+          "preparedSpells": 2,
+          "proficiencyBonus": 2,
+          "sorceryPoints": 0,
+          "spellSlots": {
+            "1": 2
+          }
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.sorcerer.font-of-magic",
+              "name": "Font of Magic"
+            },
+            {
+              "entityId": "srd521.class-feature.sorcerer.metamagic",
+              "name": "Metamagic"
+            }
+          ],
+          "level": 2,
+          "preparedSpells": 4,
+          "proficiencyBonus": 2,
+          "sorceryPoints": 2,
+          "spellSlots": {
+            "1": 3
+          }
+        },
+        {
+          "cantrips": 4,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.sorcerer.sorcerer-subclass",
+              "name": "Sorcerer Subclass"
+            }
+          ],
+          "level": 3,
+          "preparedSpells": 6,
+          "proficiencyBonus": 2,
+          "sorceryPoints": 3,
+          "spellSlots": {
+            "1": 4,
+            "2": 2
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.sorcerer.ability-score-improvement",
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 4,
+          "preparedSpells": 7,
+          "proficiencyBonus": 2,
+          "sorceryPoints": 4,
+          "spellSlots": {
+            "1": 4,
+            "2": 3
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.sorcerer.sorcerous-restoration",
+              "name": "Sorcerous Restoration"
+            }
+          ],
+          "level": 5,
+          "preparedSpells": 9,
+          "proficiencyBonus": 3,
+          "sorceryPoints": 5,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 2
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 6,
+          "preparedSpells": 10,
+          "proficiencyBonus": 3,
+          "sorceryPoints": 6,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.sorcerer.sorcery-incarnate",
+              "name": "Sorcery Incarnate"
+            }
+          ],
+          "level": 7,
+          "preparedSpells": 11,
+          "proficiencyBonus": 3,
+          "sorceryPoints": 7,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 1
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 8,
+          "preparedSpells": 12,
+          "proficiencyBonus": 3,
+          "sorceryPoints": 8,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          }
+        },
+        {
+          "cantrips": 5,
+          "features": [],
+          "level": 9,
+          "preparedSpells": 14,
+          "proficiencyBonus": 4,
+          "sorceryPoints": 9,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Metamagic"
+            }
+          ],
+          "level": 10,
+          "preparedSpells": 15,
+          "proficiencyBonus": 4,
+          "sorceryPoints": 10,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [],
+          "level": 11,
+          "preparedSpells": 16,
+          "proficiencyBonus": 4,
+          "sorceryPoints": 11,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 12,
+          "preparedSpells": 16,
+          "proficiencyBonus": 4,
+          "sorceryPoints": 12,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [],
+          "level": 13,
+          "preparedSpells": 17,
+          "proficiencyBonus": 5,
+          "sorceryPoints": 13,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 14,
+          "preparedSpells": 17,
+          "proficiencyBonus": 5,
+          "sorceryPoints": 14,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [],
+          "level": 15,
+          "preparedSpells": 18,
+          "proficiencyBonus": 5,
+          "sorceryPoints": 15,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Ability Score Improvement"
+            }
+          ],
+          "level": 16,
+          "preparedSpells": 18,
+          "proficiencyBonus": 5,
+          "sorceryPoints": 16,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Metamagic"
+            }
+          ],
+          "level": 17,
+          "preparedSpells": 19,
+          "proficiencyBonus": 6,
+          "sorceryPoints": 17,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [
+            {
+              "entityId": null,
+              "name": "Subclass feature"
+            }
+          ],
+          "level": 18,
+          "preparedSpells": 20,
+          "proficiencyBonus": 6,
+          "sorceryPoints": 18,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.sorcerer.epic-boon",
+              "name": "Epic Boon"
+            }
+          ],
+          "level": 19,
+          "preparedSpells": 21,
+          "proficiencyBonus": 6,
+          "sorceryPoints": 19,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 2,
+            "7": 1,
+            "8": 1,
+            "9": 1
+          }
+        },
+        {
+          "cantrips": 6,
+          "features": [
+            {
+              "entityId": "srd521.class-feature.sorcerer.arcane-apotheosis",
+              "name": "Arcane Apotheosis"
+            }
+          ],
+          "level": 20,
+          "preparedSpells": 22,
+          "proficiencyBonus": 6,
+          "sorceryPoints": 20,
+          "spellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 3,
+            "6": 2,
+            "7": 2,
+            "8": 1,
+            "9": 1
+          }
+        }
+      ],
+      "savingThrowProficiencies": [
+        "constitution",
+        "charisma"
+      ],
+      "skillProficiencyChoice": {
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "arcana",
+          "deception",
+          "insight",
+          "intimidation",
+          "persuasion",
+          "religion"
+        ]
+      },
+      "spellList": [
+        "srd521.spell.acid-splash",
+        "srd521.spell.chill-touch",
+        "srd521.spell.dancing-lights",
+        "srd521.spell.elementalism",
+        "srd521.spell.fire-bolt",
+        "srd521.spell.light",
+        "srd521.spell.mage-hand",
+        "srd521.spell.mending",
+        "srd521.spell.message",
+        "srd521.spell.minor-illusion",
+        "srd521.spell.poison-spray",
+        "srd521.spell.prestidigitation",
+        "srd521.spell.ray-of-frost",
+        "srd521.spell.shocking-grasp",
+        "srd521.spell.sorcerous-burst",
+        "srd521.spell.true-strike",
+        "srd521.spell.burning-hands",
+        "srd521.spell.charm-person",
+        "srd521.spell.chromatic-orb",
+        "srd521.spell.color-spray",
+        "srd521.spell.comprehend-languages",
+        "srd521.spell.detect-magic",
+        "srd521.spell.disguise-self",
+        "srd521.spell.expeditious-retreat",
+        "srd521.spell.false-life",
+        "srd521.spell.feather-fall",
+        "srd521.spell.fog-cloud",
+        "srd521.spell.grease",
+        "srd521.spell.ice-knife",
+        "srd521.spell.jump",
+        "srd521.spell.mage-armor",
+        "srd521.spell.magic-missile",
+        "srd521.spell.ray-of-sickness",
+        "srd521.spell.shield",
+        "srd521.spell.silent-image",
+        "srd521.spell.sleep",
+        "srd521.spell.thunderwave",
+        "srd521.spell.alter-self",
+        "srd521.spell.blindness-deafness",
+        "srd521.spell.blur",
+        "srd521.spell.darkness",
+        "srd521.spell.darkvision",
+        "srd521.spell.detect-thoughts",
+        "srd521.spell.dragon-s-breath",
+        "srd521.spell.enhance-ability",
+        "srd521.spell.enlarge-reduce",
+        "srd521.spell.flame-blade",
+        "srd521.spell.flaming-sphere",
+        "srd521.spell.gust-of-wind",
+        "srd521.spell.hold-person",
+        "srd521.spell.invisibility",
+        "srd521.spell.knock",
+        "srd521.spell.levitate",
+        "srd521.spell.magic-weapon",
+        "srd521.spell.mirror-image",
+        "srd521.spell.misty-step",
+        "srd521.spell.scorching-ray",
+        "srd521.spell.see-invisibility",
+        "srd521.spell.shatter",
+        "srd521.spell.spider-climb",
+        "srd521.spell.suggestion",
+        "srd521.spell.web",
+        "srd521.spell.blink",
+        "srd521.spell.clairvoyance",
+        "srd521.spell.counterspell",
+        "srd521.spell.daylight",
+        "srd521.spell.dispel-magic",
+        "srd521.spell.fear",
+        "srd521.spell.fireball",
+        "srd521.spell.fly",
+        "srd521.spell.gaseous-form",
+        "srd521.spell.haste",
+        "srd521.spell.hypnotic-pattern",
+        "srd521.spell.lightning-bolt",
+        "srd521.spell.major-image",
+        "srd521.spell.protection-from-energy",
+        "srd521.spell.sleet-storm",
+        "srd521.spell.slow",
+        "srd521.spell.stinking-cloud",
+        "srd521.spell.tongues",
+        "srd521.spell.vampiric-touch",
+        "srd521.spell.water-breathing",
+        "srd521.spell.water-walk",
+        "srd521.spell.banishment",
+        "srd521.spell.blight",
+        "srd521.spell.charm-monster",
+        "srd521.spell.confusion",
+        "srd521.spell.dimension-door",
+        "srd521.spell.dominate-beast",
+        "srd521.spell.fire-shield",
+        "srd521.spell.greater-invisibility",
+        "srd521.spell.ice-storm",
+        "srd521.spell.polymorph",
+        "srd521.spell.stoneskin",
+        "srd521.spell.vitriolic-sphere",
+        "srd521.spell.wall-of-fire",
+        "srd521.spell.animate-objects",
+        "srd521.spell.arcane-hand",
+        "srd521.spell.cloudkill",
+        "srd521.spell.cone-of-cold",
+        "srd521.spell.creation",
+        "srd521.spell.dominate-person",
+        "srd521.spell.hold-monster",
+        "srd521.spell.insect-plague",
+        "srd521.spell.seeming",
+        "srd521.spell.telekinesis",
+        "srd521.spell.teleportation-circle",
+        "srd521.spell.wall-of-stone",
+        "srd521.spell.chain-lightning",
+        "srd521.spell.circle-of-death",
+        "srd521.spell.disintegrate",
+        "srd521.spell.eyebite",
+        "srd521.spell.flesh-to-stone",
+        "srd521.spell.freezing-sphere",
+        "srd521.spell.globe-of-invulnerability",
+        "srd521.spell.mass-suggestion",
+        "srd521.spell.move-earth",
+        "srd521.spell.sunbeam",
+        "srd521.spell.true-seeing",
+        "srd521.spell.delayed-blast-fireball",
+        "srd521.spell.etherealness",
+        "srd521.spell.finger-of-death",
+        "srd521.spell.fire-storm",
+        "srd521.spell.plane-shift",
+        "srd521.spell.prismatic-spray",
+        "srd521.spell.reverse-gravity",
+        "srd521.spell.teleport",
+        "srd521.spell.demiplane",
+        "srd521.spell.dominate-monster",
+        "srd521.spell.earthquake",
+        "srd521.spell.incendiary-cloud",
+        "srd521.spell.power-word-stun",
+        "srd521.spell.sunburst",
+        "srd521.spell.gate",
+        "srd521.spell.meteor-swarm",
+        "srd521.spell.power-word-kill",
+        "srd521.spell.time-stop",
+        "srd521.spell.wish"
+      ],
+      "spellPreparation": "full-list",
+      "spellcastingAbility": "charisma",
+      "startingEquipmentText": "Choose A or B: (A) Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer’s Pack, and 28 GP; or (B) 50 GP",
+      "weaponProficiencies": [
+        "simple"
+      ]
+    },
+    "id": "srd521.class.sorcerer",
+    "kind": "class",
+    "name": {
+      "en": "Sorcerer"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Sorcerer progression and spellcasting table from pages 64–65.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b011",
+          "p0064-b012",
+          "p0064-b013",
+          "p0064-b014",
+          "p0064-b015",
+          "p0064-b016",
+          "p0064-b017",
+          "p0064-b018",
+          "p0064-b019"
+        ],
+        "page": 64,
+        "quoteHash": "040ad6529c04664d5bfb225962f6a7084ddc176b2545be14b8270e512204d3a5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0065-b011",
+          "p0065-b006",
+          "p0065-b007",
+          "p0065-b009",
+          "p0065-b012",
+          "p0065-b008",
+          "p0065-b010",
+          "p0065-b013",
+          "p0065-b014",
+          "p0065-b015",
+          "p0065-b016",
+          "p0065-b017",
+          "p0065-b018",
+          "p0065-b019",
+          "p0065-b020",
+          "p0065-b021",
+          "p0065-b022",
+          "p0065-b023",
+          "p0065-b024",
+          "p0065-b025",
+          "p0065-b026",
+          "p0065-b027",
+          "p0065-b028",
+          "p0065-b029",
+          "p0065-b030",
+          "p0065-b031",
+          "p0065-b032",
+          "p0065-b033",
+          "p0065-b034",
+          "p0065-b035",
+          "p0065-b036",
+          "p0065-b037",
+          "p0065-b038",
+          "p0065-b039"
+        ],
+        "page": 65,
+        "quoteHash": "14980340256b7afdc7118f7ac0cb6025590e2b06cf38ca4887ba7935f1af04cc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class",
+      "sorcerer",
+      "spellcaster"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "Drawing from your innate magic, you can cast spells. See “Spells” for the rules on spellcasting. The information below details how you use those rules with Sorcerer spells, which appear in the Sorcerer spell list later in the class’s description. Cantrips. You know four Sorcerer cantrips of your choice. Light, Prestidigitation, Shocking Grasp, and Sorcerous Burst are recommended. Whenever you gain a Sorcerer level, you can replace one of your cantrips from this feature with another Sorcerer cantrip of your choice. When you reach Sorcerer levels 4 and 10, you learn another Sorcerer cantrip of your choice, as shown in the Cantrips column of the Sorcerer Features table. Spell Slots. The Sorcerer Features table shows how many spell slots you have to cast your level 1+ Sorcerer Features spells. You regain all expended slots when you finish a Long Rest. Prepared Spells of Level 1+. You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose two level 1 Sorcerer spells. Burning Hands and Detect Magic are recommended. The number of spells on your list increases as you gain Sorcerer levels, as shown in the Prepared Spells column of the Sorcerer Features table. Whenever that number increases, choose additional Sorcerer spells until the number of spells on your list matches the number in the Sorcerer Features table. The chosen spells must be of a level for which you have spell slots. For example, if you’re a level 3 Sorcerer, your list of prepared spells can include six Sorcerer spells of level 1 or 2 in any combination. If another Sorcerer feature gives you spells that you always have prepared, those spells don’t count against the number of spells you can prepare with this feature, but those spells otherwise count as Sorcerer spells for you. Changing Your Prepared Spells. Whenever you gain a Sorcerer level, you can replace one spell on your list with another Sorcerer spell for which you have spell slots. Spellcasting Ability. Charisma is your spellcasting ability for your Sorcerer spells. Spellcasting Focus. You can use an Arcane Focus as a Spellcasting Focus for your Sorcerer spells."
+    },
+    "id": "srd521.class-feature.sorcerer.spellcasting",
+    "kind": "class-feature",
+    "name": {
+      "en": "Spellcasting"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Spellcasting extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b024"
+        ],
+        "page": 64,
+        "quoteHash": "3625624b066e44ec59228279697dde80a170cfd951f4ecc67b023b1e8eb67352",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0065-b005",
+          "p0065-b002",
+          "p0065-b003"
+        ],
+        "page": 65,
+        "quoteHash": "1c11880435cb58bd14c6c0ad946e18f098307bdddd491e7849281eab13d3f74f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 1,
+      "text": "An event in your past left an indelible mark on you, infusing you with simmering magic. As a Bonus Action, you can unleash that magic for 1 minute, during which you gain the following benefits: The spell save DC of your Sorcerer spells increases by 1. • You have Advantage on the attack rolls of Sorcerer spells you cast. You can use this feature twice, and you regain all expended uses of it when you finish a Long Rest."
+    },
+    "id": "srd521.class-feature.sorcerer.innate-sorcery",
+    "kind": "class-feature",
+    "name": {
+      "en": "Innate Sorcery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Innate Sorcery extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0065-b004"
+        ],
+        "page": 65,
+        "quoteHash": "096ec76e1831309172a5e9a5eebbe4d6403addd35eca8b148a5f81c91dcaa6fa",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0066-b002",
+          "p0066-b003"
+        ],
+        "page": 66,
+        "quoteHash": "ecb0315b3e09d70c7ddaae845c03b25235c840b7937db8040f904e507c3d149a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 2,
+      "text": "You can tap into the wellspring of magic within yourself. This wellspring is represented by Sorcery Points, which allow you to create a variety of magical effects. You have 2 Sorcery Points, and you gain more as you reach higher levels, as shown in the Sorcery Points column of the Sorcerer Features table. You can’t have more Sorcery Points than the number shown in the table for your level. You regain all expended Sorcery Points when you finish a Long Rest. You can use your Sorcery Points to fuel the options below, along with other features, such as Metamagic, that use those points. Converting Spell Slots to Sorcery Points. You can expend a spell slot to gain a number of Sorcery Points equal to the slot’s level (no action required). Creating Spell Slots. As a Bonus Action, you can transform unexpended Sorcery Points into one spell slot. The Creating Spell Slots table shows the cost of creating a spell slot of a given level, and it lists the minimum Sorcerer level you must be to create a slot. You can create a spell slot no higher than level 5. Any spell slot you create with this feature vanishes when you finish a Long Rest. Creating Spell Slots Spell Slot Sorcery Point Min. Sorcerer Level Cost Level 1 2 2 2 3 3 3 5 5 4 6 7 5 7 9"
+    },
+    "id": "srd521.class-feature.sorcerer.font-of-magic",
+    "kind": "class-feature",
+    "name": {
+      "en": "Font of Magic"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Font of Magic extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b004",
+          "p0066-b005",
+          "p0066-b006",
+          "p0066-b008",
+          "p0066-b010",
+          "p0066-b007",
+          "p0066-b009",
+          "p0066-b011",
+          "p0066-b012",
+          "p0066-b013",
+          "p0066-b014",
+          "p0066-b015",
+          "p0066-b016"
+        ],
+        "page": 66,
+        "quoteHash": "0b7e964fbeca3deb1f8695209451fb04e6c8ec737f837e0a15a674c3c57e0de5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 2,
+      "text": "Because your magic flows from within, you can alter your spells to suit your needs; you gain two Metamagic options of your choice from “Meta­magic Options” later in this class’s description. You use the chosen options to temporarily modify spells you cast. To use an option, you must spend the number of Sorcery Points that it costs. You can use only one Metamagic option on a spell when you cast it unless otherwise noted in one of those options. Whenever you gain a Sorcerer level, you can replace one of your Metamagic options with one you don’t know. You gain two more options at Sorcerer level 10 and two more at Sorcerer level 17."
+    },
+    "id": "srd521.class-feature.sorcerer.metamagic",
+    "kind": "class-feature",
+    "name": {
+      "en": "Metamagic"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Metamagic extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b017",
+          "p0066-b018"
+        ],
+        "page": 66,
+        "quoteHash": "6319ad99720fd003a01ac6ef7cee93d807e96273d41497a52d83b183474d7ff7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "You gain a Sorcerer subclass of your choice. The Draconic Sorcery subclass is detailed after this class’s description. A subclass is a specialization that grants you features at certain Sorcerer levels. For the rest of your career, you gain each of your subclass’s features that are of your Sorcerer level or lower."
+    },
+    "id": "srd521.class-feature.sorcerer.sorcerer-subclass",
+    "kind": "class-feature",
+    "name": {
+      "en": "Sorcerer Subclass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Sorcerer Subclass extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b019"
+        ],
+        "page": 66,
+        "quoteHash": "d463f01b8293604cb1bc5353058168e34c834be2e7ea8f31d93b4b32072ced62",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 4,
+      "text": "You gain the Ability Score Improvement feat (see “Feats”) or another feat of your choice for which you qualify. You gain this feature again at Sorcerer levels 8, 12, and 16."
+    },
+    "id": "srd521.class-feature.sorcerer.ability-score-improvement",
+    "kind": "class-feature",
+    "name": {
+      "en": "Ability Score Improvement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Ability Score Improvement extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b020"
+        ],
+        "page": 66,
+        "quoteHash": "c67c60f1bd69f9d1392f507092fd2a9544c039a94647d002c6522763f528ffb4",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 5,
+      "text": "When you finish a Short Rest, you can regain expended Sorcery Points, but no more than a number equal to half your Sorcerer level (round down). Once you use this feature, you can’t do so again until you finish a Long Rest."
+    },
+    "id": "srd521.class-feature.sorcerer.sorcerous-restoration",
+    "kind": "class-feature",
+    "name": {
+      "en": "Sorcerous Restoration"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Sorcerous Restoration extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b021"
+        ],
+        "page": 66,
+        "quoteHash": "1fa184dc503bbfb9743da41d450cd8d892c2e0e128b3ed186a3e85234a4331db",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 7,
+      "text": "If you have no uses of Innate Sorcery left, you can use it if you spend 2 Sorcery Points when you take the Bonus Action to activate it. In addition, while your Innate Sorcery feature is active, you can use up to two of your Metamagic options on each spell you cast."
+    },
+    "id": "srd521.class-feature.sorcerer.sorcery-incarnate",
+    "kind": "class-feature",
+    "name": {
+      "en": "Sorcery Incarnate"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Sorcery Incarnate extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b022"
+        ],
+        "page": 66,
+        "quoteHash": "7c8415ac4a8b4d3018f47dca5edea9f5e3f7cb37c49756fe9c6590c48cacfd93",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 19,
+      "text": "You gain an Epic Boon feat (see “Feats”) or another feat of your choice for which you qualify. Boon of Dimensional Travel is recommended."
+    },
+    "id": "srd521.class-feature.sorcerer.epic-boon",
+    "kind": "class-feature",
+    "name": {
+      "en": "Epic Boon"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Epic Boon extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b023"
+        ],
+        "page": 66,
+        "quoteHash": "6602cea0841b8531a53dfe6573cf082d227110f2ae69433c059cd93c626035fe",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 20,
+      "text": "While your Innate Sorcery feature is active, you can use one Metamagic option on each of your turns without spending Sorcery Points on it."
+    },
+    "id": "srd521.class-feature.sorcerer.arcane-apotheosis",
+    "kind": "class-feature",
+    "name": {
+      "en": "Arcane Apotheosis"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Arcane Apotheosis extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b024"
+        ],
+        "page": 66,
+        "quoteHash": "de08698a1121ce9db1ed35efb82d650797d05e2b8413b201e511f822af21c046",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "entries": {
+        "1": 0,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "2": 2,
+        "20": 20,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9
+      },
+      "keyType": "class-level",
+      "valueType": "integer"
+    },
+    "id": "srd521.table.sorcerer.sorcery-points",
+    "kind": "rule-table",
+    "name": {
+      "en": "Sorcerer Sorcery Points"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the Sorcerer progression table.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0065-b011",
+          "p0065-b006",
+          "p0065-b007",
+          "p0065-b009",
+          "p0065-b012",
+          "p0065-b008",
+          "p0065-b010",
+          "p0065-b013",
+          "p0065-b014",
+          "p0065-b015",
+          "p0065-b016",
+          "p0065-b017",
+          "p0065-b018",
+          "p0065-b019",
+          "p0065-b020",
+          "p0065-b021",
+          "p0065-b022",
+          "p0065-b023",
+          "p0065-b024",
+          "p0065-b025",
+          "p0065-b026",
+          "p0065-b027",
+          "p0065-b028",
+          "p0065-b029",
+          "p0065-b030",
+          "p0065-b031",
+          "p0065-b032",
+          "p0065-b033",
+          "p0065-b034",
+          "p0065-b035",
+          "p0065-b036",
+          "p0065-b037",
+          "p0065-b038",
+          "p0065-b039"
+        ],
+        "page": 65,
+        "quoteHash": "14980340256b7afdc7118f7ac0cb6025590e2b06cf38ca4887ba7935f1af04cc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "rule-table",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 1,
+      "text": "Cost: 1 Sorcery Point When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell’s full force. To do so, spend 1 Sorcery Point and choose a number of those creatures up to your Charisma modifier (minimum of one creature). A chosen creature automatically succeeds on its saving throw against the spell, and it takes no damage if it would normally take half damage on a successful save."
+    },
+    "id": "srd521.option.sorcerer.metamagic.careful",
+    "kind": "class-option",
+    "name": {
+      "en": "Careful Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Careful Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0066-b026",
+          "p0066-b027"
+        ],
+        "page": 66,
+        "quoteHash": "7c56cea1a413969b68462612cb7d2cbd89596aa06e45d0fe6d4bd2fc28b5ce6f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0067-b002"
+        ],
+        "page": 67,
+        "quoteHash": "cd9a474df2738019b0dc2808bc2570b5e36d86be0e075022a4794dd7a61a8b34",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 1,
+      "text": "Cost: 1 Sorcery Point When you cast a spell that has a range of at least 5 feet, you can spend 1 Sorcery Point to double the spell’s range. Or when you cast a spell that has a range of Touch, you can spend 1 Sorcery Point to make the spell’s range 30 feet."
+    },
+    "id": "srd521.option.sorcerer.metamagic.distant",
+    "kind": "class-option",
+    "name": {
+      "en": "Distant Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Distant Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b003",
+          "p0067-b004"
+        ],
+        "page": 67,
+        "quoteHash": "f8cce46db2f0d13cbc867569e86de4cdd9f446aa2a7ad63960ed4e3c97fddb91",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 1,
+      "text": "Cost: 1 Sorcery Point When you roll damage for a spell, you can spend 1 Sorcery Point to reroll a number of the damage dice up to your Charisma modifier (minimum of one), and you must use the new rolls. You can use Empowered Spell even if you’ve already used a different Metamagic option during the casting of the spell."
+    },
+    "id": "srd521.option.sorcerer.metamagic.empowered",
+    "kind": "class-option",
+    "name": {
+      "en": "Empowered Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Empowered Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b005",
+          "p0067-b006"
+        ],
+        "page": 67,
+        "quoteHash": "98340726c35421f3c132ac550fb53da7d06931e7aa6e12231364bfd46c5157bb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 1,
+      "text": "Cost: 1 Sorcery Point When you cast a spell that has a duration of 1 minute or longer, you can spend 1 Sorcery Point to double its duration to a maximum duration of 24 hours. If the affected spell requires Concentration, you have Advantage on any saving throw you make to maintain that Concentration."
+    },
+    "id": "srd521.option.sorcerer.metamagic.extended",
+    "kind": "class-option",
+    "name": {
+      "en": "Extended Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extended Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b007",
+          "p0067-b008"
+        ],
+        "page": 67,
+        "quoteHash": "dab2371be57fd4b622692eee7af8ed63208a3b29e7326f1595a2b63ec359b9cc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 2,
+      "text": "Cost: 2 Sorcery Points When you cast a spell that forces a creature to make a saving throw, you can spend 2 Sorcery Points to give one target of the spell Disadvantage on saves against the spell."
+    },
+    "id": "srd521.option.sorcerer.metamagic.heightened",
+    "kind": "class-option",
+    "name": {
+      "en": "Heightened Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Heightened Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b009",
+          "p0067-b010"
+        ],
+        "page": 67,
+        "quoteHash": "081a28b3187b96cec1e723d41aac00ffe95b8292a0ff023cc08330639b963756",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 2,
+      "text": "Cost: 2 Sorcery Points When you cast a spell that has a casting time of an action, you can spend 2 Sorcery Points to change the casting time to a Bonus Action for this casting. You can’t modify a spell in this way if you’ve already cast a level 1+ spell on the current turn, nor can you cast a level 1+ spell on this turn after modifying a spell in this way."
+    },
+    "id": "srd521.option.sorcerer.metamagic.quickened",
+    "kind": "class-option",
+    "name": {
+      "en": "Quickened Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Quickened Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b011",
+          "p0067-b012"
+        ],
+        "page": 67,
+        "quoteHash": "d8062c9f50f8e48fbb490e8d8662afcbfcf64a341ee68af6543da3ff413c4ff6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 1,
+      "text": "Cost: 1 Sorcery Point If you make an attack roll for a spell and miss, you can spend 1 Sorcery Point to reroll the d20, and you must use the new roll. You can use Seeking Spell even if you’ve already used a different Metamagic option during the casting of the spell."
+    },
+    "id": "srd521.option.sorcerer.metamagic.seeking",
+    "kind": "class-option",
+    "name": {
+      "en": "Seeking Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Seeking Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b013",
+          "p0067-b014"
+        ],
+        "page": 67,
+        "quoteHash": "f78a4f6c368a6f64975695da082cab3422c0db9d8ba1d8cce39fe3c104b61f2f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 1,
+      "text": "Cost: 1 Sorcery Point When you cast a spell, you can spend 1 Sorcery Point to cast it without any Verbal, Somatic, or Material components, except Material components that are consumed by the spell or that have a cost specified in the spell."
+    },
+    "id": "srd521.option.sorcerer.metamagic.subtle",
+    "kind": "class-option",
+    "name": {
+      "en": "Subtle Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Subtle Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b015",
+          "p0067-b016"
+        ],
+        "page": 67,
+        "quoteHash": "d06efba0f74d7be8c713665ba817cdd96467e681866d64afeccb9322237fd7de",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 1,
+      "text": "Cost: 1 Sorcery Point When you cast a spell that deals a type of damage from the following list, you can spend 1 Sorcery Point to change that damage type to one of the other listed types: Acid, Cold, Fire, Lightning, Poison, Thunder."
+    },
+    "id": "srd521.option.sorcerer.metamagic.transmuted",
+    "kind": "class-option",
+    "name": {
+      "en": "Transmuted Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Transmuted Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b017",
+          "p0067-b018"
+        ],
+        "page": 67,
+        "quoteHash": "b7e870224b64daaea512bcc8870cb6b43351d4872cb6647f9601bf5330f6989b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.metamagic",
+      "sorceryPointCost": 1,
+      "text": "Cost: 1 Sorcery Point When you cast a spell, such as Charm Person, that can be cast with a higher-level spell slot to target an additional creature, you can spend 1 Sorcery Point to increase the spell’s effective level by 1."
+    },
+    "id": "srd521.option.sorcerer.metamagic.twinned",
+    "kind": "class-option",
+    "name": {
+      "en": "Twinned Spell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Twinned Spell Metamagic option.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0067-b019",
+          "p0067-b020"
+        ],
+        "page": 67,
+        "quoteHash": "c975e1fbd30cd5cad50a40ec06e6a8f61a0124e214cc6333df121d03b3f78654",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "metamagic"
+    ]
+  },
+  {
+    "body": {
+      "alwaysPreparedSpells": {
+        "3": [
+          "srd521.spell.alter-self",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.command",
+          "srd521.spell.dragon-s-breath"
+        ],
+        "5": [
+          "srd521.spell.fear",
+          "srd521.spell.fly"
+        ],
+        "7": [
+          "srd521.spell.arcane-eye",
+          "srd521.spell.charm-monster"
+        ],
+        "9": [
+          "srd521.spell.legend-lore",
+          "srd521.spell.summon-dragon"
+        ]
+      },
+      "description": "Your innate magic comes from the gift of a dragon. Perhaps an ancient dragon facing death bequeathed some of its magical power to you or your ancestor. You might have absorbed magic from a site infused with dragons’ power. Or perhaps you handled a treasure taken from a dragon’s hoard that was steeped in draconic power. Or you might have a dragon for an ancestor.",
+      "parentClassId": "srd521.class.sorcerer",
+      "progression": [
+        {
+          "features": [
+            "srd521.subclass-feature.sorcerer.draconic.draconic-resilience",
+            "srd521.subclass-feature.sorcerer.draconic.draconic-spells"
+          ],
+          "level": 3
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.sorcerer.draconic.elemental-affinity"
+          ],
+          "level": 6
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.sorcerer.draconic.dragon-wings"
+          ],
+          "level": 14
+        },
+        {
+          "features": [
+            "srd521.subclass-feature.sorcerer.draconic.dragon-companion"
+          ],
+          "level": 18
+        }
+      ]
+    },
+    "id": "srd521.subclass.sorcerer.draconic-sorcery",
+    "kind": "subclass",
+    "name": {
+      "en": "Draconic Sorcery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Draconic Sorcery subclass extracted from pages 69–70.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0069-b069",
+          "p0069-b071"
+        ],
+        "page": 69,
+        "quoteHash": "a29edb9d4e5edb772e23206f8ed38cbea9a2cc7609819f52bb1502b382728b63",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass",
+      "sorcerer",
+      "draconic-sorcery"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "The magic in your body manifests physical traits of your draconic gift. Your Hit Point maximum increases by 3, and it increases by 1 whenever you gain another Sorcerer level. Parts of you are also covered by dragon-like scales. While you aren’t wearing armor, your base Armor Class equals 10 plus your Dexterity and Charisma modifiers."
+    },
+    "id": "srd521.subclass-feature.sorcerer.draconic.draconic-resilience",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Draconic Resilience"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Draconic Resilience extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0069-b072"
+        ],
+        "page": 69,
+        "quoteHash": "877355a9029e7f187fa159c06cf00f29b2610a8c0cef4d510d45bcb3bfd87d03",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 3,
+      "text": "When you reach a Sorcerer level specified in the Draconic Spells table, you thereafter always have the listed spells prepared. Draconic Spells Sorcerer Level Spells 3 Alter Self, Chromatic Orb, Command, Dragon’s Breath 5 Fear, Fly 7 Arcane Eye, Charm Monster 9 Legend Lore, Summon Dragon"
+    },
+    "id": "srd521.subclass-feature.sorcerer.draconic.draconic-spells",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Draconic Spells"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Draconic Spells extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b002",
+          "p0070-b003",
+          "p0070-b004",
+          "p0070-b005",
+          "p0070-b006",
+          "p0070-b007",
+          "p0070-b008",
+          "p0070-b009"
+        ],
+        "page": 70,
+        "quoteHash": "703efdcadeae507917f3b5dd86cef0b9b0d319e112b66fd611368d6dc00094a5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 6,
+      "text": "Your draconic magic has an affinity with a damage type associated with dragons. Choose one of those types: Acid, Cold, Fire, Lightning, or Poison. You have Resistance to that damage type, and when you cast a spell that deals damage of that type, you can add your Charisma modifier to one damage roll of that spell."
+    },
+    "id": "srd521.subclass-feature.sorcerer.draconic.elemental-affinity",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Elemental Affinity"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Elemental Affinity extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b010"
+        ],
+        "page": 70,
+        "quoteHash": "8b71a061acd8971c074f45cefcc74cd676923d40e022843906653d4c35ef5efd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 14,
+      "text": "As a Bonus Action, you can cause draconic wings to appear on your back. The wings last for 1 hour or until you dismiss them (no action required). For the duration, you have a Fly Speed of 60 feet. Once you use this feature, you can’t use it again until you finish a Long Rest unless you spend 3 Sorcery Points (no action required) to restore your use of it."
+    },
+    "id": "srd521.subclass-feature.sorcerer.draconic.dragon-wings",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Dragon Wings"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Dragon Wings extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b011"
+        ],
+        "page": 70,
+        "quoteHash": "afeb8f81796613b05b2795985efebdcde036bb89764bf9594b7d8f1461bc24dc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "level": 18,
+      "text": "You can cast Summon Dragon without a Material component. You can also cast it once without a spell slot, and you regain the ability to cast it in this way when you finish a Long Rest. Whenever you start casting the spell, you can modify it so that it doesn’t require Concentration. If you do so, the spell’s duration becomes 1 minute for that casting."
+    },
+    "id": "srd521.subclass-feature.sorcerer.draconic.dragon-companion",
+    "kind": "subclass-feature",
+    "name": {
+      "en": "Dragon Companion"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Dragon Companion extracted from the Sorcerer description.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b012"
+        ],
+        "page": 70,
+        "quoteHash": "53ce4bd50b73b237ed75727eb852139b0319fb51736800120b3d60497951ae5f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-feature",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You alter your physical form. Choose one of the following options. Its effects last for the duration, during which you can take a Magic action to replace the option you chose with a different one. Aquatic Adaptation. You sprout gills and grow webs between your fingers. You can breathe underwater and gain a Swim Speed equal to your Speed. Change Appearance. You alter your appearance. You decide what you look like, including your height, weight, facial features, sound of your voice, hair length, coloration, and other distinguishing characteristics. You can make yourself appear as a member of another species, though none of your statistics change. You can’t appear as a creature of a different size, and your basic shape stays the same; if you’re bipedal, you can’t use this spell to become quadrupedal, for instance. For the duration, you can take a Magic action to change your appearance in this way again. Natural Weapons. You grow claws (Slashing), fangs (Piercing), horns (Piercing), or hooves (Bludgeoning). When you use your Unarmed Strike to deal damage with that new growth, it deals 1d6 damage of the type in parentheses instead of dealing the normal damage for your Unarmed Strike, and you use your spellcasting ability modifier for the attack and damage rolls rather than using Strength.",
+      "duration": "Concentration, up to 1 hour",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 2,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "transmutation",
+      "sorcererSpell": true
+    },
+    "id": "srd521.spell.alter-self",
+    "kind": "spell",
+    "name": {
+      "en": "Alter Self"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Sorcerer spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0107-b018",
+          "p0107-b019",
+          "p0107-b020"
+        ],
+        "page": 107,
+        "quoteHash": "e391a82e3caba7c5f7b186dfb03f70f90c3169be039c770efc734fa2f0a0eceb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "transmutation",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "cleric",
+        "paladin"
+      ],
+      "components": {
+        "material": false,
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You speak a one-word command to a creature you can see within range. The target must succeed on a Wisdom saving throw or follow the command on its next turn. Choose the command from these options: Approach. The target moves toward you by the shortest and most direct route, ending its turn if it moves within 5 feet of you. Drop. The target drops whatever it is holding and then ends its turn. Flee. The target spends its turn moving away from you by the fastest available means. Grovel. The target has the Prone condition and then ends its turn. Halt. On its turn, the target doesn’t move and takes no action or Bonus Action. Using a Higher-Level Spell Slot. You can affect one additional creature for each spell slot level above 1.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "wisdom"
+      ],
+      "school": "enchantment",
+      "sorcererSpell": true
+    },
+    "id": "srd521.spell.command",
+    "kind": "spell",
+    "name": {
+      "en": "Command"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Sorcerer spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0116-b009",
+          "p0116-b010",
+          "p0116-b011",
+          "p0116-b012",
+          "p0116-b013",
+          "p0116-b014",
+          "p0116-b015",
+          "p0116-b016",
+          "p0116-b017",
+          "p0116-b018",
+          "p0116-b019"
+        ],
+        "page": 116,
+        "quoteHash": "f8211d4c6af07fe814a534ac9e310c6f5f2185357b9516b70c0042c2857e832e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "enchantment",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Bonus Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a hot pepper",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "You touch one willing creature, and choose Acid, Cold, Fire, Lightning, or Poison. Until the spell ends, the target can take a Magic action to exhale a 15-foot Cone. Each creature in that area makes a Dexterity saving throw, taking 3d6 damage of the chosen type on a failed save or half as much damage on a successful one. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell slot level above 2.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 2,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "transmutation",
+      "sorcererSpell": true
+    },
+    "id": "srd521.spell.dragon-s-breath",
+    "kind": "spell",
+    "name": {
+      "en": "Dragon’s Breath"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Sorcerer spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0126-b006",
+          "p0126-b007",
+          "p0126-b008",
+          "p0126-b009"
+        ],
+        "page": 126,
+        "quoteHash": "9bf9862dbd49af3932c58949f823123e26be4034d1ed89dfc97d849bfcff34c3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "transmutation",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a white feather",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Each creature in a 30-foot Cone must succeed on a Wisdom saving throw or drop whatever it is holding and have the Frightened condition for the duration. A Frightened creature takes the Dash action and moves away from you by the safest route on each of its turns unless there is nowhere to move. If the creature ends its turn in a space where it doesn’t have line of sight to you, the creature makes a Wisdom saving throw. On a successful save, the spell ends on that creature.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 3,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [
+        "wisdom"
+      ],
+      "school": "illusion",
+      "sorcererSpell": true
+    },
+    "id": "srd521.spell.fear",
+    "kind": "spell",
+    "name": {
+      "en": "Fear"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Sorcerer spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0130-b002",
+          "p0130-b003",
+          "p0130-b004"
+        ],
+        "page": 130,
+        "quoteHash": "7257b88af03c4dde85ab61b3ac48b415bf5f2bedb8f883ef0aec929c967a3685",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "illusion",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You hurl a mote of fire at a creature or an object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 Fire damage. A flammable object hit by this spell starts burning if it isn’t being worn or carried. Cantrip Upgrade. The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "sorcererSpell": true
+    },
+    "id": "srd521.spell.fire-bolt",
+    "kind": "spell",
+    "name": {
+      "en": "Fire Bolt"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Sorcerer spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0132-b002",
+          "p0132-b003",
+          "p0132-b004"
+        ],
+        "page": 132,
+        "quoteHash": "151b8b36f9026634899a0bd71dcadc3b89c6c9577c9c539abfa342c1a5f2ee03",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "evocation",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a shaving of licorice root",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Choose a willing creature that you can see within range. Until the spell ends, the target’s Speed is doubled, it gains a +2 bonus to Armor Class, it has Advantage on Dexterity saving throws, and it gains an additional action on each of its turns. That action can be used to take only the Attack (one attack only), Dash, Disengage, Hide, or Utilize action. When the spell ends, the target is Incapacitated and has a Speed of 0 until the end of its next turn, as a wave of lethargy washes over it.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 3,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "transmutation",
+      "sorcererSpell": true
+    },
+    "id": "srd521.spell.haste",
+    "kind": "spell",
+    "name": {
+      "en": "Haste"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Sorcerer spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0139-b018",
+          "p0139-b019",
+          "p0139-b020"
+        ],
+        "page": 139,
+        "quoteHash": "28f885bb6698a71a2e21d387889642a37edae1e7a6fb181eecb27abf9bab3384",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "transmutation",
+      "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You cast sorcerous energy at one creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d8 damage of a type you choose: Acid, Cold, Fire, Lightning, Poison, Psychic, or Thunder. If you roll an 8 on a d8 for this spell, you can roll another d8, and add it to the damage. When you cast this spell, the maximum number of these d8s you can add to the spell’s damage equals your spellcasting ability modifier. Cantrip Upgrade. The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "120 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "sorcererSpell": true
+    },
+    "id": "srd521.spell.sorcerous-burst",
+    "kind": "spell",
+    "name": {
+      "en": "Sorcerous Burst"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Sorcerer spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0163-b013",
+          "p0163-b014",
+          "p0163-b015"
+        ],
+        "page": 163,
+        "quoteHash": "da2c166acb2a1c72ae50c3af3a3fda2cd6bcff938d922d908be2b7d0c2f1e5e7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "evocation",
+      "sorcerer"
+    ]
   }
 ]

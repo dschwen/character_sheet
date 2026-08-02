@@ -1,0 +1,82 @@
+{
+  "id": "srd521.subclass-feature.sorcerer.draconic.draconic-resilience",
+  "kind": "subclass-feature",
+  "level": 3,
+  "parentId": "srd521.subclass.sorcerer.draconic-sorcery",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "ref",
+        "path": "classLevel.sorcerer"
+      },
+      "id": "draconic-hit-points",
+      "parameters": {},
+      "target": "hitPoints.maximum",
+      "type": "add-modifier"
+    },
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "args": [
+          {
+            "kind": "literal",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "path": "ability.dexterity.modifier"
+          },
+          {
+            "kind": "ref",
+            "path": "ability.charisma.modifier"
+          }
+        ],
+        "kind": "add"
+      },
+      "id": "draconic-armor-class",
+      "parameters": {},
+      "target": "armor-class",
+      "type": "add-candidate-calculation",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "equipment.wearingArmor"
+        },
+        "right": {
+          "kind": "literal",
+          "value": false
+        }
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Spell targets and encounter effects remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0069-b072"
+      ],
+      "page": 69,
+      "quoteHash": "877355a9029e7f187fa159c06cf00f29b2610a8c0cef4d510d45bcb3bfd87d03",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "The magic in your body manifests physical traits of your draconic gift. Your Hit Point maximum increases by 3, and it increases by 1 whenever you gain another Sorcerer level. Parts of you are also covered by dragon-like scales. While you aren’t wearing armor, your base Armor Class equals 10 plus your Dexterity and Charisma modifiers."
+      }
+    ],
+    "title": "Draconic Resilience"
+  }
+}

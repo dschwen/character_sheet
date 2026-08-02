@@ -1,0 +1,56 @@
+{
+  "id": "srd521.option.sorcerer.metamagic.quickened",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.sorcerer",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-quickened-spell",
+      "parameters": {
+        "actionEconomy": "on-cast",
+        "resourceId": "srd521.resource.sorcerer.sorcery-points",
+        "spends": 2
+      },
+      "target": "action.metamagic.quickened",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.sorcerer.sorcery-points"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Spell targets and encounter effects remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0066-b017",
+        "p0066-b018"
+      ],
+      "page": 66,
+      "quoteHash": "6319ad99720fd003a01ac6ef7cee93d807e96273d41497a52d83b183474d7ff7",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Because your magic flows from within, you can alter your spells to suit your needs; you gain two Metamagic options of your choice from “Meta­magic Options” later in this class’s description. You use the chosen options to temporarily modify spells you cast. To use an option, you must spend the number of Sorcery Points that it costs. You can use only one Metamagic option on a spell when you cast it unless otherwise noted in one of those options."
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "Whenever you gain a Sorcerer level, you can replace one of your Metamagic options with one you don’t know. You gain two more options at Sorcerer level 10 and two more at Sorcerer level 17."
+      }
+    ],
+    "title": "Metamagic"
+  }
+}
