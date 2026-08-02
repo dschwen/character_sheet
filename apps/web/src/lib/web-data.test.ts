@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { evaluateCharacter } from "@dnd/rules-core";
 
-import { classSummary, signed, titleCase } from "./presentation";
+import { classSummary, numericFactText, signed, titleCase } from "./presentation";
 import { loadWebData } from "./server-data";
 
 describe("web data boundary", () => {
@@ -28,6 +28,23 @@ describe("web data boundary", () => {
       expect(evaluation.traces.armorClass, fixture.filename).toBeDefined();
       expect(evaluation.facts["hitPoints.maximum"], fixture.filename).toBeTypeOf("number");
     }
+  });
+
+  it("embeds a complete origin and walking speed for Kara", () => {
+    const data = loadWebData();
+    const kara = data.fixtures.find(({ filename }) => filename === "barbarian-1.json");
+
+    expect(kara?.character.build.speciesId).toBe("srd521.species.human");
+    expect(kara).toBeDefined();
+    if (kara === undefined) return;
+    const evaluation = evaluateCharacter({
+      character: kara.character,
+      packages: [data.rulesPackage],
+    });
+    expect(evaluation.facts["speed.walking"]).toBe(30);
+    expect(numericFactText(evaluation, "speed.walking")).toBe("30");
+    expect(numericFactText(evaluation, "missing.fact")).toBe("—");
+    expect(evaluation.validations).toEqual([]);
   });
 });
 

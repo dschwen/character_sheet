@@ -414,7 +414,7 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
         ...character.build,
         abilityScores: {
           ...character.build.abilityScores,
-          strength: 12,
+          strength: 11,
         },
       },
       loadout: {

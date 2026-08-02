@@ -343,6 +343,9 @@ button.vital-card:hover {
 .two-column {
   grid-template-columns: 1.3fr 1fr;
 }
+.play-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .panel {
   overflow: hidden;
   padding: 24px;
@@ -481,6 +484,231 @@ button.vital-card:hover {
   border-radius: 7px;
   color: var(--green);
   background: #f0f8f4;
+}
+
+.health-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.health-summary > div {
+  display: grid;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+.health-summary span,
+.play-control > label,
+.action-inputs label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.health-summary strong {
+  margin: 5px 0;
+  font:
+    700 30px/1 Georgia,
+    serif;
+}
+.health-summary small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.play-control {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+}
+.play-control > div {
+  display: flex;
+  gap: 7px;
+}
+.play-control input,
+.action-inputs input,
+.play-spell-list select {
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  background: white;
+}
+.play-control input {
+  width: 90px;
+}
+.button.danger {
+  border-color: #c67d72;
+  color: #8b3026;
+  background: #fff5f3;
+}
+.button.heal {
+  border-color: #75a290;
+  color: var(--green);
+  background: #eff7f3;
+}
+.button.compact {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+.button:disabled,
+.undo-button:disabled,
+.stepper button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+.undo-button {
+  margin-top: 18px;
+  padding: 6px 0;
+  border: 0;
+  color: var(--green-bright);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+.status-controls {
+  display: grid;
+}
+.status-controls > div {
+  display: flex;
+  min-height: 68px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 1px solid #ebe8df;
+}
+.status-controls > div > span {
+  display: grid;
+  gap: 3px;
+}
+.status-controls small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.toggle {
+  min-width: 70px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: #f2f1eb;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+}
+.toggle.active {
+  border-color: var(--green);
+  color: white;
+  background: var(--green);
+}
+.stepper {
+  display: grid;
+  grid-template-columns: 32px 35px 32px;
+  align-items: center;
+  text-align: center;
+}
+.stepper button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  font-size: 18px;
+}
+.section-copy {
+  margin: -6px 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.rest-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.rest-card {
+  display: grid;
+  gap: 5px;
+  padding: 17px;
+  border: 1px solid #b8d0c7;
+  border-radius: 8px;
+  color: var(--green);
+  background: #f0f7f4;
+  cursor: pointer;
+  text-align: left;
+}
+.rest-card.long {
+  border-color: #dfc99b;
+  color: #6c4b16;
+  background: #faf5e9;
+}
+.rest-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgb(35 42 36 / 8%);
+}
+.rest-card > span {
+  opacity: 0.68;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.rest-card > small {
+  opacity: 0.72;
+  font-size: 10px;
+}
+.play-action-list,
+.play-spell-list {
+  display: grid;
+  gap: 8px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.play-action-list > div,
+.play-spell-list > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fbfaf6;
+}
+.play-action-list > div > span,
+.play-spell-list > div > span {
+  display: grid;
+  gap: 3px;
+}
+.play-action-list small,
+.play-spell-list small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.action-inputs,
+.play-spell-list > div > div {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+}
+.action-inputs label {
+  display: grid;
+  gap: 3px;
+}
+.action-inputs input {
+  width: 82px;
+  height: 34px;
+}
+.play-spell-list select {
+  height: 34px;
+  font-size: 11px;
 }
 
 .table-wrap {
@@ -967,7 +1195,8 @@ td:first-child small {
     white-space: nowrap;
   }
   .overview-grid,
-  .two-column {
+  .two-column,
+  .play-grid {
     grid-template-columns: 1fr;
   }
   .overview-grid .panel:last-child {
@@ -993,6 +1222,18 @@ td:first-child small {
   }
   .spell-metrics {
     grid-template-columns: 1fr;
+  }
+  .rest-buttons {
+    grid-template-columns: 1fr;
+  }
+  .play-action-list > div,
+  .play-spell-list > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .action-inputs,
+  .play-spell-list > div > div {
+    flex-wrap: wrap;
   }
 }
 @media (prefers-reduced-motion: reduce) {

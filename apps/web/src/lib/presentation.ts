@@ -52,6 +52,11 @@ export function numericFact(evaluation: CharacterEvaluation, id: string): number
   return typeof value === "number" ? value : 0;
 }
 
+export function numericFactText(evaluation: CharacterEvaluation, id: string): string {
+  const value = evaluation.facts[id];
+  return typeof value === "number" ? String(value) : "—";
+}
+
 export function damageText(damage: CharacterEvaluation["attacks"][number]["damage"]): string {
   const dice =
     damage.diceCount !== undefined && damage.diceSize !== undefined

@@ -1,0 +1,101 @@
+import type { CharacterDocument, CharacterState } from "@dnd/character-model";
+
+function nonNegativeInteger(value: number): number {
+  return Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
+}
+
+export function commitCharacterState(
+  character: CharacterDocument,
+  state: CharacterState,
+  updatedAt = new Date(),
+): CharacterDocument {
+  return {
+    ...character,
+    state,
+    metadata: {
+      ...character.metadata,
+      updatedAt: updatedAt.toISOString(),
+      revision: character.metadata.revision + 1,
+    },
+  };
+}
+
+export function applyDamage(
+  character: CharacterDocument,
+  amount: number,
+  updatedAt?: Date,
+): CharacterDocument {
+  const damage = nonNegativeInteger(amount);
+  const absorbed = Math.min(character.state.temporaryHitPoints, damage);
+  const remaining = damage - absorbed;
+  return commitCharacterState(
+    character,
+    {
+      ...character.state,
+      temporaryHitPoints: character.state.temporaryHitPoints - absorbed,
+      currentHitPoints: Math.max(0, character.state.currentHitPoints - remaining),
+    },
+    updatedAt,
+  );
+}
+
+export function applyHealing(
+  character: CharacterDocument,
+  amount: number,
+  maximumHitPoints: number,
+  updatedAt?: Date,
+): CharacterDocument {
+  const healing = nonNegativeInteger(amount);
+  return commitCharacterState(
+    character,
+    {
+      ...character.state,
+      currentHitPoints: Math.min(
+        nonNegativeInteger(maximumHitPoints),
+        character.state.currentHitPoints + healing,
+      ),
+    },
+    updatedAt,
+  );
+}
+
+export function setTemporaryHitPoints(
+  character: CharacterDocument,
+  amount: number,
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(
+    character,
+    { ...character.state, temporaryHitPoints: nonNegativeInteger(amount) },
+    updatedAt,
+  );
+}
+
+export function setHeroicInspiration(
+  character: CharacterDocument,
+  heroicInspiration: boolean,
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(character, { ...character.state, heroicInspiration }, updatedAt);
+}
+
+export function setExhaustion(
+  character: CharacterDocument,
+  exhaustion: number,
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(
+    character,
+    { ...character.state, exhaustion: Math.min(6, nonNegativeInteger(exhaustion)) },
+    updatedAt,
+  );
+}
+
+export function clearConcentration(
+  character: CharacterDocument,
+  updatedAt?: Date,
+): CharacterDocument {
+  const state = { ...character.state };
+  delete state.concentrationSpellId;
+  return commitCharacterState(character, state, updatedAt);
+}

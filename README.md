@@ -16,9 +16,12 @@ corepack pnpm web
 
 Open `http://localhost:3000`. The app includes all reviewed character fixtures and lets you switch
 between them, inspect overview/combat/spell/feature views, open the calculation trace behind a
-derived value, and import or export the canonical character JSON. Imported characters stay in the
-browser's local storage; the app has no account, server, or database dependency. A production build
-is emitted as a static site in `apps/web/out` by `corepack pnpm build`.
+derived value, and import or export the canonical character JSON. The Play view tracks damage,
+healing, Temporary Hit Points, Heroic Inspiration, Exhaustion, Concentration, rests, modeled feature
+uses, and spell-slot expenditure. Every change advances the document revision, persists locally,
+and can be undone once. Imported characters stay in the browser's local storage; the app has no
+account, server, or database dependency. A production build is emitted as a static site in
+`apps/web/out` by `corepack pnpm build`.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -47,8 +50,8 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
-reports rules-invalid choices without changing the input. The web app is currently a read-only
-sheet; the choice-by-choice character builder and play-state controls are the next frontend slices.
+reports rules-invalid choices without changing the input. The next frontend slice is the
+choice-by-choice character builder; direct JSON import remains available in the meantime.
 
 ## Requirements
 

@@ -2,9 +2,22 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { characterDocumentSchema, type CharacterDocument } from "@dnd/character-model";
-import type { CharacterEvaluation, LoadedRulesPackage } from "@dnd/rules-api";
-import { evaluateCharacter } from "@dnd/rules-core";
+import {
+  characterDocumentSchema,
+  type CharacterDocument,
+  type CharacterState,
+} from "@dnd/character-model";
+import type {
+  ActionSummary,
+  ActionUseRequest,
+  CharacterEvaluation,
+  LoadedRulesPackage,
+  SpellCastRequest,
+  SpellSummary,
+  StateChange,
+  ValidationMessage,
+} from "@dnd/rules-api";
+import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
 
 import type { FixtureOption } from "../lib/server-data";
 import {
@@ -13,19 +26,74 @@ import {
   damageText,
   entityNames,
   numericFact,
+  numericFactText,
   shortEntityName,
   signed,
   titleCase,
 } from "../lib/presentation";
+import {
+  applyDamage,
+  applyHealing,
+  clearConcentration,
+  commitCharacterState,
+  setExhaustion,
+  setHeroicInspiration,
+  setTemporaryHitPoints,
+} from "../lib/play-state";
 
 const storageKey = "dnd-character-manager.document.v1";
-const tabs = ["overview", "combat", "spells", "features", "diagnostics"] as const;
+const tabs = ["overview", "play", "combat", "spells", "features", "diagnostics"] as const;
 type Tab = (typeof tabs)[number];
 type Trace = CharacterEvaluation["traces"][string];
 
 interface CharacterManagerProps {
   rulesPackage: LoadedRulesPackage;
   fixtures: FixtureOption[];
+}
+
+interface TransitionResult {
+  applicable: boolean;
+  changes: StateChange[];
+  nextState: CharacterState;
+  validations: ValidationMessage[];
+}
+
+interface ActionDraft {
+  rolls: string;
+  amount: string;
+}
+
+interface ActionRequirements {
+  diceCount?: number;
+  diceSize?: number;
+  minimumSpend?: number;
+}
+
+function objectValue(value: unknown): Readonly<Record<string, unknown>> | undefined {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Readonly<Record<string, unknown>>)
+    : undefined;
+}
+
+function actionRequirements(action: ActionSummary): ActionRequirements {
+  const healing = objectValue(action.parameters?.healing);
+  const variableSpend = objectValue(action.parameters?.variableSpend);
+  const diceCount = healing?.diceCount;
+  const diceSize = healing?.diceSize;
+  const minimumSpend = variableSpend?.minimum;
+  return {
+    ...(typeof diceCount === "number" ? { diceCount } : {}),
+    ...(typeof diceSize === "number" ? { diceSize } : {}),
+    ...(typeof minimumSpend === "number" ? { minimumSpend } : {}),
+  };
+}
+
+function supportsStateTransition(action: ActionSummary): boolean {
+  const parameters = objectValue(action.parameters);
+  return (
+    typeof parameters?.resourceId === "string" &&
+    (typeof parameters.spends === "number" || objectValue(parameters.variableSpend) !== undefined)
+  );
 }
 
 function errorMessage(error: unknown): string {
@@ -82,11 +150,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   if (firstFixture === undefined) throw new Error("The web app requires at least one fixture.");
 
   const [character, setCharacter] = useState<CharacterDocument>(firstFixture.character);
+  const [previousCharacter, setPreviousCharacter] = useState<CharacterDocument>();
   const [source, setSource] = useState(firstFixture.filename);
   const [tab, setTab] = useState<Tab>("overview");
   const [selectedTraceId, setSelectedTraceId] = useState<string>();
   const [notice, setNotice] = useState<string>();
   const [storageReady, setStorageReady] = useState(false);
+  const [playAmount, setPlayAmount] = useState("1");
+  const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
+  const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
+  const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
   const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -123,14 +196,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   }, [character, rulesPackage]);
   const names = useMemo(() => entityNames(rulesPackage), [rulesPackage]);
   const evaluation = result.evaluation;
+  const statefulActions = evaluation?.actions.filter(supportsStateTransition) ?? [];
   const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
 
   function selectFixture(filename: string): void {
     const fixture = fixtures.find((option) => option.filename === filename);
     if (fixture === undefined) return;
     setCharacter(fixture.character);
+    setPreviousCharacter(undefined);
     setSource(filename);
     setSelectedTraceId(undefined);
+    setActionDrafts({});
+    setSpellLevels({});
     setNotice(`Loaded ${fixture.character.name}.`);
   }
 
@@ -139,8 +216,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     try {
       const parsed = characterDocumentSchema.parse(JSON.parse(await file.text()) as unknown);
       setCharacter(parsed);
+      setPreviousCharacter(undefined);
       setSource("imported");
       setSelectedTraceId(undefined);
+      setActionDrafts({});
+      setSpellLevels({});
       setNotice(`Imported ${parsed.name}; it is saved only in this browser.`);
     } catch (error) {
       setNotice(`Import failed: ${errorMessage(error)}`);
@@ -160,6 +240,153 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     link.click();
     URL.revokeObjectURL(url);
     setNotice("Exported the current character document.");
+  }
+
+  function savePlayState(nextCharacter: CharacterDocument, message: string): void {
+    setPreviousCharacter(character);
+    setCharacter(nextCharacter);
+    setSource("browser-save");
+    setNotice(message);
+  }
+
+  function undoPlayState(): void {
+    if (previousCharacter === undefined) return;
+    setCharacter(previousCharacter);
+    setPreviousCharacter(undefined);
+    setSource("browser-save");
+    setNotice("Undid the last play-state change.");
+  }
+
+  function positivePlayAmount(): number | undefined {
+    const amount = Number(playAmount);
+    if (!Number.isInteger(amount) || amount < 1) {
+      setNotice("Enter a whole-number amount of at least 1.");
+      return undefined;
+    }
+    return amount;
+  }
+
+  function damageCharacter(): void {
+    const amount = positivePlayAmount();
+    if (amount === undefined) return;
+    savePlayState(
+      applyDamage(character, amount),
+      `${character.name} took ${String(amount)} damage.`,
+    );
+  }
+
+  function healCharacter(): void {
+    const amount = positivePlayAmount();
+    if (amount === undefined || evaluation === undefined) return;
+    const maximum = numericFact(evaluation, "hitPoints.maximum");
+    savePlayState(
+      applyHealing(character, amount, maximum),
+      `${character.name} recovered up to ${String(amount)} Hit Points.`,
+    );
+  }
+
+  function replaceTemporaryHitPoints(): void {
+    const amount = Number(temporaryHitPoints);
+    if (!Number.isInteger(amount) || amount < 0) {
+      setNotice("Temporary Hit Points must be a non-negative whole number.");
+      return;
+    }
+    savePlayState(
+      setTemporaryHitPoints(character, amount),
+      `Temporary Hit Points set to ${String(amount)}.`,
+    );
+  }
+
+  function applyTransition(proposal: TransitionResult, message: string): void {
+    if (!proposal.applicable) {
+      const validation = proposal.validations[0];
+      setNotice(
+        validation === undefined
+          ? "That transition is not currently available."
+          : (validation.message.en ?? Object.values(validation.message)[0] ?? validation.code),
+      );
+      return;
+    }
+    if (proposal.changes.length === 0) {
+      setNotice(`${message} No persistent state changed.`);
+      return;
+    }
+    savePlayState(commitCharacterState(character, proposal.nextState), message);
+  }
+
+  function rest(event: "short-rest" | "long-rest"): void {
+    try {
+      const proposal = proposeRest({ character, packages: [rulesPackage] }, { event });
+      applyTransition(
+        proposal,
+        `${event === "short-rest" ? "Short" : "Long"} Rest applied (${String(proposal.changes.length)} changes).`,
+      );
+    } catch (error) {
+      setNotice(`Rest failed: ${errorMessage(error)}`);
+    }
+  }
+
+  function updateActionDraft(actionId: string, update: Partial<ActionDraft>): void {
+    setActionDrafts((current) => ({
+      ...current,
+      [actionId]: { rolls: "", amount: "", ...current[actionId], ...update },
+    }));
+  }
+
+  function useAction(action: ActionSummary): void {
+    const draft = actionDrafts[action.id] ?? { rolls: "", amount: "" };
+    const request: ActionUseRequest = { actionId: action.id };
+    if (draft.rolls.trim().length > 0) {
+      const rolls = draft.rolls
+        .trim()
+        .split(/[\s,]+/u)
+        .map(Number);
+      if (rolls.some((roll) => !Number.isInteger(roll) || roll < 1)) {
+        setNotice("Action rolls must be positive whole numbers separated by spaces or commas.");
+        return;
+      }
+      request.rolls = rolls;
+    }
+    if (draft.amount.trim().length > 0) {
+      const amount = Number(draft.amount);
+      if (!Number.isInteger(amount) || amount < 1) {
+        setNotice("The resource amount must be a positive whole number.");
+        return;
+      }
+      request.amount = amount;
+    }
+    try {
+      const proposal = proposeAction({ character, packages: [rulesPackage] }, request);
+      applyTransition(
+        proposal,
+        `${names.get(action.id) ?? shortEntityName(action.id)} applied (${String(proposal.changes.length)} changes).`,
+      );
+    } catch (error) {
+      setNotice(`Action failed: ${errorMessage(error)}`);
+    }
+  }
+
+  function selectedSlotLevel(spell: SpellSummary): number {
+    const selected = Number(spellLevels[spell.id]);
+    if (Number.isInteger(selected) && selected >= spell.level) return selected;
+    return (
+      evaluation?.spellcasting?.slots.find((slot) => slot.level >= spell.level && slot.current > 0)
+        ?.level ?? spell.level
+    );
+  }
+
+  function castSpell(spell: SpellSummary, asRitual: boolean): void {
+    const request: SpellCastRequest = { spellId: spell.id, asRitual };
+    if (spell.level > 0 && !asRitual) request.slotLevel = selectedSlotLevel(spell);
+    try {
+      const proposal = proposeSpellCast({ character, packages: [rulesPackage] }, request);
+      applyTransition(
+        proposal,
+        `${spell.name}${asRitual ? " was cast as a ritual" : " was cast"}.`,
+      );
+    } catch (error) {
+      setNotice(`Spell cast failed: ${errorMessage(error)}`);
+    }
   }
 
   return (
@@ -264,7 +491,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   onSelect={setSelectedTraceId}
                 >
                   <span>Armor class</span>
-                  <strong>{String(numericFact(evaluation, "armorClass"))}</strong>
+                  <strong>{numericFactText(evaluation, "armorClass")}</strong>
                   <small>view calculation</small>
                 </TraceButton>
                 <div className="vital-card hp-card">
@@ -297,7 +524,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 >
                   <span>Speed</span>
                   <strong>
-                    {String(numericFact(evaluation, "speed.walking"))}
+                    {numericFactText(evaluation, "speed.walking")}
                     <small> ft.</small>
                   </strong>
                   <small>view calculation</small>
@@ -322,6 +549,327 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 </button>
               ))}
             </nav>
+
+            {tab === "play" ? (
+              <div className="sheet-grid play-grid">
+                <Section title="Hit Points" eyebrow="Live encounter state">
+                  <div className="health-summary">
+                    <div>
+                      <span>Current</span>
+                      <strong>{String(character.state.currentHitPoints)}</strong>
+                      <small>of {String(numericFact(evaluation, "hitPoints.maximum"))}</small>
+                    </div>
+                    <div>
+                      <span>Temporary</span>
+                      <strong>{String(character.state.temporaryHitPoints)}</strong>
+                      <small>absorbs damage first</small>
+                    </div>
+                  </div>
+                  <div className="play-control">
+                    <label htmlFor="hp-amount">Damage or healing amount</label>
+                    <div>
+                      <input
+                        id="hp-amount"
+                        type="number"
+                        min="1"
+                        step="1"
+                        inputMode="numeric"
+                        value={playAmount}
+                        onChange={(event) => {
+                          setPlayAmount(event.target.value);
+                        }}
+                      />
+                      <button className="button danger" type="button" onClick={damageCharacter}>
+                        Apply damage
+                      </button>
+                      <button className="button heal" type="button" onClick={healCharacter}>
+                        Heal
+                      </button>
+                    </div>
+                  </div>
+                  <div className="play-control">
+                    <label htmlFor="temporary-hp">Replace Temporary Hit Points</label>
+                    <div>
+                      <input
+                        id="temporary-hp"
+                        type="number"
+                        min="0"
+                        step="1"
+                        inputMode="numeric"
+                        value={temporaryHitPoints}
+                        onChange={(event) => {
+                          setTemporaryHitPointsInput(event.target.value);
+                        }}
+                      />
+                      <button
+                        className="button secondary"
+                        type="button"
+                        onClick={replaceTemporaryHitPoints}
+                      >
+                        Set temporary HP
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    className="undo-button"
+                    type="button"
+                    disabled={previousCharacter === undefined}
+                    onClick={undoPlayState}
+                  >
+                    ↶ Undo last state change
+                  </button>
+                </Section>
+
+                <Section title="Status" eyebrow="Inspiration & conditions">
+                  <div className="status-controls">
+                    <div>
+                      <span>
+                        <strong>Heroic Inspiration</strong>
+                        <small>One use at a time</small>
+                      </span>
+                      <button
+                        type="button"
+                        className={character.state.heroicInspiration ? "toggle active" : "toggle"}
+                        aria-pressed={character.state.heroicInspiration}
+                        onClick={() => {
+                          const inspired = !character.state.heroicInspiration;
+                          savePlayState(
+                            setHeroicInspiration(character, inspired),
+                            `Heroic Inspiration ${inspired ? "granted" : "spent"}.`,
+                          );
+                        }}
+                      >
+                        {character.state.heroicInspiration ? "Ready" : "None"}
+                      </button>
+                    </div>
+                    <div>
+                      <span>
+                        <strong>Exhaustion</strong>
+                        <small>Bounded from 0 to 6</small>
+                      </span>
+                      <div className="stepper">
+                        <button
+                          type="button"
+                          aria-label="Reduce exhaustion"
+                          disabled={character.state.exhaustion === 0}
+                          onClick={() => {
+                            savePlayState(
+                              setExhaustion(character, character.state.exhaustion - 1),
+                              "Exhaustion reduced by 1.",
+                            );
+                          }}
+                        >
+                          −
+                        </button>
+                        <strong>{String(character.state.exhaustion)}</strong>
+                        <button
+                          type="button"
+                          aria-label="Increase exhaustion"
+                          disabled={character.state.exhaustion === 6}
+                          onClick={() => {
+                            savePlayState(
+                              setExhaustion(character, character.state.exhaustion + 1),
+                              "Exhaustion increased by 1.",
+                            );
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <span>
+                        <strong>Concentration</strong>
+                        <small>
+                          {character.state.concentrationSpellId === undefined
+                            ? "No active spell"
+                            : (names.get(character.state.concentrationSpellId) ??
+                              shortEntityName(character.state.concentrationSpellId))}
+                        </small>
+                      </span>
+                      <button
+                        className="button secondary compact"
+                        type="button"
+                        disabled={character.state.concentrationSpellId === undefined}
+                        onClick={() => {
+                          savePlayState(clearConcentration(character), "Concentration ended.");
+                        }}
+                      >
+                        End
+                      </button>
+                    </div>
+                  </div>
+                </Section>
+
+                <Section title="Rest" eyebrow="Atomic rules transitions">
+                  <p className="section-copy">
+                    Rests apply all modeled recovery rules together. A Short Rest without Hit Dice
+                    still recharges eligible resources.
+                  </p>
+                  <div className="rest-buttons">
+                    <button
+                      className="rest-card"
+                      type="button"
+                      onClick={() => {
+                        rest("short-rest");
+                      }}
+                    >
+                      <span>About 1 hour</span>
+                      <strong>Take a Short Rest</strong>
+                      <small>Recharge eligible features</small>
+                    </button>
+                    <button
+                      className="rest-card long"
+                      type="button"
+                      onClick={() => {
+                        rest("long-rest");
+                      }}
+                    >
+                      <span>At least 8 hours</span>
+                      <strong>Take a Long Rest</strong>
+                      <small>Restore HP, slots, and resources</small>
+                    </button>
+                  </div>
+                </Section>
+
+                <Section
+                  title="Use a feature"
+                  eyebrow={`${String(statefulActions.length)} state transitions`}
+                >
+                  {statefulActions.length === 0 ? (
+                    <p className="empty">
+                      No feature actions with complete state-transition automation are available.
+                    </p>
+                  ) : (
+                    <div className="play-action-list">
+                      {statefulActions.map((action) => {
+                        const requirements = actionRequirements(action);
+                        const draft = actionDrafts[action.id] ?? { rolls: "", amount: "" };
+                        return (
+                          <div key={action.id}>
+                            <span>
+                              <strong>{names.get(action.id) ?? shortEntityName(action.id)}</strong>
+                              <small>
+                                {action.actionEconomy === undefined
+                                  ? "Special action"
+                                  : titleCase(action.actionEconomy)}{" "}
+                                · {action.available ? "Ready" : "Unavailable"}
+                              </small>
+                            </span>
+                            <div className="action-inputs">
+                              {requirements.diceCount === undefined ? null : (
+                                <label>
+                                  Rolls
+                                  <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    placeholder={`${String(requirements.diceCount)}d${String(requirements.diceSize ?? "?")}`}
+                                    value={draft.rolls}
+                                    onChange={(event) => {
+                                      updateActionDraft(action.id, { rolls: event.target.value });
+                                    }}
+                                  />
+                                </label>
+                              )}
+                              {requirements.minimumSpend === undefined ? null : (
+                                <label>
+                                  Amount
+                                  <input
+                                    type="number"
+                                    min={requirements.minimumSpend}
+                                    step="1"
+                                    value={draft.amount}
+                                    placeholder={String(requirements.minimumSpend)}
+                                    onChange={(event) => {
+                                      updateActionDraft(action.id, { amount: event.target.value });
+                                    }}
+                                  />
+                                </label>
+                              )}
+                              <button
+                                className="button primary compact"
+                                type="button"
+                                disabled={!action.available}
+                                onClick={() => {
+                                  useAction(action);
+                                }}
+                              >
+                                Use
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </Section>
+
+                {evaluation.spellcasting === undefined ? null : (
+                  <Section title="Cast a spell" eyebrow="Spell-slot transitions">
+                    <div className="play-spell-list">
+                      {evaluation.spells.map((spell) => {
+                        const eligibleSlots =
+                          evaluation.spellcasting?.slots.filter(
+                            (slot) => slot.level >= spell.level,
+                          ) ?? [];
+                        return (
+                          <div key={spell.id}>
+                            <span>
+                              <strong>{spell.name}</strong>
+                              <small>
+                                {spell.level === 0 ? "Cantrip" : `Level ${String(spell.level)}`} ·{" "}
+                                {spell.prepared ? "Prepared" : "Not prepared"}
+                                {spell.concentration ? " · Concentration" : ""}
+                              </small>
+                            </span>
+                            <div>
+                              {spell.level === 0 ? null : (
+                                <select
+                                  aria-label={`Slot level for ${spell.name}`}
+                                  value={String(selectedSlotLevel(spell))}
+                                  onChange={(event) => {
+                                    setSpellLevels((current) => ({
+                                      ...current,
+                                      [spell.id]: event.target.value,
+                                    }));
+                                  }}
+                                >
+                                  {eligibleSlots.map((slot) => (
+                                    <option key={slot.level} value={slot.level}>
+                                      Level {String(slot.level)} · {String(slot.current)} left
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                              <button
+                                className="button primary compact"
+                                type="button"
+                                onClick={() => {
+                                  castSpell(spell, false);
+                                }}
+                              >
+                                Cast
+                              </button>
+                              {spell.ritual ? (
+                                <button
+                                  className="button secondary compact"
+                                  type="button"
+                                  onClick={() => {
+                                    castSpell(spell, true);
+                                  }}
+                                >
+                                  Ritual
+                                </button>
+                              ) : null}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </Section>
+                )}
+              </div>
+            ) : null}
 
             {tab === "overview" ? (
               <div className="sheet-grid overview-grid">
