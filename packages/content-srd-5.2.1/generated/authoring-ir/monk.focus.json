@@ -1,0 +1,119 @@
+{
+  "id": "srd521.class-feature.monk.monk-s-focus",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.monk",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.monk"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.monk.focus-points"
+      },
+      "id": "focus-points-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "short-rest"
+          },
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.monk.focus-points",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "use-flurry-of-blows",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "resourceId": "srd521.resource.monk.focus-points",
+        "spends": 1
+      },
+      "target": "action.flurry-of-blows",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.monk.focus-points"
+      }
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "use-patient-defense",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "resourceId": "srd521.resource.monk.focus-points",
+        "spends": 1
+      },
+      "target": "action.patient-defense",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.monk.focus-points"
+      }
+    },
+    {
+      "automationLevel": "state-automated",
+      "id": "use-step-of-the-wind",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "resourceId": "srd521.resource.monk.focus-points",
+        "spends": 1
+      },
+      "target": "action.step-of-the-wind",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.monk.focus-points"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets and applied conditions remain roll-assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0050-b006"
+      ],
+      "page": 50,
+      "quoteHash": "a177f778110134f19a103f6dd60ae17720b34577dc567706c724baab84f81e99",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0051-b002"
+      ],
+      "page": 51,
+      "quoteHash": "dcd95665b1d78cf9b5828f78ae0859a860bc11b908c164ccb58dc8dc24c8a3bf",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Your focus and martial training allow you to harness a well of extraordinary energy within yourself. This energy is represented by Focus Points. Your Monk level determines the number of points you have, as shown in the Focus Points column of the Monk Features table. You can expend these points to enhance or fuel certain Monk features. You start knowing three such features: Flurry of Blows, Patient Defense, and Step of the Wind, each of which is detailed below. When you expend a Focus Point, it is unavailable until you finish a Short or Long Rest, at the end of which you regain all your expended points. Some features that use Focus Points require your target to make a saving throw. The save DC equals 8 plus your Wisdom modifier and Proficiency Bonus. Flurry of Blows. You can expend 1 Focus Point to make two Unarmed Strikes as a Bonus Action. Patient Defense. You can take the Disengage action as a Bonus Action. Alternatively, you can"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "expend 1 Focus Point to take both the Disengage and the Dodge actions as a Bonus Action. Step of the Wind. You can take the Dash action as a Bonus Action. Alternatively, you can expend 1 Focus Point to take both the Disengage and Dash actions as a Bonus Action, and your jump distance is doubled for the turn."
+      }
+    ],
+    "title": "Monk’s Focus"
+  }
+}

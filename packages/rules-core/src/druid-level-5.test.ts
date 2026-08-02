@@ -113,7 +113,7 @@ describe("evaluateCharacter Druid level-5 vertical slice", () => {
     const character = loadCharacter();
     const firstLevel = character.build.levels[0];
     const armor = character.loadout.inventory.find((item) => item.id === "chain-shirt-1");
-    if (firstLevel?.selectedFeatureChoices?.[0] === undefined || armor === undefined) {
+    if (firstLevel?.selectedFeatureChoices[0] === undefined || armor === undefined) {
       throw new Error("Druid fixture requires its Primal Order and armor");
     }
     firstLevel.selectedFeatureChoices[0].optionIds = ["srd521.option.druid.primal-order.magician"];

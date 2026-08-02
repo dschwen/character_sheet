@@ -1,13 +1,13 @@
 {
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 218,
+    "STRUCTURED": 249,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
     "VERIFIED": 0
   },
   "generatedAt": null,
-  "note": "Barbarian, Cleric through level 5, Druid through level 5, Fighter through level 5, Wizard through level 5, Human, Soldier, equipment, and representative spells.",
+  "note": "Barbarian, Cleric through level 5, Druid through level 5, Fighter through level 5, Monk through level 5, Wizard through level 5, Human, Soldier, equipment, and representative spells.",
   "package": "srd-5.2.1"
 }

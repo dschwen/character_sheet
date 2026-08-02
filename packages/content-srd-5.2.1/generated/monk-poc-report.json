@@ -1,0 +1,294 @@
+{
+  "authoringIr": [
+    "monk.unarmored-defense.json",
+    "monk.focus.json",
+    "monk.deflect-attacks.json",
+    "monk.extra-attack.json",
+    "monk.stunning-strike.json"
+  ],
+  "classId": "srd521.class.monk",
+  "coreTraits": {
+    "armorTraining": [],
+    "conditionalWeaponProficiencies": [
+      {
+        "attackType": "melee",
+        "category": "martial",
+        "requiredProperties": [
+          "light"
+        ]
+      }
+    ],
+    "hitPointDie": 8,
+    "primaryAbilities": [
+      "dexterity",
+      "wisdom"
+    ],
+    "savingThrowProficiencies": [
+      "strength",
+      "dexterity"
+    ],
+    "skillProficiencyChoice": {
+      "maximum": 2,
+      "minimum": 2,
+      "options": [
+        "acrobatics",
+        "athletics",
+        "history",
+        "insight",
+        "religion",
+        "stealth"
+      ]
+    },
+    "startingEquipmentText": "Choose A or B: (A) Spear, 5 Daggers, Artisan’s Tools or Musical Instrument chosen for the tool proficiency above, Explorer’s Pack, and 11 GP; or (B) 50 GP",
+    "toolProficiencyChoiceText": "Choose one type of Artisan’s Tools or Musical Instrument (see “Equipment”)",
+    "weaponProficiencies": [
+      "simple"
+    ]
+  },
+  "extractedClassFeatures": 22,
+  "extractedOpenHandFeatures": 4,
+  "generatedEntities": [
+    "srd521.class.monk",
+    "srd521.class-feature.monk.martial-arts",
+    "srd521.class-feature.monk.unarmored-defense",
+    "srd521.class-feature.monk.monk-s-focus",
+    "srd521.class-feature.monk.unarmored-movement",
+    "srd521.class-feature.monk.uncanny-metabolism",
+    "srd521.class-feature.monk.deflect-attacks",
+    "srd521.class-feature.monk.monk-subclass",
+    "srd521.class-feature.monk.ability-score-improvement",
+    "srd521.class-feature.monk.slow-fall",
+    "srd521.class-feature.monk.extra-attack",
+    "srd521.class-feature.monk.stunning-strike",
+    "srd521.class-feature.monk.empowered-strikes",
+    "srd521.class-feature.monk.evasion",
+    "srd521.class-feature.monk.acrobatic-movement",
+    "srd521.class-feature.monk.heightened-focus",
+    "srd521.class-feature.monk.self-restoration",
+    "srd521.class-feature.monk.deflect-energy",
+    "srd521.class-feature.monk.disciplined-survivor",
+    "srd521.class-feature.monk.perfect-focus",
+    "srd521.class-feature.monk.superior-defense",
+    "srd521.class-feature.monk.epic-boon",
+    "srd521.class-feature.monk.body-and-mind",
+    "srd521.table.monk.martial-arts-die",
+    "srd521.table.monk.focus-points",
+    "srd521.table.monk.unarmored-movement",
+    "srd521.subclass.monk.warrior-of-the-open-hand",
+    "srd521.subclass-feature.monk.warrior-of-the-open-hand.open-hand-technique",
+    "srd521.subclass-feature.monk.warrior-of-the-open-hand.wholeness-of-body",
+    "srd521.subclass-feature.monk.warrior-of-the-open-hand.fleet-step",
+    "srd521.subclass-feature.monk.warrior-of-the-open-hand.quivering-palm"
+  ],
+  "progression": [
+    {
+      "feature_names": [
+        "Martial Arts",
+        "Unarmored Defense"
+      ],
+      "focus_points": 0,
+      "level": 1,
+      "martial_arts_die": 6,
+      "proficiency_bonus": 2,
+      "unarmored_movement": 0
+    },
+    {
+      "feature_names": [
+        "Monk’s Focus",
+        "Unarmored Movement",
+        "Uncanny Metabolism"
+      ],
+      "focus_points": 2,
+      "level": 2,
+      "martial_arts_die": 6,
+      "proficiency_bonus": 2,
+      "unarmored_movement": 10
+    },
+    {
+      "feature_names": [
+        "Deflect Attacks",
+        "Monk Subclass"
+      ],
+      "focus_points": 3,
+      "level": 3,
+      "martial_arts_die": 6,
+      "proficiency_bonus": 2,
+      "unarmored_movement": 10
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement",
+        "Slow Fall"
+      ],
+      "focus_points": 4,
+      "level": 4,
+      "martial_arts_die": 6,
+      "proficiency_bonus": 2,
+      "unarmored_movement": 10
+    },
+    {
+      "feature_names": [
+        "Extra Attack",
+        "Stunning Strike"
+      ],
+      "focus_points": 5,
+      "level": 5,
+      "martial_arts_die": 8,
+      "proficiency_bonus": 3,
+      "unarmored_movement": 10
+    },
+    {
+      "feature_names": [
+        "Empowered Strikes",
+        "Subclass feature"
+      ],
+      "focus_points": 6,
+      "level": 6,
+      "martial_arts_die": 8,
+      "proficiency_bonus": 3,
+      "unarmored_movement": 15
+    },
+    {
+      "feature_names": [
+        "Evasion"
+      ],
+      "focus_points": 7,
+      "level": 7,
+      "martial_arts_die": 8,
+      "proficiency_bonus": 3,
+      "unarmored_movement": 15
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "focus_points": 8,
+      "level": 8,
+      "martial_arts_die": 8,
+      "proficiency_bonus": 3,
+      "unarmored_movement": 15
+    },
+    {
+      "feature_names": [
+        "Acrobatic Movement"
+      ],
+      "focus_points": 9,
+      "level": 9,
+      "martial_arts_die": 8,
+      "proficiency_bonus": 4,
+      "unarmored_movement": 15
+    },
+    {
+      "feature_names": [
+        "Heightened Focus",
+        "Self-Restoration"
+      ],
+      "focus_points": 10,
+      "level": 10,
+      "martial_arts_die": 8,
+      "proficiency_bonus": 4,
+      "unarmored_movement": 20
+    },
+    {
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "focus_points": 11,
+      "level": 11,
+      "martial_arts_die": 10,
+      "proficiency_bonus": 4,
+      "unarmored_movement": 20
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "focus_points": 12,
+      "level": 12,
+      "martial_arts_die": 10,
+      "proficiency_bonus": 4,
+      "unarmored_movement": 20
+    },
+    {
+      "feature_names": [
+        "Deflect Energy"
+      ],
+      "focus_points": 13,
+      "level": 13,
+      "martial_arts_die": 10,
+      "proficiency_bonus": 5,
+      "unarmored_movement": 20
+    },
+    {
+      "feature_names": [
+        "Disciplined Survivor"
+      ],
+      "focus_points": 14,
+      "level": 14,
+      "martial_arts_die": 10,
+      "proficiency_bonus": 5,
+      "unarmored_movement": 25
+    },
+    {
+      "feature_names": [
+        "Perfect Focus"
+      ],
+      "focus_points": 15,
+      "level": 15,
+      "martial_arts_die": 10,
+      "proficiency_bonus": 5,
+      "unarmored_movement": 25
+    },
+    {
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "focus_points": 16,
+      "level": 16,
+      "martial_arts_die": 10,
+      "proficiency_bonus": 5,
+      "unarmored_movement": 25
+    },
+    {
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "focus_points": 17,
+      "level": 17,
+      "martial_arts_die": 12,
+      "proficiency_bonus": 6,
+      "unarmored_movement": 25
+    },
+    {
+      "feature_names": [
+        "Superior Defense"
+      ],
+      "focus_points": 18,
+      "level": 18,
+      "martial_arts_die": 12,
+      "proficiency_bonus": 6,
+      "unarmored_movement": 30
+    },
+    {
+      "feature_names": [
+        "Epic Boon"
+      ],
+      "focus_points": 19,
+      "level": 19,
+      "martial_arts_die": 12,
+      "proficiency_bonus": 6,
+      "unarmored_movement": 30
+    },
+    {
+      "feature_names": [
+        "Body and Mind"
+      ],
+      "focus_points": 20,
+      "level": 20,
+      "martial_arts_die": 12,
+      "proficiency_bonus": 6,
+      "unarmored_movement": 30
+    }
+  ],
+  "progressionRows": 20
+}

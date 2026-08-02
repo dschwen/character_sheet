@@ -1,0 +1,90 @@
+{
+  "id": "srd521.class-feature.monk.unarmored-defense",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.monk",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "args": [
+          {
+            "kind": "literal",
+            "value": 10
+          },
+          {
+            "kind": "ref",
+            "path": "ability.dexterity.modifier"
+          },
+          {
+            "kind": "ref",
+            "path": "ability.wisdom.modifier"
+          }
+        ],
+        "kind": "add"
+      },
+      "id": "monk-unarmored-defense",
+      "parameters": {
+        "selection": "automatic-highest",
+        "shieldAllowed": false
+      },
+      "target": "armor-class",
+      "type": "add-candidate-calculation",
+      "when": {
+        "args": [
+          {
+            "kind": "equals",
+            "left": {
+              "kind": "ref",
+              "path": "equipment.wearingArmor"
+            },
+            "right": {
+              "kind": "literal",
+              "value": false
+            }
+          },
+          {
+            "kind": "equals",
+            "left": {
+              "kind": "ref",
+              "path": "equipment.wieldingShield"
+            },
+            "right": {
+              "kind": "literal",
+              "value": false
+            }
+          }
+        ],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets and applied conditions remain roll-assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0050-b005"
+      ],
+      "page": 50,
+      "quoteHash": "6987f96f2fb26c5487916765dfa6ef1e22dff3b739d18aadde5b86b128f20e51",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "While you aren’t wearing armor or wielding a Shield, your base Armor Class equals 10 plus your Dexterity and Wisdom modifiers."
+      }
+    ],
+    "title": "Unarmored Defense"
+  }
+}

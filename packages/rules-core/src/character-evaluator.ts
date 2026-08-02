@@ -74,6 +74,17 @@ const classBodySchema = z
     hitPointDie: z.number().int().positive(),
     savingThrowProficiencies: z.array(z.enum(abilities)).default([]),
     weaponProficiencies: z.array(z.enum(["simple", "martial"])).default([]),
+    conditionalWeaponProficiencies: z
+      .array(
+        z
+          .object({
+            category: z.enum(["simple", "martial"]),
+            attackType: z.enum(["melee", "ranged"]),
+            requiredProperties: z.array(z.string()),
+          })
+          .strict(),
+      )
+      .default([]),
     armorTraining: z.array(z.enum(["light", "medium", "heavy", "shield"])).default([]),
     skillProficiencyChoice: z
       .object({
@@ -86,6 +97,15 @@ const classBodySchema = z
       z.object({
         level: z.number().int().min(1).max(20),
         weaponMastery: z.number().int().min(0).optional(),
+        martialArtsDie: z
+          .object({
+            diceCount: z.number().int().positive(),
+            diceSize: z.number().int().positive(),
+          })
+          .strict()
+          .optional(),
+        focusPoints: z.number().int().nonnegative().optional(),
+        unarmoredMovement: z.number().int().nonnegative().optional(),
         features: z.array(
           z.object({
             name: z.string(),
@@ -94,6 +114,27 @@ const classBodySchema = z
         ),
       }),
     ),
+    featureSaveAbility: z.enum(abilities).optional(),
+    martialArts: z
+      .object({
+        ability: z.enum(abilities),
+        monkWeapon: z
+          .object({
+            attackType: z.enum(["melee", "ranged"]),
+            categories: z.array(z.enum(["simple", "martial"])),
+            conditionalCategories: z.array(
+              z
+                .object({
+                  category: z.enum(["simple", "martial"]),
+                  requiredProperties: z.array(z.string()),
+                })
+                .strict(),
+            ),
+          })
+          .strict(),
+      })
+      .strict()
+      .optional(),
   })
   .passthrough();
 
@@ -339,6 +380,9 @@ interface EquipmentContext {
   readonly items: ResolvedInventoryItem[];
   readonly armorTraining: ReadonlySet<string>;
   readonly weaponProficiencies: ReadonlySet<string>;
+  readonly conditionalWeaponProficiencies: z.infer<
+    typeof classBodySchema
+  >["conditionalWeaponProficiencies"];
   readonly rollEffects: D20RollEffect[];
 }
 
@@ -686,6 +730,7 @@ function validateProgressionSelections(
   const wizardLevel = classLevelCounts.get("srd521.class.wizard") ?? 0;
   const clericLevel = classLevelCounts.get("srd521.class.cleric") ?? 0;
   const druidLevel = classLevelCounts.get("srd521.class.druid") ?? 0;
+  const monkLevel = classLevelCounts.get("srd521.class.monk") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -757,6 +802,19 @@ function validateProgressionSelections(
       "A Druid subclass requires Druid level 3.",
       ["build.subclassId"],
     );
+  }
+  if (monkLevel >= 3 && character.build.subclassId === undefined) {
+    addValidation(
+      state,
+      "MONK_SUBCLASS_REQUIRED",
+      "A Monk of level 3 or higher must select a Monk subclass.",
+      ["build.subclassId"],
+    );
+  }
+  if (monkLevel < 3 && subclassParentId === "srd521.class.monk") {
+    addValidation(state, "MONK_SUBCLASS_LEVEL_REQUIRED", "A Monk subclass requires Monk level 3.", [
+      "build.subclassId",
+    ]);
   }
   const divineOrderSelections = character.build.levels
     .flatMap((level) => level.selectedFeatureChoices)
@@ -988,6 +1046,7 @@ function materializeFacts(character: CharacterDocument, state: EngineState): Map
   state.facts["equipment.wearingHeavyArmor"] = equippedEntityIds.some((entityId) =>
     entityId.includes(".armor.heavy."),
   );
+  state.facts["equipment.wieldingShield"] = equippedEntityIds.includes("srd521.equipment.shield");
   state.facts["state.rage.active"] = character.state.activeEffectIds.includes(
     "srd521.effect.barbarian.rage",
   );
@@ -1163,17 +1222,58 @@ function resolveEquipment(
       item.entity === undefined ? [] : entitySourceReferences(item.entity),
     ),
   };
-  return { items, armorTraining, weaponProficiencies, rollEffects };
+  return {
+    items,
+    armorTraining,
+    weaponProficiencies,
+    conditionalWeaponProficiencies: classBody?.conditionalWeaponProficiencies ?? [],
+    rollEffects,
+  };
 }
 
-function evaluateWalkingSpeed(state: EngineState): void {
+function evaluateWalkingSpeed(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): void {
   const base = state.facts["speed.walking.base"];
   const armorPenalty = state.facts["speed.armorPenalty"];
   if (typeof base !== "number" || typeof armorPenalty !== "number") {
     return;
   }
+  const classEntity = startingClassEntity(character, index);
+  const classBody = classEntity === undefined ? undefined : classBodySchema.parse(classEntity.body);
+  const classLevel =
+    classEntity === undefined
+      ? 0
+      : character.build.levels.filter((level) => level.classId === classEntity.id).length;
+  const unarmoredMovement =
+    state.facts["equipment.wearingArmor"] === false &&
+    state.facts["equipment.wieldingShield"] === false
+      ? (classBody?.progression.find((row) => row.level === classLevel)?.unarmoredMovement ?? 0)
+      : 0;
+  const movementTraceId = "speed.unarmoredMovement";
+  state.facts[movementTraceId] = unarmoredMovement;
+  state.values[movementTraceId] = { value: unarmoredMovement, traceId: movementTraceId };
+  state.traces[movementTraceId] = {
+    id: movementTraceId,
+    result: unarmoredMovement,
+    nodes: [
+      {
+        id: `${movementTraceId}.class-progression`,
+        operation: "apply-unarmored-movement",
+        inputs: [
+          classLevel,
+          state.facts["equipment.wearingArmor"] ?? false,
+          state.facts["equipment.wieldingShield"] ?? false,
+        ],
+        output: unarmoredMovement,
+      },
+    ],
+    sourceReferences: classEntity === undefined ? [] : entitySourceReferences(classEntity),
+  };
   const traceId = "speed.walking";
-  const value = Math.max(0, base + armorPenalty);
+  const value = Math.max(0, base + armorPenalty + unarmoredMovement);
   state.facts[traceId] = value;
   state.values[traceId] = { value, traceId };
   state.traces[traceId] = {
@@ -1183,14 +1283,53 @@ function evaluateWalkingSpeed(state: EngineState): void {
       {
         id: `${traceId}.combine`,
         operation: "apply-walking-speed-modifiers",
-        inputs: [base, armorPenalty],
+        inputs: [base, armorPenalty, unarmoredMovement],
         output: value,
       },
     ],
     sourceReferences: [
       ...(state.traces["speed.walking.base"]?.sourceReferences ?? []),
       ...(state.traces["speed.armorPenalty"]?.sourceReferences ?? []),
+      ...state.traces[movementTraceId].sourceReferences,
     ],
+  };
+}
+
+function evaluateFeatureSaveDifficultyClass(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  const classEntity = startingClassEntity(character, index);
+  if (classEntity === undefined) {
+    return;
+  }
+  const classBody = classBodySchema.parse(classEntity.body);
+  if (classBody.featureSaveAbility === undefined) {
+    return;
+  }
+  const classSlug = classEntity.id.split(".").at(-1) ?? classEntity.id;
+  const abilityModifier = requireNumber(
+    state.facts[`ability.${classBody.featureSaveAbility}.modifier`] ?? null,
+    `${classEntity.name.en ?? classEntity.id} feature save ability modifier`,
+  );
+  const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
+  const value = 8 + abilityModifier + proficiencyBonus;
+  const traceId = `classFeature.${classSlug}.saveDifficultyClass`;
+  state.facts[traceId] = value;
+  state.values[traceId] = { value, traceId };
+  state.traces[traceId] = {
+    id: traceId,
+    result: value,
+    nodes: [
+      {
+        id: `${traceId}.sum`,
+        operation: "add-feature-save-base-ability-and-proficiency",
+        inputs: [8, abilityModifier, proficiencyBonus],
+        output: value,
+      },
+    ],
+    sourceReferences: entitySourceReferences(classEntity),
   };
 }
 
@@ -2543,6 +2682,36 @@ function evaluateArmorClass(
   state.facts[traceId] = selected.value;
 }
 
+function weaponIsProficient(
+  weapon: z.infer<typeof weaponBodySchema>,
+  equipment: EquipmentContext,
+): boolean {
+  return (
+    equipment.weaponProficiencies.has(weapon.category) ||
+    equipment.conditionalWeaponProficiencies.some(
+      (grant) =>
+        grant.category === weapon.category &&
+        grant.attackType === weapon.attackType &&
+        grant.requiredProperties.every((property) => weapon.properties.includes(property)),
+    )
+  );
+}
+
+function weaponIsMonkWeapon(
+  weapon: z.infer<typeof weaponBodySchema>,
+  martialArts: NonNullable<z.infer<typeof classBodySchema>["martialArts"]>,
+): boolean {
+  return (
+    weapon.attackType === martialArts.monkWeapon.attackType &&
+    (martialArts.monkWeapon.categories.includes(weapon.category) ||
+      martialArts.monkWeapon.conditionalCategories.some(
+        (grant) =>
+          grant.category === weapon.category &&
+          grant.requiredProperties.every((property) => weapon.properties.includes(property)),
+      ))
+  );
+}
+
 function evaluateAttacks(
   character: CharacterDocument,
   equipment: EquipmentContext,
@@ -2568,6 +2737,21 @@ function evaluateAttacks(
       : character.build.levels.filter((level) => level.classId === classEntity.id).length;
   const masteryCapacity =
     classBody?.progression.find((row) => row.level === classLevel)?.weaponMastery ?? 0;
+  const classProgression = classBody?.progression.find((row) => row.level === classLevel);
+  const martialArts = classBody?.martialArts;
+  const equippedWeapons = equipment.items.filter(
+    (item) => item.equipped && item.entity?.kind === "equipment-weapon",
+  );
+  const martialArtsActive =
+    martialArts !== undefined &&
+    classProgression?.martialArtsDie !== undefined &&
+    state.facts["equipment.wearingArmor"] === false &&
+    state.facts["equipment.wieldingShield"] === false &&
+    equippedWeapons.every((item) =>
+      item.entity === undefined
+        ? false
+        : weaponIsMonkWeapon(weaponBodySchema.parse(item.entity.body), martialArts),
+    );
   if (selectedMasteries.size > masteryCapacity) {
     addValidation(
       state,
@@ -2608,7 +2792,7 @@ function evaluateAttacks(
       );
     } else {
       const weapon = weaponBodySchema.parse(entity.body);
-      if (!equipment.weaponProficiencies.has(weapon.category)) {
+      if (!weaponIsProficient(weapon, equipment)) {
         addValidation(
           state,
           "WEAPON_MASTERY_REQUIRES_PROFICIENCY",
@@ -2626,15 +2810,17 @@ function evaluateAttacks(
     }
     const weapon = weaponBodySchema.parse(entity.body);
     const finesse = weapon.properties.includes("finesse");
-    const ability: Ability = finesse
-      ? dexterityModifier > strengthModifier
-        ? "dexterity"
-        : "strength"
-      : weapon.attackType === "ranged"
-        ? "dexterity"
-        : "strength";
+    const monkWeapon = martialArtsActive && weaponIsMonkWeapon(weapon, martialArts);
+    const ability: Ability =
+      finesse || monkWeapon
+        ? dexterityModifier > strengthModifier
+          ? "dexterity"
+          : "strength"
+        : weapon.attackType === "ranged"
+          ? "dexterity"
+          : "strength";
     const abilityModifier = ability === "strength" ? strengthModifier : dexterityModifier;
-    const proficient = equipment.weaponProficiencies.has(weapon.category);
+    const proficient = weaponIsProficient(weapon, equipment);
     const proficiency = proficient ? proficiencyBonus : 0;
     const attackBonus = abilityModifier + proficiency;
     const attackId = `attack.${resolved.item.id}`;
@@ -2647,10 +2833,15 @@ function evaluateAttacks(
       nodes: [
         {
           id: `${traceId}.ability`,
-          operation: finesse ? "select-finesse-ability" : "select-weapon-ability",
-          inputs: finesse
-            ? [strengthModifier, dexterityModifier]
-            : [weapon.attackType, abilityModifier],
+          operation: finesse
+            ? "select-finesse-ability"
+            : monkWeapon
+              ? "select-martial-arts-ability"
+              : "select-weapon-ability",
+          inputs:
+            finesse || monkWeapon
+              ? [strengthModifier, dexterityModifier]
+              : [weapon.attackType, abilityModifier],
           output: abilityModifier,
           label: ability,
         },
@@ -2714,7 +2905,15 @@ function evaluateAttacks(
     state.facts[damageTraceId] = damageBonus;
     state.values[damageTraceId] = { value: damageBonus, traceId: damageTraceId };
 
-    const damage = weapon.damage;
+    const martialArtsDie = monkWeapon ? classProgression.martialArtsDie : undefined;
+    const damage =
+      martialArtsDie !== undefined && (weapon.damage.diceSize ?? 0) < martialArtsDie.diceSize
+        ? {
+            ...weapon.damage,
+            diceCount: martialArtsDie.diceCount,
+            diceSize: martialArtsDie.diceSize,
+          }
+        : weapon.damage;
     state.attacks.push({
       id: attackId,
       itemId: resolved.item.id,
@@ -2745,6 +2944,86 @@ function evaluateAttacks(
         property: weapon.mastery,
         enabled: selectedMasteries.has(entity.id) && masteryCapacity > 0,
       },
+      criticalHitThreshold: attackRules.criticalHitThreshold,
+      criticalHitTraceId: attackRules.criticalHitTraceId,
+      traceId,
+    });
+  }
+  if (martialArts !== undefined && classProgression?.martialArtsDie !== undefined) {
+    const ability: Ability =
+      martialArtsActive && dexterityModifier > strengthModifier ? martialArts.ability : "strength";
+    const abilityModifier = ability === "dexterity" ? dexterityModifier : strengthModifier;
+    const attackBonus = abilityModifier + proficiencyBonus;
+    const attackId = "attack.unarmed-strike";
+    const traceId = `${attackId}.bonus`;
+    const sources = classEntity === undefined ? [] : entitySourceReferences(classEntity);
+    state.traces[traceId] = {
+      id: traceId,
+      result: attackBonus,
+      nodes: [
+        {
+          id: `${traceId}.ability`,
+          operation: martialArtsActive
+            ? "select-martial-arts-ability"
+            : "select-unarmed-strike-ability",
+          inputs: [strengthModifier, dexterityModifier, martialArtsActive],
+          output: abilityModifier,
+          label: ability,
+        },
+        {
+          id: `${traceId}.proficiency`,
+          operation: "apply-unarmed-strike-proficiency",
+          inputs: [proficiencyBonus],
+          output: proficiencyBonus,
+        },
+        {
+          id: `${traceId}.total`,
+          operation: "add",
+          inputs: [abilityModifier, proficiencyBonus],
+          output: attackBonus,
+        },
+      ],
+      sourceReferences: sources,
+    };
+    state.facts[traceId] = attackBonus;
+    state.values[traceId] = { value: attackBonus, traceId };
+    const damageBonusTraceId = `${attackId}.damageBonus`;
+    state.traces[damageBonusTraceId] = {
+      id: damageBonusTraceId,
+      result: abilityModifier,
+      nodes: [
+        {
+          id: `${damageBonusTraceId}.ability`,
+          operation: "apply-damage-ability-modifier",
+          inputs: [ability, abilityModifier],
+          output: abilityModifier,
+        },
+      ],
+      sourceReferences: sources,
+    };
+    state.facts[damageBonusTraceId] = abilityModifier;
+    state.values[damageBonusTraceId] = { value: abilityModifier, traceId: damageBonusTraceId };
+    state.attacks.push({
+      id: attackId,
+      itemId: "unarmed-strike",
+      weaponId: "srd521.attack.unarmed-strike",
+      name: "Unarmed Strike",
+      ability,
+      attackBonus,
+      proficient: true,
+      damage: {
+        ...(martialArtsActive
+          ? {
+              diceCount: classProgression.martialArtsDie.diceCount,
+              diceSize: classProgression.martialArtsDie.diceSize,
+            }
+          : { flat: 1 }),
+        bonus: abilityModifier,
+        type: "bludgeoning",
+        traceId: damageBonusTraceId,
+      },
+      attackType: "melee",
+      properties: ["unarmed-strike", ...(martialArtsActive ? ["martial-arts"] : [])],
       criticalHitThreshold: attackRules.criticalHitThreshold,
       criticalHitTraceId: attackRules.criticalHitTraceId,
       traceId,
@@ -2953,8 +3232,9 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const rules = applicableRules(index, granted);
   evaluateAbilities(state);
   evaluateProficiency(state);
+  evaluateFeatureSaveDifficultyClass(character, index, state);
   const equipment = resolveEquipment(character, index, state);
-  evaluateWalkingSpeed(state);
+  evaluateWalkingSpeed(character, index, state);
   evaluateD20Tests(character, origins, index, state, input.context, [
     ...equipment.rollEffects,
     ...ruleRollEffects(rules, state, index, granted),

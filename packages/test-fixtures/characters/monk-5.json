@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "fixture-monk-5",
+  "name": "Kestrel",
+  "ruleset": {
+    "system": "dnd5e",
+    "edition": "2024",
+    "packages": [
+      {
+        "id": "srd-5.2.1",
+        "version": "0.1.0",
+        "sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87"
+      }
+    ]
+  },
+  "build": {
+    "levels": [
+      {
+        "characterLevel": 1,
+        "classId": "srd521.class.monk",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 2,
+        "classId": "srd521.class.monk",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 3,
+        "classId": "srd521.class.monk",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 4,
+        "classId": "srd521.class.monk",
+        "hitPointChoice": "fixed"
+      },
+      {
+        "characterLevel": 5,
+        "classId": "srd521.class.monk",
+        "hitPointChoice": "fixed"
+      }
+    ],
+    "abilityScores": {
+      "strength": 8,
+      "dexterity": 15,
+      "constitution": 14,
+      "intelligence": 10,
+      "wisdom": 15,
+      "charisma": 8
+    },
+    "speciesId": "srd521.species.human",
+    "speciesSize": "medium",
+    "backgroundId": "srd521.background.soldier",
+    "backgroundAbilityScoreIncreases": {
+      "strength": 1,
+      "dexterity": 1,
+      "constitution": 1
+    },
+    "subclassId": "srd521.subclass.monk.warrior-of-the-open-hand",
+    "featAbilityScoreIncreases": {
+      "dexterity": 2
+    },
+    "featIds": [
+      "srd521.feat.origin.savage-attacker",
+      "srd521.feat.origin.skilled",
+      "srd521.feat.general.ability-score-improvement"
+    ],
+    "proficiencyChoices": {
+      "skills": [
+        {
+          "skillId": "srd521.skill.acrobatics",
+          "sourceId": "srd521.class.monk"
+        },
+        {
+          "skillId": "srd521.skill.insight",
+          "sourceId": "srd521.class.monk"
+        },
+        {
+          "skillId": "srd521.skill.perception",
+          "sourceId": "srd521.species.human"
+        },
+        {
+          "skillId": "srd521.skill.arcana",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.nature",
+          "sourceId": "srd521.feat.origin.skilled"
+        },
+        {
+          "skillId": "srd521.skill.stealth",
+          "sourceId": "srd521.feat.origin.skilled"
+        }
+      ]
+    }
+  },
+  "loadout": {
+    "inventory": [
+      {
+        "id": "spear-1",
+        "entityId": "srd521.equipment.weapon.spear",
+        "quantity": 1
+      }
+    ],
+    "equippedItemIds": ["spear-1"]
+  },
+  "state": {
+    "currentHitPoints": 30,
+    "expendedResources": {
+      "srd521.resource.monk.focus-points": 2
+    }
+  },
+  "metadata": {
+    "createdAt": "2026-08-01T00:00:00.000Z",
+    "updatedAt": "2026-08-01T00:00:00.000Z",
+    "revision": 0
+  }
+}
