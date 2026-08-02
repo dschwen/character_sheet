@@ -20,6 +20,7 @@ import type {
 import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
 
 import type { FixtureOption } from "../lib/server-data";
+import { CharacterBuilder } from "./character-builder";
 import {
   abilities,
   classSummary,
@@ -156,6 +157,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [selectedTraceId, setSelectedTraceId] = useState<string>();
   const [notice, setNotice] = useState<string>();
   const [storageReady, setStorageReady] = useState(false);
+  const [builderOpen, setBuilderOpen] = useState(false);
   const [playAmount, setPlayAmount] = useState("1");
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
@@ -414,6 +416,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
               {source === "browser-save" ? (
                 <option value="browser-save">Browser save</option>
               ) : null}
+              {source === "builder" ? <option value="builder">Created character</option> : null}
               {fixtures.map((fixture) => (
                 <option key={fixture.filename} value={fixture.filename}>
                   {fixture.character.name} · {classSummary(fixture.character)}
@@ -428,6 +431,15 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             accept="application/json,.json"
             onChange={(event) => void importCharacter(event.target.files?.[0])}
           />
+          <button
+            className="button secondary"
+            type="button"
+            onClick={() => {
+              setBuilderOpen(true);
+            }}
+          >
+            New character
+          </button>
           <button
             className="button secondary"
             type="button"
@@ -1286,6 +1298,25 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           </aside>
         </div>
       )}
+      {builderOpen ? (
+        <CharacterBuilder
+          rulesPackage={rulesPackage}
+          onCancel={() => {
+            setBuilderOpen(false);
+          }}
+          onComplete={(builtCharacter) => {
+            setCharacter(builtCharacter);
+            setPreviousCharacter(undefined);
+            setSource("builder");
+            setTab("overview");
+            setSelectedTraceId(undefined);
+            setActionDrafts({});
+            setSpellLevels({});
+            setBuilderOpen(false);
+            setNotice(`${builtCharacter.name} was created and saved in this browser.`);
+          }}
+        />
+      ) : null}
     </main>
   );
 }

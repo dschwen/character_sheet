@@ -23,6 +23,11 @@ and can be undone once. Imported characters stay in the browser's local storage;
 account, server, or database dependency. A production build is emitted as a static site in
 `apps/web/out` by `corepack pnpm build`.
 
+Choose **New character** to open the guided Fighter builder. It creates rules-valid Fighters from
+levels 1–5 with Human, Soldier, Champion progression, ability assignment, unique skill choices,
+Weapon Masteries, reviewed feats, and a ready-to-play equipment package. The review step evaluates
+the complete draft before enabling creation, then opens the new character directly in the sheet.
+
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
 
@@ -50,8 +55,9 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
-reports rules-invalid choices without changing the input. The next frontend slice is the
-choice-by-choice character builder; direct JSON import remains available in the meantime.
+reports rules-invalid choices without changing the input. The builder currently covers the complete
+reviewed Fighter vertical slice; expanding the same content-driven workflow to the other classes and
+spell choices is the next frontend increment. Direct JSON import remains available in the meantime.
 
 ## Requirements
 
