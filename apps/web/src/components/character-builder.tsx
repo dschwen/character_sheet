@@ -6,13 +6,17 @@ import type { CharacterDocument } from "@dnd/character-model";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 
 import {
-  buildFighterCharacter,
-  defaultFighterDraft,
-  fighterBuilderCatalog,
+  buildCharacter,
+  characterBuilderCatalog,
+  defaultBuilderDraft,
+  fighterId,
   masteryCount,
-  previewFighterCharacter,
+  previewBuilderCharacter,
   skillIds,
-  type FighterBuilderDraft,
+  updateBuilderLevel,
+  wizardId,
+  type BuilderClassId,
+  type CharacterBuilderDraft,
 } from "../lib/character-builder";
 import {
   abilities,
@@ -22,8 +26,6 @@ import {
   signed,
   titleCase,
 } from "../lib/presentation";
-
-const steps = ["Identity", "Abilities", "Proficiencies", "Equipment", "Review"] as const;
 
 interface CharacterBuilderProps {
   rulesPackage: LoadedRulesPackage;
@@ -46,17 +48,32 @@ export function CharacterBuilder({
   onComplete,
 }: Readonly<CharacterBuilderProps>) {
   const [step, setStep] = useState(0);
-  const [draft, setDraft] = useState<FighterBuilderDraft>(defaultFighterDraft);
-  const catalog = useMemo(() => fighterBuilderCatalog(rulesPackage), [rulesPackage]);
+  const catalog = useMemo(() => characterBuilderCatalog(rulesPackage), [rulesPackage]);
+  const [draft, setDraft] = useState<CharacterBuilderDraft>(() =>
+    defaultBuilderDraft(fighterId, catalog),
+  );
+  const steps = useMemo(
+    () =>
+      [
+        "Identity",
+        "Abilities",
+        "Proficiencies",
+        draft.classId === wizardId ? "Spells" : "Equipment",
+        "Review",
+      ] as const,
+    [draft.classId],
+  );
+  const selectedClass = catalog.classes[draft.classId];
   const previewOptions = useMemo(
-    () => ({ id: "builder-preview-fighter", now: new Date("2026-08-02T00:00:00.000Z") }),
+    () => ({ id: "builder-preview-character", now: new Date("2026-08-02T00:00:00.000Z") }),
     [],
   );
   const preview = useMemo(
-    () => previewFighterCharacter(draft, rulesPackage, previewOptions),
+    () => previewBuilderCharacter(draft, rulesPackage, previewOptions),
     [draft, previewOptions, rulesPackage],
   );
   const requiredMasteries = masteryCount(draft, catalog);
+  const wizardCounts = catalog.wizardSpellCountsByLevel[draft.level];
   const allSelectedSkills = new Set([
     ...catalog.backgroundSkillIds,
     ...draft.classSkillIds,
@@ -65,14 +82,11 @@ export function CharacterBuilder({
   ]);
 
   function updateLevel(level: number): void {
-    const required = catalog.masteryCountByLevel[level] ?? 0;
-    const current = draft.weaponMasteryIds.filter((id) => catalog.weaponIds.includes(id));
-    const additions = catalog.weaponIds.filter((id) => !current.includes(id));
-    setDraft((value) => ({
-      ...value,
-      level,
-      weaponMasteryIds: [...current, ...additions].slice(0, required),
-    }));
+    setDraft((value) => updateBuilderLevel(value, catalog, level));
+  }
+
+  function selectClass(classId: BuilderClassId): void {
+    setDraft((value) => defaultBuilderDraft(classId, catalog, value.level, value.name));
   }
 
   function updateAbility(ability: Ability, score: number): void {
@@ -86,10 +100,37 @@ export function CharacterBuilder({
     return allSelectedSkills.has(id) && !ownSelections.includes(id);
   }
 
+  function toggleLearnedSpell(id: string, candidates: string[], maximum: number): void {
+    setDraft((value) => {
+      const categorySelections = value.learnedSpellIds.filter((spellId) =>
+        candidates.includes(spellId),
+      );
+      const nextCategory = toggleList(categorySelections, id, maximum);
+      const learnedSpellIds = [
+        ...value.learnedSpellIds.filter((spellId) => !candidates.includes(spellId)),
+        ...nextCategory,
+      ];
+      return {
+        ...value,
+        learnedSpellIds,
+        preparedSpellIds: value.preparedSpellIds.filter((spellId) =>
+          learnedSpellIds.includes(spellId),
+        ),
+      };
+    });
+  }
+
+  function togglePreparedSpell(id: string): void {
+    setDraft((value) => ({
+      ...value,
+      preparedSpellIds: toggleList(value.preparedSpellIds, id, wizardCounts?.preparedSpells ?? 0),
+    }));
+  }
+
   function createCharacter(): void {
     try {
       onComplete(
-        buildFighterCharacter(draft, rulesPackage, {
+        buildCharacter(draft, rulesPackage, {
           id: `character-${crypto.randomUUID()}`,
           now: new Date(),
         }),
@@ -108,7 +149,7 @@ export function CharacterBuilder({
           </span>
           <span>
             <strong>Create an adventurer</strong>
-            <small>Fighter vertical slice · levels 1–5</small>
+            <small>Fighter & Wizard · levels 1–5</small>
           </span>
         </div>
         <button type="button" onClick={onCancel} aria-label="Close character builder">
@@ -142,7 +183,9 @@ export function CharacterBuilder({
                           : index === 2
                             ? "Choose skills"
                             : index === 3
-                              ? "Ready your gear"
+                              ? draft.classId === wizardId
+                                ? "Build spellbook"
+                                : "Ready your gear"
                               : "Confirm choices"}
                     </small>
                   </span>
@@ -180,13 +223,30 @@ export function CharacterBuilder({
                   }}
                 />
               </label>
-              <div className="builder-choice-grid">
-                <article className="builder-choice selected">
-                  <span>Starting class</span>
-                  <h2>{catalog.className}</h2>
-                  <p>Martial specialist with broad weapon training and durable defenses.</p>
-                  <small>Builder-ready</small>
-                </article>
+              <div className="builder-class-grid" aria-label="Choose a starting class">
+                {([fighterId, wizardId] as const).map((classId) => {
+                  const option = catalog.classes[classId];
+                  return (
+                    <button
+                      key={classId}
+                      type="button"
+                      className={
+                        draft.classId === classId ? "builder-choice selected" : "builder-choice"
+                      }
+                      aria-pressed={draft.classId === classId}
+                      onClick={() => {
+                        selectClass(classId);
+                      }}
+                    >
+                      <span>Starting class</span>
+                      <h2>{option.name}</h2>
+                      <p>{option.description}</p>
+                      <small>{draft.classId === classId ? "Selected" : "Choose class"}</small>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="builder-choice-grid origin-choice-grid">
                 <article className="builder-choice selected">
                   <span>Species</span>
                   <h2>{catalog.speciesName}</h2>
@@ -213,13 +273,13 @@ export function CharacterBuilder({
                   {[1, 2, 3, 4, 5].map((level) => (
                     <option key={level} value={level}>
                       Level {String(level)}
-                      {level >= 3 ? ` · ${catalog.subclassName}` : ""}
+                      {level >= 3 ? ` · ${selectedClass.subclassName}` : ""}
                     </option>
                   ))}
                 </select>
                 <small>
-                  Levels 3–5 use the reviewed Champion subclass. Level 4 applies a +2 Ability Score
-                  Improvement.
+                  Levels 3–5 use the reviewed {selectedClass.subclassName} subclass. Level 4 applies
+                  a +2 Ability Score Improvement.
                 </small>
               </label>
             </div>
@@ -299,12 +359,12 @@ export function CharacterBuilder({
               </div>
               <div className="skill-choice-section">
                 <div>
-                  <span>Fighter</span>
+                  <span>{selectedClass.name}</span>
                   <h2>Choose 2 class skills</h2>
                   <small>{String(draft.classSkillIds.length)} / 2 selected</small>
                 </div>
                 <div className="choice-pills">
-                  {catalog.classSkillIds.map((id) => (
+                  {selectedClass.skillIds.map((id) => (
                     <button
                       key={id}
                       type="button"
@@ -322,6 +382,31 @@ export function CharacterBuilder({
                   ))}
                 </div>
               </div>
+              {draft.classId === wizardId && draft.level >= 2 ? (
+                <div className="skill-choice-section">
+                  <div>
+                    <span>Wizard · Scholar</span>
+                    <h2>Choose 1 Expertise</h2>
+                    <small>Must be one of your Wizard skills</small>
+                  </div>
+                  <div className="choice-pills">
+                    {draft.classSkillIds
+                      .filter((id) => id !== "srd521.skill.insight")
+                      .map((id) => (
+                        <button
+                          key={id}
+                          type="button"
+                          className={draft.scholarSkillId === id ? "selected" : undefined}
+                          onClick={() => {
+                            setDraft((value) => ({ ...value, scholarSkillId: id }));
+                          }}
+                        >
+                          {skillName(id)}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              ) : null}
               <div className="skill-choice-section">
                 <div>
                   <span>Human · Skillful</span>
@@ -378,7 +463,7 @@ export function CharacterBuilder({
             </div>
           ) : null}
 
-          {step === 3 ? (
+          {step === 3 && draft.classId === fighterId ? (
             <div className="builder-section">
               <div className="builder-callout">
                 <strong>Ready-to-play equipment package</strong>
@@ -437,14 +522,123 @@ export function CharacterBuilder({
             </div>
           ) : null}
 
+          {step === 3 && draft.classId === wizardId && wizardCounts !== undefined ? (
+            <div className="builder-section">
+              <div className="builder-callout">
+                <strong>Build your spellbook</strong>
+                <p>
+                  Choose spells from the reviewed SRD set available to a level {String(draft.level)}
+                  Wizard, then decide which leveled spells are prepared.
+                </p>
+              </div>
+              {[
+                {
+                  label: "Cantrips",
+                  count: wizardCounts.cantrips,
+                  spells: catalog.wizardSpells.filter((spell) => spell.level === 0),
+                },
+                {
+                  label: "Spellbook",
+                  count: wizardCounts.spellbookSpells,
+                  spells: catalog.wizardSpells.filter(
+                    (spell) => spell.level > 0 && spell.level <= wizardCounts.maximumSpellLevel,
+                  ),
+                },
+              ].map((group) => {
+                const groupIds = group.spells.map((spell) => spell.id);
+                const selectedCount = draft.learnedSpellIds.filter((id) =>
+                  groupIds.includes(id),
+                ).length;
+                return (
+                  <div key={group.label} className="spell-choice-section">
+                    <div className="spell-choice-heading">
+                      <div>
+                        <span>Wizard spellcasting</span>
+                        <h2>{group.label}</h2>
+                      </div>
+                      <small>
+                        {String(selectedCount)} / {String(group.count)} selected
+                      </small>
+                    </div>
+                    <div className="spell-choice-grid">
+                      {group.spells.map((spell) => {
+                        const selected = draft.learnedSpellIds.includes(spell.id);
+                        return (
+                          <button
+                            key={spell.id}
+                            type="button"
+                            className={selected ? "selected" : undefined}
+                            disabled={!selected && selectedCount >= group.count}
+                            onClick={() => {
+                              toggleLearnedSpell(spell.id, groupIds, group.count);
+                            }}
+                          >
+                            <i>{selected ? "✓" : ""}</i>
+                            <span>
+                              <strong>{spell.name}</strong>
+                              <small>
+                                {spell.level === 0 ? "Cantrip" : `Level ${String(spell.level)}`} ·{" "}
+                                {titleCase(spell.school)}
+                              </small>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="spell-choice-section prepared-choice-section">
+                <div className="spell-choice-heading">
+                  <div>
+                    <span>Daily loadout</span>
+                    <h2>Prepared spells</h2>
+                  </div>
+                  <small>
+                    {String(draft.preparedSpellIds.length)} / {String(wizardCounts.preparedSpells)}{" "}
+                    prepared
+                  </small>
+                </div>
+                <div className="spell-choice-grid">
+                  {catalog.wizardSpells
+                    .filter((spell) => spell.level > 0 && draft.learnedSpellIds.includes(spell.id))
+                    .map((spell) => {
+                      const selected = draft.preparedSpellIds.includes(spell.id);
+                      return (
+                        <button
+                          key={spell.id}
+                          type="button"
+                          className={selected ? "selected" : undefined}
+                          disabled={
+                            !selected &&
+                            draft.preparedSpellIds.length >= wizardCounts.preparedSpells
+                          }
+                          onClick={() => {
+                            togglePreparedSpell(spell.id);
+                          }}
+                        >
+                          <i>{selected ? "✓" : ""}</i>
+                          <span>
+                            <strong>{spell.name}</strong>
+                            <small>Level {String(spell.level)}</small>
+                          </span>
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           {step === 4 ? (
             <div className="builder-section review-section">
               <div className="review-identity">
                 <span>Ready to adventure</span>
-                <h2>{draft.name.trim() || "Unnamed Fighter"}</h2>
+                <h2>{draft.name.trim() || `Unnamed ${selectedClass.name}`}</h2>
                 <p>
-                  Level {String(draft.level)} {draft.level >= 3 ? `${catalog.subclassName} ` : ""}
-                  {catalog.className} · {catalog.speciesName} · {catalog.backgroundName}
+                  Level {String(draft.level)}{" "}
+                  {draft.level >= 3 ? `${selectedClass.subclassName} ` : ""}
+                  {selectedClass.name} · {catalog.speciesName} · {catalog.backgroundName}
                 </p>
               </div>
               {preview.evaluation === undefined ? null : (
@@ -502,15 +696,37 @@ export function CharacterBuilder({
                       .sort()
                       .join(", ")}
                   </p>
+                  {draft.classId === wizardId && draft.level >= 2 ? (
+                    <small>Scholar Expertise: {skillName(draft.scholarSkillId)}</small>
+                  ) : null}
                 </article>
-                <article>
-                  <span>Weapon Masteries</span>
-                  <p>
-                    {draft.weaponMasteryIds
-                      .map((id) => catalog.weaponNames[id] ?? shortEntityName(id))
-                      .join(", ")}
-                  </p>
-                </article>
+                {draft.classId === fighterId ? (
+                  <article>
+                    <span>Weapon Masteries</span>
+                    <p>
+                      {draft.weaponMasteryIds
+                        .map((id) => catalog.weaponNames[id] ?? shortEntityName(id))
+                        .join(", ")}
+                    </p>
+                  </article>
+                ) : (
+                  <article>
+                    <span>Spellcasting</span>
+                    <p>
+                      {String(draft.learnedSpellIds.length)} spells in spellbook ·{" "}
+                      {String(draft.preparedSpellIds.length)} prepared
+                    </p>
+                    <small>
+                      {draft.preparedSpellIds
+                        .map(
+                          (id) =>
+                            catalog.wizardSpells.find((spell) => spell.id === id)?.name ??
+                            shortEntityName(id),
+                        )
+                        .join(", ")}
+                    </small>
+                  </article>
+                )}
               </div>
               {preview.issues.length === 0 ? (
                 <p className="builder-success">

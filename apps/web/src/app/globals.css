@@ -1565,6 +1565,14 @@ td:first-child small {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
+.builder-class-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.origin-choice-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
 .builder-choice {
   position: relative;
   min-height: 178px;
@@ -1572,6 +1580,15 @@ td:first-child small {
   border: 1px solid var(--line);
   border-radius: 9px;
   background: var(--panel);
+}
+button.builder-choice {
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+button.builder-choice:hover {
+  border-color: var(--green-bright);
+  transform: translateY(-1px);
 }
 .builder-choice.selected {
   border-color: #8eafa2;
@@ -1762,6 +1779,98 @@ td:first-child small {
   color: var(--muted);
   font-size: 9px;
 }
+.spell-choice-section {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+.spell-choice-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+}
+.spell-choice-heading span {
+  color: var(--green-bright);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.spell-choice-heading h2 {
+  margin: 4px 0 0;
+  font:
+    700 20px/1.2 Georgia,
+    serif;
+}
+.spell-choice-heading > small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.spell-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+.spell-choice-grid button {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel);
+  cursor: pointer;
+  text-align: left;
+}
+.spell-choice-grid button.selected {
+  border-color: var(--green-bright);
+  background: #f0f7f4;
+}
+.spell-choice-grid button:disabled:not(.selected) {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+.spell-choice-grid i {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: white;
+  font-size: 10px;
+  font-style: normal;
+}
+.spell-choice-grid button.selected i {
+  border-color: var(--green);
+  background: var(--green);
+}
+.spell-choice-grid button > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+.spell-choice-grid strong {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.spell-choice-grid small {
+  color: var(--muted);
+  font-size: 9px;
+}
+.prepared-choice-section {
+  padding: 16px;
+  border: 1px solid #c9d9d2;
+  border-radius: 9px;
+  background: #f3f8f5;
+}
 .review-identity {
   padding: 26px;
   color: white;
@@ -1826,6 +1935,11 @@ td:first-child small {
   font-size: 11px;
   line-height: 1.55;
 }
+.review-columns article > small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
 .review-columns article:first-child p {
   display: flex;
   justify-content: space-between;
@@ -1857,7 +1971,7 @@ td:first-child small {
   bottom: 0;
   display: grid;
   grid-column: 2;
-  grid-template-columns: 110px 1fr 140px;
+  grid-template-columns: 110px 1fr 160px;
   gap: 15px;
   align-items: center;
   padding: 14px 35px;
@@ -1871,7 +1985,8 @@ td:first-child small {
   text-align: center;
 }
 .create-button {
-  min-width: 140px;
+  min-width: 160px;
+  white-space: nowrap;
 }
 
 @media (max-width: 1080px) {
@@ -1887,6 +2002,9 @@ td:first-child small {
   .builder-choice-grid,
   .equipment-preview {
     grid-template-columns: 1fr;
+  }
+  .spell-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .builder-choice {
     min-height: 145px;
@@ -1997,6 +2115,9 @@ td:first-child small {
     grid-template-columns: 1fr;
     gap: 12px;
   }
+  .builder-class-grid {
+    grid-template-columns: 1fr;
+  }
 }
 @media (max-width: 430px) {
   .button {
@@ -2028,7 +2149,8 @@ td:first-child small {
     flex-wrap: wrap;
   }
   .ability-editor,
-  .mastery-grid {
+  .mastery-grid,
+  .spell-choice-grid {
     grid-template-columns: 1fr;
   }
   .review-metrics {
