@@ -23,12 +23,8 @@ const scholarSkillIds = [
   "religion",
 ].map((skill) => `${skillPrefix}${skill}`);
 
-const subclassIds = {
-  [fighterId]: "srd521.subclass.fighter.champion",
-  [wizardId]: "srd521.subclass.wizard.evoker",
-} as const;
-
-export type BuilderClassId = keyof typeof subclassIds;
+export const builderClassIds = [fighterId, wizardId] as const;
+export type BuilderClassId = (typeof builderClassIds)[number];
 
 export const skillIds = [
   "acrobatics",
@@ -58,39 +54,6 @@ const fighterWeaponIds = [
   "srd521.equipment.weapon.longbow",
 ];
 
-const preferredWizardSpellIds = [
-  "srd521.spell.acid-splash",
-  "srd521.spell.light",
-  "srd521.spell.mage-hand",
-  "srd521.spell.ray-of-frost",
-  "srd521.spell.detect-magic",
-  "srd521.spell.mage-armor",
-  "srd521.spell.magic-missile",
-  "srd521.spell.shield",
-  "srd521.spell.burning-hands",
-  "srd521.spell.feather-fall",
-  "srd521.spell.chromatic-orb",
-  "srd521.spell.sleep",
-  "srd521.spell.thunderwave",
-  "srd521.spell.misty-step",
-  "srd521.spell.scorching-ray",
-  "srd521.spell.shatter",
-  "srd521.spell.web",
-  "srd521.spell.fireball",
-];
-
-const preferredPreparedSpellIds = [
-  "srd521.spell.detect-magic",
-  "srd521.spell.mage-armor",
-  "srd521.spell.magic-missile",
-  "srd521.spell.shield",
-  "srd521.spell.thunderwave",
-  "srd521.spell.misty-step",
-  "srd521.spell.scorching-ray",
-  "srd521.spell.web",
-  "srd521.spell.fireball",
-];
-
 export interface CharacterBuilderDraft {
   classId: BuilderClassId;
   name: string;
@@ -106,7 +69,7 @@ export interface CharacterBuilderDraft {
   preparedSpellIds: string[];
 }
 
-export interface WizardSpellOption {
+export interface SpellOption {
   id: string;
   name: string;
   level: number;
@@ -116,17 +79,32 @@ export interface WizardSpellOption {
 export interface ClassBuilderCatalog {
   id: BuilderClassId;
   name: string;
-  subclassId: string;
-  subclassName: string;
+  subclassId?: string;
+  subclassName?: string;
+  subclassLevel?: number;
   skillIds: string[];
+  skillMinimum: number;
+  skillMaximum: number;
   description: string;
+  weaponMasteryCountByLevel: Readonly<Record<number, number>>;
+  spellcasting?: ClassSpellcastingCatalog;
 }
 
-export interface WizardSpellCounts {
+export type SpellPreparationMode = "spellbook" | "full-list";
+
+export interface SpellSelectionCounts {
   cantrips: number;
-  spellbookSpells: number;
+  learnedLeveledSpells: number;
   preparedSpells: number;
   maximumSpellLevel: number;
+  alwaysPreparedSpellIds: string[];
+}
+
+export interface ClassSpellcastingCatalog {
+  ability: Ability;
+  preparation: SpellPreparationMode;
+  spells: SpellOption[];
+  countsByLevel: Readonly<Record<number, SpellSelectionCounts>>;
 }
 
 export interface BuilderCatalog {
@@ -136,9 +114,6 @@ export interface BuilderCatalog {
   backgroundSkillIds: string[];
   weaponIds: string[];
   weaponNames: Readonly<Record<string, string>>;
-  masteryCountByLevel: Readonly<Record<number, number>>;
-  wizardSpells: WizardSpellOption[];
-  wizardSpellCountsByLevel: Readonly<Record<number, WizardSpellCounts>>;
 }
 
 export interface BuilderPreview {
@@ -175,6 +150,20 @@ function numericValue(value: unknown, fallback = 0): number {
   return typeof value === "number" ? value : fallback;
 }
 
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+function spellsGrantedThroughLevel(value: unknown, level: number): string[] {
+  const record = objectValue(value);
+  if (record === undefined) return [];
+  return Object.entries(record).flatMap(([grantLevel, spellIds]) =>
+    Number(grantLevel) <= level ? stringArray(spellIds) : [],
+  );
+}
+
 function classCatalog(
   classId: BuilderClassId,
   rulesPackage: LoadedRulesPackage,
@@ -183,93 +172,128 @@ function classCatalog(
   const classBody = objectValue(classEntity?.body);
   const skillChoice = objectValue(classBody?.skillProficiencyChoice);
   const options = skillChoice?.options;
-  if (!Array.isArray(options)) {
+  const progression = Array.isArray(classBody?.progression) ? classBody.progression : undefined;
+  if (!Array.isArray(options) || progression === undefined) {
     throw new Error(`${shortEntityName(classId)} builder metadata is missing.`);
   }
-  return {
-    id: classId,
-    name: localizedName(classEntity),
-    subclassId: subclassIds[classId],
-    subclassName: localizedName(
-      rulesPackage.entities.find((entity) => entity.id === subclassIds[classId]),
-    ),
-    skillIds: options
-      .filter((option): option is string => typeof option === "string")
-      .map(normalizedSkillId),
-    description:
-      classId === fighterId
-        ? "Martial specialist with broad weapon training and durable defenses."
-        : "Arcane scholar with a growing spellbook, prepared magic, and ritual casting.",
-  };
-}
-
-export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): BuilderCatalog {
-  const entity = (id: string) => rulesPackage.entities.find((candidate) => candidate.id === id);
-  const fighterBody = objectValue(entity(fighterId)?.body);
-  const fighterProgression = fighterBody?.progression;
-  const wizardBody = objectValue(entity(wizardId)?.body);
-  const wizardProgression = wizardBody?.progression;
-  const wizardSpellList = wizardBody?.spellList;
-  if (
-    !Array.isArray(fighterProgression) ||
-    !Array.isArray(wizardProgression) ||
-    !Array.isArray(wizardSpellList)
-  ) {
-    throw new Error("Builder progression metadata is missing from the loaded rules package.");
-  }
-
-  const masteryCountByLevel = Object.fromEntries(
-    fighterProgression
+  const subclassEntity = rulesPackage.entities.find((candidate) => {
+    if (candidate.kind !== "subclass") return false;
+    return objectValue(candidate.body)?.parentClassId === classId;
+  });
+  const subclassProgression = objectValue(subclassEntity?.body)?.progression;
+  const subclassLevel = Array.isArray(subclassProgression)
+    ? Math.min(
+        ...subclassProgression
+          .map((row) => numericValue(objectValue(row)?.level, Number.POSITIVE_INFINITY))
+          .filter(Number.isFinite),
+      )
+    : undefined;
+  const weaponMasteryCountByLevel = Object.fromEntries(
+    progression
       .map((row) => objectValue(row))
       .filter((row): row is Readonly<Record<string, unknown>> => row !== undefined)
       .filter((row) => typeof row.level === "number" && row.level <= 5)
       .map((row) => [row.level as number, numericValue(row.weaponMastery)]),
   ) as Record<number, number>;
 
-  const wizardSpellCountsByLevel = Object.fromEntries(
-    wizardProgression
-      .map((row) => objectValue(row))
-      .filter((row): row is Readonly<Record<string, unknown>> => row !== undefined)
-      .filter((row) => typeof row.level === "number" && row.level <= 5)
-      .map((row) => {
-        const level = row.level as number;
-        const slots = objectValue(row.spellSlots);
-        const maximumSpellLevel = Math.max(1, ...Object.keys(slots ?? {}).map(Number));
-        return [
-          level,
-          {
-            cantrips: numericValue(row.cantrips),
-            spellbookSpells: 6 + 2 * (level - 1),
-            preparedSpells: numericValue(row.preparedSpells),
-            maximumSpellLevel,
-          },
-        ];
-      }),
-  ) as Record<number, WizardSpellCounts>;
+  const preparation = classBody?.spellPreparation;
+  const spellList = classBody?.spellList;
+  const spellcastingAbility = classBody?.spellcastingAbility;
+  let spellcasting: ClassSpellcastingCatalog | undefined;
+  if (
+    (preparation === "spellbook" || preparation === "full-list") &&
+    Array.isArray(spellList) &&
+    abilities.some((ability) => ability === spellcastingAbility)
+  ) {
+    const spellbookStartingSpells = numericValue(classBody?.spellbookStartingSpells);
+    const spellbookSpellsPerLevel = numericValue(classBody?.spellbookSpellsPerLevel);
+    const subclassAlwaysPrepared = objectValue(subclassEntity?.body)?.alwaysPreparedSpells;
+    const countsByLevel = Object.fromEntries(
+      progression
+        .map((row) => objectValue(row))
+        .filter((row): row is Readonly<Record<string, unknown>> => row !== undefined)
+        .filter((row) => typeof row.level === "number" && row.level <= 5)
+        .map((row) => {
+          const level = row.level as number;
+          const slots = objectValue(row.spellSlots);
+          return [
+            level,
+            {
+              cantrips: numericValue(row.cantrips),
+              learnedLeveledSpells:
+                preparation === "spellbook"
+                  ? spellbookStartingSpells + spellbookSpellsPerLevel * Math.max(0, level - 1)
+                  : 0,
+              preparedSpells: numericValue(row.preparedSpells),
+              maximumSpellLevel: Math.max(0, ...Object.keys(slots ?? {}).map(Number)),
+              alwaysPreparedSpellIds: [
+                ...spellsGrantedThroughLevel(classBody?.alwaysPreparedSpells, level),
+                ...spellsGrantedThroughLevel(subclassAlwaysPrepared, level),
+              ],
+            },
+          ];
+        }),
+    ) as Record<number, SpellSelectionCounts>;
+    const maximumSupportedSpellLevel = Math.max(
+      0,
+      ...Object.values(countsByLevel).map((counts) => counts.maximumSpellLevel),
+    );
+    const allowedSpells = new Set(stringArray(spellList));
+    const spells = rulesPackage.entities
+      .filter((candidate) => candidate.kind === "spell" && allowedSpells.has(candidate.id))
+      .map((spell) => {
+        const body = objectValue(spell.body);
+        return {
+          id: spell.id,
+          name: localizedName(spell),
+          level: numericValue(body?.level, 99),
+          school: typeof body?.school === "string" ? body.school : "unknown",
+        };
+      })
+      .filter((spell) => spell.level <= maximumSupportedSpellLevel)
+      .sort((left, right) => left.level - right.level || left.name.localeCompare(right.name));
+    spellcasting = {
+      ability: spellcastingAbility as Ability,
+      preparation,
+      spells,
+      countsByLevel,
+    };
+  }
 
-  const spellList = new Set(wizardSpellList.filter((id): id is string => typeof id === "string"));
-  const preferredOrder = new Map(preferredWizardSpellIds.map((id, index) => [id, index]));
-  const wizardSpells = rulesPackage.entities
-    .filter((candidate) => candidate.kind === "spell" && spellList.has(candidate.id))
-    .map((spell) => {
-      const body = objectValue(spell.body);
-      return {
-        id: spell.id,
-        name: localizedName(spell),
-        level: numericValue(body?.level, 99),
-        school: typeof body?.school === "string" ? body.school : "unknown",
-      };
-    })
-    .filter((spell) => spell.level <= 3)
-    .sort((left, right) => {
-      const preferred =
-        (preferredOrder.get(left.id) ?? Number.MAX_SAFE_INTEGER) -
-        (preferredOrder.get(right.id) ?? Number.MAX_SAFE_INTEGER);
-      return preferred !== 0
-        ? preferred
-        : left.level - right.level || left.name.localeCompare(right.name);
-    });
+  const primaryAbilities = stringArray(classBody?.primaryAbilities)
+    .map((ability) => shortEntityName(ability))
+    .join(" or ");
+  const hitPointDie = numericValue(classBody?.hitPointDie);
+  const focus = spellcasting
+    ? spellcasting.preparation === "spellbook"
+      ? "a growing spellbook"
+      : "prepared magic"
+    : Math.max(0, ...Object.values(weaponMasteryCountByLevel)) > 0
+      ? "Weapon Mastery"
+      : "martial training";
+  return {
+    id: classId,
+    name: localizedName(classEntity),
+    ...(subclassEntity === undefined
+      ? {}
+      : {
+          subclassId: subclassEntity.id,
+          subclassName: localizedName(subclassEntity),
+          ...(subclassLevel === undefined ? {} : { subclassLevel }),
+        }),
+    skillIds: options
+      .filter((option): option is string => typeof option === "string")
+      .map(normalizedSkillId),
+    skillMinimum: numericValue(skillChoice?.minimum),
+    skillMaximum: numericValue(skillChoice?.maximum),
+    description: `${primaryAbilities || "Adventuring"} specialist with a d${String(hitPointDie)} Hit Die and ${focus}.`,
+    weaponMasteryCountByLevel,
+    ...(spellcasting === undefined ? {} : { spellcasting }),
+  };
+}
 
+export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): BuilderCatalog {
+  const entity = (id: string) => rulesPackage.entities.find((candidate) => candidate.id === id);
   const backgroundBody = objectValue(entity(soldierId)?.body);
   const backgroundSkills = backgroundBody?.skillProficiencies;
   const backgroundSkillIds = Array.isArray(backgroundSkills)
@@ -286,9 +310,6 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
     backgroundSkillIds,
     weaponIds: fighterWeaponIds,
     weaponNames: Object.fromEntries(fighterWeaponIds.map((id) => [id, localizedName(entity(id))])),
-    masteryCountByLevel,
-    wizardSpells,
-    wizardSpellCountsByLevel,
   };
 }
 
@@ -299,17 +320,20 @@ function fillSelections(current: string[], candidates: string[], count: number):
   return [...valid, ...candidates.filter((id) => !valid.includes(id))].slice(0, count);
 }
 
-function wizardSelections(
+function spellSelections(
   draft: CharacterBuilderDraft,
   catalog: BuilderCatalog,
   level: number,
 ): Pick<CharacterBuilderDraft, "learnedSpellIds" | "preparedSpellIds"> {
-  const counts = catalog.wizardSpellCountsByLevel[level];
-  if (counts === undefined) return { learnedSpellIds: [], preparedSpellIds: [] };
-  const cantripCandidates = catalog.wizardSpells
+  const spellcasting = catalog.classes[draft.classId].spellcasting;
+  const counts = spellcasting?.countsByLevel[level];
+  if (spellcasting === undefined || counts === undefined) {
+    return { learnedSpellIds: [], preparedSpellIds: [] };
+  }
+  const cantripCandidates = spellcasting.spells
     .filter((spell) => spell.level === 0)
     .map((spell) => spell.id);
-  const leveledCandidates = catalog.wizardSpells
+  const leveledCandidates = spellcasting.spells
     .filter((spell) => spell.level > 0 && spell.level <= counts.maximumSpellLevel)
     .map((spell) => spell.id);
   const cantrips = fillSelections(
@@ -317,16 +341,18 @@ function wizardSelections(
     cantripCandidates,
     counts.cantrips,
   );
-  const leveled = fillSelections(
-    draft.learnedSpellIds.filter((id) => leveledCandidates.includes(id)),
-    leveledCandidates,
-    counts.spellbookSpells,
-  );
+  const leveled =
+    spellcasting.preparation === "spellbook"
+      ? fillSelections(
+          draft.learnedSpellIds.filter((id) => leveledCandidates.includes(id)),
+          leveledCandidates,
+          counts.learnedLeveledSpells,
+        )
+      : [];
   const learnedSpellIds = [...cantrips, ...leveled];
-  const preparedCandidates = [
-    ...preferredPreparedSpellIds.filter((id) => leveled.includes(id)),
-    ...leveled.filter((id) => !preferredPreparedSpellIds.includes(id)),
-  ];
+  const preparedCandidates = (
+    spellcasting.preparation === "spellbook" ? leveled : leveledCandidates
+  ).filter((id) => !counts.alwaysPreparedSpellIds.includes(id));
   return {
     learnedSpellIds,
     preparedSpellIds: fillSelections(
@@ -344,6 +370,7 @@ export function defaultBuilderDraft(
   name = "",
 ): CharacterBuilderDraft {
   const fighter = classId === fighterId;
+  const selectedClass = catalog.classes[classId];
   const draft: CharacterBuilderDraft = {
     classId,
     name,
@@ -374,11 +401,16 @@ export function defaultBuilderDraft(
       ? [`${skillPrefix}arcana`, `${skillPrefix}insight`, `${skillPrefix}stealth`]
       : [`${skillPrefix}persuasion`, `${skillPrefix}stealth`, `${skillPrefix}survival`],
     scholarSkillId: classId === wizardId && level >= 2 ? `${skillPrefix}arcana` : "",
-    weaponMasteryIds: fighterWeaponIds.slice(0, catalog.masteryCountByLevel[level] ?? 0),
+    weaponMasteryIds: fighterWeaponIds.slice(
+      0,
+      selectedClass.weaponMasteryCountByLevel[level] ?? 0,
+    ),
     learnedSpellIds: [],
     preparedSpellIds: [],
   };
-  return classId === wizardId ? { ...draft, ...wizardSelections(draft, catalog, level) } : draft;
+  return selectedClass.spellcasting === undefined
+    ? draft
+    : { ...draft, ...spellSelections(draft, catalog, level) };
 }
 
 export function updateBuilderLevel(
@@ -386,32 +418,29 @@ export function updateBuilderLevel(
   catalog: BuilderCatalog,
   level: number,
 ): CharacterBuilderDraft {
-  if (draft.classId === fighterId) {
-    return {
-      ...draft,
-      level,
-      weaponMasteryIds: fillSelections(
-        draft.weaponMasteryIds,
-        catalog.weaponIds,
-        catalog.masteryCountByLevel[level] ?? 0,
-      ),
-    };
-  }
+  const selectedClass = catalog.classes[draft.classId];
   const next = {
     ...draft,
     level,
+    weaponMasteryIds: fillSelections(
+      draft.weaponMasteryIds,
+      catalog.weaponIds,
+      selectedClass.weaponMasteryCountByLevel[level] ?? 0,
+    ),
     scholarSkillId:
-      level >= 2
+      draft.classId === wizardId && level >= 2
         ? draft.classSkillIds.includes(draft.scholarSkillId)
           ? draft.scholarSkillId
           : (draft.classSkillIds.find((id) => id !== `${skillPrefix}insight`) ?? "")
         : "",
   };
-  return { ...next, ...wizardSelections(next, catalog, level) };
+  return selectedClass.spellcasting === undefined
+    ? next
+    : { ...next, ...spellSelections(next, catalog, level) };
 }
 
 export function masteryCount(draft: CharacterBuilderDraft, catalog: BuilderCatalog): number {
-  return draft.classId === fighterId ? (catalog.masteryCountByLevel[draft.level] ?? 0) : 0;
+  return catalog.classes[draft.classId].weaponMasteryCountByLevel[draft.level] ?? 0;
 }
 
 export function validateBuilderDraft(
@@ -431,11 +460,16 @@ export function validateBuilderDraft(
     }
   }
   if (
-    draft.classSkillIds.length !== 2 ||
-    new Set(draft.classSkillIds).size !== 2 ||
+    draft.classSkillIds.length < selectedClass.skillMinimum ||
+    draft.classSkillIds.length > selectedClass.skillMaximum ||
+    new Set(draft.classSkillIds).size !== draft.classSkillIds.length ||
     draft.classSkillIds.some((id) => !selectedClass.skillIds.includes(id))
   ) {
-    issues.push(`Choose exactly two ${selectedClass.name} skill proficiencies.`);
+    const count =
+      selectedClass.skillMinimum === selectedClass.skillMaximum
+        ? `exactly ${String(selectedClass.skillMinimum)}`
+        : `${String(selectedClass.skillMinimum)}–${String(selectedClass.skillMaximum)}`;
+    issues.push(`Choose ${count} ${selectedClass.name} skill proficiencies.`);
   }
   const allSkillOptions = skillIds.map((id) => `${skillPrefix}${id}`);
   if (!allSkillOptions.includes(draft.speciesSkillId)) {
@@ -458,51 +492,64 @@ export function validateBuilderDraft(
     issues.push("Each selected skill proficiency must be unique.");
   }
 
-  if (draft.classId === fighterId) {
-    const requiredMasteries = masteryCount(draft, catalog);
+  const requiredMasteries = masteryCount(draft, catalog);
+  if (
+    draft.weaponMasteryIds.length !== requiredMasteries ||
+    new Set(draft.weaponMasteryIds).size !== requiredMasteries ||
+    draft.weaponMasteryIds.some((id) => !catalog.weaponIds.includes(id))
+  ) {
+    issues.push(`Choose exactly ${String(requiredMasteries)} Weapon Masteries.`);
+  }
+  if (
+    draft.classId === wizardId &&
+    draft.level >= 2 &&
+    (!draft.classSkillIds.includes(draft.scholarSkillId) ||
+      !scholarSkillIds.includes(draft.scholarSkillId))
+  ) {
+    issues.push("Choose one proficient Wizard skill for Scholar Expertise.");
+  }
+  const spellcasting = selectedClass.spellcasting;
+  const counts = spellcasting?.countsByLevel[draft.level];
+  if (spellcasting !== undefined && counts !== undefined) {
+    const spellById = new Map(spellcasting.spells.map((spell) => [spell.id, spell]));
+    const learned = draft.learnedSpellIds.map((id) => spellById.get(id));
+    const cantripCount = learned.filter((spell) => spell?.level === 0).length;
+    const leveledCount = learned.filter(
+      (spell) => spell !== undefined && spell.level > 0 && spell.level <= counts.maximumSpellLevel,
+    ).length;
     if (
-      draft.weaponMasteryIds.length !== requiredMasteries ||
-      new Set(draft.weaponMasteryIds).size !== requiredMasteries ||
-      draft.weaponMasteryIds.some((id) => !catalog.weaponIds.includes(id))
+      new Set(draft.learnedSpellIds).size !== draft.learnedSpellIds.length ||
+      cantripCount !== counts.cantrips ||
+      leveledCount !== counts.learnedLeveledSpells ||
+      learned.some((spell) => spell === undefined || spell.level > counts.maximumSpellLevel)
     ) {
-      issues.push(`Choose exactly ${String(requiredMasteries)} Weapon Masteries.`);
+      const learnedRequirement =
+        spellcasting.preparation === "spellbook"
+          ? ` and ${String(counts.learnedLeveledSpells)} spellbook spells`
+          : "";
+      issues.push(
+        `Choose ${String(counts.cantrips)} cantrips${learnedRequirement} available at this level.`,
+      );
     }
-  } else {
-    const counts = catalog.wizardSpellCountsByLevel[draft.level];
+    const preparedCandidates =
+      spellcasting.preparation === "spellbook"
+        ? new Set(draft.learnedSpellIds)
+        : new Set(
+            spellcasting.spells
+              .filter((spell) => spell.level > 0 && spell.level <= counts.maximumSpellLevel)
+              .map((spell) => spell.id),
+          );
     if (
-      draft.level >= 2 &&
-      (!draft.classSkillIds.includes(draft.scholarSkillId) ||
-        !scholarSkillIds.includes(draft.scholarSkillId))
+      draft.preparedSpellIds.length !== counts.preparedSpells ||
+      new Set(draft.preparedSpellIds).size !== draft.preparedSpellIds.length ||
+      draft.preparedSpellIds.some(
+        (id) =>
+          !preparedCandidates.has(id) ||
+          spellById.get(id)?.level === 0 ||
+          counts.alwaysPreparedSpellIds.includes(id),
+      )
     ) {
-      issues.push("Choose one proficient Wizard skill for Scholar Expertise.");
-    }
-    if (counts !== undefined) {
-      const spellById = new Map(catalog.wizardSpells.map((spell) => [spell.id, spell]));
-      const learned = draft.learnedSpellIds.map((id) => spellById.get(id));
-      const cantripCount = learned.filter((spell) => spell?.level === 0).length;
-      const leveledCount = learned.filter(
-        (spell) =>
-          spell !== undefined && spell.level > 0 && spell.level <= counts.maximumSpellLevel,
-      ).length;
-      if (
-        new Set(draft.learnedSpellIds).size !== draft.learnedSpellIds.length ||
-        cantripCount !== counts.cantrips ||
-        leveledCount !== counts.spellbookSpells ||
-        learned.some((spell) => spell === undefined || spell.level > counts.maximumSpellLevel)
-      ) {
-        issues.push(
-          `Choose ${String(counts.cantrips)} cantrips and ${String(counts.spellbookSpells)} spellbook spells available at this level.`,
-        );
-      }
-      if (
-        draft.preparedSpellIds.length !== counts.preparedSpells ||
-        new Set(draft.preparedSpellIds).size !== draft.preparedSpellIds.length ||
-        draft.preparedSpellIds.some(
-          (id) => !draft.learnedSpellIds.includes(id) || spellById.get(id)?.level === 0,
-        )
-      ) {
-        issues.push(`Prepare exactly ${String(counts.preparedSpells)} spellbook spells.`);
-      }
+      issues.push(`Prepare exactly ${String(counts.preparedSpells)} ${selectedClass.name} spells.`);
     }
   }
   return issues;
@@ -513,6 +560,7 @@ function assembleCharacter(
   rulesPackage: LoadedRulesPackage,
   options: BuildCharacterOptions,
 ): CharacterDocument {
+  const selectedClass = classCatalog(draft.classId, rulesPackage);
   const levels = Array.from({ length: draft.level }, (_, index) => ({
     characterLevel: index + 1,
     classId: draft.classId,
@@ -523,6 +571,11 @@ function assembleCharacter(
   if (draft.level >= 4) featIds.push(abilityScoreImprovementId);
   const timestamp = options.now.toISOString();
   const fighter = draft.classId === fighterId;
+  const spellcaster = selectedClass.spellcasting !== undefined;
+  const hasSubclass =
+    selectedClass.subclassId !== undefined &&
+    selectedClass.subclassLevel !== undefined &&
+    draft.level >= selectedClass.subclassLevel;
   return characterDocumentSchema.parse({
     schemaVersion: "0.1.0",
     id: options.id,
@@ -545,10 +598,10 @@ function assembleCharacter(
       speciesSize: "medium",
       backgroundId: soldierId,
       backgroundAbilityScoreIncreases: { strength: 1, dexterity: 1, constitution: 1 },
-      ...(draft.level >= 3 ? { subclassId: subclassIds[draft.classId] } : {}),
+      ...(hasSubclass ? { subclassId: selectedClass.subclassId } : {}),
       featAbilityScoreIncreases: draft.level >= 4 ? { [draft.asiAbility]: 2 } : {},
       featIds,
-      learnedSpellIds: fighter ? [] : draft.learnedSpellIds,
+      learnedSpellIds: spellcaster ? draft.learnedSpellIds : [],
       choices: [],
       proficiencyChoices: {
         skills: [
@@ -583,7 +636,7 @@ function assembleCharacter(
       equippedItemIds: fighter ? ["chain-mail-1", "greatsword-1"] : [],
       attunedItemIds: [],
       selectedWeaponMasteryIds: fighter ? draft.weaponMasteryIds : [],
-      preparedSpellIds: fighter ? [] : draft.preparedSpellIds,
+      preparedSpellIds: spellcaster ? draft.preparedSpellIds : [],
       choices: [],
     },
     state: {

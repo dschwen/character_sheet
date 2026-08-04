@@ -28,16 +28,65 @@ describe("guided character builder", () => {
       "srd521.skill.athletics",
       "srd521.skill.intimidation",
     ]);
-    expect(catalog.masteryCountByLevel).toMatchObject({ 1: 3, 4: 4, 5: 4 });
-    expect(catalog.wizardSpellCountsByLevel[5]).toEqual({
+    expect(catalog.classes[fighterId].weaponMasteryCountByLevel).toMatchObject({
+      1: 3,
+      4: 4,
+      5: 4,
+    });
+    expect(catalog.classes[wizardId].spellcasting?.countsByLevel[5]).toEqual({
       cantrips: 4,
-      spellbookSpells: 14,
+      learnedLeveledSpells: 14,
       preparedSpells: 9,
       maximumSpellLevel: 3,
+      alwaysPreparedSpellIds: [],
     });
     expect(
-      catalog.wizardSpells.find((spell) => spell.id === "srd521.spell.fireball"),
+      catalog.classes[wizardId].spellcasting?.spells.find(
+        (spell) => spell.id === "srd521.spell.fireball",
+      ),
     ).toMatchObject({ name: "Fireball", level: 3 });
+    expect(catalog.classes[wizardId]).toMatchObject({
+      subclassId: "srd521.subclass.wizard.evoker",
+      subclassLevel: 3,
+      skillMinimum: 2,
+      skillMaximum: 2,
+    });
+  });
+
+  it("uses package spellbook growth instead of a Wizard-specific formula", () => {
+    const { rulesPackage } = loadWebData();
+    const modifiedPackage = structuredClone(rulesPackage);
+    const wizard = modifiedPackage.entities.find((entity) => entity.id === wizardId);
+    if (wizard === undefined) throw new Error("Wizard fixture is missing.");
+    const body = wizard.body as Record<string, unknown>;
+    body.spellbookStartingSpells = 7;
+    body.spellbookSpellsPerLevel = 3;
+
+    const catalog = characterBuilderCatalog(modifiedPackage);
+    expect(catalog.classes[wizardId].spellcasting?.countsByLevel[5]?.learnedLeveledSpells).toBe(19);
+  });
+
+  it("projects full-list preparation and always-prepared spells without class UI logic", () => {
+    const { rulesPackage } = loadWebData();
+    const modifiedPackage = structuredClone(rulesPackage);
+    const wizard = modifiedPackage.entities.find((entity) => entity.id === wizardId);
+    if (wizard === undefined) throw new Error("Wizard fixture is missing.");
+    const body = wizard.body as Record<string, unknown>;
+    body.spellPreparation = "full-list";
+    body.alwaysPreparedSpells = { 1: ["srd521.spell.burning-hands"] };
+
+    const catalog = characterBuilderCatalog(modifiedPackage);
+    const draft = defaultBuilderDraft(wizardId, catalog, 1, "Full-list caster");
+    const character = buildCharacter(draft, modifiedPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [modifiedPackage] });
+
+    expect(draft.learnedSpellIds).toHaveLength(3);
+    expect(draft.preparedSpellIds).toHaveLength(4);
+    expect(draft.preparedSpellIds).not.toContain("srd521.spell.burning-hands");
+    expect(evaluation.validations).toEqual([]);
+    expect(
+      evaluation.spells.find((spell) => spell.id === "srd521.spell.burning-hands")?.prepared,
+    ).toBe(true);
   });
 
   it("builds rules-valid Fighters at every supported level", () => {
@@ -72,12 +121,12 @@ describe("guided character builder", () => {
       const draft = defaultBuilderDraft(wizardId, catalog, level, `Level ${String(level)} Wizard`);
       const character = buildCharacter(draft, rulesPackage, options);
       const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
-      const counts = catalog.wizardSpellCountsByLevel[level];
+      const counts = catalog.classes[wizardId].spellcasting?.countsByLevel[level];
 
       expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
       expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
       expect(character.build.learnedSpellIds).toHaveLength(
-        (counts?.cantrips ?? 0) + (counts?.spellbookSpells ?? 0),
+        (counts?.cantrips ?? 0) + (counts?.learnedLeveledSpells ?? 0),
       );
       expect(character.loadout.preparedSpellIds).toHaveLength(counts?.preparedSpells ?? 0);
       expect(character.build.subclassId).toBe(
@@ -114,7 +163,7 @@ describe("guided character builder", () => {
     expect(validateBuilderDraft(fighter, catalog)).toEqual(
       expect.arrayContaining([
         "Enter a character name.",
-        "Choose exactly two Fighter skill proficiencies.",
+        "Choose exactly 2 Fighter skill proficiencies.",
         "Each selected skill proficiency must be unique.",
       ]),
     );
@@ -125,7 +174,7 @@ describe("guided character builder", () => {
     expect(validateBuilderDraft(wizard, catalog)).toEqual(
       expect.arrayContaining([
         "Choose 4 cantrips and 14 spellbook spells available at this level.",
-        "Prepare exactly 9 spellbook spells.",
+        "Prepare exactly 9 Wizard spells.",
       ]),
     );
   });
