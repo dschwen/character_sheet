@@ -1070,6 +1070,140 @@ td:first-child small {
   font-style: normal;
   text-transform: uppercase;
 }
+.preparation-control {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.preparation-summary,
+.preparation-editor-heading,
+.preparation-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+.preparation-summary > span,
+.preparation-editor-heading > span {
+  display: grid;
+  gap: 4px;
+}
+.preparation-summary strong,
+.preparation-editor-heading strong {
+  font:
+    700 16px/1.2 Georgia,
+    serif;
+}
+.preparation-summary small,
+.preparation-editor-heading small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.preparation-summary .button,
+.preparation-actions .button {
+  min-height: 38px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+.preparation-editor {
+  display: grid;
+  gap: 13px;
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid #cad8d1;
+  border-radius: 9px;
+  background: #f7faf8;
+}
+.preparation-editor-heading > i {
+  padding: 5px 8px;
+  border-radius: 5px;
+  color: var(--green);
+  background: #e4f0ea;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+.preparation-options {
+  display: grid;
+  max-height: 430px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.preparation-options button {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 9px;
+  color: var(--ink);
+  border: 1px solid #dcddd7;
+  border-radius: 7px;
+  background: var(--panel);
+  cursor: pointer;
+  text-align: left;
+}
+.preparation-options button.selected {
+  border-color: #80a697;
+  background: #edf5f1;
+}
+.preparation-options button.always-prepared {
+  border-color: #d8c693;
+  background: #faf5e8;
+}
+.preparation-options button:disabled:not(.always-prepared) {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+.preparation-options button.always-prepared:disabled {
+  cursor: default;
+  opacity: 1;
+}
+.preparation-options button > i {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid #bbbdb5;
+  border-radius: 50%;
+  font-size: 10px;
+  font-style: normal;
+}
+.preparation-options button.selected > i {
+  color: white;
+  border-color: var(--green);
+  background: var(--green);
+}
+.preparation-options button.always-prepared > i {
+  color: #715917;
+  border-color: #d1b867;
+  background: #ead89f;
+}
+.preparation-options button > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+.preparation-options button strong {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.preparation-options button small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.preparation-actions {
+  justify-content: flex-end;
+  padding-top: 2px;
+}
 
 .resource-list,
 .action-list {
@@ -2134,6 +2268,14 @@ button.builder-choice:hover {
     grid-template-columns: 1fr;
   }
   .spell-metrics {
+    grid-template-columns: 1fr;
+  }
+  .preparation-summary,
+  .preparation-editor-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .preparation-options {
     grid-template-columns: 1fr;
   }
   .rest-buttons {

@@ -42,6 +42,7 @@ import {
   setHeroicInspiration,
   setTemporaryHitPoints,
 } from "../lib/play-state";
+import { proposePreparedSpellLoadout, spellPreparationEditor } from "../lib/spell-preparation";
 import { rollD20, rollDice, type D20RollRequest, type DiceRollResult } from "../lib/dice-roll";
 
 const storageKey = "dnd-character-manager.document.v1";
@@ -208,6 +209,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
+  const [preparedSpellDraft, setPreparedSpellDraft] = useState<string[]>();
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
   const [castFeedback, setCastFeedback] = useState<CastFeedback>();
   const importInput = useRef<HTMLInputElement>(null);
@@ -245,6 +247,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
   }, [character, rulesPackage]);
   const names = useMemo(() => entityNames(rulesPackage), [rulesPackage]);
+  const preparationEditor = useMemo(
+    () => spellPreparationEditor(character, rulesPackage),
+    [character, rulesPackage],
+  );
   const evaluation = result.evaluation;
   const statefulActions = evaluation?.actions.filter(supportsStateTransition) ?? [];
   const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
@@ -344,6 +350,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setSelectedTraceId(undefined);
     setActionDrafts({});
     setSpellLevels({});
+    setPreparedSpellDraft(undefined);
     setNotice(`Loaded ${fixture.character.name}.`);
   }
 
@@ -357,6 +364,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setSelectedTraceId(undefined);
       setActionDrafts({});
       setSpellLevels({});
+      setPreparedSpellDraft(undefined);
       setNotice(`Imported ${parsed.name}; it is saved only in this browser.`);
     } catch (error) {
       setNotice(`Import failed: ${errorMessage(error)}`);
@@ -535,6 +543,31 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     } catch (error) {
       setNotice(`Spell cast failed: ${errorMessage(error)}`);
     }
+  }
+
+  function togglePreparedSpell(spellId: string): void {
+    if (preparationEditor === undefined) return;
+    setPreparedSpellDraft((current) => {
+      const selected = current ?? preparationEditor.selectedSpellIds;
+      if (selected.includes(spellId)) return selected.filter((id) => id !== spellId);
+      return selected.length >= preparationEditor.requiredSelections
+        ? selected
+        : [...selected, spellId];
+    });
+  }
+
+  function savePreparedSpells(): void {
+    if (preparedSpellDraft === undefined) return;
+    const proposal = proposePreparedSpellLoadout(character, rulesPackage, preparedSpellDraft);
+    if (!proposal.applicable || proposal.nextCharacter === undefined) {
+      setNotice(proposal.issues[0] ?? "The prepared-spell loadout is not valid.");
+      return;
+    }
+    savePlayState(
+      proposal.nextCharacter,
+      `${String(preparedSpellDraft.length)} ${preparationEditor?.className ?? "class"} spells prepared.`,
+    );
+    setPreparedSpellDraft(undefined);
   }
 
   return (
@@ -1393,6 +1426,115 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   title="Known & prepared spells"
                   eyebrow={`${String(evaluation.spells.length)} spells`}
                 >
+                  {preparationEditor === undefined ? null : (
+                    <div className="preparation-control">
+                      <div className="preparation-summary">
+                        <span>
+                          <strong>
+                            {String(
+                              preparedSpellDraft?.length ??
+                                preparationEditor.selectedSpellIds.length,
+                            )}{" "}
+                            / {String(preparationEditor.requiredSelections)} chosen
+                          </strong>
+                          <small>
+                            {preparationEditor.mode === "spellbook"
+                              ? "Selected from this character’s spellbook"
+                              : `Selected from the ${preparationEditor.className} spell list`}
+                            {preparationEditor.alwaysPreparedSpellIds.length === 0
+                              ? ""
+                              : ` · ${String(preparationEditor.alwaysPreparedSpellIds.length)} additional always prepared`}
+                          </small>
+                        </span>
+                        {preparedSpellDraft === undefined ? (
+                          <button
+                            className="button secondary"
+                            type="button"
+                            onClick={() => {
+                              setPreparedSpellDraft([...preparationEditor.selectedSpellIds]);
+                            }}
+                          >
+                            Change preparation
+                          </button>
+                        ) : null}
+                      </div>
+                      {preparedSpellDraft === undefined ? null : (
+                        <div className="preparation-editor">
+                          <div className="preparation-editor-heading">
+                            <span>
+                              <strong>Daily spell loadout</strong>
+                              <small>
+                                Record preparation here after completing any rest or preparation
+                                required by your class.
+                              </small>
+                            </span>
+                            <i>
+                              {String(preparedSpellDraft.length)} /{" "}
+                              {String(preparationEditor.requiredSelections)}
+                            </i>
+                          </div>
+                          <div className="preparation-options">
+                            {preparationEditor.options.map((spell) => {
+                              const selected = preparedSpellDraft.includes(spell.id);
+                              return (
+                                <button
+                                  key={spell.id}
+                                  type="button"
+                                  className={
+                                    spell.alwaysPrepared
+                                      ? "always-prepared"
+                                      : selected
+                                        ? "selected"
+                                        : undefined
+                                  }
+                                  disabled={
+                                    spell.alwaysPrepared ||
+                                    (!selected &&
+                                      preparedSpellDraft.length >=
+                                        preparationEditor.requiredSelections)
+                                  }
+                                  aria-pressed={spell.alwaysPrepared || selected}
+                                  onClick={() => {
+                                    togglePreparedSpell(spell.id);
+                                  }}
+                                >
+                                  <i>{spell.alwaysPrepared || selected ? "✓" : ""}</i>
+                                  <span>
+                                    <strong>{spell.name}</strong>
+                                    <small>
+                                      Level {String(spell.level)} · {titleCase(spell.school)}
+                                      {spell.alwaysPrepared ? " · Always prepared" : ""}
+                                    </small>
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <div className="preparation-actions">
+                            <button
+                              className="button secondary"
+                              type="button"
+                              onClick={() => {
+                                setPreparedSpellDraft(undefined);
+                              }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              className="button primary"
+                              type="button"
+                              disabled={
+                                preparedSpellDraft.length !== preparationEditor.requiredSelections
+                              }
+                              onClick={savePreparedSpells}
+                            >
+                              Save preparation
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {evaluation.spells.length === 0 ? (
                     <p className="empty">No spells known.</p>
                   ) : (
@@ -1612,6 +1754,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSelectedTraceId(undefined);
             setActionDrafts({});
             setSpellLevels({});
+            setPreparedSpellDraft(undefined);
             setBuilderOpen(false);
             setNotice(`${builtCharacter.name} was created and saved in this browser.`);
           }}
