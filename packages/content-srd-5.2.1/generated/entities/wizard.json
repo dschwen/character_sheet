@@ -614,6 +614,54 @@
       "spellbookSpellsPerLevel": 2,
       "spellbookStartingSpells": 6,
       "spellcastingAbility": "intelligence",
+      "startingEquipment": {
+        "id": "srd521.choice.class.wizard.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "currencyGp": 5,
+            "id": "srd521.option.class.wizard.starting-equipment.a",
+            "items": [
+              {
+                "entityId": "srd521.equipment.weapon.dagger",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 2
+              },
+              {
+                "entityId": "srd521.equipment.weapon.quarterstaff",
+                "equipped": true,
+                "kind": "entity",
+                "label": "Arcane Focus (Quarterstaff)",
+                "quantity": 1
+              },
+              {
+                "kind": "text",
+                "name": "Robe",
+                "quantity": 1
+              },
+              {
+                "kind": "text",
+                "name": "Spellbook",
+                "quantity": 1
+              },
+              {
+                "kind": "text",
+                "name": "Scholar's Pack",
+                "quantity": 1
+              }
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 55,
+            "id": "srd521.option.class.wizard.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
+          }
+        ]
+      },
       "startingEquipmentText": "Choose A or B: (A) 2 Daggers, Arcane Focus (Quarterstaff), Robe, Spellbook, Scholar’s Pack, and 5 GP; or (B) 55 GP",
       "weaponProficiencies": [
         "simple"

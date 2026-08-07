@@ -497,21 +497,82 @@ def _class_entity(
     body = {
         **traits,
         "startingEquipment": {
-            "choose": 1,
+            "id": "srd521.choice.class.fighter.starting-equipment",
+            "minimum": 1,
+            "maximum": 1,
             "options": [
                 {
-                    "id": "A",
+                    "id": "srd521.option.class.fighter.starting-equipment.a",
+                    "label": "Package A",
                     "items": [
                         {
+                            "kind": "entity",
                             "entityId": "srd521.equipment.armor.heavy.chain-mail",
                             "quantity": 1,
+                            "equipped": True,
                         },
-                        {"entityId": "srd521.equipment.weapon.greatsword", "quantity": 1},
-                        {"entityId": "srd521.equipment.weapon.flail", "quantity": 1},
-                        {"entityId": "srd521.equipment.weapon.javelin", "quantity": 8},
+                        {
+                            "kind": "entity",
+                            "entityId": "srd521.equipment.weapon.greatsword",
+                            "quantity": 1,
+                            "equipped": True,
+                        },
+                        {
+                            "kind": "entity",
+                            "entityId": "srd521.equipment.weapon.flail",
+                            "quantity": 1,
+                            "equipped": False,
+                        },
+                        {
+                            "kind": "entity",
+                            "entityId": "srd521.equipment.weapon.javelin",
+                            "quantity": 8,
+                            "equipped": False,
+                        },
+                        {"kind": "text", "name": "Dungeoneer's Pack", "quantity": 1},
                     ],
                     "currencyGp": 4,
-                }
+                },
+                {
+                    "id": "srd521.option.class.fighter.starting-equipment.b",
+                    "label": "Package B",
+                    "items": [
+                        {
+                            "kind": "entity",
+                            "entityId": "srd521.equipment.armor.light.studded-leather-armor",
+                            "quantity": 1,
+                            "equipped": True,
+                        },
+                        {
+                            "kind": "entity",
+                            "entityId": "srd521.equipment.weapon.scimitar",
+                            "quantity": 1,
+                            "equipped": True,
+                        },
+                        {
+                            "kind": "entity",
+                            "entityId": "srd521.equipment.weapon.shortsword",
+                            "quantity": 1,
+                            "equipped": False,
+                        },
+                        {
+                            "kind": "entity",
+                            "entityId": "srd521.equipment.weapon.longbow",
+                            "quantity": 1,
+                            "equipped": False,
+                        },
+                        {"kind": "text", "name": "Arrows", "quantity": 20},
+                        {"kind": "text", "name": "Quiver", "quantity": 1},
+                        {"kind": "text", "name": "Dungeoneer's Pack", "quantity": 1},
+                    ],
+                    "currencyGp": 11,
+                },
+                {
+                    "id": "srd521.option.class.fighter.starting-equipment.c",
+                    "label": "Package C",
+                    "items": [],
+                    "currencyGp": 155,
+                },
             ],
         },
         "progression": [

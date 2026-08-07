@@ -4,8 +4,23 @@ import pytest
 
 from srd_extract.wizard import (
     WizardProgressionRow,
+    _class_entity,
     parse_core_traits,
 )
+
+
+def test_wizard_starting_equipment_preserves_package_and_gold_choices() -> None:
+    entity = _class_entity({}, (), (), {}, [])
+    equipment = entity["body"]["startingEquipment"]
+
+    assert [option["currencyGp"] for option in equipment["options"]] == [5, 55]
+    assert equipment["options"][0]["items"][1] == {
+        "kind": "entity",
+        "entityId": "srd521.equipment.weapon.quarterstaff",
+        "quantity": 1,
+        "equipped": True,
+        "label": "Arcane Focus (Quarterstaff)",
+    }
 
 
 def test_parse_core_wizard_traits() -> None:

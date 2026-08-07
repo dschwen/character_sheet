@@ -1,4 +1,9 @@
 import { characterDocumentSchema, type CharacterDocument } from "@dnd/character-model";
+import {
+  startingEquipmentChoiceSchema,
+  type StartingEquipmentChoice,
+  type StartingEquipmentOption,
+} from "@dnd/content-schema";
 import type { CharacterEvaluation, LoadedRulesPackage } from "@dnd/rules-api";
 import { evaluateCharacter } from "@dnd/rules-core";
 
@@ -43,13 +48,6 @@ export const skillIds = [
   "survival",
 ] as const;
 
-const fighterWeaponIds = [
-  "srd521.equipment.weapon.greatsword",
-  "srd521.equipment.weapon.flail",
-  "srd521.equipment.weapon.javelin",
-  "srd521.equipment.weapon.longbow",
-];
-
 export interface CharacterBuilderDraft {
   classId: BuilderClassId;
   speciesId: string;
@@ -65,6 +63,7 @@ export interface CharacterBuilderDraft {
   speciesSkillIds: string[];
   originFeatSkillIds: string[];
   scholarSkillId: string;
+  startingEquipmentOptionId: string;
   weaponMasteryIds: string[];
   learnedSpellIds: string[];
   preparedSpellIds: string[];
@@ -149,6 +148,7 @@ export interface ClassBuilderCatalog {
   skillMaximum: number;
   description: string;
   weaponMasteryCountByLevel: Readonly<Record<number, number>>;
+  startingEquipment: StartingEquipmentChoice;
   spellcasting?: ClassSpellcastingCatalog;
 }
 
@@ -304,6 +304,10 @@ function classCatalog(
   if (!Array.isArray(options) || progression === undefined) {
     throw new Error(`${shortEntityName(classId)} builder metadata is missing.`);
   }
+  const startingEquipment = startingEquipmentChoiceSchema.safeParse(classBody?.startingEquipment);
+  if (!startingEquipment.success) {
+    throw new Error(`${shortEntityName(classId)} starting-equipment metadata is missing.`);
+  }
   const subclassEntity = rulesPackage.entities.find((candidate) => {
     if (candidate.kind !== "subclass") return false;
     return objectValue(candidate.body)?.parentClassId === classId;
@@ -416,6 +420,7 @@ function classCatalog(
     skillMaximum: numericValue(skillChoice?.maximum),
     description: `${primaryAbilities || "Adventuring"} specialist with a d${String(hitPointDie)} Hit Die and ${focus}.`,
     weaponMasteryCountByLevel,
+    startingEquipment: startingEquipment.data,
     ...(spellcasting === undefined ? {} : { spellcasting }),
   };
 }
@@ -508,6 +513,10 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
     throw new Error("Builder origin metadata is missing from the loaded rules package.");
   }
 
+  const weapons = rulesPackage.entities
+    .filter((candidate) => candidate.kind === "equipment-weapon")
+    .map((candidate) => ({ id: candidate.id, name: localizedName(candidate) }))
+    .sort((left, right) => left.name.localeCompare(right.name));
   return {
     classes: {
       [fighterId]: classCatalog(fighterId, rulesPackage),
@@ -516,8 +525,8 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
     species,
     backgrounds,
     feats,
-    weaponIds: fighterWeaponIds,
-    weaponNames: Object.fromEntries(fighterWeaponIds.map((id) => [id, localizedName(entity(id))])),
+    weaponIds: weapons.map((weapon) => weapon.id),
+    weaponNames: Object.fromEntries(weapons.map((weapon) => [weapon.id, weapon.name])),
   };
 }
 
@@ -632,6 +641,28 @@ function fillSelections(current: string[], candidates: string[], count: number):
   return [...valid, ...candidates.filter((id) => !valid.includes(id))].slice(0, count);
 }
 
+function selectedEquipmentOption(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): StartingEquipmentOption | undefined {
+  return catalog.classes[draft.classId].startingEquipment.options.find(
+    (option) => option.id === draft.startingEquipmentOptionId,
+  );
+}
+
+function masteryCandidates(
+  selectedClass: ClassBuilderCatalog,
+  equipmentOptionId: string,
+  catalog: BuilderCatalog,
+): string[] {
+  const packageWeapons = selectedClass.startingEquipment.options
+    .find((option) => option.id === equipmentOptionId)
+    ?.items.flatMap((item) =>
+      item.kind === "entity" && catalog.weaponIds.includes(item.entityId) ? [item.entityId] : [],
+    );
+  return [...new Set([...(packageWeapons ?? []), ...catalog.weaponIds])];
+}
+
 function spellSelections(
   draft: CharacterBuilderDraft,
   catalog: BuilderCatalog,
@@ -702,6 +733,10 @@ export function defaultBuilderDraft(
   if (backgroundAbilityOption?.abilityIncreases === undefined) {
     throw new Error("No background ability allocation is available.");
   }
+  const startingEquipmentOption = selectedClass.startingEquipment.options[0];
+  if (startingEquipmentOption === undefined) {
+    throw new Error(`${selectedClass.name} has no starting-equipment option.`);
+  }
   const draft: CharacterBuilderDraft = {
     classId,
     speciesId: species.id,
@@ -743,7 +778,8 @@ export function defaultBuilderDraft(
       : [`${skillPrefix}persuasion`, `${skillPrefix}stealth`, `${skillPrefix}survival`]
     ).slice(0, originFeat.skillMaximum),
     scholarSkillId: classId === wizardId && level >= 2 ? `${skillPrefix}arcana` : "",
-    weaponMasteryIds: fighterWeaponIds.slice(
+    startingEquipmentOptionId: startingEquipmentOption.id,
+    weaponMasteryIds: masteryCandidates(selectedClass, startingEquipmentOption.id, catalog).slice(
       0,
       selectedClass.weaponMasteryCountByLevel[level] ?? 0,
     ),
@@ -766,7 +802,7 @@ export function updateBuilderLevel(
     level,
     weaponMasteryIds: fillSelections(
       draft.weaponMasteryIds,
-      catalog.weaponIds,
+      masteryCandidates(selectedClass, draft.startingEquipmentOptionId, catalog),
       selectedClass.weaponMasteryCountByLevel[level] ?? 0,
     ),
     scholarSkillId:
@@ -795,9 +831,13 @@ export function validateBuilderDraft(
   const selectedBackground = catalog.backgrounds[draft.backgroundId];
   const selectedOriginFeat = catalog.feats[draft.originFeatId];
   const originChoices = builderOriginChoiceDefinitions(draft, catalog);
+  const equipmentOption = selectedEquipmentOption(draft, catalog);
   if (draft.name.trim().length === 0) issues.push("Enter a character name.");
   if (!Number.isInteger(draft.level) || draft.level < 1 || draft.level > 5) {
     issues.push(`Choose a ${selectedClass.name} level from 1 through 5.`);
+  }
+  if (equipmentOption === undefined) {
+    issues.push(`Choose a ${selectedClass.name} starting-equipment package.`);
   }
   for (const ability of abilities) {
     const score = draft.abilityScores[ability];
@@ -951,12 +991,14 @@ function assembleCharacter(
   const selectedSpecies = catalog.species[draft.speciesId];
   const selectedBackground = catalog.backgrounds[draft.backgroundId];
   const selectedOriginFeat = catalog.feats[draft.originFeatId];
+  const equipmentOption = selectedEquipmentOption(draft, catalog);
   if (
     selectedSpecies === undefined ||
     selectedBackground === undefined ||
-    selectedOriginFeat === undefined
+    selectedOriginFeat === undefined ||
+    equipmentOption === undefined
   ) {
-    throw new Error("Selected origin metadata is missing.");
+    throw new Error("Selected builder metadata is missing.");
   }
   const levels = Array.from({ length: draft.level }, (_, index) => ({
     characterLevel: index + 1,
@@ -967,12 +1009,23 @@ function assembleCharacter(
   if (draft.classId === fighterId) featIds.unshift(defenseStyleId);
   if (draft.level >= 4) featIds.push(abilityScoreImprovementId);
   const timestamp = options.now.toISOString();
-  const fighter = draft.classId === fighterId;
   const spellcaster = selectedClass.spellcasting !== undefined;
   const hasSubclass =
     selectedClass.subclassId !== undefined &&
     selectedClass.subclassLevel !== undefined &&
     draft.level >= selectedClass.subclassLevel;
+  const instanceCounts = new Map<string, number>();
+  const inventory: Array<{ id: string; entityId: string; quantity: number }> = [];
+  const equippedItemIds: string[] = [];
+  for (const item of equipmentOption.items) {
+    if (item.kind !== "entity") continue;
+    const stem = shortEntityName(item.entityId).toLowerCase().replaceAll(" ", "-");
+    const sequence = (instanceCounts.get(stem) ?? 0) + 1;
+    instanceCounts.set(stem, sequence);
+    const instanceId = `${stem}-${String(sequence)}`;
+    inventory.push({ id: instanceId, entityId: item.entityId, quantity: item.quantity });
+    if (item.equipped) equippedItemIds.push(instanceId);
+  }
   return characterDocumentSchema.parse({
     schemaVersion: "0.1.0",
     id: options.id,
@@ -1019,28 +1072,17 @@ function assembleCharacter(
       },
     },
     loadout: {
-      inventory: fighter
-        ? [
-            {
-              id: "chain-mail-1",
-              entityId: "srd521.equipment.armor.heavy.chain-mail",
-              quantity: 1,
-            },
-            {
-              id: "greatsword-1",
-              entityId: "srd521.equipment.weapon.greatsword",
-              quantity: 1,
-            },
-            { id: "flail-1", entityId: "srd521.equipment.weapon.flail", quantity: 1 },
-            { id: "javelins", entityId: "srd521.equipment.weapon.javelin", quantity: 8 },
-            { id: "longbow-1", entityId: "srd521.equipment.weapon.longbow", quantity: 1 },
-          ]
-        : [],
-      equippedItemIds: fighter ? ["chain-mail-1", "greatsword-1"] : [],
+      inventory,
+      equippedItemIds,
       attunedItemIds: [],
-      selectedWeaponMasteryIds: fighter ? draft.weaponMasteryIds : [],
+      selectedWeaponMasteryIds: draft.weaponMasteryIds,
       preparedSpellIds: spellcaster ? draft.preparedSpellIds : [],
-      choices: [],
+      choices: [
+        {
+          choiceId: selectedClass.startingEquipment.id,
+          optionIds: [equipmentOption.id],
+        },
+      ],
     },
     state: {
       currentHitPoints: 1,

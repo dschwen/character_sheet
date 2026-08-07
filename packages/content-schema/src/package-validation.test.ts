@@ -8,6 +8,7 @@ import {
   contentEntitySchema,
   packageManifestSchema,
   sourceManifestSchema,
+  startingEquipmentChoiceSchema,
 } from "./index.js";
 
 describe("bootstrap content package", () => {
@@ -160,6 +161,40 @@ describe("bootstrap content package", () => {
       type: "add-modifier",
       target: "armor-class",
     });
+  });
+
+  it("validates structured starting-equipment choices and their entity references", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const entities = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities.json", root), "utf8")));
+    const entityIds = new Set(entities.map((entity) => entity.id));
+    const parsedChoices = entities.flatMap((entity) => {
+      if (entity.kind !== "class" || entity.body === null) return [];
+      const body = z.record(z.unknown()).parse(entity.body);
+      if (body.startingEquipment === undefined) return [];
+      return [
+        {
+          classId: entity.id,
+          choice: startingEquipmentChoiceSchema.parse(body.startingEquipment),
+        },
+      ];
+    });
+
+    expect(parsedChoices.map(({ classId }) => classId)).toEqual(
+      expect.arrayContaining([
+        "srd521.class.barbarian",
+        "srd521.class.fighter",
+        "srd521.class.wizard",
+      ]),
+    );
+    expect(
+      parsedChoices
+        .flatMap(({ choice }) => choice.options)
+        .flatMap((option) => option.items)
+        .filter((item) => item.kind === "entity")
+        .every((item) => entityIds.has(item.entityId)),
+    ).toBe(true);
   });
 
   it("validates Fighter levels 2–5 and Champion authoring IR", () => {

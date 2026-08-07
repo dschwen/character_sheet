@@ -329,18 +329,36 @@ def reconcile_progression(
 
 def _starting_equipment() -> dict[str, Any]:
     return {
-        "choose": 1,
+        "id": "srd521.choice.class.barbarian.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
         "options": [
             {
-                "id": "A",
+                "id": "srd521.option.class.barbarian.starting-equipment.a",
+                "label": "Package A",
                 "items": [
-                    {"entityId": "srd521.equipment.weapon.greataxe", "quantity": 1},
-                    {"entityId": "srd521.equipment.weapon.handaxe", "quantity": 4},
-                    {"entityId": "srd521.equipment.pack.explorers", "quantity": 1},
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.greataxe",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.handaxe",
+                        "quantity": 4,
+                        "equipped": False,
+                    },
+                    {"kind": "text", "name": "Explorer's Pack", "quantity": 1},
                 ],
                 "currencyGp": 15,
             },
-            {"id": "B", "items": [], "currencyGp": 75},
+            {
+                "id": "srd521.option.class.barbarian.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 75,
+            },
         ],
     }
 

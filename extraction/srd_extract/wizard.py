@@ -527,6 +527,42 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "startingEquipment": {
+                "id": "srd521.choice.class.wizard.starting-equipment",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": "srd521.option.class.wizard.starting-equipment.a",
+                        "label": "Package A",
+                        "items": [
+                            {
+                                "kind": "entity",
+                                "entityId": "srd521.equipment.weapon.dagger",
+                                "quantity": 2,
+                                "equipped": False,
+                            },
+                            {
+                                "kind": "entity",
+                                "entityId": "srd521.equipment.weapon.quarterstaff",
+                                "quantity": 1,
+                                "equipped": True,
+                                "label": "Arcane Focus (Quarterstaff)",
+                            },
+                            {"kind": "text", "name": "Robe", "quantity": 1},
+                            {"kind": "text", "name": "Spellbook", "quantity": 1},
+                            {"kind": "text", "name": "Scholar's Pack", "quantity": 1},
+                        ],
+                        "currencyGp": 5,
+                    },
+                    {
+                        "id": "srd521.option.class.wizard.starting-equipment.b",
+                        "label": "Package B",
+                        "items": [],
+                        "currencyGp": 55,
+                    },
+                ],
+            },
             "spellcastingAbility": "intelligence",
             "spellPreparation": "spellbook",
             "spellbookStartingSpells": 6,

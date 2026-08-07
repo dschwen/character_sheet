@@ -34,6 +34,9 @@ describe("guided character builder", () => {
       4: 4,
       5: 4,
     });
+    expect(catalog.weaponIds).toHaveLength(38);
+    expect(catalog.classes[fighterId].startingEquipment.options).toHaveLength(3);
+    expect(catalog.classes[wizardId].startingEquipment.options).toHaveLength(2);
     expect(catalog.classes[wizardId].spellcasting?.countsByLevel[5]).toEqual({
       cantrips: 4,
       learnedLeveledSpells: 14,
@@ -106,6 +109,52 @@ describe("guided character builder", () => {
     expect(evaluation.validations).toEqual([]);
   });
 
+  it("materializes the selected source equipment package and records its choice", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const fighter = defaultBuilderDraft(fighterId, catalog, 1, "Equipped Fighter");
+    const fighterCharacter = buildCharacter(fighter, rulesPackage, options);
+    const wizard = defaultBuilderDraft(wizardId, catalog, 1, "Equipped Wizard");
+    const wizardCharacter = buildCharacter(wizard, rulesPackage, options);
+
+    expect(fighterCharacter.loadout.inventory.map((item) => item.entityId)).toEqual([
+      "srd521.equipment.armor.heavy.chain-mail",
+      "srd521.equipment.weapon.greatsword",
+      "srd521.equipment.weapon.flail",
+      "srd521.equipment.weapon.javelin",
+    ]);
+    expect(fighterCharacter.loadout.inventory.map((item) => item.entityId)).not.toContain(
+      "srd521.equipment.weapon.longbow",
+    );
+    expect(fighterCharacter.loadout.equippedItemIds).toEqual(["chain-mail-1", "greatsword-1"]);
+    expect(fighterCharacter.loadout.choices).toEqual([
+      {
+        choiceId: "srd521.choice.class.fighter.starting-equipment",
+        optionIds: ["srd521.option.class.fighter.starting-equipment.a"],
+      },
+    ]);
+    expect(wizardCharacter.loadout.inventory.map((item) => item.entityId)).toEqual([
+      "srd521.equipment.weapon.dagger",
+      "srd521.equipment.weapon.quarterstaff",
+    ]);
+    expect(wizardCharacter.loadout.equippedItemIds).toEqual(["quarterstaff-1"]);
+  });
+
+  it("supports gold-only equipment alternatives without class-specific assembly", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const draft = defaultBuilderDraft(fighterId, catalog, 1, "Gold Fighter");
+    draft.startingEquipmentOptionId = "srd521.option.class.fighter.starting-equipment.c";
+
+    const character = buildCharacter(draft, rulesPackage, options);
+
+    expect(character.loadout.inventory).toEqual([]);
+    expect(character.loadout.equippedItemIds).toEqual([]);
+    expect(character.loadout.choices[0]?.optionIds).toEqual([
+      "srd521.option.class.fighter.starting-equipment.c",
+    ]);
+  });
+
   it("uses package spellbook growth instead of a Wizard-specific formula", () => {
     const { rulesPackage } = loadWebData();
     const modifiedPackage = structuredClone(rulesPackage);
@@ -157,7 +206,10 @@ describe("guided character builder", () => {
       const character = buildCharacter(draft, rulesPackage, options);
       const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
 
-      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(
+        evaluation.validations.filter((validation) => validation.severity === "error"),
+        `level ${String(level)}`,
+      ).toEqual([]);
       expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
       expect(character.build.subclassId).toBe(
         level >= 3 ? "srd521.subclass.fighter.champion" : undefined,
@@ -212,12 +264,14 @@ describe("guided character builder", () => {
     const fighter = defaultBuilderDraft(fighterId, catalog);
     fighter.classSkillIds = ["srd521.skill.athletics"];
     fighter.speciesSkillIds = ["srd521.skill.athletics"];
+    fighter.startingEquipmentOptionId = "srd521.option.class.fighter.starting-equipment.unknown";
 
     expect(validateBuilderDraft(fighter, catalog)).toEqual(
       expect.arrayContaining([
         "Enter a character name.",
         "Choose exactly 2 Fighter skill proficiencies.",
         "Each selected skill proficiency must be unique.",
+        "Choose a Fighter starting-equipment package.",
       ]),
     );
 

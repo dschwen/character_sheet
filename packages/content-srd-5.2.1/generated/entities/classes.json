@@ -313,30 +313,39 @@
         ]
       },
       "startingEquipment": {
-        "choose": 1,
+        "id": "srd521.choice.class.barbarian.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
         "options": [
           {
             "currencyGp": 15,
-            "id": "A",
+            "id": "srd521.option.class.barbarian.starting-equipment.a",
             "items": [
               {
                 "entityId": "srd521.equipment.weapon.greataxe",
+                "equipped": true,
+                "kind": "entity",
                 "quantity": 1
               },
               {
                 "entityId": "srd521.equipment.weapon.handaxe",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 4
               },
               {
-                "entityId": "srd521.equipment.pack.explorers",
+                "kind": "text",
+                "name": "Explorer's Pack",
                 "quantity": 1
               }
-            ]
+            ],
+            "label": "Package A"
           },
           {
             "currencyGp": 75,
-            "id": "B",
-            "items": []
+            "id": "srd521.option.class.barbarian.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
           }
         ]
       },

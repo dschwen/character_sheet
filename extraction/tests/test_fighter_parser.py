@@ -1,6 +1,11 @@
 from typing import Any
 
-from srd_extract.fighter import extract_champion_features, parse_core_traits, parse_progression
+from srd_extract.fighter import (
+    _class_entity,
+    extract_champion_features,
+    parse_core_traits,
+    parse_progression,
+)
 
 
 def _word(text: str, x: float, y: float) -> dict[str, Any]:
@@ -27,6 +32,24 @@ def test_parse_core_fighter_traits() -> None:
     assert traits["savingThrowProficiencies"] == ["strength", "constitution"]
     assert traits["skillProficiencyChoice"]["maximum"] == 2
     assert traits["armorTraining"] == ["light", "medium", "heavy", "shield"]
+
+
+def test_fighter_starting_equipment_preserves_all_three_source_packages() -> None:
+    entity = _class_entity({}, (), {"entries": []}, [])
+    equipment = entity["body"]["startingEquipment"]
+
+    assert equipment["minimum"] == equipment["maximum"] == 1
+    assert [option["label"] for option in equipment["options"]] == [
+        "Package A",
+        "Package B",
+        "Package C",
+    ]
+    assert equipment["options"][0]["items"][-1] == {
+        "kind": "text",
+        "name": "Dungeoneer's Pack",
+        "quantity": 1,
+    }
+    assert equipment["options"][2]["currencyGp"] == 155
 
 
 def test_parse_fighter_progression_enforces_twenty_levels() -> None:

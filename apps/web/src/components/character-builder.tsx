@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import type { CharacterDocument } from "@dnd/character-model";
+import type { StartingEquipmentItem } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 
 import {
@@ -75,13 +76,32 @@ export function CharacterBuilder({
   const originFeatChoice = originChoices.find((choice) => choice.selection === "originFeatId");
   const spellcasting = selectedClass.spellcasting;
   const spellCounts = spellcasting?.countsByLevel[draft.level];
+  const selectedEquipmentOption =
+    selectedClass.startingEquipment.options.find(
+      (option) => option.id === draft.startingEquipmentOptionId,
+    ) ?? selectedClass.startingEquipment.options[0];
+  if (selectedEquipmentOption === undefined) {
+    throw new Error(`No starting-equipment package is available for ${selectedClass.name}.`);
+  }
+  const equipmentNames = useMemo(
+    () =>
+      Object.fromEntries(
+        rulesPackage.entities
+          .filter((entity) => entity.kind.startsWith("equipment-"))
+          .map((entity) => [
+            entity.id,
+            entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
+          ]),
+      ),
+    [rulesPackage],
+  );
   const steps = useMemo(
     () =>
       [
         "Identity",
         "Abilities",
         "Proficiencies",
-        spellcasting === undefined ? "Equipment" : "Spells",
+        spellcasting === undefined ? "Equipment" : "Spells & Equipment",
         "Review",
       ] as const,
     [spellcasting],
@@ -161,6 +181,51 @@ export function CharacterBuilder({
     }
   }
 
+  function equipmentItemLabel(item: StartingEquipmentItem): string {
+    const name =
+      item.kind === "text"
+        ? item.name
+        : (item.label ?? equipmentNames[item.entityId] ?? shortEntityName(item.entityId));
+    return item.quantity === 1 ? name : `${String(item.quantity)} ${name}`;
+  }
+
+  const equipmentChoices = (
+    <div className="equipment-choice-section">
+      <div className="builder-callout">
+        <strong>Choose a source-defined starting package</strong>
+        <p>
+          Items backed by the equipment catalog become inventory entries. The package selection also
+          preserves included gold and named adventuring gear.
+        </p>
+      </div>
+      <div className="builder-choice-grid starting-equipment-grid">
+        {selectedClass.startingEquipment.options.map((option) => {
+          const selected = draft.startingEquipmentOptionId === option.id;
+          const itemSummary = option.items.map(equipmentItemLabel).join(", ");
+          return (
+            <button
+              key={option.id}
+              type="button"
+              className={selected ? "builder-choice selected" : "builder-choice"}
+              aria-pressed={selected}
+              onClick={() => {
+                setDraft((value) => ({ ...value, startingEquipmentOptionId: option.id }));
+              }}
+            >
+              <span>Starting equipment</span>
+              <h2>{option.label}</h2>
+              <p>
+                {itemSummary.length > 0 ? `${itemSummary} · ` : ""}
+                {String(option.currencyGp)} GP
+              </p>
+              <small>{selected ? "Selected" : "Choose package"}</small>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <div className="builder-shell" role="dialog" aria-modal="true" aria-label="Create a character">
       <header className="builder-header">
@@ -209,9 +274,7 @@ export function CharacterBuilder({
                             : index === 3
                               ? spellcasting === undefined
                                 ? "Ready your gear"
-                                : spellcasting.preparation === "spellbook"
-                                  ? "Build spellbook"
-                                  : "Choose spells"
+                                : "Choose spells and gear"
                               : "Confirm choices"}
                     </small>
                   </span>
@@ -665,30 +728,7 @@ export function CharacterBuilder({
 
           {step === 3 && spellcasting === undefined ? (
             <div className="builder-section">
-              <div className="builder-callout">
-                <strong>Ready-to-play equipment package</strong>
-                <p>
-                  The reviewed Fighter package equips Chain Mail and a Greatsword and carries a
-                  Flail, eight Javelins, and a Longbow.
-                </p>
-              </div>
-              <div className="equipment-preview">
-                <div>
-                  <span>Equipped armor</span>
-                  <strong>Chain Mail</strong>
-                  <small>Heavy armor · AC 16</small>
-                </div>
-                <div>
-                  <span>Equipped weapon</span>
-                  <strong>Greatsword</strong>
-                  <small>Martial melee · 2d6 Slashing</small>
-                </div>
-                <div>
-                  <span>Carried weapons</span>
-                  <strong>Flail, Javelins, Longbow</strong>
-                  <small>Included in inventory</small>
-                </div>
-              </div>
+              {equipmentChoices}
               <div className="mastery-heading">
                 <div>
                   <span>Weapon Mastery</span>
@@ -724,6 +764,7 @@ export function CharacterBuilder({
 
           {step === 3 && spellcasting !== undefined && spellCounts !== undefined ? (
             <div className="builder-section">
+              {equipmentChoices}
               <div className="builder-callout">
                 <strong>
                   {spellcasting.preparation === "spellbook"
@@ -919,6 +960,14 @@ export function CharacterBuilder({
                   {draft.classId === wizardId && draft.level >= 2 ? (
                     <small>Scholar Expertise: {skillName(draft.scholarSkillId)}</small>
                   ) : null}
+                </article>
+                <article>
+                  <span>Starting Equipment</span>
+                  <p>
+                    {selectedEquipmentOption.label}:{" "}
+                    {selectedEquipmentOption.items.map(equipmentItemLabel).join(", ") || "No items"}
+                  </p>
+                  <small>{String(selectedEquipmentOption.currencyGp)} GP included</small>
                 </article>
                 {spellcasting === undefined ? (
                   <article>

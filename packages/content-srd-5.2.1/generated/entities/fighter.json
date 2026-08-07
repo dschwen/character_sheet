@@ -302,29 +302,97 @@
         ]
       },
       "startingEquipment": {
-        "choose": 1,
+        "id": "srd521.choice.class.fighter.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
         "options": [
           {
             "currencyGp": 4,
-            "id": "A",
+            "id": "srd521.option.class.fighter.starting-equipment.a",
             "items": [
               {
                 "entityId": "srd521.equipment.armor.heavy.chain-mail",
+                "equipped": true,
+                "kind": "entity",
                 "quantity": 1
               },
               {
                 "entityId": "srd521.equipment.weapon.greatsword",
+                "equipped": true,
+                "kind": "entity",
                 "quantity": 1
               },
               {
                 "entityId": "srd521.equipment.weapon.flail",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               },
               {
                 "entityId": "srd521.equipment.weapon.javelin",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 8
+              },
+              {
+                "kind": "text",
+                "name": "Dungeoneer's Pack",
+                "quantity": 1
               }
-            ]
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 11,
+            "id": "srd521.option.class.fighter.starting-equipment.b",
+            "items": [
+              {
+                "entityId": "srd521.equipment.armor.light.studded-leather-armor",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.scimitar",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.shortsword",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.longbow",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "kind": "text",
+                "name": "Arrows",
+                "quantity": 20
+              },
+              {
+                "kind": "text",
+                "name": "Quiver",
+                "quantity": 1
+              },
+              {
+                "kind": "text",
+                "name": "Dungeoneer's Pack",
+                "quantity": 1
+              }
+            ],
+            "label": "Package B"
+          },
+          {
+            "currencyGp": 155,
+            "id": "srd521.option.class.fighter.starting-equipment.c",
+            "items": [],
+            "label": "Package C"
           }
         ]
       },

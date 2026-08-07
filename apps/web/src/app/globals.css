@@ -1875,6 +1875,13 @@ button.builder-choice:disabled {
   color: var(--muted);
   font-size: 10px;
 }
+.equipment-choice-section {
+  display: grid;
+  gap: 14px;
+}
+.starting-equipment-grid {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
 .mastery-heading {
   display: flex;
   justify-content: space-between;

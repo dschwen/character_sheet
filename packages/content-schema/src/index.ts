@@ -222,9 +222,65 @@ export const contentEntitySchema = z
   })
   .strict();
 
+export const startingEquipmentItemSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      kind: z.literal("entity"),
+      entityId: entityIdSchema,
+      quantity: z.number().int().positive(),
+      equipped: z.boolean().default(false),
+      label: z.string().min(1).optional(),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("text"),
+      name: z.string().min(1),
+      quantity: z.number().int().positive(),
+    })
+    .strict(),
+]);
+
+export const startingEquipmentOptionSchema = z
+  .object({
+    id: entityIdSchema,
+    label: z.string().min(1),
+    items: z.array(startingEquipmentItemSchema),
+    currencyGp: z.number().int().nonnegative(),
+  })
+  .strict();
+
+export const startingEquipmentChoiceSchema = z
+  .object({
+    id: entityIdSchema,
+    minimum: z.number().int().nonnegative(),
+    maximum: z.number().int().positive(),
+    options: z.array(startingEquipmentOptionSchema).min(1),
+  })
+  .strict()
+  .superRefine((choice, context) => {
+    if (choice.minimum > choice.maximum || choice.maximum > choice.options.length) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Starting-equipment bounds must fit the available options",
+        path: ["maximum"],
+      });
+    }
+    if (new Set(choice.options.map((option) => option.id)).size !== choice.options.length) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Starting-equipment option IDs must be unique",
+        path: ["options"],
+      });
+    }
+  });
+
 export type PackageManifest = z.infer<typeof packageManifestSchema>;
 export type SourceManifest = z.infer<typeof sourceManifestSchema>;
 export type SourceSpan = z.infer<typeof sourceSpanSchema>;
 export type ContentEntity = z.infer<typeof contentEntitySchema>;
+export type StartingEquipmentItem = z.infer<typeof startingEquipmentItemSchema>;
+export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSchema>;
+export type StartingEquipmentChoice = z.infer<typeof startingEquipmentChoiceSchema>;
 export type DraftRule = z.infer<typeof draftRuleSchema>;
 export type AuthoringIr = z.infer<typeof authoringIrSchema>;
