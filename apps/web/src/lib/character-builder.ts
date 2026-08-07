@@ -6,10 +6,6 @@ import { abilities, type Ability, shortEntityName } from "./presentation";
 
 export const fighterId = "srd521.class.fighter";
 export const wizardId = "srd521.class.wizard";
-const humanId = "srd521.species.human";
-const soldierId = "srd521.background.soldier";
-const skilledId = "srd521.feat.origin.skilled";
-const savageAttackerId = "srd521.feat.origin.savage-attacker";
 const defenseStyleId = "srd521.feat.fighting-style.defense";
 const abilityScoreImprovementId = "srd521.feat.general.ability-score-improvement";
 const scholarId = "srd521.class-feature.wizard.scholar";
@@ -56,17 +52,83 @@ const fighterWeaponIds = [
 
 export interface CharacterBuilderDraft {
   classId: BuilderClassId;
+  speciesId: string;
+  speciesSize: SpeciesSize;
+  backgroundId: string;
+  backgroundAbilityScoreIncreases: Partial<Record<Ability, number>>;
+  originFeatId: string;
   name: string;
   level: number;
   abilityScores: Record<Ability, number>;
   asiAbility: Ability;
   classSkillIds: string[];
-  speciesSkillId: string;
-  skilledSkillIds: string[];
+  speciesSkillIds: string[];
+  originFeatSkillIds: string[];
   scholarSkillId: string;
   weaponMasteryIds: string[];
   learnedSpellIds: string[];
   preparedSpellIds: string[];
+}
+
+export type SpeciesSize = NonNullable<CharacterDocument["build"]["speciesSize"]>;
+
+export interface BuilderChoiceOption {
+  id: string;
+  label: string;
+  description?: string;
+  disabledReason?: string;
+  abilityIncreases?: Partial<Record<Ability, number>>;
+}
+
+export interface BuilderChoiceDefinition {
+  id: string;
+  sourceId: string;
+  selection:
+    | "speciesId"
+    | "speciesSize"
+    | "backgroundId"
+    | "backgroundAbilityScoreIncreases"
+    | "originFeatId"
+    | "speciesSkillIds"
+    | "originFeatSkillIds";
+  kind: "single" | "multiple" | "ability-allocation";
+  prompt: string;
+  minimum: number;
+  maximum: number;
+  options: BuilderChoiceOption[];
+}
+
+export interface SpeciesBuilderCatalog {
+  id: string;
+  name: string;
+  description: string;
+  walkingSpeed: number;
+  sizeOptions: SpeciesSize[];
+  recommendedOriginFeatId?: string;
+  skillMinimum: number;
+  skillMaximum: number;
+  originFeatMinimum: number;
+  originFeatMaximum: number;
+}
+
+export interface BackgroundBuilderCatalog {
+  id: string;
+  name: string;
+  description: string;
+  abilityIds: Ability[];
+  abilityIncreaseOptions: BuilderChoiceOption[];
+  skillIds: string[];
+  featId: string;
+}
+
+export interface FeatBuilderCatalog {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  repeatable: boolean;
+  skillMinimum: number;
+  skillMaximum: number;
 }
 
 export interface SpellOption {
@@ -109,9 +171,9 @@ export interface ClassSpellcastingCatalog {
 
 export interface BuilderCatalog {
   classes: Readonly<Record<BuilderClassId, ClassBuilderCatalog>>;
-  speciesName: string;
-  backgroundName: string;
-  backgroundSkillIds: string[];
+  species: Readonly<Record<string, SpeciesBuilderCatalog>>;
+  backgrounds: Readonly<Record<string, BackgroundBuilderCatalog>>;
+  feats: Readonly<Record<string, FeatBuilderCatalog>>;
   weaponIds: string[];
   weaponNames: Readonly<Record<string, string>>;
 }
@@ -154,6 +216,72 @@ function stringArray(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
     : [];
+}
+
+function abilityValue(value: unknown): Ability | undefined {
+  return abilities.find((ability) => ability === value);
+}
+
+function speciesSizeValue(value: unknown): SpeciesSize | undefined {
+  return ["small", "medium", "large"].find((size): size is SpeciesSize => size === value);
+}
+
+function entityDescription(entity: LoadedRulesPackage["entities"][number]): string {
+  const body = objectValue(entity.body);
+  if (typeof body?.description === "string") return body.description;
+  if (typeof body?.traitsText === "string") return body.traitsText;
+  if (typeof body?.equipmentText === "string") return body.equipmentText;
+  const text = objectValue(body?.text);
+  const nodes = text?.nodes;
+  if (Array.isArray(nodes)) {
+    const paragraph = nodes
+      .map((node) => objectValue(node)?.text)
+      .find((value): value is string => typeof value === "string");
+    if (paragraph !== undefined) return paragraph;
+  }
+  return "Reviewed SRD character option.";
+}
+
+function abilityIncreaseOptions(abilityIds: Ability[], value: unknown): BuilderChoiceOption[] {
+  if (!Array.isArray(value)) return [];
+  const results = new Map<string, BuilderChoiceOption>();
+  for (const unparsedPattern of value) {
+    if (!Array.isArray(unparsedPattern)) continue;
+    const pattern = unparsedPattern.filter(
+      (amount): amount is number => typeof amount === "number",
+    );
+    function assign(
+      position: number,
+      remaining: Ability[],
+      increases: Partial<Record<Ability, number>>,
+    ): void {
+      if (position >= pattern.length) {
+        const entries = abilities
+          .filter((ability) => increases[ability] !== undefined)
+          .map((ability) => [ability, increases[ability] ?? 0] as const);
+        const id = entries.map(([ability, amount]) => `${ability}:${String(amount)}`).join("|");
+        results.set(id, {
+          id,
+          label: entries
+            .map(([ability, amount]) => `+${String(amount)} ${shortEntityName(ability)}`)
+            .join(", "),
+          abilityIncreases: { ...increases },
+        });
+        return;
+      }
+      const amount = pattern[position];
+      if (amount === undefined) return;
+      for (const ability of remaining) {
+        assign(
+          position + 1,
+          remaining.filter((candidate) => candidate !== ability),
+          { ...increases, [ability]: amount },
+        );
+      }
+    }
+    assign(0, abilityIds, {});
+  }
+  return [...results.values()].sort((left, right) => left.label.localeCompare(right.label));
 }
 
 function spellsGrantedThroughLevel(value: unknown, level: number): string[] {
@@ -294,23 +422,207 @@ function classCatalog(
 
 export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): BuilderCatalog {
   const entity = (id: string) => rulesPackage.entities.find((candidate) => candidate.id === id);
-  const backgroundBody = objectValue(entity(soldierId)?.body);
-  const backgroundSkills = backgroundBody?.skillProficiencies;
-  const backgroundSkillIds = Array.isArray(backgroundSkills)
-    ? backgroundSkills.filter((skill): skill is string => typeof skill === "string")
-    : [];
+  const species = Object.fromEntries(
+    rulesPackage.entities
+      .filter((candidate) => candidate.kind === "species")
+      .map((candidate) => {
+        const body = objectValue(candidate.body);
+        const skillChoice = objectValue(body?.skillProficiencyChoice);
+        const originFeatChoice = objectValue(body?.originFeatChoice);
+        const sizeOptions = stringArray(body?.sizeOptions)
+          .map(speciesSizeValue)
+          .filter((size): size is SpeciesSize => size !== undefined);
+        const walkingSpeed = numericValue(body?.walkingSpeed);
+        return [
+          candidate.id,
+          {
+            id: candidate.id,
+            name: localizedName(candidate),
+            description: `${shortEntityName(typeof body?.creatureType === "string" ? body.creatureType : "creature")} · ${String(walkingSpeed)}-foot speed · ${sizeOptions.map(shortEntityName).join(" or ")} size.`,
+            walkingSpeed,
+            sizeOptions,
+            ...(typeof body?.recommendedOriginFeatId === "string"
+              ? { recommendedOriginFeatId: body.recommendedOriginFeatId }
+              : {}),
+            skillMinimum: numericValue(skillChoice?.minimum),
+            skillMaximum: numericValue(skillChoice?.maximum),
+            originFeatMinimum: numericValue(originFeatChoice?.minimum),
+            originFeatMaximum: numericValue(originFeatChoice?.maximum),
+          },
+        ];
+      }),
+  ) as Record<string, SpeciesBuilderCatalog>;
+  const backgrounds = Object.fromEntries(
+    rulesPackage.entities
+      .filter((candidate) => candidate.kind === "background")
+      .map((candidate) => {
+        const body = objectValue(candidate.body);
+        const abilityIds = stringArray(body?.abilityScoreOptions)
+          .map(abilityValue)
+          .filter((ability): ability is Ability => ability !== undefined);
+        const backgroundSkillIds = stringArray(body?.skillProficiencies);
+        const featId = typeof body?.featId === "string" ? body.featId : "";
+        return [
+          candidate.id,
+          {
+            id: candidate.id,
+            name: localizedName(candidate),
+            description: `Grants ${[...backgroundSkillIds.map(shortEntityName), localizedName(entity(featId))].join(", ")}, and background ability increases.`,
+            abilityIds,
+            abilityIncreaseOptions: abilityIncreaseOptions(
+              abilityIds,
+              body?.abilityScoreIncreasePatterns,
+            ),
+            skillIds: backgroundSkillIds,
+            featId,
+          },
+        ];
+      }),
+  ) as Record<string, BackgroundBuilderCatalog>;
+  const feats = Object.fromEntries(
+    rulesPackage.entities
+      .filter((candidate) => candidate.kind === "feat")
+      .map((candidate) => {
+        const body = objectValue(candidate.body);
+        const proficiencyChoice = objectValue(body?.proficiencyChoice);
+        const categories = stringArray(proficiencyChoice?.categories);
+        return [
+          candidate.id,
+          {
+            id: candidate.id,
+            name: localizedName(candidate),
+            description: entityDescription(candidate),
+            category: typeof body?.category === "string" ? body.category : "unknown",
+            repeatable: body?.repeatable === true,
+            skillMinimum: categories.includes("skill")
+              ? numericValue(proficiencyChoice?.minimum)
+              : 0,
+            skillMaximum: categories.includes("skill")
+              ? numericValue(proficiencyChoice?.maximum)
+              : 0,
+          },
+        ];
+      }),
+  ) as Record<string, FeatBuilderCatalog>;
+  if (Object.keys(species).length === 0 || Object.keys(backgrounds).length === 0) {
+    throw new Error("Builder origin metadata is missing from the loaded rules package.");
+  }
 
   return {
     classes: {
       [fighterId]: classCatalog(fighterId, rulesPackage),
       [wizardId]: classCatalog(wizardId, rulesPackage),
     },
-    speciesName: localizedName(entity(humanId)),
-    backgroundName: localizedName(entity(soldierId)),
-    backgroundSkillIds,
+    species,
+    backgrounds,
+    feats,
     weaponIds: fighterWeaponIds,
     weaponNames: Object.fromEntries(fighterWeaponIds.map((id) => [id, localizedName(entity(id))])),
   };
+}
+
+export function builderOriginChoiceDefinitions(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): BuilderChoiceDefinition[] {
+  const selectedSpecies = catalog.species[draft.speciesId];
+  const selectedBackground = catalog.backgrounds[draft.backgroundId];
+  const selectedFeat = catalog.feats[draft.originFeatId];
+  const allSkills = skillIds.map((skill) => ({
+    id: `${skillPrefix}${skill}`,
+    label: shortEntityName(skill),
+  }));
+  const originFeats = Object.values(catalog.feats).filter((feat) => feat.category === "origin");
+  return [
+    {
+      id: "builder.choice.species",
+      sourceId: "builder",
+      selection: "speciesId",
+      kind: "single",
+      prompt: "Choose a species",
+      minimum: 1,
+      maximum: 1,
+      options: Object.values(catalog.species).map((species) => ({
+        id: species.id,
+        label: species.name,
+        description: species.description,
+      })),
+    },
+    {
+      id: "builder.choice.background",
+      sourceId: "builder",
+      selection: "backgroundId",
+      kind: "single",
+      prompt: "Choose a background",
+      minimum: 1,
+      maximum: 1,
+      options: Object.values(catalog.backgrounds).map((background) => ({
+        id: background.id,
+        label: background.name,
+        description: background.description,
+      })),
+    },
+    {
+      id: `${draft.speciesId}.choice.size`,
+      sourceId: draft.speciesId,
+      selection: "speciesSize",
+      kind: "single",
+      prompt: "Choose a size",
+      minimum: 1,
+      maximum: 1,
+      options: (selectedSpecies?.sizeOptions ?? []).map((size) => ({
+        id: size,
+        label: shortEntityName(size),
+      })),
+    },
+    {
+      id: `${draft.backgroundId}.choice.ability-score-increases`,
+      sourceId: draft.backgroundId,
+      selection: "backgroundAbilityScoreIncreases",
+      kind: "ability-allocation",
+      prompt: "Choose background ability increases",
+      minimum: 1,
+      maximum: 1,
+      options: selectedBackground?.abilityIncreaseOptions ?? [],
+    },
+    {
+      id: `${draft.speciesId}.choice.origin-feat`,
+      sourceId: draft.speciesId,
+      selection: "originFeatId",
+      kind: "single",
+      prompt: "Choose an Origin feat",
+      minimum: selectedSpecies?.originFeatMinimum ?? 0,
+      maximum: selectedSpecies?.originFeatMaximum ?? 0,
+      options: originFeats.map((feat) => ({
+        id: feat.id,
+        label: feat.name,
+        description: feat.description,
+        ...(feat.id === selectedBackground?.featId && !feat.repeatable
+          ? { disabledReason: `Already granted by ${selectedBackground.name}.` }
+          : {}),
+      })),
+    },
+    {
+      id: `${draft.speciesId}.choice.skill`,
+      sourceId: draft.speciesId,
+      selection: "speciesSkillIds",
+      kind: "multiple",
+      prompt: `Choose ${String(selectedSpecies?.skillMaximum ?? 0)} species skill`,
+      minimum: selectedSpecies?.skillMinimum ?? 0,
+      maximum: selectedSpecies?.skillMaximum ?? 0,
+      options: allSkills,
+    },
+    {
+      id: `${draft.originFeatId}.choice.skill`,
+      sourceId: draft.originFeatId,
+      selection: "originFeatSkillIds",
+      kind: "multiple",
+      prompt: `Choose ${String(selectedFeat?.skillMaximum ?? 0)} feat skills`,
+      minimum: selectedFeat?.skillMinimum ?? 0,
+      maximum: selectedFeat?.skillMaximum ?? 0,
+      options: allSkills,
+    },
+  ];
 }
 
 function fillSelections(current: string[], candidates: string[], count: number): string[] {
@@ -371,8 +683,34 @@ export function defaultBuilderDraft(
 ): CharacterBuilderDraft {
   const fighter = classId === fighterId;
   const selectedClass = catalog.classes[classId];
+  const species = Object.values(catalog.species)[0];
+  const background = Object.values(catalog.backgrounds)[0];
+  if (species === undefined || background === undefined) {
+    throw new Error("Builder origin metadata is missing.");
+  }
+  const originFeats = Object.values(catalog.feats).filter(
+    (feat) => feat.category === "origin" && (feat.id !== background.featId || feat.repeatable),
+  );
+  const originFeat =
+    originFeats.find((feat) => feat.id === species.recommendedOriginFeatId) ?? originFeats[0];
+  if (originFeat === undefined) throw new Error("No eligible Origin feat is available.");
+  const backgroundAbilityOption = [...background.abilityIncreaseOptions].sort(
+    (left, right) =>
+      Object.keys(right.abilityIncreases ?? {}).length -
+      Object.keys(left.abilityIncreases ?? {}).length,
+  )[0];
+  if (backgroundAbilityOption?.abilityIncreases === undefined) {
+    throw new Error("No background ability allocation is available.");
+  }
   const draft: CharacterBuilderDraft = {
     classId,
+    speciesId: species.id,
+    speciesSize: species.sizeOptions.includes("medium")
+      ? "medium"
+      : (species.sizeOptions[0] ?? "medium"),
+    backgroundId: background.id,
+    backgroundAbilityScoreIncreases: { ...backgroundAbilityOption.abilityIncreases },
+    originFeatId: originFeat.id,
     name,
     level,
     abilityScores: fighter
@@ -396,10 +734,14 @@ export function defaultBuilderDraft(
     classSkillIds: fighter
       ? [`${skillPrefix}perception`, `${skillPrefix}survival`]
       : [`${skillPrefix}arcana`, `${skillPrefix}investigation`],
-    speciesSkillId: fighter ? `${skillPrefix}persuasion` : `${skillPrefix}perception`,
-    skilledSkillIds: fighter
+    speciesSkillIds: [fighter ? `${skillPrefix}persuasion` : `${skillPrefix}perception`].slice(
+      0,
+      species.skillMaximum,
+    ),
+    originFeatSkillIds: (fighter
       ? [`${skillPrefix}arcana`, `${skillPrefix}insight`, `${skillPrefix}stealth`]
-      : [`${skillPrefix}persuasion`, `${skillPrefix}stealth`, `${skillPrefix}survival`],
+      : [`${skillPrefix}persuasion`, `${skillPrefix}stealth`, `${skillPrefix}survival`]
+    ).slice(0, originFeat.skillMaximum),
     scholarSkillId: classId === wizardId && level >= 2 ? `${skillPrefix}arcana` : "",
     weaponMasteryIds: fighterWeaponIds.slice(
       0,
@@ -449,6 +791,10 @@ export function validateBuilderDraft(
 ): string[] {
   const issues: string[] = [];
   const selectedClass = catalog.classes[draft.classId];
+  const selectedSpecies = catalog.species[draft.speciesId];
+  const selectedBackground = catalog.backgrounds[draft.backgroundId];
+  const selectedOriginFeat = catalog.feats[draft.originFeatId];
+  const originChoices = builderOriginChoiceDefinitions(draft, catalog);
   if (draft.name.trim().length === 0) issues.push("Enter a character name.");
   if (!Number.isInteger(draft.level) || draft.level < 1 || draft.level > 5) {
     issues.push(`Choose a ${selectedClass.name} level from 1 through 5.`);
@@ -458,6 +804,34 @@ export function validateBuilderDraft(
     if (!Number.isInteger(score) || score < 3 || score > 18) {
       issues.push(`${shortEntityName(ability)} must be a whole number from 3 through 18.`);
     }
+  }
+  if (selectedSpecies === undefined) {
+    issues.push("Choose a reviewed species.");
+  } else if (!selectedSpecies.sizeOptions.includes(draft.speciesSize)) {
+    issues.push(`Choose a valid size for ${selectedSpecies.name}.`);
+  }
+  if (selectedBackground === undefined) {
+    issues.push("Choose a reviewed background.");
+  } else if (
+    !selectedBackground.abilityIncreaseOptions.some((option) =>
+      abilities.every(
+        (ability) =>
+          (option.abilityIncreases?.[ability] ?? 0) ===
+          (draft.backgroundAbilityScoreIncreases[ability] ?? 0),
+      ),
+    )
+  ) {
+    issues.push(`Choose a valid ability-score allocation for ${selectedBackground.name}.`);
+  }
+  const originFeatChoice = originChoices.find((choice) => choice.selection === "originFeatId");
+  const selectedOriginFeatOption = originFeatChoice?.options.find(
+    (option) => option.id === draft.originFeatId,
+  );
+  if (
+    selectedOriginFeat?.category !== "origin" ||
+    selectedOriginFeatOption?.disabledReason !== undefined
+  ) {
+    issues.push("Choose an eligible Origin feat granted by your species.");
   }
   if (
     draft.classSkillIds.length < selectedClass.skillMinimum ||
@@ -472,21 +846,33 @@ export function validateBuilderDraft(
     issues.push(`Choose ${count} ${selectedClass.name} skill proficiencies.`);
   }
   const allSkillOptions = skillIds.map((id) => `${skillPrefix}${id}`);
-  if (!allSkillOptions.includes(draft.speciesSkillId)) {
-    issues.push("Choose one Human skill proficiency.");
+  if (
+    selectedSpecies !== undefined &&
+    (draft.speciesSkillIds.length < selectedSpecies.skillMinimum ||
+      draft.speciesSkillIds.length > selectedSpecies.skillMaximum ||
+      new Set(draft.speciesSkillIds).size !== draft.speciesSkillIds.length ||
+      draft.speciesSkillIds.some((id) => !allSkillOptions.includes(id)))
+  ) {
+    issues.push(
+      `Choose exactly ${String(selectedSpecies.skillMaximum)} ${selectedSpecies.name} skill proficiency.`,
+    );
   }
   if (
-    draft.skilledSkillIds.length !== 3 ||
-    new Set(draft.skilledSkillIds).size !== 3 ||
-    draft.skilledSkillIds.some((id) => !allSkillOptions.includes(id))
+    selectedOriginFeat !== undefined &&
+    (draft.originFeatSkillIds.length < selectedOriginFeat.skillMinimum ||
+      draft.originFeatSkillIds.length > selectedOriginFeat.skillMaximum ||
+      new Set(draft.originFeatSkillIds).size !== draft.originFeatSkillIds.length ||
+      draft.originFeatSkillIds.some((id) => !allSkillOptions.includes(id)))
   ) {
-    issues.push("Choose exactly three skill proficiencies for Skilled.");
+    issues.push(
+      `Choose exactly ${String(selectedOriginFeat.skillMaximum)} skill proficiencies for ${selectedOriginFeat.name}.`,
+    );
   }
   const allSkills = [
-    ...catalog.backgroundSkillIds,
+    ...(selectedBackground?.skillIds ?? []),
     ...draft.classSkillIds,
-    draft.speciesSkillId,
-    ...draft.skilledSkillIds,
+    ...draft.speciesSkillIds,
+    ...draft.originFeatSkillIds,
   ];
   if (new Set(allSkills).size !== allSkills.length) {
     issues.push("Each selected skill proficiency must be unique.");
@@ -560,13 +946,24 @@ function assembleCharacter(
   rulesPackage: LoadedRulesPackage,
   options: BuildCharacterOptions,
 ): CharacterDocument {
-  const selectedClass = classCatalog(draft.classId, rulesPackage);
+  const catalog = characterBuilderCatalog(rulesPackage);
+  const selectedClass = catalog.classes[draft.classId];
+  const selectedSpecies = catalog.species[draft.speciesId];
+  const selectedBackground = catalog.backgrounds[draft.backgroundId];
+  const selectedOriginFeat = catalog.feats[draft.originFeatId];
+  if (
+    selectedSpecies === undefined ||
+    selectedBackground === undefined ||
+    selectedOriginFeat === undefined
+  ) {
+    throw new Error("Selected origin metadata is missing.");
+  }
   const levels = Array.from({ length: draft.level }, (_, index) => ({
     characterLevel: index + 1,
     classId: draft.classId,
     hitPointChoice: "fixed" as const,
   }));
-  const featIds = [savageAttackerId, skilledId];
+  const featIds = [selectedBackground.featId, selectedOriginFeat.id];
   if (draft.classId === fighterId) featIds.unshift(defenseStyleId);
   if (draft.level >= 4) featIds.push(abilityScoreImprovementId);
   const timestamp = options.now.toISOString();
@@ -594,10 +991,10 @@ function assembleCharacter(
     build: {
       levels,
       abilityScores: draft.abilityScores,
-      speciesId: humanId,
-      speciesSize: "medium",
-      backgroundId: soldierId,
-      backgroundAbilityScoreIncreases: { strength: 1, dexterity: 1, constitution: 1 },
+      speciesId: selectedSpecies.id,
+      speciesSize: draft.speciesSize,
+      backgroundId: selectedBackground.id,
+      backgroundAbilityScoreIncreases: draft.backgroundAbilityScoreIncreases,
       ...(hasSubclass ? { subclassId: selectedClass.subclassId } : {}),
       featAbilityScoreIncreases: draft.level >= 4 ? { [draft.asiAbility]: 2 } : {},
       featIds,
@@ -606,8 +1003,14 @@ function assembleCharacter(
       proficiencyChoices: {
         skills: [
           ...draft.classSkillIds.map((skillId) => ({ skillId, sourceId: draft.classId })),
-          { skillId: draft.speciesSkillId, sourceId: humanId },
-          ...draft.skilledSkillIds.map((skillId) => ({ skillId, sourceId: skilledId })),
+          ...draft.speciesSkillIds.map((skillId) => ({
+            skillId,
+            sourceId: selectedSpecies.id,
+          })),
+          ...draft.originFeatSkillIds.map((skillId) => ({
+            skillId,
+            sourceId: selectedOriginFeat.id,
+          })),
         ],
         expertise:
           draft.classId === wizardId && draft.level >= 2

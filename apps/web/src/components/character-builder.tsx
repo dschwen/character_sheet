@@ -8,6 +8,7 @@ import type { LoadedRulesPackage } from "@dnd/rules-api";
 import {
   buildCharacter,
   builderClassIds,
+  builderOriginChoiceDefinitions,
   characterBuilderCatalog,
   defaultBuilderDraft,
   fighterId,
@@ -54,6 +55,24 @@ export function CharacterBuilder({
     defaultBuilderDraft(fighterId, catalog),
   );
   const selectedClass = catalog.classes[draft.classId];
+  const selectedSpecies = catalog.species[draft.speciesId];
+  const selectedBackground = catalog.backgrounds[draft.backgroundId];
+  const selectedOriginFeat = catalog.feats[draft.originFeatId];
+  if (
+    selectedSpecies === undefined ||
+    selectedBackground === undefined ||
+    selectedOriginFeat === undefined
+  ) {
+    throw new Error("The selected builder origin is unavailable.");
+  }
+  const originChoices = builderOriginChoiceDefinitions(draft, catalog);
+  const speciesChoice = originChoices.find((choice) => choice.selection === "speciesId");
+  const backgroundChoice = originChoices.find((choice) => choice.selection === "backgroundId");
+  const sizeChoice = originChoices.find((choice) => choice.selection === "speciesSize");
+  const abilityIncreaseChoice = originChoices.find(
+    (choice) => choice.selection === "backgroundAbilityScoreIncreases",
+  );
+  const originFeatChoice = originChoices.find((choice) => choice.selection === "originFeatId");
   const spellcasting = selectedClass.spellcasting;
   const spellCounts = spellcasting?.countsByLevel[draft.level];
   const steps = useMemo(
@@ -77,10 +96,10 @@ export function CharacterBuilder({
   );
   const requiredMasteries = masteryCount(draft, catalog);
   const allSelectedSkills = new Set([
-    ...catalog.backgroundSkillIds,
+    ...selectedBackground.skillIds,
     ...draft.classSkillIds,
-    draft.speciesSkillId,
-    ...draft.skilledSkillIds,
+    ...draft.speciesSkillIds,
+    ...draft.originFeatSkillIds,
   ]);
 
   function updateLevel(level: number): void {
@@ -254,20 +273,120 @@ export function CharacterBuilder({
                 })}
               </div>
               <div className="builder-choice-grid origin-choice-grid">
-                <article className="builder-choice selected">
-                  <span>Species</span>
-                  <h2>{catalog.speciesName}</h2>
-                  <p>Resourceful, Skillful, and Versatile. Walking speed 30 feet.</p>
-                  <small>Only reviewed species available</small>
-                </article>
-                <article className="builder-choice selected">
-                  <span>Background</span>
-                  <h2>{catalog.backgroundName}</h2>
-                  <p>
-                    Grants Athletics, Intimidation, Savage Attacker, and three ability increases.
-                  </p>
-                  <small>Only reviewed background available</small>
-                </article>
+                {speciesChoice?.options.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={
+                      draft.speciesId === option.id ? "builder-choice selected" : "builder-choice"
+                    }
+                    onClick={() => {
+                      const species = catalog.species[option.id];
+                      if (species === undefined) return;
+                      setDraft((value) => ({
+                        ...value,
+                        speciesId: species.id,
+                        speciesSize: species.sizeOptions.includes(value.speciesSize)
+                          ? value.speciesSize
+                          : (species.sizeOptions[0] ?? "medium"),
+                        speciesSkillIds: value.speciesSkillIds.slice(0, species.skillMaximum),
+                      }));
+                    }}
+                  >
+                    <span>Species</span>
+                    <h2>{option.label}</h2>
+                    <p>{option.description}</p>
+                    <small>{draft.speciesId === option.id ? "Selected" : "Choose species"}</small>
+                  </button>
+                ))}
+                {backgroundChoice?.options.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={
+                      draft.backgroundId === option.id
+                        ? "builder-choice selected"
+                        : "builder-choice"
+                    }
+                    onClick={() => {
+                      const background = catalog.backgrounds[option.id];
+                      const allocation = background?.abilityIncreaseOptions[0]?.abilityIncreases;
+                      if (background === undefined || allocation === undefined) return;
+                      setDraft((value) => ({
+                        ...value,
+                        backgroundId: background.id,
+                        backgroundAbilityScoreIncreases: { ...allocation },
+                      }));
+                    }}
+                  >
+                    <span>Background</span>
+                    <h2>{option.label}</h2>
+                    <p>{option.description}</p>
+                    <small>
+                      {draft.backgroundId === option.id ? "Selected" : "Choose background"}
+                    </small>
+                  </button>
+                ))}
+              </div>
+              <div className="builder-choice-grid origin-detail-grid">
+                <label className="builder-field compact-field">
+                  {sizeChoice?.prompt ?? "Species size"}
+                  <select
+                    value={draft.speciesSize}
+                    onChange={(event) => {
+                      setDraft((value) => ({
+                        ...value,
+                        speciesSize: event.target.value as typeof value.speciesSize,
+                      }));
+                    }}
+                  >
+                    {sizeChoice?.options.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <small>Walking speed {String(selectedSpecies.walkingSpeed)} feet.</small>
+                </label>
+              </div>
+              <div className="builder-choice-grid origin-feat-grid">
+                {originFeatChoice?.options.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={
+                      draft.originFeatId === option.id
+                        ? "builder-choice selected"
+                        : "builder-choice"
+                    }
+                    disabled={option.disabledReason !== undefined}
+                    onClick={() => {
+                      const feat = catalog.feats[option.id];
+                      if (feat === undefined) return;
+                      const unavailable = new Set([
+                        ...selectedBackground.skillIds,
+                        ...draft.classSkillIds,
+                        ...draft.speciesSkillIds,
+                      ]);
+                      const candidates = skillIds
+                        .map((skill) => `srd521.skill.${skill}`)
+                        .filter((id) => !unavailable.has(id));
+                      setDraft((value) => ({
+                        ...value,
+                        originFeatId: feat.id,
+                        originFeatSkillIds: candidates.slice(0, feat.skillMaximum),
+                      }));
+                    }}
+                  >
+                    <span>Origin feat</span>
+                    <h2>{option.label}</h2>
+                    <p>{option.description}</p>
+                    <small>
+                      {option.disabledReason ??
+                        (draft.originFeatId === option.id ? "Selected" : "Choose feat")}
+                    </small>
+                  </button>
+                ))}
               </div>
               <label className="builder-field compact-field">
                 Starting level
@@ -305,17 +424,47 @@ export function CharacterBuilder({
               <div className="builder-callout">
                 <strong>Assign base scores</strong>
                 <p>
-                  Enter scores before the Soldier background adds +1 Strength, Dexterity, and
-                  Constitution.
+                  Enter scores before the {selectedBackground.name} background applies the selected
+                  ability increases.
                 </p>
+              </div>
+              <div className="skill-choice-section ability-allocation-choice">
+                <div>
+                  <span>{selectedBackground.name}</span>
+                  <h2>{abilityIncreaseChoice?.prompt ?? "Ability increases"}</h2>
+                  <small>Choose one package from the background’s allowed patterns</small>
+                </div>
+                <div className="choice-pills">
+                  {abilityIncreaseChoice?.options.map((option) => {
+                    const selected = abilities.every(
+                      (ability) =>
+                        (option.abilityIncreases?.[ability] ?? 0) ===
+                        (draft.backgroundAbilityScoreIncreases[ability] ?? 0),
+                    );
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        className={selected ? "selected" : undefined}
+                        onClick={() => {
+                          if (option.abilityIncreases === undefined) return;
+                          setDraft((value) => ({
+                            ...value,
+                            backgroundAbilityScoreIncreases: {
+                              ...option.abilityIncreases,
+                            },
+                          }));
+                        }}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div className="ability-editor">
                 {abilities.map((ability) => {
-                  const backgroundIncrease = ["strength", "dexterity", "constitution"].includes(
-                    ability,
-                  )
-                    ? 1
-                    : 0;
+                  const backgroundIncrease = draft.backgroundAbilityScoreIncreases[ability] ?? 0;
                   const featIncrease = draft.level >= 4 && draft.asiAbility === ability ? 2 : 0;
                   const finalScore =
                     draft.abilityScores[ability] + backgroundIncrease + featIncrease;
@@ -368,8 +517,9 @@ export function CharacterBuilder({
               <div className="builder-callout">
                 <strong>No duplicates</strong>
                 <p>
-                  Soldier already grants Athletics and Intimidation. Choose unique skills for every
-                  other source.
+                  {selectedBackground.name} already grants{" "}
+                  {selectedBackground.skillIds.map(skillName).join(" and ")}. Choose unique skills
+                  for every other source.
                 </p>
               </div>
               <div className="skill-choice-section">
@@ -434,9 +584,15 @@ export function CharacterBuilder({
               ) : null}
               <div className="skill-choice-section">
                 <div>
-                  <span>Human · Skillful</span>
-                  <h2>Choose 1 skill</h2>
-                  <small>1 / 1 selected</small>
+                  <span>{selectedSpecies.name}</span>
+                  <h2>
+                    Choose {String(selectedSpecies.skillMaximum)} skill
+                    {selectedSpecies.skillMaximum === 1 ? "" : "s"}
+                  </h2>
+                  <small>
+                    {String(draft.speciesSkillIds.length)} / {String(selectedSpecies.skillMaximum)}{" "}
+                    selected
+                  </small>
                 </div>
                 <div className="choice-pills">
                   {skillIds.map((skill) => {
@@ -445,37 +601,16 @@ export function CharacterBuilder({
                       <button
                         key={id}
                         type="button"
-                        disabled={skillDisabled(id, [draft.speciesSkillId])}
-                        className={draft.speciesSkillId === id ? "selected" : undefined}
-                        onClick={() => {
-                          setDraft((value) => ({ ...value, speciesSkillId: id }));
-                        }}
-                      >
-                        {skillName(id)}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="skill-choice-section">
-                <div>
-                  <span>Skilled feat</span>
-                  <h2>Choose 3 skills</h2>
-                  <small>{String(draft.skilledSkillIds.length)} / 3 selected</small>
-                </div>
-                <div className="choice-pills">
-                  {skillIds.map((skill) => {
-                    const id = `srd521.skill.${skill}`;
-                    return (
-                      <button
-                        key={id}
-                        type="button"
-                        disabled={skillDisabled(id, draft.skilledSkillIds)}
-                        className={draft.skilledSkillIds.includes(id) ? "selected" : undefined}
+                        disabled={skillDisabled(id, draft.speciesSkillIds)}
+                        className={draft.speciesSkillIds.includes(id) ? "selected" : undefined}
                         onClick={() => {
                           setDraft((value) => ({
                             ...value,
-                            skilledSkillIds: toggleList(value.skilledSkillIds, id, 3),
+                            speciesSkillIds: toggleList(
+                              value.speciesSkillIds,
+                              id,
+                              selectedSpecies.skillMaximum,
+                            ),
                           }));
                         }}
                       >
@@ -485,6 +620,46 @@ export function CharacterBuilder({
                   })}
                 </div>
               </div>
+              {selectedOriginFeat.skillMaximum === 0 ? null : (
+                <div className="skill-choice-section">
+                  <div>
+                    <span>{selectedOriginFeat.name} feat</span>
+                    <h2>
+                      Choose {String(selectedOriginFeat.skillMaximum)} skill
+                      {selectedOriginFeat.skillMaximum === 1 ? "" : "s"}
+                    </h2>
+                    <small>
+                      {String(draft.originFeatSkillIds.length)} /{" "}
+                      {String(selectedOriginFeat.skillMaximum)} selected
+                    </small>
+                  </div>
+                  <div className="choice-pills">
+                    {skillIds.map((skill) => {
+                      const id = `srd521.skill.${skill}`;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          disabled={skillDisabled(id, draft.originFeatSkillIds)}
+                          className={draft.originFeatSkillIds.includes(id) ? "selected" : undefined}
+                          onClick={() => {
+                            setDraft((value) => ({
+                              ...value,
+                              originFeatSkillIds: toggleList(
+                                value.originFeatSkillIds,
+                                id,
+                                selectedOriginFeat.skillMaximum,
+                              ),
+                            }));
+                          }}
+                        >
+                          {skillName(id)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           ) : null}
 
@@ -682,7 +857,8 @@ export function CharacterBuilder({
                   draft.level >= selectedClass.subclassLevel
                     ? `${selectedClass.subclassName} `
                     : ""}
-                  {selectedClass.name} · {catalog.speciesName} · {catalog.backgroundName}
+                  {selectedClass.name} · {selectedSpecies.name} ({titleCase(draft.speciesSize)}) ·{" "}
+                  {selectedBackground.name}
                 </p>
               </div>
               {preview.evaluation === undefined ? null : (
@@ -732,9 +908,9 @@ export function CharacterBuilder({
                   <p>
                     {[
                       ...draft.classSkillIds,
-                      draft.speciesSkillId,
-                      ...draft.skilledSkillIds,
-                      ...catalog.backgroundSkillIds,
+                      ...draft.speciesSkillIds,
+                      ...draft.originFeatSkillIds,
+                      ...selectedBackground.skillIds,
                     ]
                       .map(skillName)
                       .sort()

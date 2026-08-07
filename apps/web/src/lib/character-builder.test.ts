@@ -4,6 +4,7 @@ import { evaluateCharacter } from "@dnd/rules-core";
 
 import {
   buildCharacter,
+  builderOriginChoiceDefinitions,
   characterBuilderCatalog,
   defaultBuilderDraft,
   fighterId,
@@ -24,7 +25,7 @@ describe("guided character builder", () => {
     expect(catalog.classes[wizardId].name).toBe("Wizard");
     expect(catalog.classes[fighterId].skillIds).toContain("srd521.skill.perception");
     expect(catalog.classes[wizardId].skillIds).toContain("srd521.skill.arcana");
-    expect(catalog.backgroundSkillIds).toEqual([
+    expect(catalog.backgrounds["srd521.background.soldier"]?.skillIds).toEqual([
       "srd521.skill.athletics",
       "srd521.skill.intimidation",
     ]);
@@ -51,6 +52,58 @@ describe("guided character builder", () => {
       skillMinimum: 2,
       skillMaximum: 2,
     });
+  });
+
+  it("projects dependent species, background, feat, size, and ability choices", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const draft = defaultBuilderDraft(fighterId, catalog, 1, "Projected origins");
+    const choices = builderOriginChoiceDefinitions(draft, catalog);
+    const choice = (selection: (typeof choices)[number]["selection"]) =>
+      choices.find((candidate) => candidate.selection === selection);
+
+    expect(choices.map((candidate) => candidate.selection)).toEqual([
+      "speciesId",
+      "backgroundId",
+      "speciesSize",
+      "backgroundAbilityScoreIncreases",
+      "originFeatId",
+      "speciesSkillIds",
+      "originFeatSkillIds",
+    ]);
+    expect(choice("speciesSize")?.options.map((option) => option.id)).toEqual(["medium", "small"]);
+    expect(choice("backgroundAbilityScoreIncreases")?.options).toHaveLength(7);
+    expect(choice("originFeatId")?.options).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.feat.origin.skilled" }),
+        expect.objectContaining({
+          id: "srd521.feat.origin.savage-attacker",
+          disabledReason: "Already granted by Soldier.",
+        }),
+      ]),
+    );
+  });
+
+  it("persists projected origin selections into a rules-valid character", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const draft = defaultBuilderDraft(fighterId, catalog, 1, "Small soldier");
+    draft.speciesSize = "small";
+    draft.backgroundAbilityScoreIncreases = { strength: 2, constitution: 1 };
+
+    const character = buildCharacter(draft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+    expect(character.build).toMatchObject({
+      speciesId: "srd521.species.human",
+      speciesSize: "small",
+      backgroundId: "srd521.background.soldier",
+      backgroundAbilityScoreIncreases: { strength: 2, constitution: 1 },
+    });
+    expect(character.build.featIds).toEqual(
+      expect.arrayContaining(["srd521.feat.origin.savage-attacker", "srd521.feat.origin.skilled"]),
+    );
+    expect(evaluation.validations).toEqual([]);
   });
 
   it("uses package spellbook growth instead of a Wizard-specific formula", () => {
@@ -153,18 +206,29 @@ describe("guided character builder", () => {
     expect(validateBuilderDraft(returnedToOne, catalog)).toEqual([]);
   });
 
-  it("rejects incomplete, duplicate, and undersized spell choices before creation", () => {
+  it("rejects incomplete, duplicate, invalid-origin, and undersized spell choices", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
     const fighter = defaultBuilderDraft(fighterId, catalog);
     fighter.classSkillIds = ["srd521.skill.athletics"];
-    fighter.speciesSkillId = "srd521.skill.athletics";
+    fighter.speciesSkillIds = ["srd521.skill.athletics"];
 
     expect(validateBuilderDraft(fighter, catalog)).toEqual(
       expect.arrayContaining([
         "Enter a character name.",
         "Choose exactly 2 Fighter skill proficiencies.",
         "Each selected skill proficiency must be unique.",
+      ]),
+    );
+
+    const invalidOrigin = defaultBuilderDraft(fighterId, catalog, 1, "Invalid origin");
+    invalidOrigin.originFeatId = "srd521.feat.origin.savage-attacker";
+    invalidOrigin.originFeatSkillIds = [];
+    invalidOrigin.backgroundAbilityScoreIncreases = { charisma: 3 };
+    expect(validateBuilderDraft(invalidOrigin, catalog)).toEqual(
+      expect.arrayContaining([
+        "Choose a valid ability-score allocation for Soldier.",
+        "Choose an eligible Origin feat granted by your species.",
       ]),
     );
 

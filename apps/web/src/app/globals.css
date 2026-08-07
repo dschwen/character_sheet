@@ -1707,6 +1707,12 @@ td:first-child small {
 .origin-choice-grid {
   grid-template-columns: repeat(2, 1fr);
 }
+.origin-detail-grid {
+  grid-template-columns: 1fr;
+}
+.origin-feat-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
 .builder-choice {
   position: relative;
   min-height: 178px;
@@ -1723,6 +1729,11 @@ button.builder-choice {
 button.builder-choice:hover {
   border-color: var(--green-bright);
   transform: translateY(-1px);
+}
+button.builder-choice:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
 }
 .builder-choice.selected {
   border-color: #8eafa2;
