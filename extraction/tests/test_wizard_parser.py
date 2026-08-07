@@ -5,6 +5,7 @@ import pytest
 from srd_extract.wizard import (
     WizardProgressionRow,
     _class_entity,
+    _spellbook_entity,
     parse_core_traits,
 )
 
@@ -20,6 +21,26 @@ def test_wizard_starting_equipment_preserves_package_and_gold_choices() -> None:
         "quantity": 1,
         "equipped": True,
         "label": "Arcane Focus (Quarterstaff)",
+    }
+    assert equipment["options"][0]["items"][3]["entityId"] == ("srd521.equipment.gear.spellbook")
+
+
+def test_spellbook_entity_preserves_class_defined_physical_properties() -> None:
+    node = {
+        "parentId": "page-0078",
+        "sourceBlocks": ["spellbook"],
+        "normalizedText": ("Spellbook. Your wizardly apprenticeship culminated in a unique book."),
+    }
+
+    spellbook = _spellbook_entity({"nodes": [node]})
+
+    assert spellbook["id"] == "srd521.equipment.gear.spellbook"
+    assert spellbook["body"] == {
+        "weightLb": 3,
+        "cost": None,
+        "size": "tiny",
+        "pageCount": 100,
+        "spellcastingFocusFor": ["srd521.class.wizard"],
     }
 
 

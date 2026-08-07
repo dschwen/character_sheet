@@ -349,7 +349,12 @@ def _starting_equipment() -> dict[str, Any]:
                         "quantity": 4,
                         "equipped": False,
                     },
-                    {"kind": "text", "name": "Explorer's Pack", "quantity": 1},
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.explorers-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
                 ],
                 "currencyGp": 15,
             },

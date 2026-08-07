@@ -637,18 +637,21 @@
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Robe",
+                "entityId": "srd521.equipment.gear.robe",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Spellbook",
+                "entityId": "srd521.equipment.gear.spellbook",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Scholar's Pack",
+                "entityId": "srd521.equipment.gear.scholars-pack",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               }
             ],
@@ -728,6 +731,46 @@
       "class",
       "wizard",
       "spellcaster"
+    ]
+  },
+  {
+    "body": {
+      "cost": null,
+      "pageCount": 100,
+      "size": "tiny",
+      "spellcastingFocusFor": [
+        "srd521.class.wizard"
+      ],
+      "weightLb": 3
+    },
+    "id": "srd521.equipment.gear.spellbook",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Spellbook"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Wizard spellbook properties extracted from page 78.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0078-b005"
+        ],
+        "page": 78,
+        "quoteHash": "2637ee5684052ca7f9340de422b08b67df545e39f81d82a2361953427c9cf230",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear",
+      "spellcasting-focus",
+      "wizard"
     ]
   },
   {

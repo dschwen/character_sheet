@@ -6,6 +6,7 @@ import {
   characterDocumentSchema,
   type CharacterDocument,
   type CharacterState,
+  type CurrencyDenomination,
 } from "@dnd/character-model";
 import type {
   ActionSummary,
@@ -40,6 +41,7 @@ import {
   commitCharacterState,
   setExhaustion,
   setHeroicInspiration,
+  setCurrency,
   setTemporaryHitPoints,
 } from "../lib/play-state";
 import { proposePreparedSpellLoadout, spellPreparationEditor } from "../lib/spell-preparation";
@@ -47,6 +49,7 @@ import { rollD20, rollDice, type D20RollRequest, type DiceRollResult } from "../
 
 const storageKey = "dnd-character-manager.document.v1";
 const tabs = ["overview", "play", "combat", "spells", "features", "diagnostics"] as const;
+const currencyDenominations = ["pp", "gp", "ep", "sp", "cp"] as const;
 type Tab = (typeof tabs)[number];
 type Trace = CharacterEvaluation["traces"][string];
 
@@ -399,6 +402,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setPreviousCharacter(undefined);
     setSource("browser-save");
     setNotice("Undid the last play-state change.");
+  }
+
+  function updateCurrency(denomination: CurrencyDenomination, value: string): void {
+    const amount = Number(value);
+    if (!Number.isInteger(amount) || amount < 0) {
+      setNotice("Currency must be a non-negative whole number.");
+      return;
+    }
+    savePlayState(
+      setCurrency(character, denomination, amount),
+      `Updated ${denomination.toUpperCase()} to ${String(amount)}.`,
+    );
   }
 
   function positivePlayAmount(): number | undefined {
@@ -1329,16 +1344,36 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   )}
                 </Section>
                 <Section title="Equipment" eyebrow="Current loadout">
-                  <div className="item-list">
-                    {evaluation.inventory.map((item) => (
-                      <div key={item.id}>
-                        <span>
-                          <strong>{item.name}</strong>
-                          <small>{titleCase(item.kind)}</small>
-                        </span>
-                        <span>{item.equipped ? "Equipped" : `×${String(item.quantity)}`}</span>
-                      </div>
+                  <div className="currency-grid" aria-label="Currency">
+                    {currencyDenominations.map((denomination) => (
+                      <label key={denomination}>
+                        <span>{denomination.toUpperCase()}</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={character.loadout.currency[denomination]}
+                          onChange={(event) => {
+                            updateCurrency(denomination, event.target.value);
+                          }}
+                        />
+                      </label>
                     ))}
+                  </div>
+                  <div className="item-list">
+                    {evaluation.inventory.length === 0 ? (
+                      <p className="empty">No carried equipment.</p>
+                    ) : (
+                      evaluation.inventory.map((item) => (
+                        <div key={item.id}>
+                          <span>
+                            <strong>{item.name}</strong>
+                            <small>{titleCase(item.kind)}</small>
+                          </span>
+                          <span>{item.equipped ? "Equipped" : `×${String(item.quantity)}`}</span>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </Section>
                 <Section title="Conditions" eyebrow="Active state">

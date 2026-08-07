@@ -122,11 +122,13 @@ describe("guided character builder", () => {
       "srd521.equipment.weapon.greatsword",
       "srd521.equipment.weapon.flail",
       "srd521.equipment.weapon.javelin",
+      "srd521.equipment.gear.dungeoneers-pack",
     ]);
     expect(fighterCharacter.loadout.inventory.map((item) => item.entityId)).not.toContain(
       "srd521.equipment.weapon.longbow",
     );
     expect(fighterCharacter.loadout.equippedItemIds).toEqual(["chain-mail-1", "greatsword-1"]);
+    expect(fighterCharacter.loadout.currency.gp).toBe(4);
     expect(fighterCharacter.loadout.choices).toEqual([
       {
         choiceId: "srd521.choice.class.fighter.starting-equipment",
@@ -136,8 +138,12 @@ describe("guided character builder", () => {
     expect(wizardCharacter.loadout.inventory.map((item) => item.entityId)).toEqual([
       "srd521.equipment.weapon.dagger",
       "srd521.equipment.weapon.quarterstaff",
+      "srd521.equipment.gear.robe",
+      "srd521.equipment.gear.spellbook",
+      "srd521.equipment.gear.scholars-pack",
     ]);
     expect(wizardCharacter.loadout.equippedItemIds).toEqual(["quarterstaff-1"]);
+    expect(wizardCharacter.loadout.currency.gp).toBe(5);
   });
 
   it("supports gold-only equipment alternatives without class-specific assembly", () => {
@@ -150,6 +156,7 @@ describe("guided character builder", () => {
 
     expect(character.loadout.inventory).toEqual([]);
     expect(character.loadout.equippedItemIds).toEqual([]);
+    expect(character.loadout.currency.gp).toBe(155);
     expect(character.loadout.choices[0]?.optionIds).toEqual([
       "srd521.option.class.fighter.starting-equipment.c",
     ]);

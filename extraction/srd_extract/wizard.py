@@ -17,6 +17,7 @@ from srd_extract.io import read_json, write_json
 SOURCE_ID = "wotc-srd-5.2.1-en"
 CLASS_ID = "srd521.class.wizard"
 SUBCLASS_ID = "srd521.subclass.wizard.evoker"
+SPELLBOOK_ID = "srd521.equipment.gear.spellbook"
 HEADING_PATTERN = re.compile(r"^Level (?P<level>\d+): (?P<name>.+)$")
 SCHOOLS = (
     "Abjuration",
@@ -159,17 +160,12 @@ def _row_words(
     return [
         word
         for word in words
-        if start_y <= float(word["bbox"][1]) < end_y
-        and 63 <= float(word["bbox"][0]) <= 540
+        if start_y <= float(word["bbox"][1]) < end_y and 63 <= float(word["bbox"][0]) <= 540
     ]
 
 
 def _column_text(words: Iterable[dict[str, Any]], minimum_x: float, maximum_x: float) -> str:
-    selected = [
-        word
-        for word in words
-        if minimum_x <= float(word["bbox"][0]) < maximum_x
-    ]
+    selected = [word for word in words if minimum_x <= float(word["bbox"][0]) < maximum_x]
     selected.sort(key=lambda word: (float(word["bbox"][1]), float(word["bbox"][0])))
     return " ".join(str(word["text"]) for word in selected)
 
@@ -195,13 +191,13 @@ def parse_progression(raw_page: dict[str, Any]) -> tuple[WizardProgressionRow, .
         end_y = starts[index + 1][0] if index + 1 < len(starts) else 725
         row = _row_words(words, start_y - 1, end_y - 1)
         feature_text = _column_text(row, 140, 285)
-        features = () if feature_text == "—" else tuple(
-            value.strip() for value in feature_text.split(",") if value.strip()
+        features = (
+            ()
+            if feature_text == "—"
+            else tuple(value.strip() for value in feature_text.split(",") if value.strip())
         )
         slots = tuple(
-            0
-            if (value := _column_text(row, left, right)) in {"", "—"}
-            else int(value)
+            0 if (value := _column_text(row, left, right)) in {"", "—"} else int(value)
             for left, right in pairwise(slot_boundaries)
         )
         rows.append(
@@ -271,8 +267,7 @@ def extract_evoker_features(document: dict[str, Any]) -> tuple[dict[str, Any], .
     start = next(
         index
         for index, node in enumerate(nodes)
-        if node["kind"] == "HeadingNode"
-        and node["normalizedText"] == "Wizard Subclass: Evoker"
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Wizard Subclass: Evoker"
     )
     features: list[dict[str, Any]] = []
     for index, node in enumerate(nodes[start + 1 :], start + 1):
@@ -415,9 +410,7 @@ def extract_spell_entities(
         if name not in REPRESENTATIVE_SPELLS:
             continue
         end = starts[position + 1][0] if position + 1 < len(starts) else len(nodes)
-        section = [
-            node for node in nodes[start:end] if node["kind"] != "MetadataNode"
-        ]
+        section = [node for node in nodes[start:end] if node["kind"] != "MetadataNode"]
         metadata_nodes: list[dict[str, Any]] = []
         description_nodes: list[dict[str, Any]] = []
         for node in section[2:]:
@@ -430,9 +423,7 @@ def extract_spell_entities(
         casting = _parse_casting_metadata(
             " ".join(str(node["normalizedText"]) for node in metadata_nodes)
         )
-        description = " ".join(
-            str(node["normalizedText"]) for node in description_nodes
-        )
+        description = " ".join(str(node["normalizedText"]) for node in description_nodes)
         level, school, classes = signature
         list_entry = spell_list[name]
         if level != list_entry["level"] or school != list_entry["school"]:
@@ -511,6 +502,30 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _spellbook_entity(document: dict[str, Any]) -> dict[str, Any]:
+    node = next(
+        node
+        for node in document["nodes"]
+        if "Your wizardly apprenticeship culminated" in str(node["normalizedText"])
+    )
+    return {
+        "id": SPELLBOOK_ID,
+        "kind": "equipment-gear",
+        "name": {"en": "Spellbook"},
+        "tags": ["equipment", "adventuring-gear", "spellcasting-focus", "wizard"],
+        "source": _source_spans([node]),
+        "body": {
+            "weightLb": 3,
+            "cost": None,
+            "size": "tiny",
+            "pageCount": 100,
+            "spellcastingFocusFor": [CLASS_ID],
+        },
+        "rules": [],
+        "review": _review("Wizard spellbook properties extracted from page 78."),
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[WizardProgressionRow, ...],
@@ -549,9 +564,24 @@ def _class_entity(
                                 "equipped": True,
                                 "label": "Arcane Focus (Quarterstaff)",
                             },
-                            {"kind": "text", "name": "Robe", "quantity": 1},
-                            {"kind": "text", "name": "Spellbook", "quantity": 1},
-                            {"kind": "text", "name": "Scholar's Pack", "quantity": 1},
+                            {
+                                "kind": "entity",
+                                "entityId": "srd521.equipment.gear.robe",
+                                "quantity": 1,
+                                "equipped": False,
+                            },
+                            {
+                                "kind": "entity",
+                                "entityId": SPELLBOOK_ID,
+                                "quantity": 1,
+                                "equipped": False,
+                            },
+                            {
+                                "kind": "entity",
+                                "entityId": "srd521.equipment.gear.scholars-pack",
+                                "quantity": 1,
+                                "equipped": False,
+                            },
                         ],
                         "currencyGp": 5,
                     },
@@ -608,8 +638,7 @@ def _subclass_entities(
     heading = next(
         node
         for node in nodes
-        if node["kind"] == "HeadingNode"
-        and node["normalizedText"] == "Wizard Subclass: Evoker"
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Wizard Subclass: Evoker"
     )
     intro = nodes[nodes.index(heading) + 1]
     subclass = {
@@ -621,8 +650,7 @@ def _subclass_entities(
         "body": {
             "parentClassId": CLASS_ID,
             "progression": [
-                {"level": feature["level"], "features": [feature["id"]]}
-                for feature in features
+                {"level": feature["level"], "features": [feature["id"]]} for feature in features
             ],
             "description": intro["normalizedText"],
         },
@@ -668,6 +696,7 @@ def generate_wizard_content(
     )
     wizard_entities = [
         class_entity,
+        _spellbook_entity(class_document),
         *[_feature_entity(feature, "class-feature") for feature in features],
         *_subclass_entities(class_document, evoker_features),
         *spell_entities,
@@ -677,6 +706,7 @@ def generate_wizard_content(
         for entity in read_json(output / "entities.json")
         if entity["id"] != CLASS_ID
         and entity["id"] != SUBCLASS_ID
+        and entity["id"] != SPELLBOOK_ID
         and not str(entity["id"]).startswith("srd521.class-feature.wizard.")
         and not str(entity["id"]).startswith("srd521.subclass-feature.wizard.")
         and str(entity["id"])

@@ -6,6 +6,7 @@ import {
   applyDamage,
   applyHealing,
   clearConcentration,
+  setCurrency,
   setExhaustion,
   setHeroicInspiration,
   setTemporaryHitPoints,
@@ -47,5 +48,15 @@ describe("browser play-state edits", () => {
     expect(unconcentrated.state.heroicInspiration).toBe(true);
     expect(unconcentrated.state.exhaustion).toBe(6);
     expect(unconcentrated.state.concentrationSpellId).toBeUndefined();
+  });
+
+  it("updates one currency denomination without mutating the source", () => {
+    const source = character();
+    const updated = setCurrency(source, "gp", 37, updatedAt);
+
+    expect(updated.loadout.currency.gp).toBe(37);
+    expect(updated.loadout.currency.sp).toBe(source.loadout.currency.sp);
+    expect(source.loadout.currency.gp).not.toBe(37);
+    expect(updated.metadata.revision).toBe(source.metadata.revision + 1);
   });
 });

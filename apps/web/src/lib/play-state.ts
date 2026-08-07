@@ -1,4 +1,4 @@
-import type { CharacterDocument, CharacterState } from "@dnd/character-model";
+import type { CharacterDocument, CharacterState, CurrencyDenomination } from "@dnd/character-model";
 
 function nonNegativeInteger(value: number): number {
   return Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
@@ -98,4 +98,27 @@ export function clearConcentration(
   const state = { ...character.state };
   delete state.concentrationSpellId;
   return commitCharacterState(character, state, updatedAt);
+}
+
+export function setCurrency(
+  character: CharacterDocument,
+  denomination: CurrencyDenomination,
+  amount: number,
+  updatedAt = new Date(),
+): CharacterDocument {
+  return {
+    ...character,
+    loadout: {
+      ...character.loadout,
+      currency: {
+        ...character.loadout.currency,
+        [denomination]: nonNegativeInteger(amount),
+      },
+    },
+    metadata: {
+      ...character.metadata,
+      updatedAt: updatedAt.toISOString(),
+      revision: character.metadata.revision + 1,
+    },
+  };
 }

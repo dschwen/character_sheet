@@ -334,8 +334,9 @@
                 "quantity": 4
               },
               {
-                "kind": "text",
-                "name": "Explorer's Pack",
+                "entityId": "srd521.equipment.gear.explorers-pack",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               }
             ],
@@ -4277,6 +4278,3136 @@
   },
   {
     "body": {
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.acid",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Acid"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b004"
+        ],
+        "page": 95,
+        "quoteHash": "bb38742ae9daf85f3b759e1230237665f710b0f7c2703388e152b1effa41d7f3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.alchemists-fire",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Alchemist’s Fire"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b005"
+        ],
+        "page": 95,
+        "quoteHash": "c4b63ae2a2f218265b6c43de534501434c4b9d76d2ac79cac0b994c18e9484d2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": null,
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.ammunition",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Ammunition"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b006"
+        ],
+        "page": 95,
+        "quoteHash": "2f4bd29fb09753eaecd20cbaadd9d74d54f8d9846cd4e626f77d47398e2b772b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.antitoxin",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Antitoxin"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b007"
+        ],
+        "page": 95,
+        "quoteHash": "32e2f7ef07524304c87b3a3dc23ba5d0b55d5ad647ef95f7b4308d3a51625315",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": null,
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.arcane-focus",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Arcane Focus"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b008"
+        ],
+        "page": 95,
+        "quoteHash": "357649c6ce0132a548b056077cc43e7c4d3b2558c136cfd4f723c0c190b86f8d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.gear.backpack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Backpack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b009"
+        ],
+        "page": 95,
+        "quoteHash": "9f07856aa32d391abe5fa638dd96d5c014ba0f0b3cde7efa345bae46fb7eed12",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.ball-bearings",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Ball Bearings"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b010"
+        ],
+        "page": 95,
+        "quoteHash": "3ae465077455beb783edf994f40b09132703fe936caabd42acb57b31baeea53a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 70.0
+    },
+    "id": "srd521.equipment.gear.barrel",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Barrel"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b011"
+        ],
+        "page": 95,
+        "quoteHash": "1bdfe37fdefa4a26ea9b3a02509045cb89aead7c76ba602fa5094635a7b3f2ec",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 4,
+        "denomination": "sp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.basket",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Basket"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b012"
+        ],
+        "page": 95,
+        "quoteHash": "12ff6723edea9843cd4ec918799f6a4b02f94342969478b2baffd21733c5f758",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 7.0
+    },
+    "id": "srd521.equipment.gear.bedroll",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Bedroll"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b013"
+        ],
+        "page": 95,
+        "quoteHash": "d31f95a7fbb6afbb12520230aab677a018120ceaf2bb87384f5e22e3994e1682",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.bell",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Bell"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b014"
+        ],
+        "page": 95,
+        "quoteHash": "e4d75bc505f796972b08eba56b8fd5682edc0372043b647da364245285fe4ecc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "sp"
+      },
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.gear.blanket",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Blanket"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b015"
+        ],
+        "page": 95,
+        "quoteHash": "3cbc8d7b7b62163e8c32634c5bb6e0e88861f6fec57f1dee7679cbff9fb22d2c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.gear.block-and-tackle",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Block and Tackle"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b016"
+        ],
+        "page": 95,
+        "quoteHash": "83a0cc5daa9d2ddfe4cff7489fe74b26ee59477e1f48a8428fc64e0d84b9e1fc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.gear.book",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Book"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b017"
+        ],
+        "page": 95,
+        "quoteHash": "48dcbc12131c4471ffc729e7fa57291a26b3a1dc9c7c96a9744ce4dfe3b09b1a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.bottle-glass",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Bottle, Glass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b018"
+        ],
+        "page": 95,
+        "quoteHash": "4bb308ed9bec708dbc287dffa80a8aafb10fbd0d3c811f92ce2fbe1ff7df9a34",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "cp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.bucket",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Bucket"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b019"
+        ],
+        "page": 95,
+        "quoteHash": "c1ceee4585646ccc037af751987e048acf2149a4eae69188338786db219a4d17",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 16,
+        "denomination": "gp"
+      },
+      "weightLb": 42.0
+    },
+    "id": "srd521.equipment.gear.burglars-pack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Burglar’s Pack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b020"
+        ],
+        "page": 95,
+        "quoteHash": "671be2c42ad1a007c50b9f748c2384ae4b2a5aec6945ee8d0862312df2cf84f2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.caltrops",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Caltrops"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b021"
+        ],
+        "page": 95,
+        "quoteHash": "667641cad3ceaba097a7b6a82343d6ac3ec76db90a1bb9aca73732e4477a3109",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "cp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.candle",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Candle"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b022"
+        ],
+        "page": 95,
+        "quoteHash": "6ff0a482aeb9de011e39c1654c167f58920d0fbf229fdfc0a456967d6e8c5032",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.case-crossbow-bolt",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Case, Crossbow Bolt"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b023"
+        ],
+        "page": 95,
+        "quoteHash": "9b286507d25201aa1c1d9431211730bd7d74e783e9d56a1d19992801049a32b4",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.case-map-or-scroll",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Case, Map or Scroll"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b024"
+        ],
+        "page": 95,
+        "quoteHash": "4bab23be39e3688d9c88352f15da4999cde113ffdc2cd4aeb2e7769ba4209ad1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "weightLb": 10.0
+    },
+    "id": "srd521.equipment.gear.chain",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Chain"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b025"
+        ],
+        "page": 95,
+        "quoteHash": "399d430eb1ea851cd675e9e9454f4773c38e6d86cf7d84edda6e5c437adf4cb6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "weightLb": 25.0
+    },
+    "id": "srd521.equipment.gear.chest",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Chest"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b026"
+        ],
+        "page": 95,
+        "quoteHash": "67def687f8ea54de1825653453317239c3ab5d8c9eef1fd9dc58cfa97d1e4029",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "weightLb": 12.0
+    },
+    "id": "srd521.equipment.gear.climbers-kit",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Climber’s Kit"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b027"
+        ],
+        "page": 95,
+        "quoteHash": "6c7fb65e058081812bdbc8436672ee7d274625e40cbc882a58d6b9ea8938284a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 15,
+        "denomination": "gp"
+      },
+      "weightLb": 6.0
+    },
+    "id": "srd521.equipment.gear.clothes-fine",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Clothes, Fine"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b028"
+        ],
+        "page": 95,
+        "quoteHash": "cf2d4d62df2aaf30907c43beff4a60e7acc4c381576a4eef0a6a5c3aab0b0357",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.gear.clothes-travelers",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Clothes, Traveler’s"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b029"
+        ],
+        "page": 95,
+        "quoteHash": "0025b516fe471286fce5faf7983688c9d94c4e4f2fb6c8d72bf66643d39566be",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.component-pouch",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Component Pouch"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b030"
+        ],
+        "page": 95,
+        "quoteHash": "d394cdc1076b920ac349d2937b3185bae251e70bfa76ea9346acec66164129ad",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.gear.costume",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Costume"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b031"
+        ],
+        "page": 95,
+        "quoteHash": "d0f43c60c1335471f8ad0e1d5e996b33b929d1a48770a4f89bb5621a9d582275",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.gear.crowbar",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Crowbar"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b032"
+        ],
+        "page": 95,
+        "quoteHash": "997c2e528503a84df5b1341a34d1b3aadc672883418f58f6f2d27fd5705d1a38",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 39,
+        "denomination": "gp"
+      },
+      "weightLb": 39.0
+    },
+    "id": "srd521.equipment.gear.diplomats-pack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Diplomat’s Pack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b033"
+        ],
+        "page": 95,
+        "quoteHash": "789748703ec057c628fa4ca39550e0232e15962912634e1a4844505165944e14",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": null,
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.druidic-focus",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Druidic Focus"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b034"
+        ],
+        "page": 95,
+        "quoteHash": "4be496f57facfaadbf6db9cdadec1db7a9aafc4e4dd05541060522921685384c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 12,
+        "denomination": "gp"
+      },
+      "weightLb": 55.0
+    },
+    "id": "srd521.equipment.gear.dungeoneers-pack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Dungeoneer’s Pack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b035"
+        ],
+        "page": 95,
+        "quoteHash": "fb0b87f6940ee9367b0850a055906332f6cccfe7b11442092ddf330b0dbc94cb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 40,
+        "denomination": "gp"
+      },
+      "weightLb": 58.5
+    },
+    "id": "srd521.equipment.gear.entertainers-pack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Entertainer’s Pack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b036"
+        ],
+        "page": 95,
+        "quoteHash": "ab9f4dcfea0bd5b47a24f4322f227e3c31f6c27222e8ed857095a8144c67d2bc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "weightLb": 55.0
+    },
+    "id": "srd521.equipment.gear.explorers-pack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Explorer’s Pack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b037"
+        ],
+        "page": 95,
+        "quoteHash": "e80073ec77a01e8e1ad8bff48c6ad8ac9699d2cff474f04e7e33d98dc25a44a4",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "cp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.flask",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Flask"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b038"
+        ],
+        "page": 95,
+        "quoteHash": "ce4897d1d5ba215013025cb8ec43975919445893354269872721ceb3f2b45319",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.gear.grappling-hook",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Grappling Hook"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b039"
+        ],
+        "page": 95,
+        "quoteHash": "6903fcc827c83545955ea9244101a5322b1e009212663c58f9e9e82ecbc06faf",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.gear.healers-kit",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Healer’s Kit"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b040"
+        ],
+        "page": 95,
+        "quoteHash": "adb1004853a2fa9f91af34fb3471b5806913fb21e92a6a835fff07cd01a826a0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": null,
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.holy-symbol",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Holy Symbol"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b041"
+        ],
+        "page": 95,
+        "quoteHash": "f64e6719f2c76e8875560c5050e9a6c888dd5f603d0d0c152ae3ba72195ca368",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 25,
+        "denomination": "gp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.holy-water",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Holy Water"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b042"
+        ],
+        "page": 95,
+        "quoteHash": "ff476e425c0d36c56a4abbadce4caed1e228e21c5b977b7f2c41bd8488d8fa3b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "weightLb": 25.0
+    },
+    "id": "srd521.equipment.gear.hunting-trap",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Hunting Trap"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b043"
+        ],
+        "page": 95,
+        "quoteHash": "465fcf3b4011311d6ba794f4c0d8bc88c51d3a67900263b6d44f9cb7940f771d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.ink",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Ink"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b044"
+        ],
+        "page": 95,
+        "quoteHash": "bc4bed6eb3c407c0d3ab9cc270936057861baf5aac801a442f8c87a0c2ac195d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "cp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.ink-pen",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Ink Pen"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b046"
+        ],
+        "page": 95,
+        "quoteHash": "229713cb68602e0362c332b0b7c5762410ec742717b440f0462ae83205b94af1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "cp"
+      },
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.gear.jug",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Jug"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b047"
+        ],
+        "page": 95,
+        "quoteHash": "6a7eed2b29a8d4ecc71ba4c5eb0d7fac783894093193f73c222411521c9f3bb8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "sp"
+      },
+      "weightLb": 25.0
+    },
+    "id": "srd521.equipment.gear.ladder",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Ladder"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b048"
+        ],
+        "page": 95,
+        "quoteHash": "ebf57450d6943673f19f8eeb40542bb6ea5da9ed6037d7f2eeace51b129b4328",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "sp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.lamp",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Lamp"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b049"
+        ],
+        "page": 95,
+        "quoteHash": "184ffecd704ab947134e7a0e445ca06a07ca6c7e515f216b7e97deb76c9ed8a9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.lantern-bullseye",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Lantern, Bullseye"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b050"
+        ],
+        "page": 95,
+        "quoteHash": "e519f13e14e66031fbf82201cc687354004e7d017c30081c8e5a3dabc1f742bc",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.lantern-hooded",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Lantern, Hooded"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b051"
+        ],
+        "page": 95,
+        "quoteHash": "e6b2e3ef6c8c02601cb2318d493e02edd81ceb72f641eb899d16ff20730c3bde",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.lock",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Lock"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b052"
+        ],
+        "page": 95,
+        "quoteHash": "8541389ff6b027a85b0b20e620dac514a639f105ee01cda0a0735e292452680f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 100,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.magnifying-glass",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Magnifying Glass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b053"
+        ],
+        "page": 95,
+        "quoteHash": "4d51f207f997fbea17e8726244cd5564cd05b8172f7399f0d3ad893bdde26e31",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 6.0
+    },
+    "id": "srd521.equipment.gear.manacles",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Manacles"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b054"
+        ],
+        "page": 95,
+        "quoteHash": "4b8cd00bc59f9f957ef8cd05460fe7e1bf0af3ec3d7c1429cac8c4a3145961ad",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.map",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Map"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b055"
+        ],
+        "page": 95,
+        "quoteHash": "8d9a3409c21620831b4560f26cbdce98cfc452fdb02fb804f395d10fe500b794",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "weightLb": 0.5
+    },
+    "id": "srd521.equipment.gear.mirror",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Mirror"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b056"
+        ],
+        "page": 95,
+        "quoteHash": "0542fe9c8b57bc2750e4d1458c8c88ff279e927a88dd657ed986c5d8aa47173e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 3.0
+    },
+    "id": "srd521.equipment.gear.net",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Net"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b057"
+        ],
+        "page": 95,
+        "quoteHash": "b6d2136f87b1688be8bd588421087b2eff99884611637ce916e690a3fa286eed",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "sp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.oil",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Oil"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b058"
+        ],
+        "page": 95,
+        "quoteHash": "9d100c2bb7cde69f03247d8bb24bad339063859281edd9527038739cc7a84b7f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "sp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.paper",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Paper"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b059"
+        ],
+        "page": 95,
+        "quoteHash": "7c0a158ebdb8d3703a2b06c7ddca5f48645d1d8f67a9149642c23ecbf04c53b7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "sp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.parchment",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Parchment"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b060"
+        ],
+        "page": 95,
+        "quoteHash": "a41aedefc07589d07b2755f4ab63d0827177e3cbc0c94f00c97eff3137cb01bf",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.perfume",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Perfume"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b061"
+        ],
+        "page": 95,
+        "quoteHash": "40218663ebffa2946759ee6db5f36f7080d732a9c8293e83cbe23dfcfa885028",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 100,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.poison-basic",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Poison, Basic"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b062"
+        ],
+        "page": 95,
+        "quoteHash": "478bab6cef58578daab2ef44b91d6fc5c5ffc1aa3efac36001c076563f0eb5fd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "cp"
+      },
+      "weightLb": 7.0
+    },
+    "id": "srd521.equipment.gear.pole",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Pole"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b063"
+        ],
+        "page": 95,
+        "quoteHash": "ebe08f02a1be9c433d54ab4b08ea0da43fb472a8be850978d57cafec927b2903",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 10.0
+    },
+    "id": "srd521.equipment.gear.pot-iron",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Pot, Iron"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b064"
+        ],
+        "page": 95,
+        "quoteHash": "56eb9b0b4bb71341440034c0077463e1ab15d416bf5cb6017cb9bdbed8be31ef",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "weightLb": 0.5
+    },
+    "id": "srd521.equipment.gear.potion-of-healing",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Potion of Healing"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b065"
+        ],
+        "page": 95,
+        "quoteHash": "b96493a86ccd54745e55b9ac28d0bfe5ac0513bc5d4add666a0e47cbdbbf801e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "sp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.pouch",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Pouch"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b066"
+        ],
+        "page": 95,
+        "quoteHash": "e07f2aba602b1d901ca625adce989d65a5f3d0ad7f6d6754081b7f1e8799f4c2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 33,
+        "denomination": "gp"
+      },
+      "weightLb": 29.0
+    },
+    "id": "srd521.equipment.gear.priests-pack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Priest’s Pack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b067"
+        ],
+        "page": 95,
+        "quoteHash": "d6cf136d595330a08a94e49ecbb30a1b1b1b1694d34219383f39fdeb7bbcaa9a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.quiver",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Quiver"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b068"
+        ],
+        "page": 95,
+        "quoteHash": "81289d7b2594f0cfec4cc306087c097c9371039bcd4c904309bca500adf29434",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 4,
+        "denomination": "gp"
+      },
+      "weightLb": 35.0
+    },
+    "id": "srd521.equipment.gear.ram-portable",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Ram, Portable"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b069"
+        ],
+        "page": 95,
+        "quoteHash": "a91882bafd4988a5356b51517dbda472610df5a7f469cb021f503c2a81357aa0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "sp"
+      },
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.gear.rations",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Rations"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b070"
+        ],
+        "page": 95,
+        "quoteHash": "961250790128b245fff7da9a4d6750fd7ede7090af25555241856f32e27d7f52",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 4.0
+    },
+    "id": "srd521.equipment.gear.robe",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Robe"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b071"
+        ],
+        "page": 95,
+        "quoteHash": "0d33d58eb2d9a46b884d884628411d0f24ca78d6d339e2294d32e4a803081092",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.gear.rope",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Rope"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b072"
+        ],
+        "page": 95,
+        "quoteHash": "333a72d06f1c96284624b15aeb9a832db35921c7b23eb705a235ed05080cff94",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "cp"
+      },
+      "weightLb": 0.5
+    },
+    "id": "srd521.equipment.gear.sack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Sack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b073"
+        ],
+        "page": 95,
+        "quoteHash": "d16e2a9bba4150ce696fc06d4ae1b09e0dc4945287bf01048d95a38378406e26",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 40,
+        "denomination": "gp"
+      },
+      "weightLb": 22.0
+    },
+    "id": "srd521.equipment.gear.scholars-pack",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Scholar’s Pack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b074"
+        ],
+        "page": 95,
+        "quoteHash": "9059a27e94b9c97eff08c2d7e0f803aacfff6d693d9c0a0f94becb31b435d3b6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.gear.shovel",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Shovel"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b075"
+        ],
+        "page": 95,
+        "quoteHash": "791e2cccc65c387dc2ec1050ddc6fcf3cda55284c842d4a249c0fbea4ab8b2da",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "cp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.signal-whistle",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Signal Whistle"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b076"
+        ],
+        "page": 95,
+        "quoteHash": "def6b28e1760445d8c5a794bd5d65644bda20f43095f90fbcd252fb44f76ee30",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 30,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.spell-scroll-cantrip",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Spell Scroll (Cantrip)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b077"
+        ],
+        "page": 95,
+        "quoteHash": "5eaaa6c90a1008c886c80f15b70e45c76d4e4c469a50b950824768f40d3690c2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 50,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.spell-scroll-level-1",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Spell Scroll (Level 1)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b078"
+        ],
+        "page": 95,
+        "quoteHash": "dcc0c1de147257074118273041f0c518b58ffda2b01f59e27509d574e435dd76",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.gear.spikes-iron",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Spikes, Iron"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b079"
+        ],
+        "page": 95,
+        "quoteHash": "b122e202dfed60840d043a0d01f36e9418cd7811244117db13aae17e012eb515",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1000,
+        "denomination": "gp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.spyglass",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Spyglass"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b080"
+        ],
+        "page": 95,
+        "quoteHash": "cf78cdd60d5fd07e23154430bedd78f17d6c4db5364eb4c15ffbd6fea4bae09a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "sp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.string",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "String"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b081"
+        ],
+        "page": 95,
+        "quoteHash": "e57c50e31a6ca368394478225dd0eef9359522c33c7f7862c539df179bdd89b1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "gp"
+      },
+      "weightLb": 20.0
+    },
+    "id": "srd521.equipment.gear.tent",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Tent"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b082"
+        ],
+        "page": 95,
+        "quoteHash": "bff6f0bbc284f0874698133377ca6b2406f04ff43084c8e9995a26ca155d8a8b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 5,
+        "denomination": "sp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.tinderbox",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Tinderbox"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b083"
+        ],
+        "page": 95,
+        "quoteHash": "69b0731231931bea7277639566926fe1d789e0a167512f4ff86247c37ce59c17",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "cp"
+      },
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.gear.torch",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Torch"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b084"
+        ],
+        "page": 95,
+        "quoteHash": "371fd3218abdac56be769966c9f9e7aa9f5ecbb59a80b38b07645335625246f2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "weightLb": null
+    },
+    "id": "srd521.equipment.gear.vial",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Vial"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b085"
+        ],
+        "page": 95,
+        "quoteHash": "cfd7c61cb668af76a1b1e7fe028e17f1cbdfa374ea4a2649c01d0947e361cec3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 2,
+        "denomination": "sp"
+      },
+      "weightLb": 5.0
+    },
+    "id": "srd521.equipment.gear.waterskin",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Waterskin"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0095-b086"
+        ],
+        "page": 95,
+        "quoteHash": "59a81c41a94afa53d47289146b87e29368b6dcf19920010bd964ceaaa769d1f2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "purchaseQuantity": 20,
+      "storage": "Quiver",
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.ammunition.arrows",
+    "kind": "equipment-ammunition",
+    "name": {
+      "en": "Arrows"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Ammunition table on page 96.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0096-b004"
+        ],
+        "page": 96,
+        "quoteHash": "c679c57cf45bce61b0d3160d1290baaabb1c3c0f4fe907838a106a5b037f2894",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "ammunition"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "purchaseQuantity": 20,
+      "storage": "Case",
+      "weightLb": 1.5
+    },
+    "id": "srd521.equipment.ammunition.bolts",
+    "kind": "equipment-ammunition",
+    "name": {
+      "en": "Bolts"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Ammunition table on page 96.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0096-b005"
+        ],
+        "page": 96,
+        "quoteHash": "d275bc6daa7e69e35f1fde31709cc3cb55df68b75c44393ceaf3d3b1877fa435",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "ammunition"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 3,
+        "denomination": "gp"
+      },
+      "purchaseQuantity": 10,
+      "storage": "Pouch",
+      "weightLb": 2.0
+    },
+    "id": "srd521.equipment.ammunition.bullets-firearm",
+    "kind": "equipment-ammunition",
+    "name": {
+      "en": "Bullets, Firearm"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Ammunition table on page 96.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0096-b006"
+        ],
+        "page": 96,
+        "quoteHash": "0409685c153bf7d2ca4c33c6a9d535f7370ce76f600bf5ad573181053cfa5a2e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "ammunition"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 4,
+        "denomination": "cp"
+      },
+      "purchaseQuantity": 20,
+      "storage": "Pouch",
+      "weightLb": 1.5
+    },
+    "id": "srd521.equipment.ammunition.bullets-sling",
+    "kind": "equipment-ammunition",
+    "name": {
+      "en": "Bullets, Sling"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Ammunition table on page 96.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0096-b007"
+        ],
+        "page": 96,
+        "quoteHash": "6bacc147491d65f39cb66cfe263eb9f5d39b7162e39e84493b5fde88385f1935",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "ammunition"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 1,
+        "denomination": "gp"
+      },
+      "purchaseQuantity": 50,
+      "storage": "Pouch",
+      "weightLb": 1.0
+    },
+    "id": "srd521.equipment.ammunition.needles",
+    "kind": "equipment-ammunition",
+    "name": {
+      "en": "Needles"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Extracted from the SRD Ammunition table on page 96.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0096-b008"
+        ],
+        "page": 96,
+        "quoteHash": "d865d85228ce9a48ddafcec41a905c0af88c9ff4c599faa2172f2956192931b0",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "ammunition"
+    ]
+  },
+  {
+    "body": {
       "abilityScoreIncreasePatterns": [
         [
           2,
@@ -4805,8 +7936,9 @@
                 "quantity": 8
               },
               {
-                "kind": "text",
-                "name": "Dungeoneer's Pack",
+                "entityId": "srd521.equipment.gear.dungeoneers-pack",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               }
             ],
@@ -4841,18 +7973,21 @@
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Arrows",
+                "entityId": "srd521.equipment.ammunition.arrows",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 20
               },
               {
-                "kind": "text",
-                "name": "Quiver",
+                "entityId": "srd521.equipment.gear.quiver",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Dungeoneer's Pack",
+                "entityId": "srd521.equipment.gear.dungeoneers-pack",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               }
             ],
@@ -6782,18 +9917,21 @@
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Robe",
+                "entityId": "srd521.equipment.gear.robe",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Spellbook",
+                "entityId": "srd521.equipment.gear.spellbook",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Scholar's Pack",
+                "entityId": "srd521.equipment.gear.scholars-pack",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               }
             ],
@@ -6873,6 +10011,46 @@
       "class",
       "wizard",
       "spellcaster"
+    ]
+  },
+  {
+    "body": {
+      "cost": null,
+      "pageCount": 100,
+      "size": "tiny",
+      "spellcastingFocusFor": [
+        "srd521.class.wizard"
+      ],
+      "weightLb": 3
+    },
+    "id": "srd521.equipment.gear.spellbook",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Spellbook"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Wizard spellbook properties extracted from page 78.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0078-b005"
+        ],
+        "page": 78,
+        "quoteHash": "2637ee5684052ca7f9340de422b08b67df545e39f81d82a2361953427c9cf230",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "adventuring-gear",
+      "spellcasting-focus",
+      "wizard"
     ]
   },
   {

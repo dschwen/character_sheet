@@ -45,9 +45,10 @@ def test_fighter_starting_equipment_preserves_all_three_source_packages() -> Non
         "Package C",
     ]
     assert equipment["options"][0]["items"][-1] == {
-        "kind": "text",
-        "name": "Dungeoneer's Pack",
+        "kind": "entity",
+        "entityId": "srd521.equipment.gear.dungeoneers-pack",
         "quantity": 1,
+        "equipped": False,
     }
     assert equipment["options"][2]["currencyGp"] == 155
 

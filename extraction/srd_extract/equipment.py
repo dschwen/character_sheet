@@ -1,4 +1,4 @@
-"""Parse the SRD weapon and armor tables into typed content entities."""
+"""Parse the SRD weapon, armor, adventuring gear, and ammunition tables."""
 
 from __future__ import annotations
 
@@ -35,7 +35,8 @@ def _quote_hash(text: str) -> str:
 
 
 def _slug(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
+    normalized = value.casefold().replace("'", "").replace("’", "")
+    return re.sub(r"[^a-z0-9]+", "-", normalized).strip("-")
 
 
 def _column_text(
@@ -72,9 +73,12 @@ def _split_properties(value: str) -> list[str]:
 
 
 def _parse_weight(value: str) -> float | None:
-    if value == "—":
+    if value in {"—", "Varies"}:
         return None
-    number = value.removesuffix(" lb.").strip()
+    number = value.replace(" lb. (full)", "").removesuffix(" lb.").strip()
+    if number.endswith("½"):
+        whole = number.removesuffix("½")
+        return (float(whole) if whole else 0) + 0.5
     if "/" in number:
         numerator, denominator = number.split("/", maxsplit=1)
         return int(numerator) / int(denominator)
@@ -84,6 +88,10 @@ def _parse_weight(value: str) -> float | None:
 def _parse_cost(value: str) -> dict[str, Any]:
     amount, denomination = value.replace(",", "").split()
     return {"amount": int(amount), "denomination": denomination.casefold()}
+
+
+def _parse_optional_cost(value: str) -> dict[str, Any] | None:
+    return None if value == "Varies" else _parse_cost(value)
 
 
 def _source(block_ids: list[str], page: int, quote: str) -> list[dict[str, Any]]:
@@ -288,14 +296,99 @@ def parse_armor_table(raw_page: dict[str, Any]) -> list[dict[str, Any]]:
     return entities
 
 
+def parse_adventuring_gear_table(raw_page: dict[str, Any]) -> list[dict[str, Any]]:
+    row_blocks = [
+        block
+        for block in raw_page["blocks"]
+        if len(str(block["text"]).splitlines()) == 3
+        and str(block["text"]).splitlines()[0] != "Item"
+        and (66 <= float(block["bbox"][0]) < 67 or 320 <= float(block["bbox"][0]) < 321)
+    ]
+    entities: list[dict[str, Any]] = []
+    for block in row_blocks:
+        name, weight, cost = str(block["text"]).splitlines()
+        quote = "\n".join((name, weight, cost))
+        entities.append(
+            {
+                "id": f"srd521.equipment.gear.{_slug(name)}",
+                "kind": "equipment-gear",
+                "name": {"en": name},
+                "tags": ["equipment", "adventuring-gear"],
+                "source": _source([str(block["block_id"])], 95, quote),
+                "body": {
+                    "weightLb": _parse_weight(weight),
+                    "cost": _parse_optional_cost(cost),
+                },
+                "rules": [],
+                "review": {
+                    "status": "STRUCTURED",
+                    "extractionApproved": True,
+                    "semanticsApproved": False,
+                    "testsApproved": False,
+                    "notes": "Extracted from the SRD Adventuring Gear table on page 95.",
+                },
+            }
+        )
+    if len(entities) != 82:
+        raise ValueError(f"Expected 82 adventuring gear entries; extracted {len(entities)}")
+    return entities
+
+
+def parse_ammunition_table(raw_page: dict[str, Any]) -> list[dict[str, Any]]:
+    row_blocks = [
+        block
+        for block in raw_page["blocks"]
+        if len(str(block["text"]).splitlines()) == 5
+        and str(block["text"]).splitlines()[0] != "Type"
+        and 66 <= float(block["bbox"][0]) < 67
+    ]
+    entities: list[dict[str, Any]] = []
+    for block in row_blocks:
+        name, amount, storage, weight, cost = str(block["text"]).splitlines()
+        quote = "\n".join((name, amount, storage, weight, cost))
+        entities.append(
+            {
+                "id": f"srd521.equipment.ammunition.{_slug(name)}",
+                "kind": "equipment-ammunition",
+                "name": {"en": name},
+                "tags": ["equipment", "ammunition"],
+                "source": _source([str(block["block_id"])], 96, quote),
+                "body": {
+                    "purchaseQuantity": int(amount),
+                    "storage": storage,
+                    "weightLb": _parse_weight(weight),
+                    "cost": _parse_cost(cost),
+                },
+                "rules": [],
+                "review": {
+                    "status": "STRUCTURED",
+                    "extractionApproved": True,
+                    "semanticsApproved": False,
+                    "testsApproved": False,
+                    "notes": "Extracted from the SRD Ammunition table on page 96.",
+                },
+            }
+        )
+    if len(entities) != 5:
+        raise ValueError(f"Expected 5 ammunition entries; extracted {len(entities)}")
+    return entities
+
+
 def generate_equipment_content(extraction_root: Path, output: Path) -> dict[str, Any]:
     weapons = parse_weapon_table(read_json(extraction_root / "raw" / "pages" / "0091.json"))
     armor = parse_armor_table(read_json(extraction_root / "raw" / "pages" / "0092.json"))
-    equipment = [*weapons, *armor]
+    adventuring_gear = parse_adventuring_gear_table(
+        read_json(extraction_root / "raw" / "pages" / "0095.json")
+    )
+    ammunition = parse_ammunition_table(read_json(extraction_root / "raw" / "pages" / "0096.json"))
+    equipment = [*weapons, *armor, *adventuring_gear, *ammunition]
+    previous_equipment_ids = {
+        entity["id"] for entity in read_json(output / "entities" / "equipment.json")
+    }
     existing = [
         entity
         for entity in read_json(output / "entities.json")
-        if not str(entity["kind"]).startswith("equipment-")
+        if entity["id"] not in previous_equipment_ids
     ]
     all_entities = [*existing, *equipment]
     write_json(output / "entities" / "equipment.json", equipment)
@@ -314,7 +407,7 @@ def generate_equipment_content(extraction_root: Path, output: Path) -> dict[str,
                 "VERIFIED": 0,
             },
             "note": (
-                "Barbarian pages 28–30 and equipment pages 91–92 proof of concept. "
+                "Barbarian pages 28–30 and equipment pages 91–92 and 95–96 proof of concept. "
                 "Proposed executable rules remain under review."
             ),
         },
@@ -322,6 +415,8 @@ def generate_equipment_content(extraction_root: Path, output: Path) -> dict[str,
     report = {
         "weapons": len(weapons),
         "armorAndShields": len(armor),
+        "adventuringGear": len(adventuring_gear),
+        "ammunition": len(ammunition),
         "generatedEntities": [entity["id"] for entity in equipment],
     }
     write_json(output / "equipment-poc-report.json", report)
@@ -340,7 +435,9 @@ def main(arguments: Sequence[str] | None = None) -> int:
     report = generate_equipment_content(options.extraction, options.output)
     print(
         f"Generated {report['weapons']} weapons and "
-        f"{report['armorAndShields']} armor/shield entries"
+        f"{report['armorAndShields']} armor/shield, "
+        f"{report['adventuringGear']} adventuring gear, and "
+        f"{report['ammunition']} ammunition entries"
     )
     return 0
 

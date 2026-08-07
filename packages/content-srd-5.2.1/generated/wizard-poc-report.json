@@ -32,6 +32,7 @@
   "extractedEvokerFeatures": 5,
   "generatedEntities": [
     "srd521.class.wizard",
+    "srd521.equipment.gear.spellbook",
     "srd521.class-feature.wizard.spellcasting",
     "srd521.class-feature.wizard.ritual-adept",
     "srd521.class-feature.wizard.arcane-recovery",

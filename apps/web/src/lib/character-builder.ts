@@ -1015,7 +1015,7 @@ function assembleCharacter(
     selectedClass.subclassLevel !== undefined &&
     draft.level >= selectedClass.subclassLevel;
   const instanceCounts = new Map<string, number>();
-  const inventory: Array<{ id: string; entityId: string; quantity: number }> = [];
+  const inventory: { id: string; entityId: string; quantity: number }[] = [];
   const equippedItemIds: string[] = [];
   for (const item of equipmentOption.items) {
     if (item.kind !== "entity") continue;
@@ -1073,6 +1073,7 @@ function assembleCharacter(
     },
     loadout: {
       inventory,
+      currency: { gp: equipmentOption.currencyGp },
       equippedItemIds,
       attunedItemIds: [],
       selectedWeaponMasteryIds: draft.weaponMasteryIds,

@@ -122,9 +122,21 @@ const characterBuildSchema = z
     });
   });
 
+const characterCurrencySchema = z
+  .object({
+    cp: z.number().int().nonnegative().default(0),
+    sp: z.number().int().nonnegative().default(0),
+    ep: z.number().int().nonnegative().default(0),
+    gp: z.number().int().nonnegative().default(0),
+    pp: z.number().int().nonnegative().default(0),
+  })
+  .strict()
+  .default({});
+
 const characterLoadoutSchema = z
   .object({
     preparedSpellIds: z.array(entityIdSchema).default([]),
+    currency: characterCurrencySchema,
     inventory: z
       .array(
         z
@@ -233,6 +245,8 @@ export type RulesetReference = z.infer<typeof rulesetReferenceSchema>;
 export type CharacterBuild = z.infer<typeof characterBuildSchema>;
 export type ProficiencyChoice = z.infer<typeof proficiencyChoiceSchema>;
 export type ProficiencyChoices = z.infer<typeof proficiencyChoicesSchema>;
+export type CharacterCurrency = z.infer<typeof characterCurrencySchema>;
+export type CurrencyDenomination = keyof CharacterCurrency;
 export type InventoryItem = CharacterLoadout["inventory"][number];
 export type CharacterLoadout = z.infer<typeof characterLoadoutSchema>;
 export type CharacterState = z.infer<typeof characterStateSchema>;

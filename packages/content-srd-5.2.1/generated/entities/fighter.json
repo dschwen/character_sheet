@@ -335,8 +335,9 @@
                 "quantity": 8
               },
               {
-                "kind": "text",
-                "name": "Dungeoneer's Pack",
+                "entityId": "srd521.equipment.gear.dungeoneers-pack",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               }
             ],
@@ -371,18 +372,21 @@
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Arrows",
+                "entityId": "srd521.equipment.ammunition.arrows",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 20
               },
               {
-                "kind": "text",
-                "name": "Quiver",
+                "entityId": "srd521.equipment.gear.quiver",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               },
               {
-                "kind": "text",
-                "name": "Dungeoneer's Pack",
+                "entityId": "srd521.equipment.gear.dungeoneers-pack",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               }
             ],

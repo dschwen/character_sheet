@@ -966,6 +966,32 @@ td:first-child small {
   color: var(--muted);
   font-size: 11px;
 }
+.currency-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+  margin-bottom: 12px;
+}
+.currency-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.currency-grid input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: #fbfaf5;
+  font-weight: 700;
+  text-align: center;
+}
 .tag-list {
   display: flex;
   flex-wrap: wrap;

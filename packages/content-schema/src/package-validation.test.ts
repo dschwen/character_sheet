@@ -20,7 +20,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(426);
+    expect(parsedEntities).toHaveLength(514);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -52,6 +52,9 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.equipment.weapon.greataxe");
     expect(entityIds).toContain("srd521.equipment.armor.heavy.chain-mail");
     expect(entityIds).toContain("srd521.equipment.shield");
+    expect(entityIds).toContain("srd521.equipment.gear.dungeoneers-pack");
+    expect(entityIds).toContain("srd521.equipment.gear.spellbook");
+    expect(entityIds).toContain("srd521.equipment.ammunition.arrows");
     expect(entityIds).toContain("srd521.class.fighter");
     expect(entityIds).toContain("srd521.class-feature.fighter.second-wind");
     expect(entityIds).toContain("srd521.feat.fighting-style.defense");
@@ -272,7 +275,7 @@ describe("bootstrap content package", () => {
       })
       .parse(wizard?.body);
 
-    expect(entities).toHaveLength(37);
+    expect(entities).toHaveLength(38);
     expect(spells).toHaveLength(20);
     expect(wizardBody.spellList).toHaveLength(217);
     expect(wizardBody.progression[4]).toMatchObject({
@@ -282,6 +285,29 @@ describe("bootstrap content package", () => {
       spellSlots: { "1": 4, "2": 3, "3": 2 },
     });
     expect(spells.every((spell) => spell.source.length > 0)).toBe(true);
+  });
+
+  it("validates complete adventuring-gear and ammunition table slices", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const entities = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities/equipment.json", root), "utf8")));
+    const gear = entities.filter((entity) => entity.kind === "equipment-gear");
+    const ammunition = entities.filter((entity) => entity.kind === "equipment-ammunition");
+
+    expect(entities).toHaveLength(138);
+    expect(gear).toHaveLength(82);
+    expect(ammunition).toHaveLength(5);
+    expect(gear.map((entity) => entity.id)).toEqual(
+      expect.arrayContaining([
+        "srd521.equipment.gear.dungeoneers-pack",
+        "srd521.equipment.gear.explorers-pack",
+        "srd521.equipment.gear.quiver",
+        "srd521.equipment.gear.robe",
+        "srd521.equipment.gear.scholars-pack",
+      ]),
+    );
+    expect(ammunition.find((entity) => entity.id.endsWith(".arrows"))?.source[0]?.page).toBe(96);
   });
 
   it("validates Cleric, Life Domain, and Channel Divinity authoring IR", () => {

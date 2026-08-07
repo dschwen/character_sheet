@@ -334,8 +334,9 @@
                 "quantity": 4
               },
               {
-                "kind": "text",
-                "name": "Explorer's Pack",
+                "entityId": "srd521.equipment.gear.explorers-pack",
+                "equipped": false,
+                "kind": "entity",
                 "quantity": 1
               }
             ],

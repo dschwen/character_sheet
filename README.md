@@ -343,13 +343,14 @@ Generate the Human and Soldier origin slice from pages 83, 86, and 87:
 This parser generates typed Human, Soldier, Savage Attacker, and Skilled entities plus
 roll-assisted Savage Attacker authoring IR.
 
-Generate the structured weapon and armor entities from SRD pages 91–92:
+Generate structured weapon, armor, adventuring-gear, and ammunition entities from SRD pages 91–92
+and 95–96:
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
   --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
   --out generated/extraction/srd-5.2.1-equipment \
-  --pages 91-92
+  --pages 91-92,95-96
 
 .venv/bin/python -m srd_extract.equipment \
   --extraction generated/extraction/srd-5.2.1-equipment \
