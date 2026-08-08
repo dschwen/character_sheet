@@ -1,6 +1,6 @@
 import pytest
 
-from srd_extract.cleric import ClericProgressionRow, parse_core_traits
+from srd_extract.cleric import ClericProgressionRow, _starting_equipment, parse_core_traits
 
 
 def test_parse_core_cleric_traits() -> None:
@@ -26,10 +26,21 @@ def test_cleric_progression_validates_proficiency_bonus() -> None:
 
 
 def test_cleric_progression_accepts_level_five_row() -> None:
-    row = ClericProgressionRow(
-        5, 3, ("Sear Undead",), 2, 4, 9, (4, 3, 2, 0, 0, 0, 0, 0, 0)
-    )
+    row = ClericProgressionRow(5, 3, ("Sear Undead",), 2, 4, 9, (4, 3, 2, 0, 0, 0, 0, 0, 0))
 
     assert row.channel_divinity == 2
     assert row.prepared_spells == 9
     assert row.spell_slots[:3] == (4, 3, 2)
+
+
+def test_cleric_starting_equipment_preserves_package_and_gold_choices() -> None:
+    choice = _starting_equipment()
+
+    assert [option["currencyGp"] for option in choice["options"]] == [7, 110]
+    assert [item["entityId"] for item in choice["options"][0]["items"]] == [
+        "srd521.equipment.armor.medium.chain-shirt",
+        "srd521.equipment.shield",
+        "srd521.equipment.weapon.mace",
+        "srd521.equipment.gear.holy-symbol",
+        "srd521.equipment.gear.priests-pack",
+    ]

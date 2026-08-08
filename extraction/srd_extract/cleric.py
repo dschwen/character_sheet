@@ -115,11 +115,7 @@ def parse_core_traits(table_text: str) -> dict[str, Any]:
 
 
 def _column_text(words: Iterable[dict[str, Any]], minimum_x: float, maximum_x: float) -> str:
-    selected = [
-        word
-        for word in words
-        if minimum_x <= float(word["bbox"][0]) < maximum_x
-    ]
+    selected = [word for word in words if minimum_x <= float(word["bbox"][0]) < maximum_x]
     selected.sort(key=lambda word: (float(word["bbox"][1]), float(word["bbox"][0])))
     return " ".join(str(word["text"]) for word in selected)
 
@@ -153,9 +149,7 @@ def parse_progression(raw_page: dict[str, Any]) -> tuple[ClericProgressionRow, .
         )
         channel_text = _column_text(row, 255, 300)
         slots = tuple(
-            0
-            if (value := _column_text(row, left, right)) in {"", "—"}
-            else int(value)
+            0 if (value := _column_text(row, left, right)) in {"", "—"} else int(value)
             for left, right in pairwise(slot_boundaries)
         )
         rows.append(
@@ -419,6 +413,59 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _starting_equipment() -> dict[str, Any]:
+    return {
+        "id": "srd521.choice.class.cleric.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
+        "options": [
+            {
+                "id": "srd521.option.class.cleric.starting-equipment.a",
+                "label": "Package A",
+                "items": [
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.armor.medium.chain-shirt",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.shield",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.mace",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.holy-symbol",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.priests-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                ],
+                "currencyGp": 7,
+            },
+            {
+                "id": "srd521.option.class.cleric.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 110,
+            },
+        ],
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[ClericProgressionRow, ...],
@@ -435,6 +482,29 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits.get("skillProficiencyChoice", {}),
+                "countByLevel": {str(level): 2 for level in range(1, 6)},
+            },
+            "startingEquipment": _starting_equipment(),
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 13,
+                    "dexterity": 10,
+                    "constitution": 14,
+                    "intelligence": 8,
+                    "wisdom": 15,
+                    "charisma": 12,
+                },
+                "defaultAbilityScoreImprovementAbility": "wisdom",
+                "defaultClassSkillIds": [
+                    "srd521.skill.insight",
+                    "srd521.skill.religion",
+                ],
+                "defaultGrantedFeatIds": [],
+            },
             "spellcastingAbility": "wisdom",
             "spellPreparation": "full-list",
             "spellList": [
@@ -445,6 +515,7 @@ def _class_entity(
             ],
             "divineOrderChoice": {
                 "id": DIVINE_ORDER_CHOICE_ID,
+                "level": 1,
                 "minimum": 1,
                 "maximum": 1,
                 "options": [PROTECTOR_ID, THAUMATURGE_ID],

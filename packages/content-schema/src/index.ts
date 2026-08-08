@@ -322,6 +322,25 @@ export const classBuilderMetadataSchema = z
     }
   });
 
+export const classFeatureChoiceSchema = z
+  .object({
+    id: entityIdSchema,
+    level: z.number().int().min(1).max(20),
+    minimum: z.number().int().nonnegative(),
+    maximum: z.number().int().positive(),
+    options: z.array(entityIdSchema).min(1),
+  })
+  .strict()
+  .superRefine((choice, context) => {
+    if (choice.minimum > choice.maximum || choice.maximum > choice.options.length) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Class-feature choice bounds must fit the available options",
+        path: ["maximum"],
+      });
+    }
+  });
+
 export type PackageManifest = z.infer<typeof packageManifestSchema>;
 export type SourceManifest = z.infer<typeof sourceManifestSchema>;
 export type SourceSpan = z.infer<typeof sourceSpanSchema>;
@@ -330,5 +349,6 @@ export type StartingEquipmentItem = z.infer<typeof startingEquipmentItemSchema>;
 export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSchema>;
 export type StartingEquipmentChoice = z.infer<typeof startingEquipmentChoiceSchema>;
 export type ClassBuilderMetadata = z.infer<typeof classBuilderMetadataSchema>;
+export type ClassFeatureChoice = z.infer<typeof classFeatureChoiceSchema>;
 export type DraftRule = z.infer<typeof draftRuleSchema>;
 export type AuthoringIr = z.infer<typeof authoringIrSchema>;

@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   authoringIrSchema,
   classBuilderMetadataSchema,
+  classFeatureChoiceSchema,
   contentEntitySchema,
   packageManifestSchema,
   sourceManifestSchema,
@@ -210,6 +211,7 @@ describe("bootstrap content package", () => {
       .parse(JSON.parse(readFileSync(new URL("entities.json", root), "utf8")));
     const builderClasses = new Set([
       "srd521.class.barbarian",
+      "srd521.class.cleric",
       "srd521.class.fighter",
       "srd521.class.wizard",
     ]);
@@ -219,10 +221,19 @@ describe("bootstrap content package", () => {
       return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
     });
 
-    expect(metadata).toHaveLength(3);
+    expect(metadata).toHaveLength(4);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "strength",
+    });
+    const cleric = entities.find((entity) => entity.id === "srd521.class.cleric");
+    const clericBody = z.record(z.unknown()).parse(cleric?.body);
+    expect(classFeatureChoiceSchema.parse(clericBody.divineOrderChoice)).toMatchObject({
+      level: 1,
+      options: [
+        "srd521.option.cleric.divine-order.protector",
+        "srd521.option.cleric.divine-order.thaumaturge",
+      ],
     });
   });
 

@@ -7,8 +7,11 @@ import {
   buildCharacter,
   builderOriginChoiceDefinitions,
   characterBuilderCatalog,
+  clericId,
   defaultBuilderDraft,
   fighterId,
+  spellSelectionCounts,
+  updateBuilderFeatureChoice,
   updateBuilderLevel,
   validateBuilderDraft,
   wizardId,
@@ -36,6 +39,26 @@ describe("guided character builder", () => {
     expect(catalog.classes[barbarianId].weaponMasteryIds).not.toContain(
       "srd521.equipment.weapon.longbow",
     );
+    expect(catalog.classes[clericId]).toMatchObject({
+      name: "Cleric",
+      subclassId: "srd521.subclass.cleric.life-domain",
+      subclassLevel: 3,
+      spellcasting: { preparation: "full-list", ability: "wisdom" },
+    });
+    expect(catalog.classes[clericId].featureChoices[0]).toMatchObject({
+      id: "srd521.choice.cleric.divine-order",
+      level: 1,
+      options: [
+        expect.objectContaining({
+          id: "srd521.option.cleric.divine-order.protector",
+          additionalCantrips: 0,
+        }),
+        expect.objectContaining({
+          id: "srd521.option.cleric.divine-order.thaumaturge",
+          additionalCantrips: 1,
+        }),
+      ],
+    });
     expect(catalog.classes[fighterId].skillIds).toContain("srd521.skill.perception");
     expect(catalog.classes[wizardId].skillIds).toContain("srd521.skill.arcana");
     expect(catalog.backgrounds["srd521.background.soldier"]?.skillIds).toEqual([
@@ -272,6 +295,60 @@ describe("guided character builder", () => {
       expect(evaluation.values["speed.walking"]?.value).toBe(level >= 5 ? 40 : 30);
       expect(evaluation.values["attackAction.attacks"]?.value).toBe(level >= 5 ? 2 : 1);
     }
+  });
+
+  it("builds Life Domain Clerics with prepared divine magic at every supported level", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [10, 17, 24, 31, 38];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(clericId, catalog, level, `Level ${String(level)} Cleric`);
+      const counts = spellSelectionCounts(draft, catalog);
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(character.build.learnedSpellIds).toHaveLength(counts?.cantrips ?? 0);
+      expect(character.loadout.preparedSpellIds).toHaveLength(counts?.preparedSpells ?? 0);
+      expect(character.build.levels[0]?.selectedFeatureChoices).toEqual([
+        {
+          choiceId: "srd521.choice.cleric.divine-order",
+          optionIds: ["srd521.option.cleric.divine-order.protector"],
+        },
+      ]);
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.cleric.life-domain" : undefined,
+      );
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(5);
+        expect(character.loadout.equippedItemIds).toHaveLength(3);
+        expect(character.loadout.currency.gp).toBe(7);
+      }
+    }
+  });
+
+  it("reconciles Thaumaturge's additional cantrip from structured option effects", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const protector = defaultBuilderDraft(clericId, catalog, 1, "Protector Cleric");
+    const thaumaturge = updateBuilderFeatureChoice(
+      protector,
+      catalog,
+      "srd521.choice.cleric.divine-order",
+      "srd521.option.cleric.divine-order.thaumaturge",
+    );
+    const character = buildCharacter(thaumaturge, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+    expect(protector.learnedSpellIds).toHaveLength(3);
+    expect(thaumaturge.learnedSpellIds).toHaveLength(4);
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.spellcasting?.cantripsKnown).toBe(4);
+    expect(character.build.levels[0]?.selectedFeatureChoices[0]?.optionIds).toEqual([
+      "srd521.option.cleric.divine-order.thaumaturge",
+    ]);
   });
 
   it("builds complete Wizard spellbooks at every supported level", () => {

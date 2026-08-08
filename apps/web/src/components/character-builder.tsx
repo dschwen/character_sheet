@@ -17,6 +17,8 @@ import {
   masteryCount,
   previewBuilderCharacter,
   skillIds,
+  spellSelectionCounts,
+  updateBuilderFeatureChoice,
   updateBuilderLevel,
   type BuilderClassId,
   type CharacterBuilderDraft,
@@ -75,7 +77,10 @@ export function CharacterBuilder({
   );
   const originFeatChoice = originChoices.find((choice) => choice.selection === "originFeatId");
   const spellcasting = selectedClass.spellcasting;
-  const spellCounts = spellcasting?.countsByLevel[draft.level];
+  const spellCounts = spellSelectionCounts(draft, catalog);
+  const activeFeatureChoices = selectedClass.featureChoices.filter(
+    (choice) => choice.level <= draft.level,
+  );
   const selectedEquipmentOption =
     selectedClass.startingEquipment.options.find(
       (option) => option.id === draft.startingEquipmentOptionId,
@@ -490,6 +495,44 @@ export function CharacterBuilder({
                   </small>
                 )}
               </label>
+              {activeFeatureChoices.map((choice) => (
+                <div className="skill-choice-section" key={choice.id}>
+                  <div>
+                    <span>
+                      {selectedClass.name} · Level {String(choice.level)}
+                    </span>
+                    <h2>Choose {shortEntityName(choice.id)}</h2>
+                    <small>
+                      {String((draft.featureChoiceSelections[choice.id] ?? []).length)} /{" "}
+                      {String(choice.maximum)} selected
+                    </small>
+                  </div>
+                  <div className="builder-choice-grid">
+                    {choice.options.map((option) => {
+                      const selected = (draft.featureChoiceSelections[choice.id] ?? []).includes(
+                        option.id,
+                      );
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          className={selected ? "builder-choice selected" : "builder-choice"}
+                          onClick={() => {
+                            setDraft((value) =>
+                              updateBuilderFeatureChoice(value, catalog, choice.id, option.id),
+                            );
+                          }}
+                        >
+                          <span>{shortEntityName(choice.id)}</span>
+                          <h2>{option.name}</h2>
+                          <p>{option.description}</p>
+                          <small>{selected ? "Selected" : "Choose option"}</small>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           ) : null}
 
@@ -972,6 +1015,23 @@ export function CharacterBuilder({
                     </small>
                   ) : null}
                 </article>
+                {activeFeatureChoices.length === 0 ? null : (
+                  <article>
+                    <span>Class Choices</span>
+                    {activeFeatureChoices.map((choice) => (
+                      <p key={choice.id}>
+                        <strong>{shortEntityName(choice.id)}</strong>{" "}
+                        {(draft.featureChoiceSelections[choice.id] ?? [])
+                          .map(
+                            (id) =>
+                              choice.options.find((option) => option.id === id)?.name ??
+                              shortEntityName(id),
+                          )
+                          .join(", ")}
+                      </p>
+                    ))}
+                  </article>
+                )}
                 <article>
                   <span>Starting Equipment</span>
                   <p>

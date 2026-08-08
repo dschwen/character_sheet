@@ -6161,8 +6161,27 @@
         "medium",
         "shield"
       ],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "wisdom",
+        "defaultAbilityScores": {
+          "charisma": 12,
+          "constitution": 14,
+          "dexterity": 10,
+          "intelligence": 8,
+          "strength": 13,
+          "wisdom": 15
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.insight",
+          "srd521.skill.religion"
+        ],
+        "defaultGrantedFeatIds": [],
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
       "divineOrderChoice": {
         "id": "srd521.choice.cleric.divine-order",
+        "level": 1,
         "maximum": 1,
         "minimum": 1,
         "options": [
@@ -6568,6 +6587,13 @@
         "charisma"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2
+        },
         "maximum": 2,
         "minimum": 2,
         "options": [
@@ -6691,6 +6717,56 @@
       ],
       "spellPreparation": "full-list",
       "spellcastingAbility": "wisdom",
+      "startingEquipment": {
+        "id": "srd521.choice.class.cleric.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "currencyGp": 7,
+            "id": "srd521.option.class.cleric.starting-equipment.a",
+            "items": [
+              {
+                "entityId": "srd521.equipment.armor.medium.chain-shirt",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.shield",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.mace",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.holy-symbol",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.priests-pack",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              }
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 110,
+            "id": "srd521.option.class.cleric.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
+          }
+        ]
+      },
       "startingEquipmentText": "Choose A or B: (A) Chain Shirt, Shield, Mace, Holy Symbol, Priest’s Pack, and 7 GP; or (B) 110 GP",
       "weaponProficiencies": [
         "simple"
