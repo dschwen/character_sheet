@@ -11,13 +11,13 @@ import {
   builderClassIds,
   builderOriginChoiceDefinitions,
   characterBuilderCatalog,
+  classSkillCount,
   defaultBuilderDraft,
   fighterId,
   masteryCount,
   previewBuilderCharacter,
   skillIds,
   updateBuilderLevel,
-  wizardId,
   type BuilderClassId,
   type CharacterBuilderDraft,
 } from "../lib/character-builder";
@@ -115,6 +115,17 @@ export function CharacterBuilder({
     [draft, previewOptions, rulesPackage],
   );
   const requiredMasteries = masteryCount(draft, catalog);
+  const requiredClassSkills = classSkillCount(draft, catalog);
+  const expertiseChoice = selectedClass.builder.expertiseChoice;
+  const supportedLevels = Array.from(
+    {
+      length:
+        selectedClass.builder.supportedLevelMaximum -
+        selectedClass.builder.supportedLevelMinimum +
+        1,
+    },
+    (_, index) => selectedClass.builder.supportedLevelMinimum + index,
+  );
   const allSelectedSkills = new Set([
     ...selectedBackground.skillIds,
     ...draft.classSkillIds,
@@ -459,7 +470,7 @@ export function CharacterBuilder({
                     updateLevel(Number(event.target.value));
                   }}
                 >
-                  {[1, 2, 3, 4, 5].map((level) => (
+                  {supportedLevels.map((level) => (
                     <option key={level} value={level}>
                       Level {String(level)}
                       {selectedClass.subclassLevel !== undefined &&
@@ -589,12 +600,11 @@ export function CharacterBuilder({
                 <div>
                   <span>{selectedClass.name}</span>
                   <h2>
-                    Choose {String(selectedClass.skillMaximum)} class skill
-                    {selectedClass.skillMaximum === 1 ? "" : "s"}
+                    Choose {String(requiredClassSkills)} class skill
+                    {requiredClassSkills === 1 ? "" : "s"}
                   </h2>
                   <small>
-                    {String(draft.classSkillIds.length)} / {String(selectedClass.skillMaximum)}{" "}
-                    selected
+                    {String(draft.classSkillIds.length)} / {String(requiredClassSkills)} selected
                   </small>
                 </div>
                 <div className="choice-pills">
@@ -607,11 +617,7 @@ export function CharacterBuilder({
                       onClick={() => {
                         setDraft((value) => ({
                           ...value,
-                          classSkillIds: toggleList(
-                            value.classSkillIds,
-                            id,
-                            selectedClass.skillMaximum,
-                          ),
+                          classSkillIds: toggleList(value.classSkillIds, id, requiredClassSkills),
                         }));
                       }}
                     >
@@ -620,23 +626,25 @@ export function CharacterBuilder({
                   ))}
                 </div>
               </div>
-              {draft.classId === wizardId && draft.level >= 2 ? (
+              {expertiseChoice !== undefined && draft.level >= expertiseChoice.minimumLevel ? (
                 <div className="skill-choice-section">
                   <div>
-                    <span>Wizard · Scholar</span>
+                    <span>
+                      {selectedClass.name} · {shortEntityName(expertiseChoice.sourceId)}
+                    </span>
                     <h2>Choose 1 Expertise</h2>
-                    <small>Must be one of your Wizard skills</small>
+                    <small>Must be one of your eligible class skills</small>
                   </div>
                   <div className="choice-pills">
                     {draft.classSkillIds
-                      .filter((id) => id !== "srd521.skill.insight")
+                      .filter((id) => expertiseChoice.eligibleSkillIds.includes(id))
                       .map((id) => (
                         <button
                           key={id}
                           type="button"
-                          className={draft.scholarSkillId === id ? "selected" : undefined}
+                          className={draft.expertiseSkillId === id ? "selected" : undefined}
                           onClick={() => {
-                            setDraft((value) => ({ ...value, scholarSkillId: id }));
+                            setDraft((value) => ({ ...value, expertiseSkillId: id }));
                           }}
                         >
                           {skillName(id)}
@@ -739,7 +747,7 @@ export function CharacterBuilder({
                 </small>
               </div>
               <div className="mastery-grid">
-                {catalog.weaponIds.map((id) => (
+                {selectedClass.weaponMasteryIds.map((id) => (
                   <button
                     key={id}
                     type="button"
@@ -957,8 +965,11 @@ export function CharacterBuilder({
                       .sort()
                       .join(", ")}
                   </p>
-                  {draft.classId === wizardId && draft.level >= 2 ? (
-                    <small>Scholar Expertise: {skillName(draft.scholarSkillId)}</small>
+                  {expertiseChoice !== undefined && draft.level >= expertiseChoice.minimumLevel ? (
+                    <small>
+                      {shortEntityName(expertiseChoice.sourceId)} Expertise:{" "}
+                      {skillName(draft.expertiseSkillId)}
+                    </small>
                   ) : null}
                 </article>
                 <article>

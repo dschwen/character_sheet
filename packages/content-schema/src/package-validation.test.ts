@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   authoringIrSchema,
+  classBuilderMetadataSchema,
   contentEntitySchema,
   packageManifestSchema,
   sourceManifestSchema,
@@ -20,10 +21,12 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(514);
+    expect(parsedEntities).toHaveLength(519);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
+    expect(entityIds).toContain("srd521.subclass.barbarian.path-of-the-berserker");
+    expect(entityIds).toContain("srd521.subclass-feature.barbarian.path-of-the-berserker.frenzy");
     expect(entityIds).toContain("srd521.class.druid");
     expect(entityIds).toContain("srd521.subclass.druid.circle-of-the-land");
     expect(entityIds).toContain("srd521.class.monk");
@@ -198,6 +201,29 @@ describe("bootstrap content package", () => {
         .filter((item) => item.kind === "entity")
         .every((item) => entityIds.has(item.entityId)),
     ).toBe(true);
+  });
+
+  it("validates data-driven builder metadata for each supported class", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const entities = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities.json", root), "utf8")));
+    const builderClasses = new Set([
+      "srd521.class.barbarian",
+      "srd521.class.fighter",
+      "srd521.class.wizard",
+    ]);
+    const metadata = entities.flatMap((entity) => {
+      if (!builderClasses.has(entity.id)) return [];
+      const body = z.record(z.unknown()).parse(entity.body);
+      return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
+    });
+
+    expect(metadata).toHaveLength(3);
+    expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
+      supportedLevelMaximum: 5,
+      defaultAbilityScoreImprovementAbility: "strength",
+    });
   });
 
   it("validates Fighter levels 2–5 and Champion authoring IR", () => {

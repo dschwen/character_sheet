@@ -542,6 +542,10 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits.get("skillProficiencyChoice", {}),
+                "countByLevel": {str(level): 2 for level in range(1, 6)},
+            },
             "startingEquipment": {
                 "id": "srd521.choice.class.wizard.starting-equipment",
                 "minimum": 1,
@@ -592,6 +596,37 @@ def _class_entity(
                         "currencyGp": 55,
                     },
                 ],
+            },
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 8,
+                    "dexterity": 14,
+                    "constitution": 13,
+                    "intelligence": 15,
+                    "wisdom": 12,
+                    "charisma": 10,
+                },
+                "defaultAbilityScoreImprovementAbility": "intelligence",
+                "defaultClassSkillIds": [
+                    "srd521.skill.arcana",
+                    "srd521.skill.investigation",
+                ],
+                "defaultGrantedFeatIds": [],
+                "expertiseChoice": {
+                    "sourceId": "srd521.class-feature.wizard.scholar",
+                    "minimumLevel": 2,
+                    "eligibleSkillIds": [
+                        "srd521.skill.arcana",
+                        "srd521.skill.history",
+                        "srd521.skill.investigation",
+                        "srd521.skill.medicine",
+                        "srd521.skill.nature",
+                        "srd521.skill.religion",
+                    ],
+                    "requireClassProficiency": True,
+                },
             },
             "spellcastingAbility": "intelligence",
             "spellPreparation": "spellbook",

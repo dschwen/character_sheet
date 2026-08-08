@@ -2,6 +2,37 @@
   {
     "body": {
       "armorTraining": [],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "intelligence",
+        "defaultAbilityScores": {
+          "charisma": 10,
+          "constitution": 13,
+          "dexterity": 14,
+          "intelligence": 15,
+          "strength": 8,
+          "wisdom": 12
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.arcana",
+          "srd521.skill.investigation"
+        ],
+        "defaultGrantedFeatIds": [],
+        "expertiseChoice": {
+          "eligibleSkillIds": [
+            "srd521.skill.arcana",
+            "srd521.skill.history",
+            "srd521.skill.investigation",
+            "srd521.skill.medicine",
+            "srd521.skill.nature",
+            "srd521.skill.religion"
+          ],
+          "minimumLevel": 2,
+          "requireClassProficiency": true,
+          "sourceId": "srd521.class-feature.wizard.scholar"
+        },
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
       "hitPointDie": 6,
       "primaryAbilities": [
         "intelligence"
@@ -379,6 +410,13 @@
         "wisdom"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2
+        },
         "maximum": 2,
         "minimum": 2,
         "options": [

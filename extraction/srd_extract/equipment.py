@@ -407,8 +407,9 @@ def generate_equipment_content(extraction_root: Path, output: Path) -> dict[str,
                 "VERIFIED": 0,
             },
             "note": (
-                "Barbarian pages 28–30 and equipment pages 91–92 and 95–96 proof of concept. "
-                "Proposed executable rules remain under review."
+                "Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
+                "Warlock, and Wizard through level 5, Human, Soldier, equipment, and "
+                "representative spells."
             ),
         },
     )

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { evaluateCharacter } from "@dnd/rules-core";
 
 import {
+  barbarianId,
   buildCharacter,
   builderOriginChoiceDefinitions,
   characterBuilderCatalog,
@@ -23,6 +24,18 @@ describe("guided character builder", () => {
 
     expect(catalog.classes[fighterId].name).toBe("Fighter");
     expect(catalog.classes[wizardId].name).toBe("Wizard");
+    expect(catalog.classes[barbarianId]).toMatchObject({
+      name: "Barbarian",
+      subclassId: "srd521.subclass.barbarian.path-of-the-berserker",
+      subclassLevel: 3,
+      skillCountByLevel: { 1: 2, 3: 3, 5: 3 },
+    });
+    expect(catalog.classes[barbarianId].weaponMasteryIds).toContain(
+      "srd521.equipment.weapon.greataxe",
+    );
+    expect(catalog.classes[barbarianId].weaponMasteryIds).not.toContain(
+      "srd521.equipment.weapon.longbow",
+    );
     expect(catalog.classes[fighterId].skillIds).toContain("srd521.skill.perception");
     expect(catalog.classes[wizardId].skillIds).toContain("srd521.skill.arcana");
     expect(catalog.backgrounds["srd521.background.soldier"]?.skillIds).toEqual([
@@ -232,6 +245,35 @@ describe("guided character builder", () => {
     }
   });
 
+  it("builds Path of the Berserker Barbarians at every supported level", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [14, 23, 32, 41, 50];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(
+        barbarianId,
+        catalog,
+        level,
+        `Level ${String(level)} Barbarian`,
+      );
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+      expect(
+        evaluation.validations.filter((validation) => validation.severity === "error"),
+        `level ${String(level)}`,
+      ).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(character.build.proficiencyChoices.skills).toHaveLength(level >= 3 ? 7 : 6);
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.barbarian.path-of-the-berserker" : undefined,
+      );
+      expect(evaluation.values["speed.walking"]?.value).toBe(level >= 5 ? 40 : 30);
+      expect(evaluation.values["attackAction.attacks"]?.value).toBe(level >= 5 ? 2 : 1);
+    }
+  });
+
   it("builds complete Wizard spellbooks at every supported level", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
@@ -265,11 +307,11 @@ describe("guided character builder", () => {
 
     expect(levelFive.learnedSpellIds).toHaveLength(18);
     expect(levelFive.preparedSpellIds).toHaveLength(9);
-    expect(levelFive.scholarSkillId).toBe("srd521.skill.arcana");
+    expect(levelFive.expertiseSkillId).toBe("srd521.skill.arcana");
     expect(validateBuilderDraft(levelFive, catalog)).toEqual([]);
     expect(returnedToOne.learnedSpellIds).toHaveLength(9);
     expect(returnedToOne.preparedSpellIds).toHaveLength(4);
-    expect(returnedToOne.scholarSkillId).toBe("");
+    expect(returnedToOne.expertiseSkillId).toBe("");
     expect(validateBuilderDraft(returnedToOne, catalog)).toEqual([]);
   });
 

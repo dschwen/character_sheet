@@ -6,6 +6,25 @@
         "medium",
         "shield"
       ],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "strength",
+        "defaultAbilityScores": {
+          "charisma": 10,
+          "constitution": 14,
+          "dexterity": 13,
+          "intelligence": 8,
+          "strength": 15,
+          "wisdom": 12
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.perception",
+          "srd521.skill.survival",
+          "srd521.skill.animal-handling"
+        ],
+        "defaultGrantedFeatIds": [],
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
       "hitPointDie": 12,
       "primaryAbilities": [
         "strength"
@@ -30,6 +49,7 @@
           "proficiencyBonus": 2,
           "rageDamage": 2,
           "rages": 2,
+          "walkingSpeedBonus": 0,
           "weaponMastery": 2
         },
         {
@@ -47,6 +67,7 @@
           "proficiencyBonus": 2,
           "rageDamage": 2,
           "rages": 2,
+          "walkingSpeedBonus": 0,
           "weaponMastery": 2
         },
         {
@@ -64,6 +85,7 @@
           "proficiencyBonus": 2,
           "rageDamage": 2,
           "rages": 3,
+          "walkingSpeedBonus": 0,
           "weaponMastery": 2
         },
         {
@@ -77,6 +99,7 @@
           "proficiencyBonus": 2,
           "rageDamage": 2,
           "rages": 3,
+          "walkingSpeedBonus": 0,
           "weaponMastery": 3
         },
         {
@@ -94,6 +117,7 @@
           "proficiencyBonus": 3,
           "rageDamage": 2,
           "rages": 3,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 3
         },
         {
@@ -107,6 +131,7 @@
           "proficiencyBonus": 3,
           "rageDamage": 2,
           "rages": 4,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 3
         },
         {
@@ -124,6 +149,7 @@
           "proficiencyBonus": 3,
           "rageDamage": 2,
           "rages": 4,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 3
         },
         {
@@ -137,6 +163,7 @@
           "proficiencyBonus": 3,
           "rageDamage": 2,
           "rages": 4,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 3
         },
         {
@@ -150,6 +177,7 @@
           "proficiencyBonus": 4,
           "rageDamage": 3,
           "rages": 4,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 3
         },
         {
@@ -163,6 +191,7 @@
           "proficiencyBonus": 4,
           "rageDamage": 3,
           "rages": 4,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -176,6 +205,7 @@
           "proficiencyBonus": 4,
           "rageDamage": 3,
           "rages": 4,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -189,6 +219,7 @@
           "proficiencyBonus": 4,
           "rageDamage": 3,
           "rages": 5,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -202,6 +233,7 @@
           "proficiencyBonus": 5,
           "rageDamage": 3,
           "rages": 5,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -215,6 +247,7 @@
           "proficiencyBonus": 5,
           "rageDamage": 3,
           "rages": 5,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -228,6 +261,7 @@
           "proficiencyBonus": 5,
           "rageDamage": 3,
           "rages": 5,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -241,6 +275,7 @@
           "proficiencyBonus": 5,
           "rageDamage": 4,
           "rages": 5,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -254,6 +289,7 @@
           "proficiencyBonus": 6,
           "rageDamage": 4,
           "rages": 6,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -267,6 +303,7 @@
           "proficiencyBonus": 6,
           "rageDamage": 4,
           "rages": 6,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -280,6 +317,7 @@
           "proficiencyBonus": 6,
           "rageDamage": 4,
           "rages": 6,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         },
         {
@@ -293,6 +331,7 @@
           "proficiencyBonus": 6,
           "rageDamage": 4,
           "rages": 6,
+          "walkingSpeedBonus": 10,
           "weaponMastery": 4
         }
       ],
@@ -301,6 +340,13 @@
         "constitution"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 2,
+          "2": 2,
+          "3": 3,
+          "4": 3,
+          "5": 3
+        },
         "maximum": 2,
         "minimum": 2,
         "options": [
@@ -351,6 +397,15 @@
         ]
       },
       "startingEquipmentText": "Choose A or B: (A) Greataxe, 4 Handaxes, Explorer’s Pack, and 15 GP; or (B) 75 GP",
+      "weaponMasteryChoice": {
+        "attackTypes": [
+          "melee"
+        ],
+        "categories": [
+          "simple",
+          "martial"
+        ]
+      },
       "weaponProficiencies": [
         "simple",
         "martial"

@@ -21,6 +21,7 @@ from srd_extract.normalize import normalize_lines
 
 SOURCE_ID = "wotc-srd-5.2.1-en"
 CLASS_ID = "srd521.class.barbarian"
+BERSERKER_ID = "srd521.subclass.barbarian.path-of-the-berserker"
 HEADING_PATTERN = re.compile(r"^Level (?P<level>\d+): (?P<name>.+)$")
 EXPECTED_CORE_LABELS = (
     "Primary Ability",
@@ -272,6 +273,47 @@ def extract_class_features(document: dict[str, Any]) -> tuple[ExtractedFeature, 
     return tuple(features)
 
 
+def extract_berserker_features(document: dict[str, Any]) -> tuple[ExtractedFeature, ...]:
+    nodes = [node for node in document["nodes"] if str(node["parentId"]) == "page-0030"]
+    start = next(
+        index
+        for index, node in enumerate(nodes)
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Path of the Berserker"
+    )
+    subclass_nodes = nodes[start:]
+    features: list[ExtractedFeature] = []
+    for index, node in enumerate(subclass_nodes):
+        if node["kind"] != "HeadingNode":
+            continue
+        match = HEADING_PATTERN.fullmatch(node["normalizedText"])
+        if match is None:
+            continue
+        body_nodes: list[dict[str, Any]] = []
+        for following in subclass_nodes[index + 1 :]:
+            if following["kind"] == "HeadingNode":
+                break
+            if following["kind"] != "MetadataNode":
+                body_nodes.append(following)
+        if not body_nodes:
+            raise ValueError(f"Berserker feature has no extracted body: {node['normalizedText']}")
+        name = match.group("name")
+        level = int(match.group("level"))
+        features.append(
+            ExtractedFeature(
+                id=f"srd521.subclass-feature.barbarian.path-of-the-berserker.{_slug(name)}",
+                name=name,
+                level=level,
+                heading_node_id=node["nodeId"],
+                body_nodes=tuple(body_nodes),
+                source_spans=_source_spans_for_nodes([node, *body_nodes]),
+            )
+        )
+    expected = {"Frenzy", "Mindless Rage", "Retaliation", "Intimidating Presence"}
+    if {feature.name for feature in features} != expected:
+        raise ValueError("Path of the Berserker feature extraction is incomplete")
+    return tuple(features)
+
+
 def reconcile_progression(
     progression: tuple[ClassProgressionRow, ...],
     features: tuple[ExtractedFeature, ...],
@@ -392,6 +434,7 @@ def _class_entity(
             "rages": row.rages,
             "rageDamage": row.rage_damage,
             "weaponMastery": row.weapon_mastery,
+            "walkingSpeedBonus": 10 if row.level >= 5 else 0,
         }
         for row in progression
     ]
@@ -409,11 +452,35 @@ def _class_entity(
                 "minimum": traits.skill_choice_count,
                 "maximum": traits.skill_choice_count,
                 "options": list(traits.skill_options),
+                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 6)},
             },
             "weaponProficiencies": list(traits.weapon_proficiencies),
+            "weaponMasteryChoice": {
+                "categories": ["simple", "martial"],
+                "attackTypes": ["melee"],
+            },
             "armorTraining": list(traits.armor_training),
             "startingEquipment": _starting_equipment(),
             "startingEquipmentText": traits.starting_equipment_text,
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 15,
+                    "dexterity": 13,
+                    "constitution": 14,
+                    "intelligence": 8,
+                    "wisdom": 12,
+                    "charisma": 10,
+                },
+                "defaultAbilityScoreImprovementAbility": "strength",
+                "defaultClassSkillIds": [
+                    "srd521.skill.perception",
+                    "srd521.skill.survival",
+                    "srd521.skill.animal-handling",
+                ],
+                "defaultGrantedFeatIds": [],
+            },
             "progression": progression_body,
         },
         "rules": [],
@@ -462,6 +529,69 @@ def _feature_entity(feature: ExtractedFeature) -> dict[str, Any]:
             "notes": "Executable rules are proposals in the authoring IR.",
         },
     }
+
+
+def _berserker_entities(
+    document: dict[str, Any],
+    features: tuple[ExtractedFeature, ...],
+) -> list[dict[str, Any]]:
+    nodes = [node for node in document["nodes"] if str(node["parentId"]) == "page-0030"]
+    heading_index = next(
+        index
+        for index, node in enumerate(nodes)
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Path of the Berserker"
+    )
+    first_feature_index = next(
+        index
+        for index, node in enumerate(nodes[heading_index + 1 :], heading_index + 1)
+        if node["kind"] == "HeadingNode" and HEADING_PATTERN.fullmatch(node["normalizedText"])
+    )
+    introduction = nodes[heading_index:first_feature_index]
+    subclass = {
+        "id": BERSERKER_ID,
+        "kind": "subclass",
+        "name": {"en": "Path of the Berserker"},
+        "tags": ["subclass", "barbarian", "path-of-the-berserker"],
+        "source": list(_source_spans_for_nodes(introduction)),
+        "body": {
+            "parentClassId": CLASS_ID,
+            "progression": [
+                {
+                    "level": level,
+                    "features": [feature.id for feature in features if feature.level == level],
+                }
+                for level in sorted({feature.level for feature in features})
+            ],
+            "text": {
+                "title": "Path of the Berserker",
+                "nodes": [
+                    {"kind": node["kind"], "text": node["normalizedText"]}
+                    for node in introduction[1:]
+                ],
+            },
+        },
+        "rules": [],
+        "review": {
+            "status": "STRUCTURED",
+            "extractionApproved": True,
+            "semanticsApproved": False,
+            "testsApproved": False,
+            "notes": "Path of the Berserker extracted from page 30.",
+        },
+    }
+    feature_entities = []
+    for feature in features:
+        entity = _feature_entity(feature)
+        entity["kind"] = "subclass-feature"
+        entity["tags"] = [
+            "subclass-feature",
+            "barbarian",
+            "path-of-the-berserker",
+            f"level-{feature.level}",
+        ]
+        entity["body"]["parentId"] = BERSERKER_ID
+        feature_entities.append(entity)
+    return [subclass, *feature_entities]
 
 
 def _rule_table_entity(
@@ -648,6 +778,34 @@ def _unarmored_defense_ir(feature: ExtractedFeature) -> dict[str, Any]:
     }
 
 
+def _extra_attack_ir(feature: ExtractedFeature) -> dict[str, Any]:
+    return {
+        "schemaVersion": "0.1.0",
+        "id": feature.id,
+        "kind": "class-feature",
+        "parentId": CLASS_ID,
+        "level": feature.level,
+        "source": list(feature.source_spans),
+        "text": _feature_text(feature),
+        "proposedRules": [
+            {
+                "id": "barbarian-extra-attack",
+                "type": "set-attack-count",
+                "target": "attackAction.attacks",
+                "expression": {"kind": "literal", "value": 2},
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            }
+        ],
+        "review": {
+            "extraction": "approved",
+            "semantics": "needs-review",
+            "tests": "draft",
+            "notes": [],
+        },
+    }
+
+
 def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str, Any]:
     raw_page = read_json(extraction_root / "raw" / "pages" / "0028.json")
     layout = read_json(extraction_root / "layout" / "pages" / "0028.json")
@@ -661,6 +819,7 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
     traits, parsed_core_rows = parse_core_traits(raw_page, core_region)
     progression = parse_progression(raw_page, progression_region)
     features = extract_class_features(document)
+    berserker_features = extract_berserker_features(document)
     reconciliation = reconcile_progression(progression, features)
     if not reconciliation["valid"]:
         raise ValueError("Class progression contains unresolved feature references")
@@ -691,6 +850,7 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
         for name in ("Rage", "Unarmored Defense")
     ]
     feature_entities = [_feature_entity(feature) for feature in features]
+    berserker_entities = _berserker_entities(document, berserker_features)
     rule_tables = [
         _rule_table_entity(
             progression,
@@ -707,7 +867,7 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
             source_span=progression_source_span,
         ),
     ]
-    all_entities = [class_entity, *feature_entities, *rule_tables]
+    all_entities = [class_entity, *feature_entities, *berserker_entities, *rule_tables]
     rage = selected_features[0]
     unarmored_defense = selected_features[1]
 
@@ -742,6 +902,13 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
         output / "authoring-ir" / "barbarian.unarmored-defense.json",
         _unarmored_defense_ir(unarmored_defense),
     )
+    extra_attack = next(
+        feature for feature in features if feature.name == "Extra Attack" and feature.level == 5
+    )
+    write_json(
+        output / "authoring-ir" / "barbarian.extra-attack.json",
+        _extra_attack_ir(extra_attack),
+    )
     write_json(output / "indexes" / "barbarian-reconciliation.json", reconciliation)
     report = {
         "classId": CLASS_ID,
@@ -749,6 +916,7 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
         "parsedCoreRows": parsed_core_rows,
         "progressionRows": len(progression),
         "extractedClassFeatures": len(features),
+        "extractedBerserkerFeatures": len(berserker_features),
         "generatedEntities": [entity["id"] for entity in all_entities],
         "reconciliation": reconciliation["counts"],
     }

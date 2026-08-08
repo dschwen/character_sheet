@@ -7,6 +7,26 @@
         "heavy",
         "shield"
       ],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "strength",
+        "defaultAbilityScores": {
+          "charisma": 8,
+          "constitution": 13,
+          "dexterity": 13,
+          "intelligence": 10,
+          "strength": 15,
+          "wisdom": 12
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.perception",
+          "srd521.skill.survival"
+        ],
+        "defaultGrantedFeatIds": [
+          "srd521.feat.fighting-style.defense"
+        ],
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
       "hitPointDie": 10,
       "primaryAbilities": [
         "strength",
@@ -287,6 +307,13 @@
         "constitution"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2
+        },
         "maximum": 2,
         "minimum": 2,
         "options": [

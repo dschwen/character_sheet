@@ -1,0 +1,45 @@
+{
+  "id": "srd521.class-feature.barbarian.extra-attack",
+  "kind": "class-feature",
+  "level": 5,
+  "parentId": "srd521.class.barbarian",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 2
+      },
+      "id": "barbarian-extra-attack",
+      "parameters": {},
+      "target": "attackAction.attacks",
+      "type": "set-attack-count"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0029-b013"
+      ],
+      "page": 29,
+      "quoteHash": "fbf13a03f72ea9591bb816108e99aecb61b0e4b3e952341ed1c49d8df0e7e967",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can attack twice instead of once whenever you take the Attack action on your turn."
+      }
+    ],
+    "title": "Extra Attack"
+  }
+}

@@ -29,6 +29,7 @@
       "martial"
     ]
   },
+  "extractedBerserkerFeatures": 4,
   "extractedClassFeatures": 20,
   "generatedEntities": [
     "srd521.class.barbarian",
@@ -52,6 +53,11 @@
     "srd521.class-feature.barbarian.indomitable-might",
     "srd521.class-feature.barbarian.epic-boon",
     "srd521.class-feature.barbarian.primal-champion",
+    "srd521.subclass.barbarian.path-of-the-berserker",
+    "srd521.subclass-feature.barbarian.path-of-the-berserker.frenzy",
+    "srd521.subclass-feature.barbarian.path-of-the-berserker.mindless-rage",
+    "srd521.subclass-feature.barbarian.path-of-the-berserker.retaliation",
+    "srd521.subclass-feature.barbarian.path-of-the-berserker.intimidating-presence",
     "srd521.table.barbarian.rages",
     "srd521.table.barbarian.rage-damage"
   ],

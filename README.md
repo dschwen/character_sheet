@@ -29,12 +29,13 @@ and can be undone once. Imported characters stay in the browser's local storage;
 account, server, or database dependency. A production build is emitted as a static site in
 `apps/web/out` by `corepack pnpm build`.
 
-Choose **New character** to open the guided Fighter and Wizard builder. It creates rules-valid
+Choose **New character** to open the guided Barbarian, Fighter, and Wizard builder. It creates rules-valid
 characters from levels 1–5 with Human and Soldier origins, class-specific abilities and skills,
-reviewed subclasses, and complete choice validation. Fighters choose Weapon Masteries and receive a
-ready-to-play equipment package. Wizards build a level-appropriate spellbook, choose prepared
-spells, and select Scholar Expertise. The review step evaluates the complete draft before enabling
-creation, then opens the new character directly in the sheet.
+reviewed subclasses, and complete choice validation. Barbarians gain Primal Knowledge, choose only
+eligible melee Weapon Masteries, and follow the Path of the Berserker. Fighters choose Weapon
+Masteries and receive a ready-to-play equipment package. Wizards build a level-appropriate
+spellbook, choose prepared spells, and select Scholar Expertise. The review step evaluates the
+complete draft before enabling creation, then opens the new character directly in the sheet.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -64,8 +65,9 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-reviewed Fighter and Wizard vertical slices; expanding the same content-driven workflow to the other
-classes is the next frontend increment. Direct JSON import remains available in the meantime.
+reviewed Barbarian, Fighter, and Wizard level 1–5 vertical slices; expanding the same content-driven
+workflow to the other classes is the next frontend increment. Direct JSON import remains available
+in the meantime.
 
 ## Requirements
 
@@ -108,7 +110,7 @@ required notice language.
 ## Run the layout extraction proof of concept
 
 The first extraction slice covers PDF pages 28–30: the Barbarian class introduction, core-traits
-table, progression table, and feature text.
+table, progression table, feature text, and Path of the Berserker subclass.
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
@@ -130,8 +132,9 @@ Generate the typed Barbarian proof-of-concept content and draft authoring IR:
   --output packages/content-srd-5.2.1/generated
 ```
 
-This command parses both class tables, reconciles the progression against feature headings, and
-generates source-linked draft mechanics for Rage and Unarmored Defense.
+This command parses both class tables, reconciles the progression against feature headings,
+extracts Path of the Berserker, and generates source-linked draft mechanics for Rage, Unarmored
+Defense, and Extra Attack.
 
 Generate the typed Fighter-through-level-5 content from class pages 47–49, Ability Score
 Improvement on page 87, and the Defense Fighting Style on page 88:

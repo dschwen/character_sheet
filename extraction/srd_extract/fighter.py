@@ -496,6 +496,10 @@ def _class_entity(
     }
     body = {
         **traits,
+        "skillProficiencyChoice": {
+            **traits.get("skillProficiencyChoice", {}),
+            "countByLevel": {str(level): 2 for level in range(1, 6)},
+        },
         "startingEquipment": {
             "id": "srd521.choice.class.fighter.starting-equipment",
             "minimum": 1,
@@ -594,6 +598,24 @@ def _class_entity(
                     "currencyGp": 155,
                 },
             ],
+        },
+        "builder": {
+            "supportedLevelMinimum": 1,
+            "supportedLevelMaximum": 5,
+            "defaultAbilityScores": {
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 13,
+                "intelligence": 10,
+                "wisdom": 12,
+                "charisma": 8,
+            },
+            "defaultAbilityScoreImprovementAbility": "strength",
+            "defaultClassSkillIds": [
+                "srd521.skill.perception",
+                "srd521.skill.survival",
+            ],
+            "defaultGrantedFeatIds": [DEFENSE_ID],
         },
         "progression": [
             {

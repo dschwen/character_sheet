@@ -74,6 +74,13 @@ const classBodySchema = z
     hitPointDie: z.number().int().positive(),
     savingThrowProficiencies: z.array(z.enum(abilities)).default([]),
     weaponProficiencies: z.array(z.enum(["simple", "martial"])).default([]),
+    weaponMasteryChoice: z
+      .object({
+        categories: z.array(z.enum(["simple", "martial"])),
+        attackTypes: z.array(z.enum(["melee", "ranged"])),
+      })
+      .strict()
+      .optional(),
     conditionalWeaponProficiencies: z
       .array(
         z
@@ -91,6 +98,7 @@ const classBodySchema = z
         minimum: z.number().int().min(0),
         maximum: z.number().int().min(0),
         options: z.array(z.string()),
+        countByLevel: z.record(z.string(), z.number().int().nonnegative()).optional(),
       })
       .optional(),
     progression: z.array(
@@ -106,6 +114,7 @@ const classBodySchema = z
           .optional(),
         focusPoints: z.number().int().nonnegative().optional(),
         unarmoredMovement: z.number().int().nonnegative().optional(),
+        walkingSpeedBonus: z.number().int().nonnegative().optional(),
         sneakAttack: z
           .object({
             diceCount: z.number().int().positive(),
@@ -983,6 +992,52 @@ function validateProgressionSelections(
       ["build.subclassId"],
     );
   }
+  const classesWithLegacySubclassValidation = new Set([
+    "srd521.class.fighter",
+    "srd521.class.wizard",
+    "srd521.class.cleric",
+    "srd521.class.druid",
+    "srd521.class.monk",
+    "srd521.class.paladin",
+    "srd521.class.ranger",
+    "srd521.class.rogue",
+    "srd521.class.sorcerer",
+    "srd521.class.warlock",
+  ]);
+  const loadedSubclasses = [...index.entities.values()].flatMap((entity) =>
+    entity.kind === "subclass" ? [{ entity, body: subclassBodySchema.parse(entity.body) }] : [],
+  );
+  for (const [classId, classLevel] of classLevelCounts) {
+    if (classesWithLegacySubclassValidation.has(classId)) continue;
+    const availableSubclasses = loadedSubclasses.filter(
+      (candidate) => candidate.body.parentClassId === classId,
+    );
+    if (availableSubclasses.length === 0) continue;
+    const subclassLevel = Math.min(
+      ...availableSubclasses.flatMap((candidate) =>
+        candidate.body.progression.map((row) => row.level),
+      ),
+    );
+    const classEntity = index.entities.get(classId);
+    const className = classEntity?.name.en ?? classId;
+    const validationPrefix = classId.split(".").at(-1)?.toUpperCase() ?? "CLASS";
+    if (classLevel >= subclassLevel && subclassParentId !== classId) {
+      addValidation(
+        state,
+        `${validationPrefix}_SUBCLASS_REQUIRED`,
+        `A ${className} of level ${String(subclassLevel)} or higher must select a ${className} subclass.`,
+        ["build.subclassId"],
+      );
+    }
+    if (classLevel < subclassLevel && subclassParentId === classId) {
+      addValidation(
+        state,
+        `${validationPrefix}_SUBCLASS_LEVEL_REQUIRED`,
+        `A ${className} subclass requires ${className} level ${String(subclassLevel)}.`,
+        ["build.subclassId"],
+      );
+    }
+  }
   const divineOrderSelections = character.build.levels
     .flatMap((level) => level.selectedFeatureChoices)
     .filter((choice) => choice.choiceId === "srd521.choice.cleric.divine-order")
@@ -1581,6 +1636,10 @@ function evaluateWalkingSpeed(
     state.facts["equipment.wieldingShield"] === false
       ? (classBody?.progression.find((row) => row.level === classLevel)?.unarmoredMovement ?? 0)
       : 0;
+  const walkingSpeedBonus =
+    state.facts["equipment.wearingHeavyArmor"] === false
+      ? (classBody?.progression.find((row) => row.level === classLevel)?.walkingSpeedBonus ?? 0)
+      : 0;
   const movementTraceId = "speed.unarmoredMovement";
   state.facts[movementTraceId] = unarmoredMovement;
   state.values[movementTraceId] = { value: unarmoredMovement, traceId: movementTraceId };
@@ -1601,8 +1660,27 @@ function evaluateWalkingSpeed(
     ],
     sourceReferences: classEntity === undefined ? [] : entitySourceReferences(classEntity),
   };
+  const classBonusTraceId = "speed.classBonus";
+  state.facts[classBonusTraceId] = walkingSpeedBonus;
+  state.values[classBonusTraceId] = { value: walkingSpeedBonus, traceId: classBonusTraceId };
+  state.traces[classBonusTraceId] = {
+    id: classBonusTraceId,
+    result: walkingSpeedBonus,
+    nodes: [
+      {
+        id: `${classBonusTraceId}.class-progression`,
+        operation: "apply-class-walking-speed-bonus",
+        inputs: [classLevel, state.facts["equipment.wearingHeavyArmor"] ?? false],
+        output: walkingSpeedBonus,
+      },
+    ],
+    sourceReferences:
+      classEntity === undefined || walkingSpeedBonus === 0
+        ? []
+        : entitySourceReferences(classEntity),
+  };
   const traceId = "speed.walking";
-  const value = Math.max(0, base + armorPenalty + unarmoredMovement);
+  const value = Math.max(0, base + armorPenalty + unarmoredMovement + walkingSpeedBonus);
   state.facts[traceId] = value;
   state.values[traceId] = { value, traceId };
   state.traces[traceId] = {
@@ -1612,7 +1690,7 @@ function evaluateWalkingSpeed(
       {
         id: `${traceId}.combine`,
         operation: "apply-walking-speed-modifiers",
-        inputs: [base, armorPenalty, unarmoredMovement],
+        inputs: [base, armorPenalty, unarmoredMovement, walkingSpeedBonus],
         output: value,
       },
     ],
@@ -1620,6 +1698,7 @@ function evaluateWalkingSpeed(
       ...(state.traces["speed.walking.base"]?.sourceReferences ?? []),
       ...(state.traces["speed.armorPenalty"]?.sourceReferences ?? []),
       ...state.traces[movementTraceId].sourceReferences,
+      ...state.traces[classBonusTraceId].sourceReferences,
     ],
   };
 }
@@ -1920,14 +1999,18 @@ function evaluateD20Tests(
         (option) => `${skillEntityPrefix}${normalizedSkillId(option)}`,
       ),
     );
-    if (
-      classChoices.length < firstClassBody.skillProficiencyChoice.minimum ||
-      classChoices.length > firstClassBody.skillProficiencyChoice.maximum
-    ) {
+    const firstClassLevel = character.build.levels.filter(
+      (level) => level.classId === firstClassId,
+    ).length;
+    const requiredClassSkills =
+      firstClassBody.skillProficiencyChoice.countByLevel?.[String(firstClassLevel)];
+    const minimum = requiredClassSkills ?? firstClassBody.skillProficiencyChoice.minimum;
+    const maximum = requiredClassSkills ?? firstClassBody.skillProficiencyChoice.maximum;
+    if (classChoices.length < minimum || classChoices.length > maximum) {
       addValidation(
         state,
         "CLASS_SKILL_PROFICIENCY_COUNT",
-        `${firstClassId} requires ${String(firstClassBody.skillProficiencyChoice.minimum)} skill proficiency choices.`,
+        `${firstClassId} requires ${String(minimum)} skill proficiency choices.`,
         ["build.proficiencyChoices.skills"],
       );
     }
@@ -3197,6 +3280,17 @@ function evaluateAttacks(
           state,
           "WEAPON_MASTERY_REQUIRES_PROFICIENCY",
           `${masteryId} cannot be selected without weapon proficiency.`,
+          ["loadout.selectedWeaponMasteryIds"],
+        );
+      } else if (
+        classBody?.weaponMasteryChoice !== undefined &&
+        (!classBody.weaponMasteryChoice.categories.includes(weapon.category) ||
+          !classBody.weaponMasteryChoice.attackTypes.includes(weapon.attackType))
+      ) {
+        addValidation(
+          state,
+          "WEAPON_MASTERY_CLASS_RESTRICTION",
+          `${masteryId} is not eligible for this class's Weapon Mastery choice.`,
           ["loadout.selectedWeaponMasteryIds"],
         );
       }

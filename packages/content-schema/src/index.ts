@@ -275,6 +275,53 @@ export const startingEquipmentChoiceSchema = z
     }
   });
 
+export const characterBuilderAbilitySchema = z.enum([
+  "strength",
+  "dexterity",
+  "constitution",
+  "intelligence",
+  "wisdom",
+  "charisma",
+]);
+
+export const classBuilderMetadataSchema = z
+  .object({
+    supportedLevelMinimum: z.number().int().min(1).max(20),
+    supportedLevelMaximum: z.number().int().min(1).max(20),
+    defaultAbilityScores: z
+      .object({
+        strength: z.number().int().min(3).max(18),
+        dexterity: z.number().int().min(3).max(18),
+        constitution: z.number().int().min(3).max(18),
+        intelligence: z.number().int().min(3).max(18),
+        wisdom: z.number().int().min(3).max(18),
+        charisma: z.number().int().min(3).max(18),
+      })
+      .strict(),
+    defaultAbilityScoreImprovementAbility: characterBuilderAbilitySchema,
+    defaultClassSkillIds: z.array(entityIdSchema),
+    defaultGrantedFeatIds: z.array(entityIdSchema).default([]),
+    expertiseChoice: z
+      .object({
+        sourceId: entityIdSchema,
+        minimumLevel: z.number().int().min(1).max(20),
+        eligibleSkillIds: z.array(entityIdSchema).min(1),
+        requireClassProficiency: z.boolean().default(true),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict()
+  .superRefine((metadata, context) => {
+    if (metadata.supportedLevelMaximum < metadata.supportedLevelMinimum) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["supportedLevelMaximum"],
+        message: "Must be greater than or equal to supportedLevelMinimum",
+      });
+    }
+  });
+
 export type PackageManifest = z.infer<typeof packageManifestSchema>;
 export type SourceManifest = z.infer<typeof sourceManifestSchema>;
 export type SourceSpan = z.infer<typeof sourceSpanSchema>;
@@ -282,5 +329,6 @@ export type ContentEntity = z.infer<typeof contentEntitySchema>;
 export type StartingEquipmentItem = z.infer<typeof startingEquipmentItemSchema>;
 export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSchema>;
 export type StartingEquipmentChoice = z.infer<typeof startingEquipmentChoiceSchema>;
+export type ClassBuilderMetadata = z.infer<typeof classBuilderMetadataSchema>;
 export type DraftRule = z.infer<typeof draftRuleSchema>;
 export type AuthoringIr = z.infer<typeof authoringIrSchema>;

@@ -34,6 +34,11 @@ def test_barbarian_pages_28_to_30_audit(tmp_path: Path) -> None:
 
     assert content_report["progressionRows"] == 20
     assert content_report["extractedClassFeatures"] == 20
-    assert len(entities) == 23
+    assert content_report["extractedBerserkerFeatures"] == 4
+    assert len(entities) == 28
+    assert any(
+        entity["id"] == "srd521.subclass.barbarian.path-of-the-berserker" for entity in entities
+    )
+    assert (content / "authoring-ir" / "barbarian.extra-attack.json").exists()
     assert reconciliation["valid"] is True
     assert reconciliation["counts"]["unresolved"] == 0
