@@ -24,6 +24,16 @@ import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from 
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
 import {
+  addInventoryItem,
+  adjustInventoryQuantity,
+  formatEquipmentCost,
+  inventoryCatalog,
+  purchaseInventoryItem,
+  removeInventoryItem,
+  toggleEquippedItem,
+  type InventoryChangeProposal,
+} from "../lib/inventory-management";
+import {
   abilities,
   classSummary,
   damageText,
@@ -215,6 +225,15 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [preparedSpellDraft, setPreparedSpellDraft] = useState<string[]>();
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
   const [castFeedback, setCastFeedback] = useState<CastFeedback>();
+  const equipmentCatalog = useMemo(() => inventoryCatalog(rulesPackage), [rulesPackage]);
+  const equipmentCatalogById = useMemo(
+    () => new Map(equipmentCatalog.map((item) => [item.id, item])),
+    [equipmentCatalog],
+  );
+  const [selectedInventoryEntityId, setSelectedInventoryEntityId] = useState(
+    equipmentCatalog[0]?.id ?? "",
+  );
+  const [inventoryLots, setInventoryLots] = useState("1");
   const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -413,6 +432,40 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     savePlayState(
       setCurrency(character, denomination, amount),
       `Updated ${denomination.toUpperCase()} to ${String(amount)}.`,
+    );
+  }
+
+  function commitInventoryProposal(
+    proposal: InventoryChangeProposal,
+    successMessage: string,
+  ): void {
+    if (!proposal.applicable || proposal.nextCharacter === undefined) {
+      setNotice(proposal.issues[0] ?? "The inventory could not be updated.");
+      return;
+    }
+    savePlayState(proposal.nextCharacter, successMessage);
+  }
+
+  function selectedInventoryLots(): number | undefined {
+    const lots = Number(inventoryLots);
+    if (!Number.isInteger(lots) || lots < 1) {
+      setNotice("Enter a positive whole-number quantity.");
+      return undefined;
+    }
+    return lots;
+  }
+
+  function addSelectedInventoryItem(purchase: boolean): void {
+    const item = equipmentCatalogById.get(selectedInventoryEntityId);
+    const lots = selectedInventoryLots();
+    if (item === undefined || lots === undefined) return;
+    const totalQuantity = lots * item.purchaseQuantity;
+    const proposal = purchase
+      ? purchaseInventoryItem(character, item, lots)
+      : addInventoryItem(character, item, lots);
+    commitInventoryProposal(
+      proposal,
+      `${purchase ? "Purchased" : "Added"} ${totalQuantity === 1 ? item.name : `${String(totalQuantity)} × ${item.name}`}.`,
     );
   }
 
@@ -1360,19 +1413,129 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       </label>
                     ))}
                   </div>
+                  <div className="inventory-editor">
+                    <label>
+                      <span>Equipment catalog</span>
+                      <select
+                        value={selectedInventoryEntityId}
+                        onChange={(event) => {
+                          setSelectedInventoryEntityId(event.target.value);
+                        }}
+                      >
+                        {equipmentCatalog.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name} · {formatEquipmentCost(item)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="inventory-lots">
+                      <span>Lots</span>
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={inventoryLots}
+                        onChange={(event) => {
+                          setInventoryLots(event.target.value);
+                        }}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="button secondary compact"
+                      onClick={() => {
+                        addSelectedInventoryItem(false);
+                      }}
+                    >
+                      Add loot
+                    </button>
+                    <button
+                      type="button"
+                      className="button primary compact"
+                      disabled={
+                        equipmentCatalogById.get(selectedInventoryEntityId)?.cost === undefined
+                      }
+                      onClick={() => {
+                        addSelectedInventoryItem(true);
+                      }}
+                    >
+                      Buy
+                    </button>
+                  </div>
                   <div className="item-list">
                     {evaluation.inventory.length === 0 ? (
                       <p className="empty">No carried equipment.</p>
                     ) : (
-                      evaluation.inventory.map((item) => (
-                        <div key={item.id}>
-                          <span>
-                            <strong>{item.name}</strong>
-                            <small>{titleCase(item.kind)}</small>
-                          </span>
-                          <span>{item.equipped ? "Equipped" : `×${String(item.quantity)}`}</span>
-                        </div>
-                      ))
+                      evaluation.inventory.map((item) => {
+                        const catalogItem = equipmentCatalogById.get(item.entityId);
+                        return (
+                          <div key={item.id} className="inventory-row">
+                            <span>
+                              <strong>{item.name}</strong>
+                              <small>
+                                {titleCase(item.kind)} · {item.equipped ? "Equipped" : "Carried"}
+                              </small>
+                            </span>
+                            <div className="inventory-actions">
+                              {catalogItem?.equippable === true ? (
+                                <button
+                                  type="button"
+                                  className={item.equipped ? "equipped" : undefined}
+                                  onClick={() => {
+                                    commitInventoryProposal(
+                                      toggleEquippedItem(character, item.id, equipmentCatalog),
+                                      `${item.equipped ? "Unequipped" : "Equipped"} ${item.name}.`,
+                                    );
+                                  }}
+                                >
+                                  {item.equipped ? "Unequip" : "Equip"}
+                                </button>
+                              ) : null}
+                              {!catalogItem?.equippable || item.quantity > 1 ? (
+                                <div className="inventory-quantity">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      commitInventoryProposal(
+                                        adjustInventoryQuantity(character, item.id, -1),
+                                        `Reduced ${item.name} quantity.`,
+                                      );
+                                    }}
+                                  >
+                                    −
+                                  </button>
+                                  <strong>{String(item.quantity)}</strong>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      commitInventoryProposal(
+                                        adjustInventoryQuantity(character, item.id, 1),
+                                        `Increased ${item.name} quantity.`,
+                                      );
+                                    }}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              ) : null}
+                              <button
+                                type="button"
+                                className="remove-item"
+                                aria-label={`Remove ${item.name}`}
+                                onClick={() => {
+                                  commitInventoryProposal(
+                                    removeInventoryItem(character, item.id),
+                                    `Removed ${item.name}.`,
+                                  );
+                                }}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
                     )}
                   </div>
                 </Section>

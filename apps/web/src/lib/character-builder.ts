@@ -1015,16 +1015,30 @@ function assembleCharacter(
     selectedClass.subclassLevel !== undefined &&
     draft.level >= selectedClass.subclassLevel;
   const instanceCounts = new Map<string, number>();
+  const equipmentKinds = new Map(
+    rulesPackage.entities.map((entity) => [entity.id, entity.kind] as const),
+  );
   const inventory: { id: string; entityId: string; quantity: number }[] = [];
   const equippedItemIds: string[] = [];
   for (const item of equipmentOption.items) {
     if (item.kind !== "entity") continue;
     const stem = shortEntityName(item.entityId).toLowerCase().replaceAll(" ", "-");
-    const sequence = (instanceCounts.get(stem) ?? 0) + 1;
-    instanceCounts.set(stem, sequence);
-    const instanceId = `${stem}-${String(sequence)}`;
-    inventory.push({ id: instanceId, entityId: item.entityId, quantity: item.quantity });
-    if (item.equipped) equippedItemIds.push(instanceId);
+    const equipmentKind = equipmentKinds.get(item.entityId);
+    const separateInstances = ["equipment-weapon", "equipment-armor", "equipment-shield"].includes(
+      equipmentKind ?? "",
+    );
+    const instanceTotal = separateInstances ? item.quantity : 1;
+    for (let index = 0; index < instanceTotal; index += 1) {
+      const sequence = (instanceCounts.get(stem) ?? 0) + 1;
+      instanceCounts.set(stem, sequence);
+      const instanceId = `${stem}-${String(sequence)}`;
+      inventory.push({
+        id: instanceId,
+        entityId: item.entityId,
+        quantity: separateInstances ? 1 : item.quantity,
+      });
+      if (item.equipped && index === 0) equippedItemIds.push(instanceId);
+    }
   }
   return characterDocumentSchema.parse({
     schemaVersion: "0.1.0",

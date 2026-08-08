@@ -117,16 +117,19 @@ describe("guided character builder", () => {
     const wizard = defaultBuilderDraft(wizardId, catalog, 1, "Equipped Wizard");
     const wizardCharacter = buildCharacter(wizard, rulesPackage, options);
 
-    expect(fighterCharacter.loadout.inventory.map((item) => item.entityId)).toEqual([
-      "srd521.equipment.armor.heavy.chain-mail",
-      "srd521.equipment.weapon.greatsword",
-      "srd521.equipment.weapon.flail",
-      "srd521.equipment.weapon.javelin",
-      "srd521.equipment.gear.dungeoneers-pack",
-    ]);
-    expect(fighterCharacter.loadout.inventory.map((item) => item.entityId)).not.toContain(
-      "srd521.equipment.weapon.longbow",
+    const fighterEntityIds = fighterCharacter.loadout.inventory.map((item) => item.entityId);
+    expect(fighterEntityIds).toEqual(
+      expect.arrayContaining([
+        "srd521.equipment.armor.heavy.chain-mail",
+        "srd521.equipment.weapon.greatsword",
+        "srd521.equipment.weapon.flail",
+        "srd521.equipment.gear.dungeoneers-pack",
+      ]),
     );
+    expect(fighterEntityIds.filter((id) => id === "srd521.equipment.weapon.javelin")).toHaveLength(
+      8,
+    );
+    expect(fighterEntityIds).not.toContain("srd521.equipment.weapon.longbow");
     expect(fighterCharacter.loadout.equippedItemIds).toEqual(["chain-mail-1", "greatsword-1"]);
     expect(fighterCharacter.loadout.currency.gp).toBe(4);
     expect(fighterCharacter.loadout.choices).toEqual([
@@ -137,10 +140,15 @@ describe("guided character builder", () => {
     ]);
     expect(wizardCharacter.loadout.inventory.map((item) => item.entityId)).toEqual([
       "srd521.equipment.weapon.dagger",
+      "srd521.equipment.weapon.dagger",
       "srd521.equipment.weapon.quarterstaff",
       "srd521.equipment.gear.robe",
       "srd521.equipment.gear.spellbook",
       "srd521.equipment.gear.scholars-pack",
+    ]);
+    expect(wizardCharacter.loadout.inventory.slice(0, 2).map((item) => item.id)).toEqual([
+      "dagger-1",
+      "dagger-2",
     ]);
     expect(wizardCharacter.loadout.equippedItemIds).toEqual(["quarterstaff-1"]);
     expect(wizardCharacter.loadout.currency.gp).toBe(5);

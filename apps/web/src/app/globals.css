@@ -992,6 +992,91 @@ td:first-child small {
   font-weight: 700;
   text-align: center;
 }
+.inventory-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 62px auto auto;
+  gap: 7px;
+  align-items: end;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #dedbd1;
+  border-radius: 8px;
+  background: #faf9f4;
+}
+.inventory-editor label {
+  display: grid;
+  gap: 4px;
+}
+.inventory-editor label > span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.inventory-editor select,
+.inventory-editor input {
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: white;
+}
+.inventory-lots input {
+  text-align: center;
+}
+.inventory-row {
+  align-items: center;
+}
+.inventory-actions,
+.inventory-quantity {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.inventory-actions > button,
+.inventory-quantity button {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--green);
+  background: white;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 750;
+}
+.inventory-actions > button.equipped {
+  border-color: #9dbbad;
+  background: #edf6f2;
+}
+.inventory-actions > button.remove-item {
+  width: 28px;
+  padding: 0;
+  color: #8b3026;
+  border-color: #e0b8b1;
+  background: #fff5f3;
+  font-size: 16px;
+}
+.inventory-quantity {
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.inventory-quantity button {
+  border: 0;
+  border-radius: 0;
+  font-size: 15px;
+}
+.inventory-quantity strong {
+  min-width: 28px;
+  font-size: 11px;
+  text-align: center;
+}
 .tag-list {
   display: flex;
   flex-wrap: wrap;
@@ -2243,6 +2328,12 @@ button.builder-choice:disabled {
   .panel {
     padding: 19px;
   }
+  .inventory-editor {
+    grid-template-columns: minmax(0, 1fr) 62px;
+  }
+  .inventory-editor > button {
+    width: 100%;
+  }
   .builder-header {
     padding: 10px 15px;
   }
@@ -2329,6 +2420,13 @@ button.builder-choice:disabled {
   .play-spell-list > div {
     align-items: stretch;
     flex-direction: column;
+  }
+  .inventory-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .inventory-actions {
+    justify-content: flex-end;
   }
   .action-inputs,
   .play-spell-list > div > div {
