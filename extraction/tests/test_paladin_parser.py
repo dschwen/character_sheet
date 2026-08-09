@@ -1,6 +1,6 @@
 import pytest
 
-from srd_extract.paladin import PaladinProgressionRow, parse_core_traits
+from srd_extract.paladin import PaladinProgressionRow, _starting_equipment, parse_core_traits
 
 
 def test_parse_core_paladin_traits() -> None:
@@ -32,3 +32,17 @@ def test_paladin_progression_accepts_level_five_row() -> None:
     assert row.channel_divinity == 2
     assert row.prepared_spells == 6
     assert row.spell_slots[:2] == (4, 2)
+
+
+def test_paladin_starting_equipment_preserves_both_source_packages() -> None:
+    equipment = _starting_equipment()
+
+    assert [option["currencyGp"] for option in equipment["options"]] == [9, 150]
+    assert [item.get("entityId") for item in equipment["options"][0]["items"]] == [
+        "srd521.equipment.armor.heavy.chain-mail",
+        "srd521.equipment.shield",
+        "srd521.equipment.weapon.longsword",
+        "srd521.equipment.weapon.javelin",
+        "srd521.equipment.gear.holy-symbol",
+        "srd521.equipment.gear.priests-pack",
+    ]

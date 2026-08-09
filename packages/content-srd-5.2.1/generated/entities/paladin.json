@@ -15,6 +15,33 @@
         "heavy",
         "shield"
       ],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "charisma",
+        "defaultAbilityScores": {
+          "charisma": 15,
+          "constitution": 14,
+          "dexterity": 8,
+          "intelligence": 8,
+          "strength": 15,
+          "wisdom": 10
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.insight",
+          "srd521.skill.persuasion"
+        ],
+        "defaultGrantedFeatIds": [],
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
+      "fightingStyleChoice": {
+        "id": "srd521.choice.paladin.fighting-style",
+        "level": 2,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.feat.fighting-style.defense"
+        ]
+      },
       "hitPointDie": 10,
       "primaryAbilities": [
         "strength",
@@ -417,6 +444,13 @@
         "charisma"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2
+        },
         "maximum": 2,
         "minimum": 2,
         "options": [
@@ -470,7 +504,73 @@
       ],
       "spellPreparation": "full-list",
       "spellcastingAbility": "charisma",
+      "startingEquipment": {
+        "id": "srd521.choice.class.paladin.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "currencyGp": 9,
+            "id": "srd521.option.class.paladin.starting-equipment.a",
+            "items": [
+              {
+                "entityId": "srd521.equipment.armor.heavy.chain-mail",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.shield",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.longsword",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.javelin",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 6
+              },
+              {
+                "entityId": "srd521.equipment.gear.holy-symbol",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.priests-pack",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              }
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 150,
+            "id": "srd521.option.class.paladin.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
+          }
+        ]
+      },
       "startingEquipmentText": "Choose A or B: (A) Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest’s Pack, and 9 GP; or (B) 150 GP",
+      "weaponMasteryChoice": {
+        "attackTypes": [
+          "melee",
+          "ranged"
+        ],
+        "categories": [
+          "simple",
+          "martial"
+        ]
+      },
       "weaponProficiencies": [
         "simple",
         "martial"

@@ -19,6 +19,7 @@ export const barbarianId = "srd521.class.barbarian";
 export const clericId = "srd521.class.cleric";
 export const druidId = "srd521.class.druid";
 export const monkId = "srd521.class.monk";
+export const paladinId = "srd521.class.paladin";
 const abilityScoreImprovementId = "srd521.feat.general.ability-score-improvement";
 const skillPrefix = "srd521.skill.";
 
@@ -28,6 +29,7 @@ export const builderClassIds = [
   druidId,
   fighterId,
   monkId,
+  paladinId,
   wizardId,
 ] as const;
 export type BuilderClassId = (typeof builderClassIds)[number];
@@ -168,6 +170,7 @@ export interface ClassFeatureChoiceOptionCatalog {
   description: string;
   additionalCantrips: number;
   alwaysPreparedSpellsByLevel: Readonly<Record<string, string[]>>;
+  grantedFeatId?: string;
 }
 
 export interface ClassFeatureChoiceCatalog extends Omit<ClassFeatureChoice, "options"> {
@@ -386,6 +389,7 @@ function classCatalog(
               stringArray(spellIds),
             ]),
           ),
+          ...(option.kind === "feat" ? { grantedFeatId: option.id } : {}),
         };
       });
       return [{ ...parsed.data, options: choiceOptions }];
@@ -650,6 +654,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
       [druidId]: classCatalog(druidId, rulesPackage),
       [fighterId]: classCatalog(fighterId, rulesPackage),
       [monkId]: classCatalog(monkId, rulesPackage),
+      [paladinId]: classCatalog(paladinId, rulesPackage),
       [wizardId]: classCatalog(wizardId, rulesPackage),
     },
     species,
@@ -1285,10 +1290,21 @@ function assembleCharacter(
         return optionIds.length === 0 ? [] : [{ choiceId: choice.id, optionIds }];
       }),
   }));
+  const selectedFeatureFeatIds = selectedClass.featureChoices.flatMap((choice) => {
+    const selectedOptions = new Set(draft.featureChoiceSelections[choice.id] ?? []);
+    return choice.options.flatMap((option) =>
+      option.grantedFeatId !== undefined && selectedOptions.has(option.id)
+        ? [option.grantedFeatId]
+        : [],
+    );
+  });
   const featIds = [
-    ...selectedClass.builder.defaultGrantedFeatIds,
-    selectedBackground.featId,
-    selectedOriginFeat.id,
+    ...new Set([
+      ...selectedClass.builder.defaultGrantedFeatIds,
+      ...selectedFeatureFeatIds,
+      selectedBackground.featId,
+      selectedOriginFeat.id,
+    ]),
   ];
   if (draft.level >= 4) featIds.push(abilityScoreImprovementId);
   const timestamp = options.now.toISOString();

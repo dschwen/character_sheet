@@ -26,6 +26,7 @@ LAY_ON_HANDS_ID = "srd521.resource.paladin.lay-on-hands"
 CHANNEL_DIVINITY_ID = "srd521.resource.paladin.channel-divinity"
 SMITE_USE_ID = "srd521.resource.paladin.free-divine-smite"
 STEED_USE_ID = "srd521.resource.paladin.free-find-steed"
+DEFENSE_ID = "srd521.feat.fighting-style.defense"
 HEADING_PATTERN = re.compile(r"^Level (?P<level>\d+): (?P<name>.+)$")
 REPRESENTATIVE_SPELLS = (
     "Divine Smite",
@@ -399,6 +400,65 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _starting_equipment() -> dict[str, Any]:
+    return {
+        "id": "srd521.choice.class.paladin.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
+        "options": [
+            {
+                "id": "srd521.option.class.paladin.starting-equipment.a",
+                "label": "Package A",
+                "items": [
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.armor.heavy.chain-mail",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.shield",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.longsword",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.javelin",
+                        "quantity": 6,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.holy-symbol",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.priests-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                ],
+                "currencyGp": 9,
+            },
+            {
+                "id": "srd521.option.class.paladin.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 150,
+            },
+        ],
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[PaladinProgressionRow, ...],
@@ -415,6 +475,40 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits["skillProficiencyChoice"],
+                "countByLevel": {str(level): 2 for level in range(1, 6)},
+            },
+            "weaponMasteryChoice": {
+                "categories": ["simple", "martial"],
+                "attackTypes": ["melee", "ranged"],
+            },
+            "startingEquipment": _starting_equipment(),
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 15,
+                    "dexterity": 8,
+                    "constitution": 14,
+                    "intelligence": 8,
+                    "wisdom": 10,
+                    "charisma": 15,
+                },
+                "defaultAbilityScoreImprovementAbility": "charisma",
+                "defaultClassSkillIds": [
+                    "srd521.skill.insight",
+                    "srd521.skill.persuasion",
+                ],
+                "defaultGrantedFeatIds": [],
+            },
+            "fightingStyleChoice": {
+                "id": "srd521.choice.paladin.fighting-style",
+                "level": 2,
+                "minimum": 1,
+                "maximum": 1,
+                "options": [DEFENSE_ID],
+            },
             "spellcastingAbility": "charisma",
             "spellPreparation": "full-list",
             "alwaysPreparedSpells": {

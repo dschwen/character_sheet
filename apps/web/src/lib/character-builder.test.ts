@@ -12,6 +12,7 @@ import {
   druidId,
   fighterId,
   monkId,
+  paladinId,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
@@ -35,6 +36,39 @@ describe("guided character builder", () => {
       skillCountByLevel: { 1: 2, 3: 2, 5: 2 },
     });
     expect(catalog.classes[monkId].description).toContain("Focus Points");
+    expect(catalog.classes[paladinId]).toMatchObject({
+      name: "Paladin",
+      subclassId: "srd521.subclass.paladin.oath-of-devotion",
+      subclassLevel: 3,
+      spellcasting: { preparation: "full-list", ability: "charisma" },
+      skillCountByLevel: { 1: 2, 3: 2, 5: 2 },
+    });
+    expect(catalog.classes[paladinId].featureChoices).toEqual([
+      expect.objectContaining({
+        id: "srd521.choice.paladin.fighting-style",
+        level: 2,
+        options: [
+          expect.objectContaining({
+            id: "srd521.feat.fighting-style.defense",
+            grantedFeatId: "srd521.feat.fighting-style.defense",
+          }),
+        ],
+      }),
+    ]);
+    expect(catalog.classes[paladinId].spellcasting?.countsByLevel[5]).toEqual({
+      cantrips: 0,
+      learnedLeveledSpells: 0,
+      preparedSpells: 6,
+      maximumSpellLevel: 2,
+      alwaysPreparedSpellIds: [
+        "srd521.spell.divine-smite",
+        "srd521.spell.find-steed",
+        "srd521.spell.protection-from-evil-and-good",
+        "srd521.spell.shield-of-faith",
+        "srd521.spell.aid",
+        "srd521.spell.zone-of-truth",
+      ],
+    });
     expect(catalog.classes[wizardId].name).toBe("Wizard");
     expect(catalog.classes[barbarianId]).toMatchObject({
       name: "Barbarian",
@@ -454,6 +488,60 @@ describe("guided character builder", () => {
         expect(character.loadout.inventory).toHaveLength(7);
         expect(character.loadout.equippedItemIds).toEqual(["spear-1"]);
         expect(character.loadout.currency.gp).toBe(11);
+      }
+    }
+  });
+
+  it("builds Oath of Devotion Paladins with level-gated Fighting Style and magic", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [12, 20, 28, 36, 44];
+    const expectedAlwaysPrepared = [0, 1, 3, 3, 6];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(
+        paladinId,
+        catalog,
+        level,
+        `Level ${String(level)} Paladin`,
+      );
+      const counts = spellSelectionCounts(draft, catalog);
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+      const layOnHands = evaluation.resources.find(
+        (resource) => resource.id === "srd521.resource.paladin.lay-on-hands",
+      );
+      const channelDivinity = evaluation.resources.find(
+        (resource) => resource.id === "srd521.resource.paladin.channel-divinity",
+      );
+
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(character.build.learnedSpellIds).toEqual([]);
+      expect(character.loadout.preparedSpellIds).toHaveLength(counts?.preparedSpells ?? 0);
+      expect(evaluation.spellcasting?.alwaysPreparedSpells).toBe(expectedAlwaysPrepared[level - 1]);
+      expect(character.build.featIds.includes("srd521.feat.fighting-style.defense")).toBe(
+        level >= 2,
+      );
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.paladin.oath-of-devotion" : undefined,
+      );
+      expect(character.loadout.selectedWeaponMasteryIds).toEqual([
+        "srd521.equipment.weapon.longsword",
+        "srd521.equipment.weapon.javelin",
+      ]);
+      expect(layOnHands?.maximum).toBe(level * 5);
+      expect(channelDivinity?.maximum).toBe(level >= 3 ? 2 : undefined);
+      expect(evaluation.values.armorClass?.value).toBe(level >= 2 ? 19 : 18);
+      expect(evaluation.values["attackAction.attacks"]?.value).toBe(level >= 5 ? 2 : 1);
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(11);
+        expect(character.loadout.equippedItemIds).toEqual([
+          "chain-mail-1",
+          "shield-1",
+          "longsword-1",
+        ]);
+        expect(character.loadout.currency.gp).toBe(9);
       }
     }
   });

@@ -17,6 +17,7 @@ import {
   druidId,
   fighterId,
   monkId,
+  paladinId,
   wizardId,
 } from "./character-builder";
 import { loadWebData } from "./server-data";
@@ -27,7 +28,7 @@ const initialOptions = {
 };
 
 describe("guided character level up", () => {
-  it.each([barbarianId, clericId, druidId, fighterId, monkId, wizardId] as const)(
+  it.each([barbarianId, clericId, druidId, fighterId, monkId, paladinId, wizardId] as const)(
     "advances %s from level 1 through 5 without replacing play state or possessions",
     (classId) => {
       const { rulesPackage } = loadWebData();
@@ -114,6 +115,15 @@ describe("guided character level up", () => {
           },
         ]);
       }
+      if (classId === paladinId) {
+        expect(character.build.levels[1]?.selectedFeatureChoices).toEqual([
+          {
+            choiceId: "srd521.choice.paladin.fighting-style",
+            optionIds: ["srd521.feat.fighting-style.defense"],
+          },
+        ]);
+        expect(character.build.featIds).toContain("srd521.feat.fighting-style.defense");
+      }
     },
   );
 
@@ -142,7 +152,7 @@ describe("guided character level up", () => {
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, and Wizard.",
+        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, and Wizard.",
     });
     expect(() => createLevelUpDraft(levelFive, catalog)).toThrow(
       "Fighter advancement is currently reviewed through level 5.",

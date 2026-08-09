@@ -203,6 +203,7 @@ describe("bootstrap content package", () => {
         "srd521.class.druid",
         "srd521.class.fighter",
         "srd521.class.monk",
+        "srd521.class.paladin",
         "srd521.class.wizard",
       ]),
     );
@@ -226,6 +227,7 @@ describe("bootstrap content package", () => {
       "srd521.class.druid",
       "srd521.class.fighter",
       "srd521.class.monk",
+      "srd521.class.paladin",
       "srd521.class.wizard",
     ]);
     const metadata = entities.flatMap((entity) => {
@@ -234,7 +236,7 @@ describe("bootstrap content package", () => {
       return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
     });
 
-    expect(metadata).toHaveLength(6);
+    expect(metadata).toHaveLength(7);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "strength",
@@ -243,6 +245,17 @@ describe("bootstrap content package", () => {
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "dexterity",
       defaultClassSkillIds: ["srd521.skill.acrobatics", "srd521.skill.insight"],
+    });
+    expect(metadata.find(({ id }) => id === "srd521.class.paladin")?.builder).toMatchObject({
+      supportedLevelMaximum: 5,
+      defaultAbilityScoreImprovementAbility: "charisma",
+      defaultClassSkillIds: ["srd521.skill.insight", "srd521.skill.persuasion"],
+    });
+    const paladin = entities.find((entity) => entity.id === "srd521.class.paladin");
+    const paladinBody = z.record(z.unknown()).parse(paladin?.body);
+    expect(classFeatureChoiceSchema.parse(paladinBody.fightingStyleChoice)).toMatchObject({
+      level: 2,
+      options: ["srd521.feat.fighting-style.defense"],
     });
     const cleric = entities.find((entity) => entity.id === "srd521.class.cleric");
     const clericBody = z.record(z.unknown()).parse(cleric?.body);
