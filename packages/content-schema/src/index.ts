@@ -329,6 +329,7 @@ export const classFeatureChoiceSchema = z
     minimum: z.number().int().nonnegative(),
     maximum: z.number().int().positive(),
     options: z.array(entityIdSchema).min(1),
+    changeOn: z.array(z.enum(["short-rest", "long-rest"])).optional(),
   })
   .strict()
   .superRefine((choice, context) => {

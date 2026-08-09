@@ -9,6 +9,7 @@ import { createLevelUpDraft, levelUpCharacter, previewLevelUp } from "../lib/cha
 import {
   characterBuilderCatalog,
   classSkillCount,
+  expertiseSkillCandidates,
   masteryCount,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
@@ -125,6 +126,7 @@ export function CharacterLevelUp({
     (choice) => choice.level === targetLevel,
   );
   const expertiseChoice = selectedClass.builder.expertiseChoice;
+  const eligibleExpertiseSkills = expertiseSkillCandidates(draft, catalog);
   const introducesExpertise = expertiseChoice?.minimumLevel === targetLevel;
   const introducesSubclass = selectedClass.subclassLevel === targetLevel;
   const introducesAsi = targetLevel === 4;
@@ -347,15 +349,16 @@ export function CharacterLevelUp({
                       );
                     }}
                   >
-                    {draft.classSkillIds
-                      .filter((id) => expertiseChoice.eligibleSkillIds.includes(id))
-                      .map((id) => (
-                        <option key={id} value={id}>
-                          {skillName(id)}
-                        </option>
-                      ))}
+                    {eligibleExpertiseSkills.map((id) => (
+                      <option key={id} value={id}>
+                        {skillName(id)}
+                      </option>
+                    ))}
                   </select>
-                  <small>Choose one eligible existing class proficiency.</small>
+                  <small>
+                    Choose one eligible existing
+                    {expertiseChoice.requireClassProficiency ? " class" : ""} proficiency.
+                  </small>
                 </label>
               ) : null}
 

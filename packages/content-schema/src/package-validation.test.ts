@@ -204,6 +204,7 @@ describe("bootstrap content package", () => {
         "srd521.class.fighter",
         "srd521.class.monk",
         "srd521.class.paladin",
+        "srd521.class.ranger",
         "srd521.class.wizard",
       ]),
     );
@@ -228,6 +229,7 @@ describe("bootstrap content package", () => {
       "srd521.class.fighter",
       "srd521.class.monk",
       "srd521.class.paladin",
+      "srd521.class.ranger",
       "srd521.class.wizard",
     ]);
     const metadata = entities.flatMap((entity) => {
@@ -236,7 +238,7 @@ describe("bootstrap content package", () => {
       return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
     });
 
-    expect(metadata).toHaveLength(7);
+    expect(metadata).toHaveLength(8);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "strength",
@@ -256,6 +258,31 @@ describe("bootstrap content package", () => {
     expect(classFeatureChoiceSchema.parse(paladinBody.fightingStyleChoice)).toMatchObject({
       level: 2,
       options: ["srd521.feat.fighting-style.defense"],
+    });
+    const ranger = entities.find((entity) => entity.id === "srd521.class.ranger");
+    const rangerBody = z.record(z.unknown()).parse(ranger?.body);
+    expect(classFeatureChoiceSchema.parse(rangerBody.fightingStyleChoice)).toMatchObject({
+      level: 2,
+      options: ["srd521.feat.fighting-style.defense"],
+    });
+    expect(metadata.find(({ id }) => id === "srd521.class.ranger")?.builder).toMatchObject({
+      supportedLevelMaximum: 5,
+      defaultAbilityScoreImprovementAbility: "wisdom",
+      expertiseChoice: {
+        sourceId: "srd521.class-feature.ranger.deft-explorer",
+        minimumLevel: 2,
+        requireClassProficiency: false,
+      },
+    });
+    const hunter = entities.find((entity) => entity.id === "srd521.subclass.ranger.hunter");
+    const hunterBody = z.record(z.unknown()).parse(hunter?.body);
+    expect(classFeatureChoiceSchema.parse(hunterBody.huntersPreyChoice)).toMatchObject({
+      level: 3,
+      options: [
+        "srd521.option.ranger.hunters-prey.colossus-slayer",
+        "srd521.option.ranger.hunters-prey.horde-breaker",
+      ],
+      changeOn: ["short-rest", "long-rest"],
     });
     const cleric = entities.find((entity) => entity.id === "srd521.class.cleric");
     const clericBody = z.record(z.unknown()).parse(cleric?.body);

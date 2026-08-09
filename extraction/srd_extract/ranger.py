@@ -26,6 +26,7 @@ FAVORED_ENEMY_ID = "srd521.resource.ranger.favored-enemy"
 HUNTERS_PREY_CHOICE_ID = "srd521.choice.ranger.hunters-prey"
 COLOSSUS_SLAYER_ID = "srd521.option.ranger.hunters-prey.colossus-slayer"
 HORDE_BREAKER_ID = "srd521.option.ranger.hunters-prey.horde-breaker"
+DEFENSE_ID = "srd521.feat.fighting-style.defense"
 HEADING_PATTERN = re.compile(r"^Level (?P<level>\d+): (?P<name>.+)$")
 REPRESENTATIVE_SPELLS = (
     "Ensnaring Strike",
@@ -405,6 +406,76 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _starting_equipment() -> dict[str, Any]:
+    return {
+        "id": "srd521.choice.class.ranger.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
+        "options": [
+            {
+                "id": "srd521.option.class.ranger.starting-equipment.a",
+                "label": "Package A",
+                "items": [
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.armor.light.studded-leather-armor",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.scimitar",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.shortsword",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.longbow",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.ammunition.arrows",
+                        "quantity": 20,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.quiver",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "text",
+                        "name": "Druidic Focus (sprig of mistletoe)",
+                        "quantity": 1,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.explorers-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                ],
+                "currencyGp": 7,
+            },
+            {
+                "id": "srd521.option.class.ranger.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 150,
+            },
+        ],
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[RangerProgressionRow, ...],
@@ -421,6 +492,66 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits["skillProficiencyChoice"],
+                "countByLevel": {str(level): 3 for level in range(1, 6)},
+            },
+            "weaponMasteryChoice": {
+                "categories": ["simple", "martial"],
+                "attackTypes": ["melee", "ranged"],
+            },
+            "startingEquipment": _starting_equipment(),
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 10,
+                    "dexterity": 15,
+                    "constitution": 13,
+                    "intelligence": 8,
+                    "wisdom": 15,
+                    "charisma": 10,
+                },
+                "defaultAbilityScoreImprovementAbility": "wisdom",
+                "defaultClassSkillIds": [
+                    "srd521.skill.perception",
+                    "srd521.skill.stealth",
+                    "srd521.skill.survival",
+                ],
+                "defaultGrantedFeatIds": [],
+                "expertiseChoice": {
+                    "sourceId": "srd521.class-feature.ranger.deft-explorer",
+                    "minimumLevel": 2,
+                    "eligibleSkillIds": [
+                        "srd521.skill.acrobatics",
+                        "srd521.skill.animal-handling",
+                        "srd521.skill.arcana",
+                        "srd521.skill.athletics",
+                        "srd521.skill.deception",
+                        "srd521.skill.history",
+                        "srd521.skill.insight",
+                        "srd521.skill.intimidation",
+                        "srd521.skill.investigation",
+                        "srd521.skill.medicine",
+                        "srd521.skill.nature",
+                        "srd521.skill.perception",
+                        "srd521.skill.performance",
+                        "srd521.skill.persuasion",
+                        "srd521.skill.religion",
+                        "srd521.skill.sleight-of-hand",
+                        "srd521.skill.stealth",
+                        "srd521.skill.survival",
+                    ],
+                    "requireClassProficiency": False,
+                },
+            },
+            "fightingStyleChoice": {
+                "id": "srd521.choice.ranger.fighting-style",
+                "level": 2,
+                "minimum": 1,
+                "maximum": 1,
+                "options": [DEFENSE_ID],
+            },
             "spellcastingAbility": "wisdom",
             "spellPreparation": "full-list",
             "alwaysPreparedSpells": {"1": ["srd521.spell.hunter-s-mark"]},
@@ -484,6 +615,7 @@ def _hunter_entities(
             ],
             "huntersPreyChoice": {
                 "id": HUNTERS_PREY_CHOICE_ID,
+                "level": 3,
                 "minimum": 1,
                 "maximum": 1,
                 "options": [COLOSSUS_SLAYER_ID, HORDE_BREAKER_ID],

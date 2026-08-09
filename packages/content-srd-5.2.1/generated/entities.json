@@ -15303,6 +15303,59 @@
         "medium",
         "shield"
       ],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "wisdom",
+        "defaultAbilityScores": {
+          "charisma": 10,
+          "constitution": 13,
+          "dexterity": 15,
+          "intelligence": 8,
+          "strength": 10,
+          "wisdom": 15
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.perception",
+          "srd521.skill.stealth",
+          "srd521.skill.survival"
+        ],
+        "defaultGrantedFeatIds": [],
+        "expertiseChoice": {
+          "eligibleSkillIds": [
+            "srd521.skill.acrobatics",
+            "srd521.skill.animal-handling",
+            "srd521.skill.arcana",
+            "srd521.skill.athletics",
+            "srd521.skill.deception",
+            "srd521.skill.history",
+            "srd521.skill.insight",
+            "srd521.skill.intimidation",
+            "srd521.skill.investigation",
+            "srd521.skill.medicine",
+            "srd521.skill.nature",
+            "srd521.skill.perception",
+            "srd521.skill.performance",
+            "srd521.skill.persuasion",
+            "srd521.skill.religion",
+            "srd521.skill.sleight-of-hand",
+            "srd521.skill.stealth",
+            "srd521.skill.survival"
+          ],
+          "minimumLevel": 2,
+          "requireClassProficiency": false,
+          "sourceId": "srd521.class-feature.ranger.deft-explorer"
+        },
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
+      "fightingStyleChoice": {
+        "id": "srd521.choice.ranger.fighting-style",
+        "level": 2,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.feat.fighting-style.defense"
+        ]
+      },
       "hitPointDie": 10,
       "primaryAbilities": [
         "dexterity",
@@ -15707,6 +15760,13 @@
         "dexterity"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 3,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 3
+        },
         "maximum": 3,
         "minimum": 3,
         "options": [
@@ -15772,7 +15832,84 @@
       ],
       "spellPreparation": "full-list",
       "spellcastingAbility": "wisdom",
+      "startingEquipment": {
+        "id": "srd521.choice.class.ranger.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "currencyGp": 7,
+            "id": "srd521.option.class.ranger.starting-equipment.a",
+            "items": [
+              {
+                "entityId": "srd521.equipment.armor.light.studded-leather-armor",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.scimitar",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.shortsword",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.longbow",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.ammunition.arrows",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 20
+              },
+              {
+                "entityId": "srd521.equipment.gear.quiver",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "kind": "text",
+                "name": "Druidic Focus (sprig of mistletoe)",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.explorers-pack",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              }
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 150,
+            "id": "srd521.option.class.ranger.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
+          }
+        ]
+      },
       "startingEquipmentText": "Choose A or B: (A) Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus (sprig of mistletoe), Explorer’s Pack, and 7 GP; or (B) 150 GP",
+      "weaponMasteryChoice": {
+        "attackTypes": [
+          "melee",
+          "ranged"
+        ],
+        "categories": [
+          "simple",
+          "martial"
+        ]
+      },
       "weaponProficiencies": [
         "simple",
         "martial"
@@ -16532,6 +16669,7 @@
           "long-rest"
         ],
         "id": "srd521.choice.ranger.hunters-prey",
+        "level": 3,
         "maximum": 1,
         "minimum": 1,
         "options": [

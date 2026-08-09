@@ -1,6 +1,6 @@
 import pytest
 
-from srd_extract.ranger import RangerProgressionRow, parse_core_traits
+from srd_extract.ranger import RangerProgressionRow, _starting_equipment, parse_core_traits
 
 
 def test_parse_core_ranger_traits() -> None:
@@ -43,3 +43,19 @@ def test_ranger_progression_row_accepts_level_five_values() -> None:
 def test_ranger_progression_row_rejects_wrong_proficiency_bonus() -> None:
     with pytest.raises(ValueError, match="expected 3"):
         RangerProgressionRow(5, 2, ("Extra Attack",), 3, 6, (4, 2, 0, 0, 0))
+
+
+def test_ranger_starting_equipment_preserves_both_source_packages() -> None:
+    equipment = _starting_equipment()
+
+    assert [option["currencyGp"] for option in equipment["options"]] == [7, 150]
+    assert [item.get("entityId") for item in equipment["options"][0]["items"]] == [
+        "srd521.equipment.armor.light.studded-leather-armor",
+        "srd521.equipment.weapon.scimitar",
+        "srd521.equipment.weapon.shortsword",
+        "srd521.equipment.weapon.longbow",
+        "srd521.equipment.ammunition.arrows",
+        "srd521.equipment.gear.quiver",
+        None,
+        "srd521.equipment.gear.explorers-pack",
+    ]

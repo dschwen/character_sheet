@@ -11,8 +11,10 @@ import {
   defaultBuilderDraft,
   druidId,
   fighterId,
+  expertiseSkillCandidates,
   monkId,
   paladinId,
+  rangerId,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
@@ -69,6 +71,33 @@ describe("guided character builder", () => {
         "srd521.spell.zone-of-truth",
       ],
     });
+    expect(catalog.classes[rangerId]).toMatchObject({
+      name: "Ranger",
+      subclassId: "srd521.subclass.ranger.hunter",
+      subclassLevel: 3,
+      spellcasting: { preparation: "full-list", ability: "wisdom" },
+      skillCountByLevel: { 1: 3, 3: 3, 5: 3 },
+    });
+    expect(
+      catalog.classes[rangerId].featureChoices.map((choice) => [choice.id, choice.level]),
+    ).toEqual([
+      ["srd521.choice.ranger.fighting-style", 2],
+      ["srd521.choice.ranger.hunters-prey", 3],
+    ]);
+    expect(catalog.classes[rangerId].featureChoices[1]?.changeOn).toEqual([
+      "short-rest",
+      "long-rest",
+    ]);
+    expect(catalog.classes[rangerId].featureChoices[1]?.options).toEqual([
+      expect.objectContaining({
+        id: "srd521.option.ranger.hunters-prey.colossus-slayer",
+        description: "1d8 extra damage · Once Per Turn",
+      }),
+      expect.objectContaining({
+        id: "srd521.option.ranger.hunters-prey.horde-breaker",
+        description: "+1 attack · Once Per Turn",
+      }),
+    ]);
     expect(catalog.classes[wizardId].name).toBe("Wizard");
     expect(catalog.classes[barbarianId]).toMatchObject({
       name: "Barbarian",
@@ -544,6 +573,80 @@ describe("guided character builder", () => {
         expect(character.loadout.currency.gp).toBe(9);
       }
     }
+  });
+
+  it("builds Hunters with Expertise, Favored Enemy, and prepared magic through level 5", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [12, 20, 28, 36, 44];
+    const expectedFavoredEnemy = [2, 2, 2, 2, 3];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(rangerId, catalog, level, `Level ${String(level)} Ranger`);
+      const counts = spellSelectionCounts(draft, catalog);
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+      const favoredEnemy = evaluation.resources.find(
+        (resource) => resource.id === "srd521.resource.ranger.favored-enemy",
+      );
+
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(character.build.learnedSpellIds).toEqual([]);
+      expect(character.loadout.preparedSpellIds).toHaveLength(counts?.preparedSpells ?? 0);
+      expect(evaluation.spellcasting?.alwaysPreparedSpells).toBe(1);
+      expect(character.build.featIds.includes("srd521.feat.fighting-style.defense")).toBe(
+        level >= 2,
+      );
+      expect(character.build.proficiencyChoices.expertise).toHaveLength(level >= 2 ? 1 : 0);
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.ranger.hunter" : undefined,
+      );
+      expect(character.build.levels[2]?.selectedFeatureChoices).toEqual(
+        level >= 3
+          ? [
+              {
+                choiceId: "srd521.choice.ranger.hunters-prey",
+                optionIds: ["srd521.option.ranger.hunters-prey.colossus-slayer"],
+              },
+            ]
+          : undefined,
+      );
+      expect(character.loadout.selectedWeaponMasteryIds).toEqual([
+        "srd521.equipment.weapon.scimitar",
+        "srd521.equipment.weapon.shortsword",
+      ]);
+      expect(favoredEnemy?.maximum).toBe(expectedFavoredEnemy[level - 1]);
+      expect(evaluation.values["attackAction.attacks"]?.value).toBe(level >= 5 ? 2 : 1);
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(7);
+        expect(character.loadout.equippedItemIds).toEqual([
+          "studded-leather-armor-1",
+          "shortsword-1",
+          "longbow-1",
+        ]);
+        expect(character.loadout.currency.gp).toBe(7);
+      }
+    }
+  });
+
+  it("allows Deft Explorer Expertise in any existing proficient skill", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const draft = defaultBuilderDraft(rangerId, catalog, 2, "Broad Expertise Ranger");
+
+    expect(expertiseSkillCandidates(draft, catalog)).toContain("srd521.skill.athletics");
+    draft.expertiseSkillId = "srd521.skill.athletics";
+    const character = buildCharacter(draft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+    expect(evaluation.validations).toEqual([]);
+    expect(character.build.proficiencyChoices.expertise).toEqual([
+      {
+        sourceId: "srd521.class-feature.ranger.deft-explorer",
+        skillId: "srd521.skill.athletics",
+      },
+    ]);
   });
 
   it("reconciles Druid Primal Order cantrips and selected land spells", () => {

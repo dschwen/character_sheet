@@ -13,6 +13,7 @@ import {
   characterBuilderCatalog,
   classSkillCount,
   defaultBuilderDraft,
+  expertiseSkillCandidates,
   fighterId,
   masteryCount,
   previewBuilderCharacter,
@@ -122,6 +123,7 @@ export function CharacterBuilder({
   const requiredMasteries = masteryCount(draft, catalog);
   const requiredClassSkills = classSkillCount(draft, catalog);
   const expertiseChoice = selectedClass.builder.expertiseChoice;
+  const eligibleExpertiseSkills = expertiseSkillCandidates(draft, catalog);
   const supportedLevels = Array.from(
     {
       length:
@@ -676,23 +678,24 @@ export function CharacterBuilder({
                       {selectedClass.name} · {shortEntityName(expertiseChoice.sourceId)}
                     </span>
                     <h2>Choose 1 Expertise</h2>
-                    <small>Must be one of your eligible class skills</small>
+                    <small>
+                      Must be one of your eligible
+                      {expertiseChoice.requireClassProficiency ? " class" : " proficient"} skills
+                    </small>
                   </div>
                   <div className="choice-pills">
-                    {draft.classSkillIds
-                      .filter((id) => expertiseChoice.eligibleSkillIds.includes(id))
-                      .map((id) => (
-                        <button
-                          key={id}
-                          type="button"
-                          className={draft.expertiseSkillId === id ? "selected" : undefined}
-                          onClick={() => {
-                            setDraft((value) => ({ ...value, expertiseSkillId: id }));
-                          }}
-                        >
-                          {skillName(id)}
-                        </button>
-                      ))}
+                    {eligibleExpertiseSkills.map((id) => (
+                      <button
+                        key={id}
+                        type="button"
+                        className={draft.expertiseSkillId === id ? "selected" : undefined}
+                        onClick={() => {
+                          setDraft((value) => ({ ...value, expertiseSkillId: id }));
+                        }}
+                      >
+                        {skillName(id)}
+                      </button>
+                    ))}
                   </div>
                 </div>
               ) : null}
