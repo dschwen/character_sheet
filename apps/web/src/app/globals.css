@@ -2098,6 +2098,10 @@ button.builder-choice:disabled {
   cursor: not-allowed;
   opacity: 0.38;
 }
+.spell-choice-grid button:disabled.selected {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
 .spell-choice-grid i {
   display: grid;
   width: 21px;

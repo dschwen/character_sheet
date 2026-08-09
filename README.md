@@ -24,9 +24,9 @@ uses, and spell-slot expenditure. Weapon rows provide attack, damage, and critic
 Spells expose structured attack, damage, and saving-throw details, while cast confirmations report
 the slot spent, remaining slots, and Concentration changes. The Combat view’s Equipment panel edits
 coin denominations, adds loot, purchases source-priced gear, adjusts stack quantities, and equips or
-removes inventory instances. Every state change advances the document revision, persists locally,
-and can be undone once. Imported characters stay in the browser's local storage; the app has no
-account, server, or database dependency. A production build is emitted as a static site in
+removes inventory instances. Every saved character change advances the document revision, persists
+locally, and can be undone once. Imported characters stay in the browser's local storage; the app
+has no account, server, or database dependency. A production build is emitted as a static site in
 `apps/web/out` by `corepack pnpm build`.
 
 Choose **New character** to open the guided Barbarian, Cleric, Fighter, and Wizard builder. It
@@ -38,6 +38,14 @@ choose Weapon Masteries and receive a ready-to-play equipment package. Wizards b
 level-appropriate spellbook, choose prepared spells, and select Scholar Expertise. The review step
 evaluates the complete draft before enabling creation, then opens the new character directly in the
 sheet.
+
+For a supported level 1–4 character, choose **Level up** to add the next level in its existing
+class. The advancement flow presents only newly introduced decisions, including class skills,
+Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
+Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
+inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
+same-class Barbarian, Cleric, Fighter, and Wizard advancement through level 5; multiclassing and
+higher levels remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:

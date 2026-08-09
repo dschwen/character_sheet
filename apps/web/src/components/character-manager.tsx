@@ -21,8 +21,11 @@ import type {
 } from "@dnd/rules-api";
 import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
 
+import { levelUpEligibility } from "../lib/character-level-up";
+import { characterBuilderCatalog } from "../lib/character-builder";
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
+import { CharacterLevelUp } from "./character-level-up";
 import {
   addInventoryItem,
   adjustInventoryQuantity,
@@ -218,6 +221,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [notice, setNotice] = useState<string>();
   const [storageReady, setStorageReady] = useState(false);
   const [builderOpen, setBuilderOpen] = useState(false);
+  const [levelUpOpen, setLevelUpOpen] = useState(false);
   const [playAmount, setPlayAmount] = useState("1");
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
@@ -272,6 +276,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const preparationEditor = useMemo(
     () => spellPreparationEditor(character, rulesPackage),
     [character, rulesPackage],
+  );
+  const builderCatalog = useMemo(() => characterBuilderCatalog(rulesPackage), [rulesPackage]);
+  const advancement = useMemo(
+    () => levelUpEligibility(character, builderCatalog),
+    [builderCatalog, character],
   );
   const evaluation = result.evaluation;
   const statefulActions = evaluation?.actions.filter(supportsStateTransition) ?? [];
@@ -420,7 +429,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setCharacter(previousCharacter);
     setPreviousCharacter(undefined);
     setSource("browser-save");
-    setNotice("Undid the last play-state change.");
+    setNotice("Undid the last character change.");
   }
 
   function updateCurrency(denomination: CurrencyDenomination, value: string): void {
@@ -686,6 +695,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             }}
           >
             New character
+          </button>
+          <button
+            className="button secondary"
+            type="button"
+            disabled={!advancement.eligible}
+            title={advancement.reason ?? `Advance to level ${String(advancement.targetLevel)}`}
+            onClick={() => {
+              setLevelUpOpen(true);
+            }}
+          >
+            Level up
           </button>
           <button
             className="button secondary"
@@ -1955,6 +1975,27 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setPreparedSpellDraft(undefined);
             setBuilderOpen(false);
             setNotice(`${builtCharacter.name} was created and saved in this browser.`);
+          }}
+        />
+      ) : null}
+      {levelUpOpen ? (
+        <CharacterLevelUp
+          character={character}
+          rulesPackage={rulesPackage}
+          onCancel={() => {
+            setLevelUpOpen(false);
+          }}
+          onComplete={(advancedCharacter) => {
+            savePlayState(
+              advancedCharacter,
+              `${advancedCharacter.name} advanced to level ${String(advancedCharacter.build.levels.length)}.`,
+            );
+            setTab("overview");
+            setSelectedTraceId(undefined);
+            setActionDrafts({});
+            setSpellLevels({});
+            setPreparedSpellDraft(undefined);
+            setLevelUpOpen(false);
           }}
         />
       ) : null}
