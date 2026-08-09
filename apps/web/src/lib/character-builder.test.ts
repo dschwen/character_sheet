@@ -9,6 +9,7 @@ import {
   characterBuilderCatalog,
   clericId,
   defaultBuilderDraft,
+  druidId,
   fighterId,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
@@ -59,6 +60,28 @@ describe("guided character builder", () => {
         }),
       ],
     });
+    expect(catalog.classes[druidId]).toMatchObject({
+      name: "Druid",
+      subclassId: "srd521.subclass.druid.circle-of-the-land",
+      subclassLevel: 3,
+      spellcasting: { preparation: "full-list", ability: "wisdom" },
+    });
+    const druidChoices = catalog.classes[druidId].featureChoices;
+    expect(druidChoices.map((choice) => [choice.id, choice.level])).toEqual([
+      ["srd521.choice.druid.primal-order", 1],
+      ["srd521.choice.druid.circle-of-land", 3],
+    ]);
+    expect(
+      druidChoices[0]?.options.map((option) => [option.id, option.additionalCantrips]),
+    ).toEqual([
+      ["srd521.option.druid.primal-order.magician", 1],
+      ["srd521.option.druid.primal-order.warden", 0],
+    ]);
+    const arid = druidChoices[1]?.options.find(
+      (option) => option.id === "srd521.option.druid.land.arid",
+    );
+    expect(arid?.alwaysPreparedSpellsByLevel["3"]).toContain("srd521.spell.burning-hands");
+    expect(arid?.alwaysPreparedSpellsByLevel["5"]).toEqual(["srd521.spell.fireball"]);
     expect(catalog.classes[fighterId].skillIds).toContain("srd521.skill.perception");
     expect(catalog.classes[wizardId].skillIds).toContain("srd521.skill.arcana");
     expect(catalog.backgrounds["srd521.background.soldier"]?.skillIds).toEqual([
@@ -349,6 +372,110 @@ describe("guided character builder", () => {
     expect(character.build.levels[0]?.selectedFeatureChoices[0]?.optionIds).toEqual([
       "srd521.option.cleric.divine-order.thaumaturge",
     ]);
+  });
+
+  it("builds Circle of the Land Druids with prepared primal magic at every supported level", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [10, 17, 24, 31, 38];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(druidId, catalog, level, `Level ${String(level)} Druid`);
+      const counts = spellSelectionCounts(draft, catalog);
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(character.build.learnedSpellIds).toHaveLength(counts?.cantrips ?? 0);
+      expect(character.loadout.preparedSpellIds).toHaveLength(counts?.preparedSpells ?? 0);
+      expect(evaluation.spellcasting?.alwaysPreparedSpells).toBe(
+        level >= 5 ? 5 : level >= 3 ? 4 : 1,
+      );
+      expect(character.build.levels[0]?.selectedFeatureChoices).toEqual([
+        {
+          choiceId: "srd521.choice.druid.primal-order",
+          optionIds: ["srd521.option.druid.primal-order.magician"],
+        },
+      ]);
+      expect(character.build.levels[2]?.selectedFeatureChoices).toEqual(
+        level >= 3
+          ? [
+              {
+                choiceId: "srd521.choice.druid.circle-of-land",
+                optionIds: ["srd521.option.druid.land.arid"],
+              },
+            ]
+          : undefined,
+      );
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.druid.circle-of-the-land" : undefined,
+      );
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(5);
+        expect(character.loadout.equippedItemIds).toHaveLength(3);
+        expect(character.loadout.currency.gp).toBe(9);
+      }
+    }
+  });
+
+  it("reconciles Druid Primal Order cantrips and selected land spells", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const magician = defaultBuilderDraft(druidId, catalog, 5, "Magician Druid");
+    const warden = updateBuilderFeatureChoice(
+      magician,
+      catalog,
+      "srd521.choice.druid.primal-order",
+      "srd521.option.druid.primal-order.warden",
+    );
+    const polar = updateBuilderFeatureChoice(
+      warden,
+      catalog,
+      "srd521.choice.druid.circle-of-land",
+      "srd521.option.druid.land.polar",
+    );
+    const character = buildCharacter(polar, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+    expect(magician.learnedSpellIds).toHaveLength(4);
+    expect(warden.learnedSpellIds).toHaveLength(3);
+    expect(spellSelectionCounts(polar, catalog)?.alwaysPreparedSpellIds).toEqual(
+      expect.arrayContaining([
+        "srd521.spell.speak-with-animals",
+        "srd521.spell.fog-cloud",
+        "srd521.spell.sleet-storm",
+      ]),
+    );
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.spellcasting).toMatchObject({ cantripsKnown: 3, alwaysPreparedSpells: 5 });
+    expect(
+      evaluation.spells.find((spell) => spell.id === "srd521.spell.sleet-storm"),
+    ).toMatchObject({
+      prepared: true,
+      level: 3,
+    });
+  });
+
+  it.each([
+    "srd521.option.druid.land.arid",
+    "srd521.option.druid.land.polar",
+    "srd521.option.druid.land.temperate",
+    "srd521.option.druid.land.tropical",
+  ])("builds a valid level-5 Druid for the %s land option", (landOptionId) => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const draft = updateBuilderFeatureChoice(
+      defaultBuilderDraft(druidId, catalog, 5, "Land Druid"),
+      catalog,
+      "srd521.choice.druid.circle-of-land",
+      landOptionId,
+    );
+    const character = buildCharacter(draft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.spellcasting?.alwaysPreparedSpells).toBe(5);
   });
 
   it("builds complete Wizard spellbooks at every supported level", () => {

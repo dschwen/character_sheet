@@ -17,10 +17,11 @@ export const fighterId = "srd521.class.fighter";
 export const wizardId = "srd521.class.wizard";
 export const barbarianId = "srd521.class.barbarian";
 export const clericId = "srd521.class.cleric";
+export const druidId = "srd521.class.druid";
 const abilityScoreImprovementId = "srd521.feat.general.ability-score-improvement";
 const skillPrefix = "srd521.skill.";
 
-export const builderClassIds = [barbarianId, clericId, fighterId, wizardId] as const;
+export const builderClassIds = [barbarianId, clericId, druidId, fighterId, wizardId] as const;
 export type BuilderClassId = (typeof builderClassIds)[number];
 
 export const skillIds = [
@@ -158,6 +159,7 @@ export interface ClassFeatureChoiceOptionCatalog {
   name: string;
   description: string;
   additionalCantrips: number;
+  alwaysPreparedSpellsByLevel: Readonly<Record<string, string[]>>;
 }
 
 export interface ClassFeatureChoiceCatalog extends Omit<ClassFeatureChoice, "options"> {
@@ -269,6 +271,9 @@ function classOptionDescription(entity: LoadedRulesPackage["entities"][number]):
           `${shortEntityName(body.knowledgeCheckBonusAbility)} for ${stringArray(body.knowledgeChecks).map(shortEntityName).join(" and ")} checks`,
         ]
       : []),
+    ...(objectValue(body?.alwaysPreparedSpells) === undefined
+      ? []
+      : ["Always-prepared Circle spells"]),
   ];
   return benefits.length > 0 ? benefits.join(" · ") : entityDescription(entity);
 }
@@ -343,30 +348,42 @@ function classCatalog(
   if (!builder.success) {
     throw new Error(`${shortEntityName(classId)} character-builder metadata is missing.`);
   }
-  const featureChoices = Object.values(classBody ?? {}).flatMap((value) => {
-    const parsed = classFeatureChoiceSchema.safeParse(value);
-    if (!parsed.success) return [];
-    const choiceOptions = parsed.data.options.map((optionId) => {
-      const option = rulesPackage.entities.find((candidate) => candidate.id === optionId);
-      if (option === undefined) {
-        throw new Error(
-          `${shortEntityName(classId)} feature-choice option ${optionId} is missing.`,
-        );
-      }
-      return {
-        id: option.id,
-        name: localizedName(option),
-        description: classOptionDescription(option),
-        additionalCantrips: numericValue(objectValue(option.body)?.additionalCantrips),
-      };
-    });
-    return [{ ...parsed.data, options: choiceOptions }];
-  });
   const subclassEntity = rulesPackage.entities.find((candidate) => {
     if (candidate.kind !== "subclass") return false;
     return objectValue(candidate.body)?.parentClassId === classId;
   });
-  const subclassProgression = objectValue(subclassEntity?.body)?.progression;
+  const subclassBody = objectValue(subclassEntity?.body);
+  const featureChoices = [classBody, subclassBody]
+    .flatMap((container) => Object.values(container ?? {}))
+    .flatMap((value) => {
+      const parsed = classFeatureChoiceSchema.safeParse(value);
+      if (!parsed.success) return [];
+      const choiceOptions = parsed.data.options.map((optionId) => {
+        const option = rulesPackage.entities.find((candidate) => candidate.id === optionId);
+        if (option === undefined) {
+          throw new Error(
+            `${shortEntityName(classId)} feature-choice option ${optionId} is missing.`,
+          );
+        }
+        const optionBody = objectValue(option.body);
+        const alwaysPreparedSpells = objectValue(optionBody?.alwaysPreparedSpells);
+        return {
+          id: option.id,
+          name: localizedName(option),
+          description: classOptionDescription(option),
+          additionalCantrips: numericValue(optionBody?.additionalCantrips),
+          alwaysPreparedSpellsByLevel: Object.fromEntries(
+            Object.entries(alwaysPreparedSpells ?? {}).map(([level, spellIds]) => [
+              level,
+              stringArray(spellIds),
+            ]),
+          ),
+        };
+      });
+      return [{ ...parsed.data, options: choiceOptions }];
+    })
+    .sort((left, right) => left.level - right.level || left.id.localeCompare(right.id));
+  const subclassProgression = subclassBody?.progression;
   const subclassLevel = Array.isArray(subclassProgression)
     ? Math.min(
         ...subclassProgression
@@ -420,7 +437,7 @@ function classCatalog(
   ) {
     const spellbookStartingSpells = numericValue(classBody?.spellbookStartingSpells);
     const spellbookSpellsPerLevel = numericValue(classBody?.spellbookSpellsPerLevel);
-    const subclassAlwaysPrepared = objectValue(subclassEntity?.body)?.alwaysPreparedSpells;
+    const subclassAlwaysPrepared = subclassBody?.alwaysPreparedSpells;
     const countsByLevel = Object.fromEntries(
       progression
         .map((row) => objectValue(row))
@@ -606,6 +623,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
     classes: {
       [barbarianId]: classCatalog(barbarianId, rulesPackage),
       [clericId]: classCatalog(clericId, rulesPackage),
+      [druidId]: classCatalog(druidId, rulesPackage),
       [fighterId]: classCatalog(fighterId, rulesPackage),
       [wizardId]: classCatalog(wizardId, rulesPackage),
     },
@@ -786,7 +804,19 @@ export function spellSelectionCounts(
     .flatMap((choice) => choice.options)
     .filter((option) => selectedOptions.has(option.id))
     .reduce((total, option) => total + option.additionalCantrips, 0);
-  return { ...counts, cantrips: counts.cantrips + additionalCantrips };
+  const choiceGrantedSpells = selectedClass.featureChoices
+    .flatMap((choice) => choice.options)
+    .filter((option) => selectedOptions.has(option.id))
+    .flatMap((option) =>
+      spellsGrantedThroughLevel(option.alwaysPreparedSpellsByLevel, draft.level),
+    );
+  return {
+    ...counts,
+    cantrips: counts.cantrips + additionalCantrips,
+    alwaysPreparedSpellIds: [
+      ...new Set([...counts.alwaysPreparedSpellIds, ...choiceGrantedSpells]),
+    ],
+  };
 }
 
 function spellSelections(

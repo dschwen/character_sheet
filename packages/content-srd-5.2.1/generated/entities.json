@@ -8677,9 +8677,28 @@
         "light",
         "shield"
       ],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "wisdom",
+        "defaultAbilityScores": {
+          "charisma": 12,
+          "constitution": 14,
+          "dexterity": 10,
+          "intelligence": 8,
+          "strength": 13,
+          "wisdom": 15
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.animal-handling",
+          "srd521.skill.nature"
+        ],
+        "defaultGrantedFeatIds": [],
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
       "hitPointDie": 8,
       "primalOrderChoice": {
         "id": "srd521.choice.druid.primal-order",
+        "level": 1,
         "maximum": 1,
         "minimum": 1,
         "options": [
@@ -9097,6 +9116,13 @@
         "wisdom"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2
+        },
         "maximum": 2,
         "minimum": 2,
         "options": [
@@ -9238,6 +9264,62 @@
       ],
       "spellPreparation": "full-list",
       "spellcastingAbility": "wisdom",
+      "startingEquipment": {
+        "id": "srd521.choice.class.druid.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "currencyGp": 9,
+            "id": "srd521.option.class.druid.starting-equipment.a",
+            "items": [
+              {
+                "entityId": "srd521.equipment.armor.light.leather-armor",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.shield",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.sickle",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.quarterstaff",
+                "equipped": true,
+                "kind": "entity",
+                "label": "Druidic Focus (Quarterstaff)",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.explorers-pack",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "kind": "text",
+                "name": "Herbalism Kit",
+                "quantity": 1
+              }
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 50,
+            "id": "srd521.option.class.druid.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
+          }
+        ]
+      },
       "startingEquipmentText": "Choose A or B: (A) Leather Armor, Shield, Sickle, Druidic Focus (Quarterstaff), Explorer’s Pack, Herbalism Kit, and 9 GP; or (B) 50 GP",
       "toolProficiencies": [
         "Herbalism Kit"
@@ -10016,6 +10098,7 @@
       "description": "The Circle of the Land comprises mystics and sages who safeguard ancient knowledge and rites. These Druids meet within sacred circles of trees or standing stones to whisper primal secrets in Druidic. The circle’s wisest members preside as the chief priests of their communities.",
       "landChoice": {
         "id": "srd521.choice.druid.circle-of-land",
+        "level": 3,
         "maximum": 1,
         "minimum": 1,
         "options": [
@@ -10501,6 +10584,64 @@
       "attackType": null,
       "castingTime": "Action",
       "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "Your body becomes blurred. For the duration, any creature has Disadvantage on attack rolls against you. An attacker is immune to this effect if it perceives you with Blindsight or Truesight.",
+      "druidSpell": false,
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 2,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "illusion"
+    },
+    "id": "srd521.spell.blur",
+    "kind": "spell",
+    "name": {
+      "en": "Blur"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Druid or Circle spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0114-b003",
+          "p0114-b004",
+          "p0114-b005"
+        ],
+        "page": 114,
+        "quoteHash": "90ee68dd5b641a367d582e3b656188d1c7d6a7e5f8de625b787da7a638eef34f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "illusion",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
         "druid"
       ],
       "components": {
@@ -10536,7 +10677,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -10594,7 +10735,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -10654,7 +10795,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -10715,7 +10856,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -10775,7 +10916,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -10797,6 +10938,73 @@
       "spell",
       "level-1",
       "conjuration",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a bit of fur and a crystal rod",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 8,
+          "diceSize": 6,
+          "type": "lightning"
+        }
+      ],
+      "description": "A stroke of lightning forming a 100-foot-long, 5-foot-wide Line blasts out from you in a direction you choose. Each creature in the Line makes a Dexterity saving throw, taking 8d6 Lightning damage on a failed save or half as much damage on a successful one. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell slot level above 3.",
+      "druidSpell": false,
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 3,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [
+        "dexterity"
+      ],
+      "school": "evocation"
+    },
+    "id": "srd521.spell.lightning-bolt",
+    "kind": "spell",
+    "name": {
+      "en": "Lightning Bolt"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Druid or Circle spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0144-b017",
+          "p0144-b018",
+          "p0144-b019"
+        ],
+        "page": 144,
+        "quoteHash": "bf10f9b716b3d23bb94eb3d520c72035f1b49ae322ed2371e22cff02d7740fc2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-3",
+      "evocation",
       "druid"
     ]
   },
@@ -10841,7 +11049,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -10907,7 +11115,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -10970,7 +11178,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -10992,6 +11200,70 @@
       "spell",
       "level-0",
       "conjuration",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 2,
+          "diceSize": 8,
+          "type": "poison"
+        }
+      ],
+      "description": "You shoot a greenish ray at a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 2d8 Poison damage and has the Poisoned condition until the end of your next turn. Using a Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 1.",
+      "druidSpell": false,
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": true,
+      "healing": [],
+      "level": 1,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "necromancy"
+    },
+    "id": "srd521.spell.ray-of-sickness",
+    "kind": "spell",
+    "name": {
+      "en": "Ray of Sickness"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Druid or Circle spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0158-b005",
+          "p0158-b006",
+          "p0158-b007"
+        ],
+        "page": 158,
+        "quoteHash": "7edc76ca3438dee7a6c183525ce1ccd1a04dc4cc941ad72ef6c2c0c048827a4b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "necromancy",
       "druid"
     ]
   },
@@ -11028,7 +11300,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -11050,6 +11322,71 @@
       "spell",
       "level-0",
       "transmutation",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "melee",
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 1,
+          "diceSize": 8,
+          "type": "lightning"
+        }
+      ],
+      "description": "Lightning springs from you to a creature that you try to touch. Make a melee spell attack against the target. On a hit, the target takes 1d8 Lightning damage, and it can’t make Opportunity Attacks until the start of its next turn. Cantrip Upgrade. The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
+      "druidSpell": false,
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "healing": [],
+      "level": 0,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation"
+    },
+    "id": "srd521.spell.shocking-grasp",
+    "kind": "spell",
+    "name": {
+      "en": "Shocking Grasp"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Druid or Circle spell with structured casting fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0162-b013",
+          "p0162-b014",
+          "p0162-b015",
+          "p0162-b016"
+        ],
+        "page": 162,
+        "quoteHash": "bbca94ae271ec0806010d5eea7ab4a06a695313884af5cac3731527444063e7f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "evocation",
       "druid"
     ]
   },
@@ -11090,7 +11427,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -11151,7 +11488,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false
@@ -11212,7 +11549,7 @@
     },
     "review": {
       "extractionApproved": true,
-      "notes": "Representative Druid spell with structured casting fields.",
+      "notes": "Druid or Circle spell with structured casting fields.",
       "semanticsApproved": false,
       "status": "STRUCTURED",
       "testsApproved": false

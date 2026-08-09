@@ -14,6 +14,7 @@ import {
   characterBuilderCatalog,
   clericId,
   defaultBuilderDraft,
+  druidId,
   fighterId,
   wizardId,
 } from "./character-builder";
@@ -25,7 +26,7 @@ const initialOptions = {
 };
 
 describe("guided character level up", () => {
-  it.each([barbarianId, clericId, fighterId, wizardId] as const)(
+  it.each([barbarianId, clericId, druidId, fighterId, wizardId] as const)(
     "advances %s from level 1 through 5 without replacing play state or possessions",
     (classId) => {
       const { rulesPackage } = loadWebData();
@@ -104,6 +105,14 @@ describe("guided character level up", () => {
           },
         ]);
       }
+      if (classId === druidId) {
+        expect(character.build.levels[2]?.selectedFeatureChoices).toEqual([
+          {
+            choiceId: "srd521.choice.druid.circle-of-land",
+            optionIds: ["srd521.option.druid.land.arid"],
+          },
+        ]);
+      }
     },
   );
 
@@ -131,7 +140,7 @@ describe("guided character level up", () => {
     });
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
-      reason: "Level-up support currently covers Barbarian, Cleric, Fighter, and Wizard.",
+      reason: "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, and Wizard.",
     });
     expect(() => createLevelUpDraft(levelFive, catalog)).toThrow(
       "Fighter advancement is currently reviewed through level 5.",

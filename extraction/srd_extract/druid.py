@@ -48,6 +48,13 @@ REPRESENTATIVE_SPELLS = (
     "Speak with Animals",
     "Water Breathing",
 )
+CIRCLE_ONLY_SPELLS = (
+    "Blur",
+    "Lightning Bolt",
+    "Ray of Sickness",
+    "Shocking Grasp",
+)
+EXTRACTED_SPELLS = (*REPRESENTATIVE_SPELLS, *CIRCLE_ONLY_SPELLS)
 
 
 @dataclass(frozen=True, slots=True)
@@ -314,7 +321,7 @@ def extract_spell_entities(
             starts.append((index, str(node["normalizedText"]), signature))
     entities: list[dict[str, Any]] = []
     for position, (start, name, signature) in enumerate(starts):
-        if name not in REPRESENTATIVE_SPELLS:
+        if name not in EXTRACTED_SPELLS:
             continue
         end = starts[position + 1][0] if position + 1 < len(starts) else len(nodes)
         section = [node for node in nodes[start:end] if node["kind"] != "MetadataNode"]
@@ -333,15 +340,17 @@ def extract_spell_entities(
         )
         description = " ".join(str(node["normalizedText"]) for node in description_nodes)
         level, school, classes = signature
-        list_entry = spell_list[name]
-        if level != list_entry["level"] or school != list_entry["school"]:
+        list_entry = spell_list.get(name)
+        if list_entry is not None and (
+            level != list_entry["level"] or school != list_entry["school"]
+        ):
             raise ValueError(f"{name} description disagrees with the Druid spell list")
         body = {
             "level": level,
             "school": school,
             "classes": classes,
-            "druidSpell": True,
-            "ritual": list_entry["ritual"],
+            "druidSpell": list_entry is not None,
+            "ritual": False if list_entry is None else list_entry["ritual"],
             **casting,
             "attackType": (
                 "ranged"
@@ -375,18 +384,18 @@ def extract_spell_entities(
         }
         entities.append(
             {
-                "id": list_entry["id"],
+                "id": f"srd521.spell.{_slug(name)}" if list_entry is None else list_entry["id"],
                 "kind": "spell",
                 "name": {"en": name},
                 "tags": ["spell", f"level-{level}", school, "druid"],
                 "source": _source_spans(section),
                 "body": body,
                 "rules": [],
-                "review": _review("Representative Druid spell with structured casting fields."),
+                "review": _review("Druid or Circle spell with structured casting fields."),
             }
         )
-    if {entity["name"]["en"] for entity in entities} != set(REPRESENTATIVE_SPELLS):
-        raise ValueError("Representative Druid spell description extraction is incomplete")
+    if {entity["name"]["en"] for entity in entities} != set(EXTRACTED_SPELLS):
+        raise ValueError("Druid and Circle spell description extraction is incomplete")
     return tuple(entities)
 
 
@@ -406,6 +415,61 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _starting_equipment() -> dict[str, Any]:
+    return {
+        "id": "srd521.choice.class.druid.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
+        "options": [
+            {
+                "id": "srd521.option.class.druid.starting-equipment.a",
+                "label": "Package A",
+                "items": [
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.armor.light.leather-armor",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.shield",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.sickle",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.quarterstaff",
+                        "quantity": 1,
+                        "equipped": True,
+                        "label": "Druidic Focus (Quarterstaff)",
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.explorers-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                    {"kind": "text", "name": "Herbalism Kit", "quantity": 1},
+                ],
+                "currencyGp": 9,
+            },
+            {
+                "id": "srd521.option.class.druid.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 50,
+            },
+        ],
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[DruidProgressionRow, ...],
@@ -422,6 +486,29 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits.get("skillProficiencyChoice", {}),
+                "countByLevel": {str(level): 2 for level in range(1, 6)},
+            },
+            "startingEquipment": _starting_equipment(),
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 13,
+                    "dexterity": 10,
+                    "constitution": 14,
+                    "intelligence": 8,
+                    "wisdom": 15,
+                    "charisma": 12,
+                },
+                "defaultAbilityScoreImprovementAbility": "wisdom",
+                "defaultClassSkillIds": [
+                    "srd521.skill.animal-handling",
+                    "srd521.skill.nature",
+                ],
+                "defaultGrantedFeatIds": [],
+            },
             "spellcastingAbility": "wisdom",
             "spellPreparation": "full-list",
             "alwaysPreparedSpells": {"1": ["srd521.spell.speak-with-animals"]},
@@ -433,6 +520,7 @@ def _class_entity(
             ],
             "primalOrderChoice": {
                 "id": PRIMAL_ORDER_CHOICE_ID,
+                "level": 1,
                 "minimum": 1,
                 "maximum": 1,
                 "options": [MAGICIAN_ID, WARDEN_ID],
@@ -562,6 +650,7 @@ def _circle_entities(
             ],
             "landChoice": {
                 "id": LAND_CHOICE_ID,
+                "level": 3,
                 "minimum": 1,
                 "maximum": 1,
                 "options": list(LAND_OPTION_IDS.values()),

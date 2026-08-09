@@ -22,9 +22,17 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(519);
+    expect(parsedEntities).toHaveLength(523);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
+    expect(entityIds).toEqual(
+      expect.arrayContaining([
+        "srd521.spell.blur",
+        "srd521.spell.lightning-bolt",
+        "srd521.spell.ray-of-sickness",
+        "srd521.spell.shocking-grasp",
+      ]),
+    );
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
     expect(entityIds).toContain("srd521.subclass.barbarian.path-of-the-berserker");
     expect(entityIds).toContain("srd521.subclass-feature.barbarian.path-of-the-berserker.frenzy");
@@ -191,6 +199,8 @@ describe("bootstrap content package", () => {
     expect(parsedChoices.map(({ classId }) => classId)).toEqual(
       expect.arrayContaining([
         "srd521.class.barbarian",
+        "srd521.class.cleric",
+        "srd521.class.druid",
         "srd521.class.fighter",
         "srd521.class.wizard",
       ]),
@@ -212,6 +222,7 @@ describe("bootstrap content package", () => {
     const builderClasses = new Set([
       "srd521.class.barbarian",
       "srd521.class.cleric",
+      "srd521.class.druid",
       "srd521.class.fighter",
       "srd521.class.wizard",
     ]);
@@ -221,7 +232,7 @@ describe("bootstrap content package", () => {
       return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
     });
 
-    expect(metadata).toHaveLength(4);
+    expect(metadata).toHaveLength(5);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "strength",
@@ -233,6 +244,28 @@ describe("bootstrap content package", () => {
       options: [
         "srd521.option.cleric.divine-order.protector",
         "srd521.option.cleric.divine-order.thaumaturge",
+      ],
+    });
+    const druid = entities.find((entity) => entity.id === "srd521.class.druid");
+    const druidBody = z.record(z.unknown()).parse(druid?.body);
+    expect(classFeatureChoiceSchema.parse(druidBody.primalOrderChoice)).toMatchObject({
+      level: 1,
+      options: [
+        "srd521.option.druid.primal-order.magician",
+        "srd521.option.druid.primal-order.warden",
+      ],
+    });
+    const circle = entities.find(
+      (entity) => entity.id === "srd521.subclass.druid.circle-of-the-land",
+    );
+    const circleBody = z.record(z.unknown()).parse(circle?.body);
+    expect(classFeatureChoiceSchema.parse(circleBody.landChoice)).toMatchObject({
+      level: 3,
+      options: [
+        "srd521.option.druid.land.arid",
+        "srd521.option.druid.land.polar",
+        "srd521.option.druid.land.temperate",
+        "srd521.option.druid.land.tropical",
       ],
     });
   });

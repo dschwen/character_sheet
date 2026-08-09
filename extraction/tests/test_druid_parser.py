@@ -1,6 +1,6 @@
 import pytest
 
-from srd_extract.druid import DruidProgressionRow, parse_core_traits
+from srd_extract.druid import DruidProgressionRow, _starting_equipment, parse_core_traits
 
 
 def test_parse_core_druid_traits() -> None:
@@ -34,3 +34,17 @@ def test_druid_progression_accepts_level_five_row() -> None:
     assert row.wild_shape == 2
     assert row.prepared_spells == 9
     assert row.spell_slots[:3] == (4, 3, 2)
+
+
+def test_druid_starting_equipment_preserves_package_and_gold_choices() -> None:
+    choice = _starting_equipment()
+
+    assert [option["currencyGp"] for option in choice["options"]] == [9, 50]
+    assert [item.get("entityId", item.get("name")) for item in choice["options"][0]["items"]] == [
+        "srd521.equipment.armor.light.leather-armor",
+        "srd521.equipment.shield",
+        "srd521.equipment.weapon.sickle",
+        "srd521.equipment.weapon.quarterstaff",
+        "srd521.equipment.gear.explorers-pack",
+        "Herbalism Kit",
+    ]
