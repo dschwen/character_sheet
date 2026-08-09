@@ -4,6 +4,58 @@
       "armorTraining": [
         "light"
       ],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "dexterity",
+        "defaultAbilityScores": {
+          "charisma": 8,
+          "constitution": 14,
+          "dexterity": 15,
+          "intelligence": 13,
+          "strength": 10,
+          "wisdom": 12
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.acrobatics",
+          "srd521.skill.investigation",
+          "srd521.skill.sleight-of-hand",
+          "srd521.skill.stealth"
+        ],
+        "defaultGrantedFeatIds": [],
+        "expertiseChoice": {
+          "countByLevel": {
+            "1": 2,
+            "2": 2,
+            "3": 2,
+            "4": 2,
+            "5": 2
+          },
+          "eligibleSkillIds": [
+            "srd521.skill.acrobatics",
+            "srd521.skill.animal-handling",
+            "srd521.skill.arcana",
+            "srd521.skill.athletics",
+            "srd521.skill.deception",
+            "srd521.skill.history",
+            "srd521.skill.insight",
+            "srd521.skill.intimidation",
+            "srd521.skill.investigation",
+            "srd521.skill.medicine",
+            "srd521.skill.nature",
+            "srd521.skill.perception",
+            "srd521.skill.performance",
+            "srd521.skill.persuasion",
+            "srd521.skill.religion",
+            "srd521.skill.sleight-of-hand",
+            "srd521.skill.stealth",
+            "srd521.skill.survival"
+          ],
+          "minimumLevel": 1,
+          "requireClassProficiency": false,
+          "sourceId": "srd521.class-feature.rogue.expertise"
+        },
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
       "conditionalWeaponProficiencies": [
         {
           "attackType": "melee",
@@ -356,6 +408,13 @@
         "intelligence"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 4,
+          "2": 4,
+          "3": 4,
+          "4": 4,
+          "5": 4
+        },
         "maximum": 4,
         "minimum": 4,
         "options": [
@@ -371,10 +430,102 @@
           "stealth"
         ]
       },
+      "startingEquipment": {
+        "id": "srd521.choice.class.rogue.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "currencyGp": 8,
+            "id": "srd521.option.class.rogue.starting-equipment.a",
+            "items": [
+              {
+                "entityId": "srd521.equipment.armor.light.leather-armor",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.dagger",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 2
+              },
+              {
+                "entityId": "srd521.equipment.weapon.shortsword",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.shortbow",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.ammunition.arrows",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 20
+              },
+              {
+                "entityId": "srd521.equipment.gear.quiver",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "kind": "text",
+                "name": "Thieves’ Tools",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.burglars-pack",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              }
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 100,
+            "id": "srd521.option.class.rogue.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
+          }
+        ]
+      },
       "startingEquipmentText": "Choose A or B: (A) Leather Armor, 2 Daggers, Short­sword, Shortbow, 20 Arrows, Quiver, Thieves’ Tools, Burglar’s Pack, and 8 GP; or (B) 100 GP",
       "toolProficiencies": [
         "Thieves’ Tools"
       ],
+      "weaponMasteryChoice": {
+        "attackTypes": [
+          "melee",
+          "ranged"
+        ],
+        "categories": [
+          "simple"
+        ],
+        "conditionalCategories": [
+          {
+            "attackType": "melee",
+            "category": "martial",
+            "requiredProperties": [
+              "finesse"
+            ]
+          },
+          {
+            "attackType": "melee",
+            "category": "martial",
+            "requiredProperties": [
+              "light"
+            ]
+          }
+        ]
+      },
       "weaponProficiencies": [
         "simple"
       ]

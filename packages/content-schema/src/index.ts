@@ -307,6 +307,7 @@ export const classBuilderMetadataSchema = z
         minimumLevel: z.number().int().min(1).max(20),
         eligibleSkillIds: z.array(entityIdSchema).min(1),
         requireClassProficiency: z.boolean().default(true),
+        countByLevel: z.record(z.string(), z.number().int().nonnegative()).optional(),
       })
       .strict()
       .optional(),

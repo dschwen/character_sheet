@@ -9,6 +9,7 @@ import { createLevelUpDraft, levelUpCharacter, previewLevelUp } from "../lib/cha
 import {
   characterBuilderCatalog,
   classSkillCount,
+  expertiseCount,
   expertiseSkillCandidates,
   masteryCount,
   spellSelectionCounts,
@@ -127,7 +128,12 @@ export function CharacterLevelUp({
   );
   const expertiseChoice = selectedClass.builder.expertiseChoice;
   const eligibleExpertiseSkills = expertiseSkillCandidates(draft, catalog);
-  const introducesExpertise = expertiseChoice?.minimumLevel === targetLevel;
+  const requiredExpertise = expertiseCount(draft, catalog);
+  const currentExpertiseSkillIds = character.build.proficiencyChoices.expertise
+    .filter((choice) => choice.sourceId === expertiseChoice?.sourceId)
+    .map((choice) => choice.skillId);
+  const newExpertiseCount = Math.max(0, requiredExpertise - currentExpertiseSkillIds.length);
+  const introducesExpertise = newExpertiseCount > 0;
   const introducesSubclass = selectedClass.subclassLevel === targetLevel;
   const introducesAsi = targetLevel === 4;
   const hasChoiceSections =
@@ -337,29 +343,46 @@ export function CharacterLevelUp({
               ) : null}
 
               {introducesExpertise ? (
-                <label className="builder-field compact-field">
-                  {shortEntityName(expertiseChoice.sourceId)} Expertise
-                  <select
-                    value={draft.expertiseSkillId}
-                    onChange={(event) => {
-                      setDraft((value) =>
-                        value === undefined
-                          ? value
-                          : { ...value, expertiseSkillId: event.target.value },
-                      );
-                    }}
-                  >
+                <div className="skill-choice-section">
+                  <div>
+                    <span>{shortEntityName(expertiseChoice?.sourceId ?? "")} Expertise</span>
+                    <h2>
+                      Choose {String(newExpertiseCount)} new skill
+                      {newExpertiseCount === 1 ? "" : "s"}
+                    </h2>
+                    <small>
+                      {String(draft.expertiseSkillIds.length - currentExpertiseSkillIds.length)} /{" "}
+                      {String(newExpertiseCount)} new
+                    </small>
+                  </div>
+                  <div className="choice-pills">
                     {eligibleExpertiseSkills.map((id) => (
-                      <option key={id} value={id}>
+                      <button
+                        key={id}
+                        type="button"
+                        className={draft.expertiseSkillIds.includes(id) ? "selected" : undefined}
+                        disabled={currentExpertiseSkillIds.includes(id)}
+                        onClick={() => {
+                          setDraft((value) =>
+                            value === undefined
+                              ? value
+                              : {
+                                  ...value,
+                                  expertiseSkillIds: toggleUnlocked(
+                                    value.expertiseSkillIds,
+                                    id,
+                                    new Set(currentExpertiseSkillIds),
+                                    requiredExpertise,
+                                  ),
+                                },
+                          );
+                        }}
+                      >
                         {skillName(id)}
-                      </option>
+                      </button>
                     ))}
-                  </select>
-                  <small>
-                    Choose one eligible existing
-                    {expertiseChoice.requireClassProficiency ? " class" : ""} proficiency.
-                  </small>
-                </label>
+                  </div>
+                </div>
               ) : null}
 
               {targetFeatureChoices.map((choice) => (

@@ -78,6 +78,17 @@ const classBodySchema = z
       .object({
         categories: z.array(z.enum(["simple", "martial"])),
         attackTypes: z.array(z.enum(["melee", "ranged"])),
+        conditionalCategories: z
+          .array(
+            z
+              .object({
+                category: z.enum(["simple", "martial"]),
+                attackType: z.enum(["melee", "ranged"]),
+                requiredProperties: z.array(z.string()),
+              })
+              .strict(),
+          )
+          .default([]),
       })
       .strict()
       .optional(),
@@ -3284,8 +3295,18 @@ function evaluateAttacks(
         );
       } else if (
         classBody?.weaponMasteryChoice !== undefined &&
-        (!classBody.weaponMasteryChoice.categories.includes(weapon.category) ||
-          !classBody.weaponMasteryChoice.attackTypes.includes(weapon.attackType))
+        !(
+          (classBody.weaponMasteryChoice.categories.includes(weapon.category) &&
+            classBody.weaponMasteryChoice.attackTypes.includes(weapon.attackType)) ||
+          classBody.weaponMasteryChoice.conditionalCategories.some(
+            (condition) =>
+              condition.category === weapon.category &&
+              condition.attackType === weapon.attackType &&
+              condition.requiredProperties.every((property) =>
+                weapon.properties.includes(property),
+              ),
+          )
+        )
       ) {
         addValidation(
           state,

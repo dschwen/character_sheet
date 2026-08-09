@@ -205,6 +205,7 @@ describe("bootstrap content package", () => {
         "srd521.class.monk",
         "srd521.class.paladin",
         "srd521.class.ranger",
+        "srd521.class.rogue",
         "srd521.class.wizard",
       ]),
     );
@@ -230,6 +231,7 @@ describe("bootstrap content package", () => {
       "srd521.class.monk",
       "srd521.class.paladin",
       "srd521.class.ranger",
+      "srd521.class.rogue",
       "srd521.class.wizard",
     ]);
     const metadata = entities.flatMap((entity) => {
@@ -238,7 +240,7 @@ describe("bootstrap content package", () => {
       return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
     });
 
-    expect(metadata).toHaveLength(8);
+    expect(metadata).toHaveLength(9);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "strength",
@@ -272,6 +274,16 @@ describe("bootstrap content package", () => {
         sourceId: "srd521.class-feature.ranger.deft-explorer",
         minimumLevel: 2,
         requireClassProficiency: false,
+      },
+    });
+    expect(metadata.find(({ id }) => id === "srd521.class.rogue")?.builder).toMatchObject({
+      supportedLevelMaximum: 5,
+      defaultAbilityScoreImprovementAbility: "dexterity",
+      expertiseChoice: {
+        sourceId: "srd521.class-feature.rogue.expertise",
+        minimumLevel: 1,
+        requireClassProficiency: false,
+        countByLevel: { 1: 2, 3: 2, 5: 2 },
       },
     });
     const hunter = entities.find((entity) => entity.id === "srd521.subclass.ranger.hunter");

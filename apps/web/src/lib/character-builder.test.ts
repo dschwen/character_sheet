@@ -12,9 +12,11 @@ import {
   druidId,
   fighterId,
   expertiseSkillCandidates,
+  expertiseCount,
   monkId,
   paladinId,
   rangerId,
+  rogueId,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
@@ -98,6 +100,23 @@ describe("guided character builder", () => {
         description: "+1 attack · Once Per Turn",
       }),
     ]);
+    expect(catalog.classes[rogueId]).toMatchObject({
+      name: "Rogue",
+      subclassId: "srd521.subclass.rogue.thief",
+      subclassLevel: 3,
+      skillCountByLevel: { 1: 4, 3: 4, 5: 4 },
+    });
+    expect(catalog.classes[rogueId].weaponMasteryIds).toEqual(
+      expect.arrayContaining([
+        "srd521.equipment.weapon.dagger",
+        "srd521.equipment.weapon.shortbow",
+        "srd521.equipment.weapon.shortsword",
+        "srd521.equipment.weapon.scimitar",
+      ]),
+    );
+    expect(catalog.classes[rogueId].weaponMasteryIds).not.toContain(
+      "srd521.equipment.weapon.longbow",
+    );
     expect(catalog.classes[wizardId].name).toBe("Wizard");
     expect(catalog.classes[barbarianId]).toMatchObject({
       name: "Barbarian",
@@ -636,7 +655,7 @@ describe("guided character builder", () => {
     const draft = defaultBuilderDraft(rangerId, catalog, 2, "Broad Expertise Ranger");
 
     expect(expertiseSkillCandidates(draft, catalog)).toContain("srd521.skill.athletics");
-    draft.expertiseSkillId = "srd521.skill.athletics";
+    draft.expertiseSkillIds = ["srd521.skill.athletics"];
     const character = buildCharacter(draft, rulesPackage, options);
     const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
 
@@ -645,6 +664,70 @@ describe("guided character builder", () => {
       {
         sourceId: "srd521.class-feature.ranger.deft-explorer",
         skillId: "srd521.skill.athletics",
+      },
+    ]);
+  });
+
+  it("builds Thief Rogues with two Expertise skills and reviewed features through level 5", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [10, 17, 24, 31, 38];
+    const expectedSneakAttackDice = [1, 1, 2, 2, 3];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(rogueId, catalog, level, `Level ${String(level)} Rogue`);
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+      const sneakAttack = evaluation.actions.find((action) => action.id === "action.sneak-attack");
+
+      expect(validateBuilderDraft(draft, catalog), `draft level ${String(level)}`).toEqual([]);
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(character.build.proficiencyChoices.expertise).toHaveLength(2);
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.rogue.thief" : undefined,
+      );
+      expect(character.loadout.selectedWeaponMasteryIds).toEqual([
+        "srd521.equipment.weapon.dagger",
+        "srd521.equipment.weapon.shortsword",
+      ]);
+      expect(sneakAttack?.parameters).toMatchObject({
+        extraDamage: { diceCount: expectedSneakAttackDice[level - 1], diceSize: 6 },
+      });
+      expect(evaluation.values["speed.climb"]?.value).toBe(level >= 3 ? 30 : undefined);
+      expect(evaluation.actions.some((action) => action.id === "action.cunning-strike.trip")).toBe(
+        level >= 5,
+      );
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(8);
+        expect(character.loadout.equippedItemIds).toEqual([
+          "leather-armor-1",
+          "shortsword-1",
+          "shortbow-1",
+        ]);
+        expect(character.loadout.currency.gp).toBe(8);
+      }
+    }
+  });
+
+  it("supports Rogue Expertise in any two existing proficient skills", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const draft = defaultBuilderDraft(rogueId, catalog, 1, "Broad Expertise Rogue");
+
+    expect(expertiseCount(draft, catalog)).toBe(2);
+    expect(expertiseSkillCandidates(draft, catalog)).toContain("srd521.skill.athletics");
+    draft.expertiseSkillIds = ["srd521.skill.athletics", "srd521.skill.acrobatics"];
+    const character = buildCharacter(draft, rulesPackage, options);
+
+    expect(character.build.proficiencyChoices.expertise).toEqual([
+      {
+        sourceId: "srd521.class-feature.rogue.expertise",
+        skillId: "srd521.skill.athletics",
+      },
+      {
+        sourceId: "srd521.class-feature.rogue.expertise",
+        skillId: "srd521.skill.acrobatics",
       },
     ]);
   });
@@ -741,11 +824,11 @@ describe("guided character builder", () => {
 
     expect(levelFive.learnedSpellIds).toHaveLength(18);
     expect(levelFive.preparedSpellIds).toHaveLength(9);
-    expect(levelFive.expertiseSkillId).toBe("srd521.skill.arcana");
+    expect(levelFive.expertiseSkillIds).toEqual(["srd521.skill.arcana"]);
     expect(validateBuilderDraft(levelFive, catalog)).toEqual([]);
     expect(returnedToOne.learnedSpellIds).toHaveLength(9);
     expect(returnedToOne.preparedSpellIds).toHaveLength(4);
-    expect(returnedToOne.expertiseSkillId).toBe("");
+    expect(returnedToOne.expertiseSkillIds).toEqual([]);
     expect(validateBuilderDraft(returnedToOne, catalog)).toEqual([]);
   });
 

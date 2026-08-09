@@ -273,6 +273,76 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _starting_equipment() -> dict[str, Any]:
+    return {
+        "id": "srd521.choice.class.rogue.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
+        "options": [
+            {
+                "id": "srd521.option.class.rogue.starting-equipment.a",
+                "label": "Package A",
+                "items": [
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.armor.light.leather-armor",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.dagger",
+                        "quantity": 2,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.shortsword",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.shortbow",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.ammunition.arrows",
+                        "quantity": 20,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.quiver",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "text",
+                        "name": "Thieves’ Tools",
+                        "quantity": 1,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.burglars-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                ],
+                "currencyGp": 8,
+            },
+            {
+                "id": "srd521.option.class.rogue.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 100,
+            },
+        ],
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[RogueProgressionRow, ...],
@@ -288,6 +358,62 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits["skillProficiencyChoice"],
+                "countByLevel": {str(level): 4 for level in range(1, 6)},
+            },
+            "weaponMasteryChoice": {
+                "categories": ["simple"],
+                "attackTypes": ["melee", "ranged"],
+                "conditionalCategories": traits["conditionalWeaponProficiencies"],
+            },
+            "startingEquipment": _starting_equipment(),
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 10,
+                    "dexterity": 15,
+                    "constitution": 14,
+                    "intelligence": 13,
+                    "wisdom": 12,
+                    "charisma": 8,
+                },
+                "defaultAbilityScoreImprovementAbility": "dexterity",
+                "defaultClassSkillIds": [
+                    "srd521.skill.acrobatics",
+                    "srd521.skill.investigation",
+                    "srd521.skill.sleight-of-hand",
+                    "srd521.skill.stealth",
+                ],
+                "defaultGrantedFeatIds": [],
+                "expertiseChoice": {
+                    "sourceId": "srd521.class-feature.rogue.expertise",
+                    "minimumLevel": 1,
+                    "eligibleSkillIds": [
+                        "srd521.skill.acrobatics",
+                        "srd521.skill.animal-handling",
+                        "srd521.skill.arcana",
+                        "srd521.skill.athletics",
+                        "srd521.skill.deception",
+                        "srd521.skill.history",
+                        "srd521.skill.insight",
+                        "srd521.skill.intimidation",
+                        "srd521.skill.investigation",
+                        "srd521.skill.medicine",
+                        "srd521.skill.nature",
+                        "srd521.skill.perception",
+                        "srd521.skill.performance",
+                        "srd521.skill.persuasion",
+                        "srd521.skill.religion",
+                        "srd521.skill.sleight-of-hand",
+                        "srd521.skill.stealth",
+                        "srd521.skill.survival",
+                    ],
+                    "requireClassProficiency": False,
+                    "countByLevel": {str(level): 2 for level in range(1, 6)},
+                },
+            },
             "featureSaveAbility": "dexterity",
             "progression": [
                 {

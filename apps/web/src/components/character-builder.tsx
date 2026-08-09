@@ -13,6 +13,7 @@ import {
   characterBuilderCatalog,
   classSkillCount,
   defaultBuilderDraft,
+  expertiseCount,
   expertiseSkillCandidates,
   fighterId,
   masteryCount,
@@ -124,6 +125,7 @@ export function CharacterBuilder({
   const requiredClassSkills = classSkillCount(draft, catalog);
   const expertiseChoice = selectedClass.builder.expertiseChoice;
   const eligibleExpertiseSkills = expertiseSkillCandidates(draft, catalog);
+  const requiredExpertise = expertiseCount(draft, catalog);
   const supportedLevels = Array.from(
     {
       length:
@@ -677,9 +679,13 @@ export function CharacterBuilder({
                     <span>
                       {selectedClass.name} · {shortEntityName(expertiseChoice.sourceId)}
                     </span>
-                    <h2>Choose 1 Expertise</h2>
+                    <h2>
+                      Choose {String(requiredExpertise)} Expertise skill
+                      {requiredExpertise === 1 ? "" : "s"}
+                    </h2>
                     <small>
-                      Must be one of your eligible
+                      {String(draft.expertiseSkillIds.length)} / {String(requiredExpertise)}{" "}
+                      selected · must be eligible
                       {expertiseChoice.requireClassProficiency ? " class" : " proficient"} skills
                     </small>
                   </div>
@@ -688,9 +694,16 @@ export function CharacterBuilder({
                       <button
                         key={id}
                         type="button"
-                        className={draft.expertiseSkillId === id ? "selected" : undefined}
+                        className={draft.expertiseSkillIds.includes(id) ? "selected" : undefined}
                         onClick={() => {
-                          setDraft((value) => ({ ...value, expertiseSkillId: id }));
+                          setDraft((value) => ({
+                            ...value,
+                            expertiseSkillIds: toggleList(
+                              value.expertiseSkillIds,
+                              id,
+                              requiredExpertise,
+                            ),
+                          }));
                         }}
                       >
                         {skillName(id)}
@@ -1014,7 +1027,7 @@ export function CharacterBuilder({
                   {expertiseChoice !== undefined && draft.level >= expertiseChoice.minimumLevel ? (
                     <small>
                       {shortEntityName(expertiseChoice.sourceId)} Expertise:{" "}
-                      {skillName(draft.expertiseSkillId)}
+                      {draft.expertiseSkillIds.map(skillName).join(", ")}
                     </small>
                   ) : null}
                 </article>

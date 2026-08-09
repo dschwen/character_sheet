@@ -1,6 +1,6 @@
 import pytest
 
-from srd_extract.rogue import RogueProgressionRow, parse_core_traits
+from srd_extract.rogue import RogueProgressionRow, _starting_equipment, parse_core_traits
 
 
 def test_parse_core_rogue_traits() -> None:
@@ -34,3 +34,19 @@ def test_rogue_progression_row_accepts_level_five_values() -> None:
 def test_rogue_progression_row_rejects_wrong_sneak_attack_scaling() -> None:
     with pytest.raises(ValueError, match="expected 3"):
         RogueProgressionRow(5, 3, ("Cunning Strike", "Uncanny Dodge"), 2)
+
+
+def test_rogue_starting_equipment_preserves_both_source_packages() -> None:
+    equipment = _starting_equipment()
+
+    assert [option["currencyGp"] for option in equipment["options"]] == [8, 100]
+    assert [item.get("entityId") for item in equipment["options"][0]["items"]] == [
+        "srd521.equipment.armor.light.leather-armor",
+        "srd521.equipment.weapon.dagger",
+        "srd521.equipment.weapon.shortsword",
+        "srd521.equipment.weapon.shortbow",
+        "srd521.equipment.ammunition.arrows",
+        "srd521.equipment.gear.quiver",
+        None,
+        "srd521.equipment.gear.burglars-pack",
+    ]

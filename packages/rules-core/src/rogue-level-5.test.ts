@@ -135,6 +135,26 @@ describe("evaluateCharacter Rogue level-5 vertical slice", () => {
     );
   });
 
+  it("allows mastery of martial melee weapons with Finesse or Light", () => {
+    const character = loadCharacter();
+    character.loadout.selectedWeaponMasteryIds = [
+      "srd521.equipment.weapon.dagger",
+      "srd521.equipment.weapon.shortsword",
+    ];
+
+    const evaluation = evaluateCharacter({
+      character,
+      packages: [loadRulesPackage()],
+    });
+
+    expect(evaluation.validations.map((message) => message.code)).not.toContain(
+      "WEAPON_MASTERY_CLASS_RESTRICTION",
+    );
+    expect(evaluation.attacks.find((attack) => attack.id === "attack.shortsword-1")).toMatchObject({
+      mastery: { property: "vex", enabled: true },
+    });
+  });
+
   it("rejects Expertise on a skill without proficiency", () => {
     const character = loadCharacter();
     character.build.proficiencyChoices.expertise[0] = {

@@ -99,7 +99,7 @@ export function levelUpEligibility(
       eligible: false,
       currentLevel,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, and Wizard.",
+        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, and Wizard.",
     };
   }
   const selectedClass = catalog.classes[classId];
@@ -192,10 +192,9 @@ export function createLevelUpDraft(
     originFeatSkillIds: skills
       .filter((choice) => choice.sourceId === originFeatId)
       .map((choice) => choice.skillId),
-    expertiseSkillId:
-      character.build.proficiencyChoices.expertise.find(
-        (choice) => choice.sourceId === expertiseSource,
-      )?.skillId ?? "",
+    expertiseSkillIds: character.build.proficiencyChoices.expertise
+      .filter((choice) => choice.sourceId === expertiseSource)
+      .map((choice) => choice.skillId),
     featureChoiceSelections: choiceSelections(character),
     startingEquipmentOptionId,
     weaponMasteryIds: [...character.loadout.selectedWeaponMasteryIds],

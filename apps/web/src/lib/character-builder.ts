@@ -21,6 +21,7 @@ export const druidId = "srd521.class.druid";
 export const monkId = "srd521.class.monk";
 export const paladinId = "srd521.class.paladin";
 export const rangerId = "srd521.class.ranger";
+export const rogueId = "srd521.class.rogue";
 const abilityScoreImprovementId = "srd521.feat.general.ability-score-improvement";
 const skillPrefix = "srd521.skill.";
 
@@ -32,6 +33,7 @@ export const builderClassIds = [
   monkId,
   paladinId,
   rangerId,
+  rogueId,
   wizardId,
 ] as const;
 export type BuilderClassId = (typeof builderClassIds)[number];
@@ -71,7 +73,7 @@ export interface CharacterBuilderDraft {
   classSkillIds: string[];
   speciesSkillIds: string[];
   originFeatSkillIds: string[];
-  expertiseSkillId: string;
+  expertiseSkillIds: string[];
   featureChoiceSelections: Readonly<Record<string, string[]>>;
   startingEquipmentOptionId: string;
   weaponMasteryIds: string[];
@@ -426,16 +428,31 @@ function classCatalog(
   const masteryChoice = objectValue(classBody?.weaponMasteryChoice);
   const masteryCategories = stringArray(masteryChoice?.categories);
   const masteryAttackTypes = stringArray(masteryChoice?.attackTypes);
+  const masteryConditions = Array.isArray(masteryChoice?.conditionalCategories)
+    ? masteryChoice.conditionalCategories
+        .map(objectValue)
+        .filter(
+          (condition): condition is Readonly<Record<string, unknown>> => condition !== undefined,
+        )
+    : [];
   const weaponMasteryIds = rulesPackage.entities
     .filter((candidate) => candidate.kind === "equipment-weapon")
     .filter((candidate) => {
       const body = objectValue(candidate.body);
-      return (
+      const baseEligible =
         (masteryCategories.length === 0 ||
           (typeof body?.category === "string" && masteryCategories.includes(body.category))) &&
         (masteryAttackTypes.length === 0 ||
-          (typeof body?.attackType === "string" && masteryAttackTypes.includes(body.attackType)))
+          (typeof body?.attackType === "string" && masteryAttackTypes.includes(body.attackType)));
+      const conditionalEligible = masteryConditions.some(
+        (condition) =>
+          condition.category === body?.category &&
+          condition.attackType === body?.attackType &&
+          stringArray(condition.requiredProperties).every((property) =>
+            stringArray(body?.properties).includes(property),
+          ),
       );
+      return baseEligible || conditionalEligible;
     })
     .map((candidate) => candidate.id);
   const authoredSkillCountByLevel = objectValue(skillChoice?.countByLevel);
@@ -669,6 +686,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
       [monkId]: classCatalog(monkId, rulesPackage),
       [paladinId]: classCatalog(paladinId, rulesPackage),
       [rangerId]: classCatalog(rangerId, rulesPackage),
+      [rogueId]: classCatalog(rogueId, rulesPackage),
       [wizardId]: classCatalog(wizardId, rulesPackage),
     },
     species,
@@ -806,6 +824,13 @@ export function expertiseSkillCandidates(
         ...draft.originFeatSkillIds,
       ];
   return [...new Set(proficientSkills)].filter((id) => choice.eligibleSkillIds.includes(id));
+}
+
+export function expertiseCount(draft: CharacterBuilderDraft, catalog: BuilderCatalog): number {
+  const choice = catalog.classes[draft.classId].builder.expertiseChoice;
+  if (choice === undefined || draft.level < choice.minimumLevel) return 0;
+  const countByLevel = objectValue(objectValue(choice)?.countByLevel);
+  return numericValue(countByLevel?.[String(draft.level)], 1);
 }
 
 function selectedEquipmentOption(
@@ -997,7 +1022,7 @@ export function defaultBuilderDraft(
     classSkillIds,
     speciesSkillIds,
     originFeatSkillIds,
-    expertiseSkillId: "",
+    expertiseSkillIds: [],
     featureChoiceSelections,
     startingEquipmentOptionId: startingEquipmentOption.id,
     weaponMasteryIds: masteryCandidates(selectedClass, startingEquipmentOption.id, catalog).slice(
@@ -1009,7 +1034,11 @@ export function defaultBuilderDraft(
   };
   const draft = {
     ...initialDraft,
-    expertiseSkillId: expertiseSkillCandidates(initialDraft, catalog)[0] ?? "",
+    expertiseSkillIds: fillSelections(
+      [],
+      expertiseSkillCandidates(initialDraft, catalog),
+      expertiseCount(initialDraft, catalog),
+    ),
   };
   return selectedClass.spellcasting === undefined
     ? draft
@@ -1050,14 +1079,17 @@ export function updateBuilderLevel(
       masteryCandidates(selectedClass, draft.startingEquipmentOptionId, catalog),
       selectedClass.weaponMasteryCountByLevel[level] ?? 0,
     ),
-    expertiseSkillId: draft.expertiseSkillId,
+    expertiseSkillIds: draft.expertiseSkillIds,
   };
   const expertiseCandidates = expertiseSkillCandidates(initialNext, catalog);
+  const requiredExpertise = expertiseCount(initialNext, catalog);
   const next = {
     ...initialNext,
-    expertiseSkillId: expertiseCandidates.includes(draft.expertiseSkillId)
-      ? draft.expertiseSkillId
-      : (expertiseCandidates[0] ?? ""),
+    expertiseSkillIds: fillSelections(
+      draft.expertiseSkillIds,
+      expertiseCandidates,
+      requiredExpertise,
+    ),
   };
   return selectedClass.spellcasting === undefined
     ? next
@@ -1237,12 +1269,17 @@ export function validateBuilderDraft(
   }
   const expertiseChoice = selectedClass.builder.expertiseChoice;
   const expertiseCandidates = expertiseSkillCandidates(draft, catalog);
+  const requiredExpertise = expertiseCount(draft, catalog);
   if (
     expertiseChoice !== undefined &&
     draft.level >= expertiseChoice.minimumLevel &&
-    !expertiseCandidates.includes(draft.expertiseSkillId)
+    (draft.expertiseSkillIds.length !== requiredExpertise ||
+      new Set(draft.expertiseSkillIds).size !== draft.expertiseSkillIds.length ||
+      draft.expertiseSkillIds.some((id) => !expertiseCandidates.includes(id)))
   ) {
-    issues.push(`Choose one eligible ${selectedClass.name} skill for Expertise.`);
+    issues.push(
+      `Choose exactly ${String(requiredExpertise)} eligible ${selectedClass.name} skill${requiredExpertise === 1 ? "" : "s"} for Expertise.`,
+    );
   }
   const spellcasting = selectedClass.spellcasting;
   const counts = spellSelectionCounts(draft, catalog);
@@ -1412,12 +1449,10 @@ function assembleCharacter(
         expertise:
           selectedClass.builder.expertiseChoice !== undefined &&
           draft.level >= selectedClass.builder.expertiseChoice.minimumLevel
-            ? [
-                {
-                  skillId: draft.expertiseSkillId,
-                  sourceId: selectedClass.builder.expertiseChoice.sourceId,
-                },
-              ]
+            ? draft.expertiseSkillIds.map((skillId) => ({
+                skillId,
+                sourceId: selectedClass.builder.expertiseChoice?.sourceId ?? "",
+              }))
             : [],
       },
     },

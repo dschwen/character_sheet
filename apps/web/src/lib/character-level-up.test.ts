@@ -19,6 +19,7 @@ import {
   monkId,
   paladinId,
   rangerId,
+  rogueId,
   wizardId,
 } from "./character-builder";
 import { loadWebData } from "./server-data";
@@ -37,6 +38,7 @@ describe("guided character level up", () => {
     monkId,
     paladinId,
     rangerId,
+    rogueId,
     wizardId,
   ] as const)(
     "advances %s from level 1 through 5 without replacing play state or possessions",
@@ -144,6 +146,9 @@ describe("guided character level up", () => {
         expect(character.build.proficiencyChoices.expertise).toHaveLength(1);
         expect(character.build.featIds).toContain("srd521.feat.fighting-style.defense");
       }
+      if (classId === rogueId) {
+        expect(character.build.proficiencyChoices.expertise).toHaveLength(2);
+      }
     },
   );
 
@@ -161,7 +166,7 @@ describe("guided character level up", () => {
     if (firstLevel === undefined) throw new Error("Expected a first character level.");
     unsupported.build.levels[0] = {
       ...firstLevel,
-      classId: "srd521.class.rogue",
+      classId: "srd521.class.sorcerer",
     };
 
     expect(levelUpEligibility(levelFive, catalog)).toMatchObject({
@@ -172,7 +177,7 @@ describe("guided character level up", () => {
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, and Wizard.",
+        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, and Wizard.",
     });
     expect(() => createLevelUpDraft(levelFive, catalog)).toThrow(
       "Fighter advancement is currently reviewed through level 5.",
