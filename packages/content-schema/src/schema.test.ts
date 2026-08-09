@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { authoringIrSchema, exprSchema, packageManifestSchema } from "./index.js";
+import {
+  authoringIrSchema,
+  classFeatureChoiceSchema,
+  exprSchema,
+  packageManifestSchema,
+} from "./index.js";
 
 describe("content schemas", () => {
   it("accepts an empty pinned SRD package manifest", () => {
@@ -42,5 +47,24 @@ describe("content schemas", () => {
         },
       }),
     ).toThrow();
+  });
+
+  it("rejects feature-choice defaults outside the authored options", () => {
+    expect(() =>
+      classFeatureChoiceSchema.parse({
+        id: "srd521.choice.sorcerer.metamagic",
+        level: 2,
+        minimum: 2,
+        maximum: 2,
+        options: [
+          "srd521.option.sorcerer.metamagic.quickened",
+          "srd521.option.sorcerer.metamagic.subtle",
+        ],
+        defaultOptionIds: [
+          "srd521.option.sorcerer.metamagic.quickened",
+          "srd521.option.sorcerer.metamagic.unknown",
+        ],
+      }),
+    ).toThrow("Defaults must be unique listed options within the choice bounds");
   });
 });

@@ -22,6 +22,7 @@ export const monkId = "srd521.class.monk";
 export const paladinId = "srd521.class.paladin";
 export const rangerId = "srd521.class.ranger";
 export const rogueId = "srd521.class.rogue";
+export const sorcererId = "srd521.class.sorcerer";
 const abilityScoreImprovementId = "srd521.feat.general.ability-score-improvement";
 const skillPrefix = "srd521.skill.";
 
@@ -34,6 +35,7 @@ export const builderClassIds = [
   paladinId,
   rangerId,
   rogueId,
+  sorcererId,
   wizardId,
 ] as const;
 export type BuilderClassId = (typeof builderClassIds)[number];
@@ -179,7 +181,7 @@ export interface ClassFeatureChoiceOptionCatalog {
 
 export interface ClassFeatureChoiceCatalog extends Omit<ClassFeatureChoice, "options"> {
   options: ClassFeatureChoiceOptionCatalog[];
-  changeOn?: ("short-rest" | "long-rest")[] | undefined;
+  changeOn?: ("level-up" | "short-rest" | "long-rest")[] | undefined;
 }
 
 export type SpellPreparationMode = "spellbook" | "full-list";
@@ -195,6 +197,10 @@ export interface SpellSelectionCounts {
 export interface ClassSpellcastingCatalog {
   ability: Ability;
   preparation: SpellPreparationMode;
+  preparationChange?: {
+    event: "level-up";
+    replacementMaximum: number;
+  };
   spells: SpellOption[];
   countsByLevel: Readonly<Record<number, SpellSelectionCounts>>;
 }
@@ -261,6 +267,7 @@ function entityDescription(entity: LoadedRulesPackage["entities"][number]): stri
   if (typeof body?.description === "string") return body.description;
   if (typeof body?.traitsText === "string") return body.traitsText;
   if (typeof body?.equipmentText === "string") return body.equipmentText;
+  if (typeof body?.text === "string") return body.text;
   const text = objectValue(body?.text);
   const nodes = text?.nodes;
   if (Array.isArray(nodes)) {
@@ -479,6 +486,7 @@ function classCatalog(
   ) {
     const spellbookStartingSpells = numericValue(classBody?.spellbookStartingSpells);
     const spellbookSpellsPerLevel = numericValue(classBody?.spellbookSpellsPerLevel);
+    const preparationChange = objectValue(classBody?.spellPreparationChange);
     const subclassAlwaysPrepared = subclassBody?.alwaysPreparedSpells;
     const countsByLevel = Object.fromEntries(
       progression
@@ -527,6 +535,15 @@ function classCatalog(
     spellcasting = {
       ability: spellcastingAbility as Ability,
       preparation,
+      ...(preparationChange?.event === "level-up" &&
+      numericValue(preparationChange.replacementMaximum) > 0
+        ? {
+            preparationChange: {
+              event: "level-up" as const,
+              replacementMaximum: numericValue(preparationChange.replacementMaximum),
+            },
+          }
+        : {}),
       spells,
       countsByLevel,
     };
@@ -687,6 +704,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
       [paladinId]: classCatalog(paladinId, rulesPackage),
       [rangerId]: classCatalog(rangerId, rulesPackage),
       [rogueId]: classCatalog(rogueId, rulesPackage),
+      [sorcererId]: classCatalog(sorcererId, rulesPackage),
       [wizardId]: classCatalog(wizardId, rulesPackage),
     },
     species,
@@ -872,7 +890,9 @@ function reconciledFeatureChoiceSelections(
         choice.id,
         fillSelections(
           current[choice.id] ?? [],
-          choice.options.map((option) => option.id),
+          [...(choice.defaultOptionIds ?? []), ...choice.options.map((option) => option.id)].filter(
+            (optionId, index, options) => options.indexOf(optionId) === index,
+          ),
           choice.minimum,
         ),
       ]),

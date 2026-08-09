@@ -76,6 +76,31 @@ describe("prepared spell loadouts", () => {
     expect(editor?.options.some((spell) => !spell.selected && !spell.alwaysPrepared)).toBe(true);
   });
 
+  it("keeps Sorcerer preparation changes in the level-up flow", () => {
+    const { rulesPackage } = loadWebData();
+    const sorcerer = fixture("sorcerer-5.json");
+    const editor = spellPreparationEditor(sorcerer, rulesPackage);
+
+    expect(editor).toMatchObject({
+      classId: "srd521.class.sorcerer",
+      mode: "full-list",
+      editable: false,
+      changeDescription: "Replace up to 1 prepared spell when gaining a Sorcerer level",
+      requiredSelections: 9,
+    });
+    expect(
+      proposePreparedSpellLoadout(
+        sorcerer,
+        rulesPackage,
+        [...sorcerer.loadout.preparedSpellIds],
+        updatedAt,
+      ),
+    ).toEqual({
+      applicable: false,
+      issues: ["Sorcerer prepared spells can change only during level up."],
+    });
+  });
+
   it("rejects incomplete and automatic prepared-spell selections", () => {
     const { rulesPackage } = loadWebData();
     const cleric = fixture("cleric-5.json");

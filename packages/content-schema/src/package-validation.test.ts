@@ -206,6 +206,7 @@ describe("bootstrap content package", () => {
         "srd521.class.paladin",
         "srd521.class.ranger",
         "srd521.class.rogue",
+        "srd521.class.sorcerer",
         "srd521.class.wizard",
       ]),
     );
@@ -232,6 +233,7 @@ describe("bootstrap content package", () => {
       "srd521.class.paladin",
       "srd521.class.ranger",
       "srd521.class.rogue",
+      "srd521.class.sorcerer",
       "srd521.class.wizard",
     ]);
     const metadata = entities.flatMap((entity) => {
@@ -240,7 +242,7 @@ describe("bootstrap content package", () => {
       return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
     });
 
-    expect(metadata).toHaveLength(9);
+    expect(metadata).toHaveLength(10);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "strength",
@@ -285,6 +287,28 @@ describe("bootstrap content package", () => {
         requireClassProficiency: false,
         countByLevel: { 1: 2, 3: 2, 5: 2 },
       },
+    });
+    expect(metadata.find(({ id }) => id === "srd521.class.sorcerer")?.builder).toMatchObject({
+      supportedLevelMaximum: 5,
+      defaultAbilityScoreImprovementAbility: "charisma",
+      defaultClassSkillIds: ["srd521.skill.arcana", "srd521.skill.persuasion"],
+    });
+    const sorcerer = entities.find((entity) => entity.id === "srd521.class.sorcerer");
+    const sorcererBody = z.record(z.unknown()).parse(sorcerer?.body);
+    expect(sorcererBody.spellPreparationChange).toEqual({
+      event: "level-up",
+      replacementMaximum: 1,
+    });
+    expect(classFeatureChoiceSchema.parse(sorcererBody.metamagicChoice)).toMatchObject({
+      level: 2,
+      minimum: 2,
+      maximum: 2,
+      defaultOptionIds: [
+        "srd521.option.sorcerer.metamagic.quickened",
+        "srd521.option.sorcerer.metamagic.subtle",
+      ],
+      changeOn: ["level-up"],
+      replacementMaximum: 1,
     });
     const hunter = entities.find((entity) => entity.id === "srd521.subclass.ranger.hunter");
     const hunterBody = z.record(z.unknown()).parse(hunter?.body);

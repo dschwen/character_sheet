@@ -1,6 +1,6 @@
 import pytest
 
-from srd_extract.sorcerer import SorcererProgressionRow, parse_core_traits
+from srd_extract.sorcerer import SorcererProgressionRow, _starting_equipment, parse_core_traits
 
 
 def test_parse_core_sorcerer_traits() -> None:
@@ -32,3 +32,15 @@ def test_sorcerer_progression_row_accepts_level_five_values() -> None:
 def test_sorcerer_progression_row_rejects_wrong_bonus() -> None:
     with pytest.raises(ValueError, match="expected 3"):
         SorcererProgressionRow(5, 2, (), 5, 5, 9, (4, 3, 2, 0, 0, 0, 0, 0, 0))
+
+
+def test_sorcerer_starting_equipment_preserves_both_source_packages() -> None:
+    equipment = _starting_equipment()
+
+    assert [option["currencyGp"] for option in equipment["options"]] == [28, 50]
+    assert [item["entityId"] for item in equipment["options"][0]["items"]] == [
+        "srd521.equipment.weapon.spear",
+        "srd521.equipment.weapon.dagger",
+        "srd521.equipment.gear.arcane-focus",
+        "srd521.equipment.gear.dungeoneers-pack",
+    ]

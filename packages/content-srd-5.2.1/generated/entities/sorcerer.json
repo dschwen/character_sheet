@@ -3,9 +3,35 @@
     "body": {
       "alwaysPreparedSpells": {},
       "armorTraining": [],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "charisma",
+        "defaultAbilityScores": {
+          "charisma": 15,
+          "constitution": 14,
+          "dexterity": 13,
+          "intelligence": 10,
+          "strength": 10,
+          "wisdom": 10
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.arcana",
+          "srd521.skill.persuasion"
+        ],
+        "defaultGrantedFeatIds": [],
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
       "hitPointDie": 6,
       "metamagicChoice": {
+        "changeOn": [
+          "level-up"
+        ],
+        "defaultOptionIds": [
+          "srd521.option.sorcerer.metamagic.quickened",
+          "srd521.option.sorcerer.metamagic.subtle"
+        ],
         "id": "srd521.choice.sorcerer.metamagic",
+        "level": 2,
         "maximum": 2,
         "minimum": 2,
         "options": [
@@ -19,7 +45,8 @@
           "srd521.option.sorcerer.metamagic.subtle",
           "srd521.option.sorcerer.metamagic.transmuted",
           "srd521.option.sorcerer.metamagic.twinned"
-        ]
+        ],
+        "replacementMaximum": 1
       },
       "primaryAbilities": [
         "charisma"
@@ -427,6 +454,13 @@
         "charisma"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2
+        },
         "maximum": 2,
         "minimum": 2,
         "options": [
@@ -579,7 +613,56 @@
         "srd521.spell.wish"
       ],
       "spellPreparation": "full-list",
+      "spellPreparationChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
       "spellcastingAbility": "charisma",
+      "startingEquipment": {
+        "id": "srd521.choice.class.sorcerer.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "currencyGp": 28,
+            "id": "srd521.option.class.sorcerer.starting-equipment.a",
+            "items": [
+              {
+                "entityId": "srd521.equipment.weapon.spear",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.dagger",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 2
+              },
+              {
+                "entityId": "srd521.equipment.gear.arcane-focus",
+                "equipped": false,
+                "kind": "entity",
+                "label": "Arcane Focus (crystal)",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.dungeoneers-pack",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              }
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 50,
+            "id": "srd521.option.class.sorcerer.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
+          }
+        ]
+      },
       "startingEquipmentText": "Choose A or B: (A) Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer’s Pack, and 28 GP; or (B) 50 GP",
       "weaponProficiencies": [
         "simple"

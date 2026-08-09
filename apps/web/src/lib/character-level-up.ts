@@ -7,6 +7,7 @@ import {
   builderClassIds,
   characterBuilderCatalog,
   defaultBuilderDraft,
+  spellSelectionCounts,
   updateBuilderLevel,
   validateBuilderDraft,
   type BuilderCatalog,
@@ -99,7 +100,7 @@ export function levelUpEligibility(
       eligible: false,
       currentLevel,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, and Wizard.",
+        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, and Wizard.",
     };
   }
   const selectedClass = catalog.classes[classId];
@@ -230,6 +231,38 @@ function advancementIssues(
   ) {
     issues.unshift("Identity and base ability scores cannot change during level up.");
   }
+  const selectedClass = catalog.classes[eligibility.classId];
+  const targetLevel = eligibility.targetLevel;
+  const currentChoices = choiceSelections(character);
+  for (const choice of selectedClass.featureChoices.filter(
+    (candidate) => candidate.level < targetLevel && candidate.changeOn?.includes("level-up"),
+  )) {
+    const current = new Set(currentChoices[choice.id] ?? []);
+    const next = new Set(draft.featureChoiceSelections[choice.id] ?? []);
+    const removed = [...current].filter((optionId) => !next.has(optionId)).length;
+    const added = [...next].filter((optionId) => !current.has(optionId)).length;
+    const replacementMaximum = choice.replacementMaximum ?? 1;
+    if (removed > replacementMaximum || added > replacementMaximum) {
+      issues.push(
+        `Replace no more than ${String(replacementMaximum)} ${selectedClass.name} feature option during level up.`,
+      );
+    }
+  }
+  const preparationChange = selectedClass.spellcasting?.preparationChange;
+  if (preparationChange?.event === "level-up") {
+    const nextPrepared = new Set(draft.preparedSpellIds);
+    const alwaysPrepared = new Set(
+      spellSelectionCounts(draft, catalog)?.alwaysPreparedSpellIds ?? [],
+    );
+    const removed = character.loadout.preparedSpellIds.filter(
+      (spellId) => !nextPrepared.has(spellId) && !alwaysPrepared.has(spellId),
+    ).length;
+    if (removed > preparationChange.replacementMaximum) {
+      issues.push(
+        `Replace no more than ${String(preparationChange.replacementMaximum)} ${selectedClass.name} prepared spell during level up.`,
+      );
+    }
+  }
   return issues;
 }
 
@@ -237,14 +270,24 @@ function mergeAdvancement(
   character: CharacterDocument,
   target: CharacterDocument,
   now: Date,
+  mutableChoiceIds: ReadonlySet<string>,
 ): CharacterDocument {
   const newLevel = target.build.levels[character.build.levels.length];
   if (newLevel === undefined) throw new Error("The new class level is missing.");
+  const targetChoices = choiceSelections(target);
+  const existingLevels = character.build.levels.map((level) => ({
+    ...level,
+    selectedFeatureChoices: level.selectedFeatureChoices.map((choice) =>
+      mutableChoiceIds.has(choice.choiceId) && targetChoices[choice.choiceId] !== undefined
+        ? { ...choice, optionIds: [...(targetChoices[choice.choiceId] ?? [])] }
+        : choice,
+    ),
+  }));
   return characterDocumentSchema.parse({
     ...character,
     build: {
       ...character.build,
-      levels: [...character.build.levels, newLevel],
+      levels: [...existingLevels, newLevel],
       subclassId: target.build.subclassId,
       featAbilityScoreIncreases: target.build.featAbilityScoreIncreases,
       featIds: [...new Set([...character.build.featIds, ...target.build.featIds])],
@@ -284,7 +327,12 @@ export function previewLevelUp(
   if (issues.length > 0) return { issues };
   try {
     const target = buildCharacter(draft, rulesPackage, options);
-    const nextCharacter = mergeAdvancement(character, target, options.now);
+    const mutableChoiceIds = new Set(
+      builderCatalog.classes[draft.classId].featureChoices
+        .filter((choice) => choice.changeOn?.includes("level-up"))
+        .map((choice) => choice.id),
+    );
+    const nextCharacter = mergeAdvancement(character, target, options.now, mutableChoiceIds);
     const evaluation = evaluateCharacter({ character: nextCharacter, packages: [rulesPackage] });
     return {
       character: nextCharacter,

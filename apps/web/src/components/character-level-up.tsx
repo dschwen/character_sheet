@@ -123,8 +123,18 @@ export function CharacterLevelUp({
   const spellCounts = spellSelectionCounts(draft, catalog);
   const currentLearned = new Set(character.build.learnedSpellIds);
   const currentPrepared = new Set(character.loadout.preparedSpellIds);
+  const preparedReplacementMaximum =
+    spellcasting?.preparationChange?.event === "level-up"
+      ? spellcasting.preparationChange.replacementMaximum
+      : 0;
+  const targetAlwaysPrepared = new Set(spellCounts?.alwaysPreparedSpellIds ?? []);
+  const removedPreparedCount = [...currentPrepared].filter(
+    (spellId) => !draft.preparedSpellIds.includes(spellId) && !targetAlwaysPrepared.has(spellId),
+  ).length;
   const targetFeatureChoices = selectedClass.featureChoices.filter(
-    (choice) => choice.level === targetLevel,
+    (choice) =>
+      choice.level === targetLevel ||
+      (choice.level < targetLevel && choice.changeOn?.includes("level-up")),
   );
   const expertiseChoice = selectedClass.builder.expertiseChoice;
   const eligibleExpertiseSkills = expertiseSkillCandidates(draft, catalog);
@@ -194,19 +204,35 @@ export function CharacterLevelUp({
 
   function togglePreparedSpell(spellId: string): void {
     if (spellCounts === undefined) return;
-    setDraft((value) =>
-      value === undefined
-        ? value
-        : {
-            ...value,
-            preparedSpellIds: toggleUnlocked(
-              value.preparedSpellIds,
-              spellId,
-              currentPrepared,
-              spellCounts.preparedSpells,
-            ),
-          },
-    );
+    setDraft((value) => {
+      if (value === undefined) return value;
+      const selected = value.preparedSpellIds.includes(spellId);
+      if (currentPrepared.has(spellId)) {
+        if (!selected) {
+          return value.preparedSpellIds.length >= spellCounts.preparedSpells
+            ? value
+            : { ...value, preparedSpellIds: [...value.preparedSpellIds, spellId] };
+        }
+        const removed = [...currentPrepared].filter(
+          (id) => !value.preparedSpellIds.includes(id) && !targetAlwaysPrepared.has(id),
+        ).length;
+        return preparedReplacementMaximum === 0 || removed >= preparedReplacementMaximum
+          ? value
+          : {
+              ...value,
+              preparedSpellIds: value.preparedSpellIds.filter((id) => id !== spellId),
+            };
+      }
+      return {
+        ...value,
+        preparedSpellIds: toggleUnlocked(
+          value.preparedSpellIds,
+          spellId,
+          new Set(),
+          spellCounts.preparedSpells,
+        ),
+      };
+    });
   }
 
   function applyLevelUp(): void {
@@ -391,8 +417,9 @@ export function CharacterLevelUp({
                     <span>{selectedClass.name} feature</span>
                     <h2>{shortEntityName(choice.id)}</h2>
                     <small>
-                      {String((draft.featureChoiceSelections[choice.id] ?? []).length)} /{" "}
-                      {String(choice.maximum)} selected
+                      {choice.level < targetLevel
+                        ? `Replace up to ${String(choice.replacementMaximum ?? 1)} option`
+                        : `${String((draft.featureChoiceSelections[choice.id] ?? []).length)} / ${String(choice.maximum)} selected`}
                     </small>
                   </div>
                   <div className="builder-choice-grid">
@@ -400,11 +427,26 @@ export function CharacterLevelUp({
                       const selected = (draft.featureChoiceSelections[choice.id] ?? []).includes(
                         option.id,
                       );
+                      const currentOptions = new Set(
+                        character.build.levels
+                          .flatMap((level) => level.selectedFeatureChoices)
+                          .find((selection) => selection.choiceId === choice.id)?.optionIds ?? [],
+                      );
+                      const removedOptions = [...currentOptions].filter(
+                        (optionId) =>
+                          !(draft.featureChoiceSelections[choice.id] ?? []).includes(optionId),
+                      ).length;
+                      const replacementBlocked =
+                        choice.level < targetLevel &&
+                        selected &&
+                        currentOptions.has(option.id) &&
+                        removedOptions >= (choice.replacementMaximum ?? 1);
                       return (
                         <button
                           key={option.id}
                           type="button"
                           className={selected ? "builder-choice selected" : "builder-choice"}
+                          disabled={replacementBlocked}
                           onClick={() => {
                             setDraft((value) =>
                               value === undefined
@@ -560,16 +602,22 @@ export function CharacterLevelUp({
                     );
                   })}
 
-                  {spellCounts.preparedSpells > currentPrepared.size ? (
+                  {spellCounts.preparedSpells > currentPrepared.size ||
+                  preparedReplacementMaximum > 0 ? (
                     <div className="spell-choice-section prepared-choice-section">
                       <div className="spell-choice-heading">
                         <div>
-                          <span>Daily loadout</span>
-                          <h2>Additional prepared spells</h2>
+                          <span>
+                            {preparedReplacementMaximum > 0 ? "Level-up choices" : "Daily loadout"}
+                          </span>
+                          <h2>Prepared spells</h2>
                         </div>
                         <small>
                           {String(draft.preparedSpellIds.length - currentPrepared.size)} /{" "}
                           {String(spellCounts.preparedSpells - currentPrepared.size)} new
+                          {preparedReplacementMaximum > 0
+                            ? ` · ${String(removedPreparedCount)} / ${String(preparedReplacementMaximum)} replaced`
+                            : ""}
                         </small>
                       </div>
                       <div className="spell-choice-grid">
@@ -584,7 +632,8 @@ export function CharacterLevelUp({
                           )
                           .map((spell) => {
                             const selected = draft.preparedSpellIds.includes(spell.id);
-                            const locked = currentPrepared.has(spell.id);
+                            const current = currentPrepared.has(spell.id);
+                            const locked = current && preparedReplacementMaximum === 0;
                             return (
                               <button
                                 key={spell.id}
@@ -592,6 +641,9 @@ export function CharacterLevelUp({
                                 className={selected ? "selected" : undefined}
                                 disabled={
                                   locked ||
+                                  (current &&
+                                    selected &&
+                                    removedPreparedCount >= preparedReplacementMaximum) ||
                                   (!selected &&
                                     draft.preparedSpellIds.length >= spellCounts.preparedSpells)
                                 }
@@ -603,7 +655,11 @@ export function CharacterLevelUp({
                                 <span>
                                   <strong>{spell.name}</strong>
                                   <small>
-                                    {locked ? "Already prepared" : `Level ${String(spell.level)}`}
+                                    {current
+                                      ? selected
+                                        ? "Currently prepared · may replace"
+                                        : "Replacing this spell"
+                                      : `Level ${String(spell.level)}`}
                                   </small>
                                 </span>
                               </button>

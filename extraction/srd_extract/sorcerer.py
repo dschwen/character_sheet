@@ -376,6 +376,54 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _starting_equipment() -> dict[str, Any]:
+    return {
+        "id": "srd521.choice.class.sorcerer.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
+        "options": [
+            {
+                "id": "srd521.option.class.sorcerer.starting-equipment.a",
+                "label": "Package A",
+                "items": [
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.spear",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.dagger",
+                        "quantity": 2,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.arcane-focus",
+                        "quantity": 1,
+                        "equipped": False,
+                        "label": "Arcane Focus (crystal)",
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.dungeoneers-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                ],
+                "currencyGp": 28,
+            },
+            {
+                "id": "srd521.option.class.sorcerer.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 50,
+            },
+        ],
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[SorcererProgressionRow, ...],
@@ -392,8 +440,35 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits["skillProficiencyChoice"],
+                "countByLevel": {str(level): 2 for level in range(1, 6)},
+            },
+            "startingEquipment": _starting_equipment(),
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 10,
+                    "dexterity": 13,
+                    "constitution": 14,
+                    "intelligence": 10,
+                    "wisdom": 10,
+                    "charisma": 15,
+                },
+                "defaultAbilityScoreImprovementAbility": "charisma",
+                "defaultClassSkillIds": [
+                    "srd521.skill.arcana",
+                    "srd521.skill.persuasion",
+                ],
+                "defaultGrantedFeatIds": [],
+            },
             "spellcastingAbility": "charisma",
             "spellPreparation": "full-list",
+            "spellPreparationChange": {
+                "event": "level-up",
+                "replacementMaximum": 1,
+            },
             "alwaysPreparedSpells": {},
             "spellList": [
                 entry["id"]
@@ -403,12 +478,19 @@ def _class_entity(
             ],
             "metamagicChoice": {
                 "id": METAMAGIC_CHOICE_ID,
+                "level": 2,
                 "minimum": 2,
                 "maximum": 2,
                 "options": [
                     f"srd521.option.sorcerer.metamagic.{_slug(name.removesuffix(' Spell'))}"
                     for name in METAMAGIC_NAMES
                 ],
+                "defaultOptionIds": [
+                    "srd521.option.sorcerer.metamagic.quickened",
+                    "srd521.option.sorcerer.metamagic.subtle",
+                ],
+                "changeOn": ["level-up"],
+                "replacementMaximum": 1,
             },
             "progression": [
                 {

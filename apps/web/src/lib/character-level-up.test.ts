@@ -20,6 +20,9 @@ import {
   paladinId,
   rangerId,
   rogueId,
+  sorcererId,
+  spellSelectionCounts,
+  updateBuilderFeatureChoice,
   wizardId,
 } from "./character-builder";
 import { loadWebData } from "./server-data";
@@ -39,6 +42,7 @@ describe("guided character level up", () => {
     paladinId,
     rangerId,
     rogueId,
+    sorcererId,
     wizardId,
   ] as const)(
     "advances %s from level 1 through 5 without replacing play state or possessions",
@@ -149,8 +153,124 @@ describe("guided character level up", () => {
       if (classId === rogueId) {
         expect(character.build.proficiencyChoices.expertise).toHaveLength(2);
       }
+      if (classId === sorcererId) {
+        expect(character.build.levels[1]?.selectedFeatureChoices).toEqual([
+          {
+            choiceId: "srd521.choice.sorcerer.metamagic",
+            optionIds: [
+              "srd521.option.sorcerer.metamagic.quickened",
+              "srd521.option.sorcerer.metamagic.subtle",
+            ],
+          },
+        ]);
+        expect(character.loadout.preparedSpellIds).toHaveLength(9);
+      }
     },
   );
+
+  it("allows one Sorcerer spell and Metamagic replacement during level up", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const sorcerer = buildCharacter(
+      defaultBuilderDraft(sorcererId, catalog, 2, "Changing Sorcerer"),
+      rulesPackage,
+      initialOptions,
+    );
+    let draft = createLevelUpDraft(sorcerer, catalog);
+    draft = updateBuilderFeatureChoice(
+      draft,
+      catalog,
+      "srd521.choice.sorcerer.metamagic",
+      "srd521.option.sorcerer.metamagic.quickened",
+    );
+    draft = updateBuilderFeatureChoice(
+      draft,
+      catalog,
+      "srd521.choice.sorcerer.metamagic",
+      "srd521.option.sorcerer.metamagic.careful",
+    );
+    const replacedSpellId = sorcerer.loadout.preparedSpellIds[0];
+    if (replacedSpellId === undefined) throw new Error("Expected a prepared Sorcerer spell.");
+    const replacementSpell = catalog.classes[sorcererId].spellcasting?.spells.find(
+      (spell) =>
+        spell.level > 0 &&
+        spell.level <= 2 &&
+        !draft.preparedSpellIds.includes(spell.id) &&
+        !spellSelectionCounts(draft, catalog)?.alwaysPreparedSpellIds.includes(spell.id),
+    );
+    if (replacementSpell === undefined) throw new Error("Expected a replacement Sorcerer spell.");
+    draft.preparedSpellIds = [
+      ...draft.preparedSpellIds.filter((spellId) => spellId !== replacedSpellId),
+      replacementSpell.id,
+    ];
+
+    const preview = previewLevelUp(sorcerer, draft, rulesPackage, {
+      id: sorcerer.id,
+      now: new Date("2026-08-09T12:00:00.000Z"),
+    });
+
+    expect(preview.issues).toEqual([]);
+    expect(preview.character?.build.levels[1]?.selectedFeatureChoices).toEqual([
+      {
+        choiceId: "srd521.choice.sorcerer.metamagic",
+        optionIds: [
+          "srd521.option.sorcerer.metamagic.subtle",
+          "srd521.option.sorcerer.metamagic.careful",
+        ],
+      },
+    ]);
+    expect(preview.character?.loadout.preparedSpellIds).toContain(replacementSpell.id);
+    expect(preview.character?.loadout.preparedSpellIds).not.toContain(replacedSpellId);
+  });
+
+  it("rejects replacing multiple Sorcerer spells or Metamagic options at one level", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const sorcerer = buildCharacter(
+      defaultBuilderDraft(sorcererId, catalog, 2, "Overchanging Sorcerer"),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(sorcerer, catalog);
+    draft.featureChoiceSelections = {
+      ...draft.featureChoiceSelections,
+      "srd521.choice.sorcerer.metamagic": [
+        "srd521.option.sorcerer.metamagic.careful",
+        "srd521.option.sorcerer.metamagic.distant",
+      ],
+    };
+    const alwaysPrepared = new Set(spellSelectionCounts(draft, catalog)?.alwaysPreparedSpellIds);
+    const removedSpellIds = sorcerer.loadout.preparedSpellIds
+      .filter((spellId) => !alwaysPrepared.has(spellId))
+      .slice(0, 2);
+    if (removedSpellIds.length !== 2) throw new Error("Expected two removable Sorcerer spells.");
+    const replacements = catalog.classes[sorcererId].spellcasting?.spells
+      .filter(
+        (spell) =>
+          spell.level > 0 &&
+          spell.level <= 2 &&
+          !draft.preparedSpellIds.includes(spell.id) &&
+          !spellSelectionCounts(draft, catalog)?.alwaysPreparedSpellIds.includes(spell.id),
+      )
+      .slice(0, 2);
+    if (replacements?.length !== 2) throw new Error("Expected two replacement Sorcerer spells.");
+    draft.preparedSpellIds = [
+      ...draft.preparedSpellIds.filter((spellId) => !removedSpellIds.includes(spellId)),
+      ...replacements.map((spell) => spell.id),
+    ];
+
+    const preview = previewLevelUp(sorcerer, draft, rulesPackage, {
+      id: sorcerer.id,
+      now: new Date("2026-08-09T13:00:00.000Z"),
+    });
+
+    expect(preview.issues).toEqual(
+      expect.arrayContaining([
+        "Replace no more than 1 Sorcerer feature option during level up.",
+        "Replace no more than 1 Sorcerer prepared spell during level up.",
+      ]),
+    );
+  });
 
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
@@ -166,7 +286,7 @@ describe("guided character level up", () => {
     if (firstLevel === undefined) throw new Error("Expected a first character level.");
     unsupported.build.levels[0] = {
       ...firstLevel,
-      classId: "srd521.class.sorcerer",
+      classId: "srd521.class.warlock",
     };
 
     expect(levelUpEligibility(levelFive, catalog)).toMatchObject({
@@ -177,7 +297,7 @@ describe("guided character level up", () => {
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, and Wizard.",
+        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, and Wizard.",
     });
     expect(() => createLevelUpDraft(levelFive, catalog)).toThrow(
       "Fighter advancement is currently reviewed through level 5.",

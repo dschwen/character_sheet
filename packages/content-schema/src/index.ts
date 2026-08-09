@@ -330,7 +330,9 @@ export const classFeatureChoiceSchema = z
     minimum: z.number().int().nonnegative(),
     maximum: z.number().int().positive(),
     options: z.array(entityIdSchema).min(1),
-    changeOn: z.array(z.enum(["short-rest", "long-rest"])).optional(),
+    defaultOptionIds: z.array(entityIdSchema).optional(),
+    changeOn: z.array(z.enum(["level-up", "short-rest", "long-rest"])).optional(),
+    replacementMaximum: z.number().int().positive().optional(),
   })
   .strict()
   .superRefine((choice, context) => {
@@ -339,6 +341,26 @@ export const classFeatureChoiceSchema = z
         code: z.ZodIssueCode.custom,
         message: "Class-feature choice bounds must fit the available options",
         path: ["maximum"],
+      });
+    }
+    if (
+      choice.defaultOptionIds !== undefined &&
+      (choice.defaultOptionIds.length < choice.minimum ||
+        choice.defaultOptionIds.length > choice.maximum ||
+        new Set(choice.defaultOptionIds).size !== choice.defaultOptionIds.length ||
+        choice.defaultOptionIds.some((optionId) => !choice.options.includes(optionId)))
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Defaults must be unique listed options within the choice bounds",
+        path: ["defaultOptionIds"],
+      });
+    }
+    if (choice.replacementMaximum !== undefined && !choice.changeOn?.includes("level-up")) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Replacement limits require a level-up change event",
+        path: ["replacementMaximum"],
       });
     }
   });

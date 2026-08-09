@@ -17,6 +17,8 @@ export interface SpellPreparationEditor {
   classId: string;
   className: string;
   mode: SpellPreparationMode;
+  editable: boolean;
+  changeDescription: string;
   requiredSelections: number;
   selectedSpellIds: string[];
   alwaysPreparedSpellIds: string[];
@@ -87,6 +89,7 @@ export function spellPreparationEditor(
   if (classEntity === undefined) return undefined;
   const classBody = objectValue(classEntity.body);
   const mode = classBody?.spellPreparation;
+  const preparationChange = objectValue(classBody?.spellPreparationChange);
   const progression = classBody?.progression;
   if ((mode !== "spellbook" && mode !== "full-list") || !Array.isArray(progression)) {
     return undefined;
@@ -136,6 +139,11 @@ export function spellPreparationEditor(
     classId: classEntity.id,
     className: localizedName(classEntity),
     mode,
+    editable: preparationChange?.event !== "level-up",
+    changeDescription:
+      preparationChange?.event === "level-up"
+        ? `Replace up to ${String(typeof preparationChange.replacementMaximum === "number" ? preparationChange.replacementMaximum : 1)} prepared spell when gaining a ${localizedName(classEntity)} level`
+        : "Change after completing the rest or preparation required by your class",
     requiredSelections: spellcasting.preparedSpellLimit,
     selectedSpellIds: [...character.loadout.preparedSpellIds],
     alwaysPreparedSpellIds,
@@ -152,6 +160,12 @@ export function proposePreparedSpellLoadout(
   const editor = spellPreparationEditor(character, rulesPackage);
   if (editor === undefined) {
     return { applicable: false, issues: ["This character does not prepare spells."] };
+  }
+  if (!editor.editable) {
+    return {
+      applicable: false,
+      issues: [`${editor.className} prepared spells can change only during level up.`],
+    };
   }
 
   const uniqueSelections = new Set(selectedSpellIds);

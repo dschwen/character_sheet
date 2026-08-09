@@ -1662,9 +1662,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             {preparationEditor.alwaysPreparedSpellIds.length === 0
                               ? ""
                               : ` · ${String(preparationEditor.alwaysPreparedSpellIds.length)} additional always prepared`}
+                            {` · ${preparationEditor.changeDescription}`}
                           </small>
                         </span>
-                        {preparedSpellDraft === undefined ? (
+                        {preparedSpellDraft === undefined && preparationEditor.editable ? (
                           <button
                             className="button secondary"
                             type="button"
@@ -1681,10 +1682,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           <div className="preparation-editor-heading">
                             <span>
                               <strong>Daily spell loadout</strong>
-                              <small>
-                                Record preparation here after completing any rest or preparation
-                                required by your class.
-                              </small>
+                              <small>{preparationEditor.changeDescription}.</small>
                             </span>
                             <i>
                               {String(preparedSpellDraft.length)} /{" "}

@@ -17,6 +17,7 @@ import {
   paladinId,
   rangerId,
   rogueId,
+  sorcererId,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
@@ -117,6 +118,34 @@ describe("guided character builder", () => {
     expect(catalog.classes[rogueId].weaponMasteryIds).not.toContain(
       "srd521.equipment.weapon.longbow",
     );
+    expect(catalog.classes[sorcererId]).toMatchObject({
+      name: "Sorcerer",
+      subclassId: "srd521.subclass.sorcerer.draconic-sorcery",
+      subclassLevel: 3,
+      spellcasting: {
+        preparation: "full-list",
+        preparationChange: { event: "level-up", replacementMaximum: 1 },
+        ability: "charisma",
+      },
+      skillCountByLevel: { 1: 2, 3: 2, 5: 2 },
+    });
+    expect(catalog.classes[sorcererId].featureChoices).toEqual([
+      expect.objectContaining({
+        id: "srd521.choice.sorcerer.metamagic",
+        level: 2,
+        minimum: 2,
+        maximum: 2,
+        defaultOptionIds: [
+          "srd521.option.sorcerer.metamagic.quickened",
+          "srd521.option.sorcerer.metamagic.subtle",
+        ],
+      }),
+    ]);
+    expect(
+      catalog.classes[sorcererId].featureChoices[0]?.options.find(
+        (option) => option.id === "srd521.option.sorcerer.metamagic.quickened",
+      )?.description,
+    ).toContain("Bonus Action");
     expect(catalog.classes[wizardId].name).toBe("Wizard");
     expect(catalog.classes[barbarianId]).toMatchObject({
       name: "Barbarian",
@@ -730,6 +759,65 @@ describe("guided character builder", () => {
         skillId: "srd521.skill.acrobatics",
       },
     ]);
+  });
+
+  it("builds Draconic Sorcerers with Metamagic and prepared spells through level 5", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [8, 14, 23, 30, 37];
+    const expectedArmorClass = [12, 12, 14, 15, 15];
+    const expectedCantrips = [4, 4, 4, 5, 5];
+    const expectedPrepared = [2, 4, 6, 7, 9];
+    const expectedAlwaysPrepared = [0, 0, 4, 4, 6];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(
+        sorcererId,
+        catalog,
+        level,
+        `Level ${String(level)} Sorcerer`,
+      );
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+      const sorceryPoints = evaluation.resources.find(
+        (resource) => resource.id === "srd521.resource.sorcerer.sorcery-points",
+      );
+
+      expect(validateBuilderDraft(draft, catalog), `draft level ${String(level)}`).toEqual([]);
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(evaluation.values.armorClass?.value).toBe(expectedArmorClass[level - 1]);
+      expect(character.build.learnedSpellIds).toHaveLength(expectedCantrips[level - 1] ?? 0);
+      expect(character.loadout.preparedSpellIds).toHaveLength(expectedPrepared[level - 1] ?? 0);
+      expect(evaluation.spellcasting?.alwaysPreparedSpells).toBe(expectedAlwaysPrepared[level - 1]);
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.sorcerer.draconic-sorcery" : undefined,
+      );
+      expect(sorceryPoints?.maximum).toBe(level >= 2 ? level : undefined);
+      expect(evaluation.actions.some((action) => action.id === "action.innate-sorcery")).toBe(true);
+      expect(evaluation.actions.some((action) => action.id === "action.metamagic.quickened")).toBe(
+        level >= 2,
+      );
+      expect(
+        evaluation.actions.some((action) => action.id === "action.sorcerous-restoration"),
+      ).toBe(level >= 5);
+      if (level >= 2) {
+        expect(character.build.levels[1]?.selectedFeatureChoices).toEqual([
+          {
+            choiceId: "srd521.choice.sorcerer.metamagic",
+            optionIds: [
+              "srd521.option.sorcerer.metamagic.quickened",
+              "srd521.option.sorcerer.metamagic.subtle",
+            ],
+          },
+        ]);
+      }
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(5);
+        expect(character.loadout.equippedItemIds).toEqual(["spear-1"]);
+        expect(character.loadout.currency.gp).toBe(28);
+      }
+    }
   });
 
   it("reconciles Druid Primal Order cantrips and selected land spells", () => {
