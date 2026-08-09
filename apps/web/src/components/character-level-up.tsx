@@ -11,6 +11,7 @@ import {
   classSkillCount,
   expertiseCount,
   expertiseSkillCandidates,
+  featureChoiceCount,
   masteryCount,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
@@ -122,6 +123,17 @@ export function CharacterLevelUp({
   const spellcasting = selectedClass.spellcasting;
   const spellCounts = spellSelectionCounts(draft, catalog);
   const currentLearned = new Set(character.build.learnedSpellIds);
+  const spellLevels = new Map(spellcasting?.spells.map((spell) => [spell.id, spell.level]) ?? []);
+  const currentCantrips = new Set(
+    character.build.learnedSpellIds.filter((spellId) => spellLevels.get(spellId) === 0),
+  );
+  const cantripReplacementMaximum =
+    spellcasting?.cantripChange?.event === "level-up"
+      ? spellcasting.cantripChange.replacementMaximum
+      : 0;
+  const removedCantripCount = [...currentCantrips].filter(
+    (spellId) => !draft.learnedSpellIds.includes(spellId),
+  ).length;
   const currentPrepared = new Set(character.loadout.preparedSpellIds);
   const preparedReplacementMaximum =
     spellcasting?.preparationChange?.event === "level-up"
@@ -185,11 +197,31 @@ export function CharacterLevelUp({
     );
   }
 
-  function toggleLearnedSpell(spellId: string, groupIds: string[], maximum: number): void {
+  function toggleLearnedSpell(
+    spellId: string,
+    groupIds: string[],
+    maximum: number,
+    replacementMaximum = 0,
+  ): void {
     setDraft((value) => {
       if (value === undefined) return value;
       const groupSelections = value.learnedSpellIds.filter((id) => groupIds.includes(id));
-      const nextGroup = toggleUnlocked(groupSelections, spellId, currentLearned, maximum);
+      const currentGroup = new Set([...currentLearned].filter((id) => groupIds.includes(id)));
+      let nextGroup: string[];
+      if (currentGroup.has(spellId) && replacementMaximum > 0) {
+        if (groupSelections.includes(spellId)) {
+          const removed = [...currentGroup].filter((id) => !groupSelections.includes(id)).length;
+          nextGroup =
+            removed >= replacementMaximum
+              ? groupSelections
+              : groupSelections.filter((id) => id !== spellId);
+        } else {
+          nextGroup =
+            groupSelections.length >= maximum ? groupSelections : [...groupSelections, spellId];
+        }
+      } else {
+        nextGroup = toggleUnlocked(groupSelections, spellId, currentLearned, maximum);
+      }
       const learnedSpellIds = [
         ...value.learnedSpellIds.filter((id) => !groupIds.includes(id)),
         ...nextGroup,
@@ -418,8 +450,8 @@ export function CharacterLevelUp({
                     <h2>{shortEntityName(choice.id)}</h2>
                     <small>
                       {choice.level < targetLevel
-                        ? `Replace up to ${String(choice.replacementMaximum ?? 1)} option`
-                        : `${String((draft.featureChoiceSelections[choice.id] ?? []).length)} / ${String(choice.maximum)} selected`}
+                        ? `${String((draft.featureChoiceSelections[choice.id] ?? []).length)} / ${String(featureChoiceCount(choice, targetLevel))} selected · replace up to ${String(choice.replacementMaximum ?? 1)}`
+                        : `${String((draft.featureChoiceSelections[choice.id] ?? []).length)} / ${String(featureChoiceCount(choice, targetLevel))} selected`}
                     </small>
                   </div>
                   <div className="builder-choice-grid">
@@ -430,7 +462,8 @@ export function CharacterLevelUp({
                       const currentOptions = new Set(
                         character.build.levels
                           .flatMap((level) => level.selectedFeatureChoices)
-                          .find((selection) => selection.choiceId === choice.id)?.optionIds ?? [],
+                          .filter((selection) => selection.choiceId === choice.id)
+                          .flatMap((selection) => selection.optionIds),
                       );
                       const removedOptions = [...currentOptions].filter(
                         (optionId) =>
@@ -441,12 +474,24 @@ export function CharacterLevelUp({
                         selected &&
                         currentOptions.has(option.id) &&
                         removedOptions >= (choice.replacementMaximum ?? 1);
+                      const selectedIds = draft.featureChoiceSelections[choice.id] ?? [];
+                      const missingPrerequisite = option.prerequisiteOptionIds.find(
+                        (optionId) => !selectedIds.includes(optionId),
+                      );
+                      const unavailable = option.minimumClassLevel > targetLevel;
+                      const maximumReached =
+                        !selected && selectedIds.length >= featureChoiceCount(choice, targetLevel);
                       return (
                         <button
                           key={option.id}
                           type="button"
                           className={selected ? "builder-choice selected" : "builder-choice"}
-                          disabled={replacementBlocked}
+                          disabled={
+                            replacementBlocked ||
+                            unavailable ||
+                            missingPrerequisite !== undefined ||
+                            maximumReached
+                          }
                           onClick={() => {
                             setDraft((value) =>
                               value === undefined
@@ -458,7 +503,15 @@ export function CharacterLevelUp({
                           <span>Class option</span>
                           <h2>{option.name}</h2>
                           <p>{option.description}</p>
-                          <small>{selected ? "Selected" : "Choose option"}</small>
+                          <small>
+                            {selected
+                              ? "Selected"
+                              : unavailable
+                                ? `Requires level ${String(option.minimumClassLevel)}`
+                                : missingPrerequisite === undefined
+                                  ? "Choose option"
+                                  : `Requires ${choice.options.find((candidate) => candidate.id === missingPrerequisite)?.name ?? shortEntityName(missingPrerequisite)}`}
+                          </small>
                         </button>
                       );
                     })}
@@ -534,6 +587,7 @@ export function CharacterLevelUp({
                     {
                       label: "Cantrips",
                       count: spellCounts.cantrips,
+                      replacementMaximum: cantripReplacementMaximum,
                       spells: spellcasting.spells.filter((spell) => spell.level === 0),
                     },
                     ...(spellcasting.preparation === "spellbook"
@@ -541,6 +595,7 @@ export function CharacterLevelUp({
                           {
                             label: "New spellbook spells",
                             count: spellCounts.learnedLeveledSpells,
+                            replacementMaximum: 0,
                             spells: spellcasting.spells.filter(
                               (spell) =>
                                 spell.level > 0 && spell.level <= spellCounts.maximumSpellLevel,
@@ -556,7 +611,7 @@ export function CharacterLevelUp({
                     const existingCount = character.build.learnedSpellIds.filter((id) =>
                       groupIds.includes(id),
                     ).length;
-                    if (group.count <= existingCount) return null;
+                    if (group.count <= existingCount && group.replacementMaximum === 0) return null;
                     return (
                       <div className="spell-choice-section" key={group.label}>
                         <div className="spell-choice-heading">
@@ -567,28 +622,49 @@ export function CharacterLevelUp({
                           <small>
                             {String(selectedCount - existingCount)} /{" "}
                             {String(group.count - existingCount)} new
+                            {group.replacementMaximum > 0
+                              ? ` · ${String(removedCantripCount)} / ${String(group.replacementMaximum)} replaced`
+                              : ""}
                           </small>
                         </div>
                         <div className="spell-choice-grid">
                           {group.spells.map((spell) => {
                             const selected = draft.learnedSpellIds.includes(spell.id);
-                            const locked = currentLearned.has(spell.id);
+                            const current = currentLearned.has(spell.id);
+                            const locked = current && group.replacementMaximum === 0;
+                            const replacementBlocked =
+                              current &&
+                              selected &&
+                              removedCantripCount >= group.replacementMaximum;
                             return (
                               <button
                                 key={spell.id}
                                 type="button"
                                 className={selected ? "selected" : undefined}
-                                disabled={locked || (!selected && selectedCount >= group.count)}
+                                disabled={
+                                  locked ||
+                                  (group.replacementMaximum > 0 && replacementBlocked) ||
+                                  (!selected && selectedCount >= group.count)
+                                }
                                 onClick={() => {
-                                  toggleLearnedSpell(spell.id, groupIds, group.count);
+                                  toggleLearnedSpell(
+                                    spell.id,
+                                    groupIds,
+                                    group.count,
+                                    group.replacementMaximum,
+                                  );
                                 }}
                               >
                                 <i>{selected ? "✓" : ""}</i>
                                 <span>
                                   <strong>{spell.name}</strong>
                                   <small>
-                                    {locked
-                                      ? "Already known"
+                                    {current
+                                      ? group.replacementMaximum > 0
+                                        ? selected
+                                          ? "Currently known · may replace"
+                                          : "Replacing this cantrip"
+                                        : "Already known"
                                       : spell.level === 0
                                         ? "New cantrip"
                                         : `Level ${String(spell.level)} · ${titleCase(spell.school)}`}

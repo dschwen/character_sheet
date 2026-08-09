@@ -329,6 +329,7 @@ export const classFeatureChoiceSchema = z
     level: z.number().int().min(1).max(20),
     minimum: z.number().int().nonnegative(),
     maximum: z.number().int().positive(),
+    countByLevel: z.record(z.string(), z.number().int().nonnegative()).optional(),
     options: z.array(entityIdSchema).min(1),
     defaultOptionIds: z.array(entityIdSchema).optional(),
     changeOn: z.array(z.enum(["level-up", "short-rest", "long-rest"])).optional(),
@@ -341,6 +342,19 @@ export const classFeatureChoiceSchema = z
         code: z.ZodIssueCode.custom,
         message: "Class-feature choice bounds must fit the available options",
         path: ["maximum"],
+      });
+    }
+    if (
+      choice.countByLevel !== undefined &&
+      Object.entries(choice.countByLevel).some(
+        ([level, count]) =>
+          !/^([1-9]|1\d|20)$/u.test(level) || count < choice.minimum || count > choice.maximum,
+      )
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Level-indexed choice counts must use levels 1–20 and fit the choice bounds",
+        path: ["countByLevel"],
       });
     }
     if (

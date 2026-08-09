@@ -23,6 +23,7 @@ import {
   sorcererId,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
+  warlockId,
   wizardId,
 } from "./character-builder";
 import { loadWebData } from "./server-data";
@@ -43,6 +44,7 @@ describe("guided character level up", () => {
     rangerId,
     rogueId,
     sorcererId,
+    warlockId,
     wizardId,
   ] as const)(
     "advances %s from level 1 through 5 without replacing play state or possessions",
@@ -165,6 +167,14 @@ describe("guided character level up", () => {
         ]);
         expect(character.loadout.preparedSpellIds).toHaveLength(9);
       }
+      if (classId === warlockId) {
+        expect(
+          character.build.levels.flatMap((level) =>
+            level.selectedFeatureChoices.flatMap((choice) => choice.optionIds),
+          ),
+        ).toHaveLength(5);
+        expect(character.loadout.preparedSpellIds).toHaveLength(6);
+      }
     },
   );
 
@@ -272,6 +282,103 @@ describe("guided character level up", () => {
     );
   });
 
+  it("allows one Warlock invocation, cantrip, and prepared-spell replacement", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const warlock = buildCharacter(
+      defaultBuilderDraft(warlockId, catalog, 2, "Changing Warlock"),
+      rulesPackage,
+      initialOptions,
+    );
+    let draft = createLevelUpDraft(warlock, catalog);
+    draft = updateBuilderFeatureChoice(
+      draft,
+      catalog,
+      "srd521.choice.warlock.eldritch-invocation",
+      "srd521.option.warlock.invocation.pact-of-the-chain",
+    );
+    draft = updateBuilderFeatureChoice(
+      draft,
+      catalog,
+      "srd521.choice.warlock.eldritch-invocation",
+      "srd521.option.warlock.invocation.armor-of-shadows",
+    );
+    const spellcasting = catalog.classes[warlockId].spellcasting;
+    const replacedCantripId = warlock.build.learnedSpellIds[0];
+    const replacementCantrip = spellcasting?.spells.find(
+      (spell) => spell.level === 0 && !draft.learnedSpellIds.includes(spell.id),
+    );
+    const replacedSpellId = warlock.loadout.preparedSpellIds[0];
+    const replacementSpell = spellcasting?.spells.find(
+      (spell) =>
+        spell.level > 0 &&
+        spell.level <= 2 &&
+        !draft.preparedSpellIds.includes(spell.id) &&
+        !spellSelectionCounts(draft, catalog)?.alwaysPreparedSpellIds.includes(spell.id),
+    );
+    if (
+      replacedCantripId === undefined ||
+      replacementCantrip === undefined ||
+      replacedSpellId === undefined ||
+      replacementSpell === undefined
+    ) {
+      throw new Error("Expected Warlock replacement choices.");
+    }
+    draft.learnedSpellIds = [
+      ...draft.learnedSpellIds.filter((spellId) => spellId !== replacedCantripId),
+      replacementCantrip.id,
+    ];
+    draft.preparedSpellIds = [
+      ...draft.preparedSpellIds.filter((spellId) => spellId !== replacedSpellId),
+      replacementSpell.id,
+    ];
+
+    const preview = previewLevelUp(warlock, draft, rulesPackage, {
+      id: warlock.id,
+      now: new Date("2026-08-09T14:00:00.000Z"),
+    });
+
+    expect(preview.issues).toEqual([]);
+    expect(preview.character?.build.learnedSpellIds).toContain(replacementCantrip.id);
+    expect(preview.character?.build.learnedSpellIds).not.toContain(replacedCantripId);
+    expect(preview.character?.loadout.preparedSpellIds).toContain(replacementSpell.id);
+    expect(preview.character?.loadout.preparedSpellIds).not.toContain(replacedSpellId);
+    expect(
+      preview.character?.build.levels.flatMap((level) =>
+        level.selectedFeatureChoices.flatMap((choice) => choice.optionIds),
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        "srd521.option.warlock.invocation.armor-of-shadows",
+        "srd521.option.warlock.invocation.devil-s-sight",
+        "srd521.option.warlock.invocation.fiendish-vigor",
+      ]),
+    );
+  });
+
+  it("rejects replacing multiple Warlock cantrips at one level", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const warlock = buildCharacter(
+      defaultBuilderDraft(warlockId, catalog, 2, "Overchanging Warlock"),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(warlock, catalog);
+    const replacement = catalog.classes[warlockId].spellcasting?.spells.find(
+      (spell) => spell.level === 0 && !draft.learnedSpellIds.includes(spell.id),
+    );
+    if (replacement === undefined) throw new Error("Expected a replacement cantrip.");
+    draft.learnedSpellIds = [replacement.id];
+
+    const preview = previewLevelUp(warlock, draft, rulesPackage, {
+      id: warlock.id,
+      now: new Date("2026-08-09T15:00:00.000Z"),
+    });
+
+    expect(preview.issues).toContain("Replace no more than 1 Warlock cantrip during level up.");
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
@@ -286,7 +393,7 @@ describe("guided character level up", () => {
     if (firstLevel === undefined) throw new Error("Expected a first character level.");
     unsupported.build.levels[0] = {
       ...firstLevel,
-      classId: "srd521.class.warlock",
+      classId: "srd521.class.bard",
     };
 
     expect(levelUpEligibility(levelFive, catalog)).toMatchObject({
@@ -297,7 +404,7 @@ describe("guided character level up", () => {
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, and Wizard.",
+        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
     });
     expect(() => createLevelUpDraft(levelFive, catalog)).toThrow(
       "Fighter advancement is currently reviewed through level 5.",

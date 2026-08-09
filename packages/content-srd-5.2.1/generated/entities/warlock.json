@@ -5,8 +5,50 @@
       "armorTraining": [
         "light"
       ],
+      "builder": {
+        "defaultAbilityScoreImprovementAbility": "charisma",
+        "defaultAbilityScores": {
+          "charisma": 15,
+          "constitution": 14,
+          "dexterity": 13,
+          "intelligence": 10,
+          "strength": 10,
+          "wisdom": 10
+        },
+        "defaultClassSkillIds": [
+          "srd521.skill.arcana",
+          "srd521.skill.deception"
+        ],
+        "defaultGrantedFeatIds": [],
+        "supportedLevelMaximum": 5,
+        "supportedLevelMinimum": 1
+      },
+      "cantripChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
       "eldritchInvocationChoice": {
+        "changeOn": [
+          "level-up"
+        ],
+        "countByLevel": {
+          "1": 1,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 5
+        },
+        "defaultOptionIds": [
+          "srd521.option.warlock.invocation.pact-of-the-chain",
+          "srd521.option.warlock.invocation.devil-s-sight",
+          "srd521.option.warlock.invocation.fiendish-vigor",
+          "srd521.option.warlock.invocation.ascendant-step",
+          "srd521.option.warlock.invocation.one-with-shadows"
+        ],
         "id": "srd521.choice.warlock.eldritch-invocation",
+        "level": 1,
+        "maximum": 5,
+        "minimum": 1,
         "options": [
           "srd521.option.warlock.invocation.agonizing-blast",
           "srd521.option.warlock.invocation.armor-of-shadows",
@@ -36,7 +78,8 @@
           "srd521.option.warlock.invocation.visions-of-distant-realms",
           "srd521.option.warlock.invocation.whispers-of-the-grave",
           "srd521.option.warlock.invocation.witch-sight"
-        ]
+        ],
+        "replacementMaximum": 1
       },
       "hitPointDie": 8,
       "primaryAbilities": [
@@ -398,6 +441,13 @@
         "charisma"
       ],
       "skillProficiencyChoice": {
+        "countByLevel": {
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2
+        },
         "maximum": 2,
         "minimum": 2,
         "options": [
@@ -486,8 +536,70 @@
         "srd521.spell.weird"
       ],
       "spellPreparation": "full-list",
+      "spellPreparationChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
       "spellcastingAbility": "charisma",
       "spellcastingModel": "pact-magic",
+      "startingEquipment": {
+        "id": "srd521.choice.class.warlock.starting-equipment",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "currencyGp": 15,
+            "id": "srd521.option.class.warlock.starting-equipment.a",
+            "items": [
+              {
+                "entityId": "srd521.equipment.armor.light.leather-armor",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.sickle",
+                "equipped": true,
+                "kind": "entity",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.weapon.dagger",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 2
+              },
+              {
+                "entityId": "srd521.equipment.gear.arcane-focus",
+                "equipped": false,
+                "kind": "entity",
+                "label": "Arcane Focus (orb)",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.book",
+                "equipped": false,
+                "kind": "entity",
+                "label": "Book (occult lore)",
+                "quantity": 1
+              },
+              {
+                "entityId": "srd521.equipment.gear.scholars-pack",
+                "equipped": false,
+                "kind": "entity",
+                "quantity": 1
+              }
+            ],
+            "label": "Package A"
+          },
+          {
+            "currencyGp": 100,
+            "id": "srd521.option.class.warlock.starting-equipment.b",
+            "items": [],
+            "label": "Package B"
+          }
+        ]
+      },
       "startingEquipmentText": "Choose A or B: (A) Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar’s Pack, and 15 GP; or (B) 100 GP",
       "weaponProficiencies": [
         "simple"

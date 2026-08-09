@@ -411,6 +411,67 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _starting_equipment() -> dict[str, Any]:
+    return {
+        "id": "srd521.choice.class.warlock.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
+        "options": [
+            {
+                "id": "srd521.option.class.warlock.starting-equipment.a",
+                "label": "Package A",
+                "items": [
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.armor.light.leather-armor",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.sickle",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.dagger",
+                        "quantity": 2,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.arcane-focus",
+                        "quantity": 1,
+                        "equipped": False,
+                        "label": "Arcane Focus (orb)",
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.book",
+                        "quantity": 1,
+                        "equipped": False,
+                        "label": "Book (occult lore)",
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.scholars-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                ],
+                "currencyGp": 15,
+            },
+            {
+                "id": "srd521.option.class.warlock.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 100,
+            },
+        ],
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[WarlockProgressionRow, ...],
@@ -428,8 +489,39 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits["skillProficiencyChoice"],
+                "countByLevel": {str(level): 2 for level in range(1, 6)},
+            },
+            "startingEquipment": _starting_equipment(),
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 10,
+                    "dexterity": 13,
+                    "constitution": 14,
+                    "intelligence": 10,
+                    "wisdom": 10,
+                    "charisma": 15,
+                },
+                "defaultAbilityScoreImprovementAbility": "charisma",
+                "defaultClassSkillIds": [
+                    "srd521.skill.arcana",
+                    "srd521.skill.deception",
+                ],
+                "defaultGrantedFeatIds": [],
+            },
             "spellcastingAbility": "charisma",
             "spellPreparation": "full-list",
+            "spellPreparationChange": {
+                "event": "level-up",
+                "replacementMaximum": 1,
+            },
+            "cantripChange": {
+                "event": "level-up",
+                "replacementMaximum": 1,
+            },
             "spellcastingModel": "pact-magic",
             "slotRecharge": "short-rest",
             "alwaysPreparedSpells": {},
@@ -441,7 +533,24 @@ def _class_entity(
             ],
             "eldritchInvocationChoice": {
                 "id": INVOCATION_CHOICE_ID,
+                "level": 1,
+                "minimum": 1,
+                "maximum": 5,
+                "countByLevel": {
+                    str(row.level): row.eldritch_invocations
+                    for row in progression
+                    if row.level <= 5
+                },
                 "options": [invocation["id"] for invocation in invocations],
+                "defaultOptionIds": [
+                    "srd521.option.warlock.invocation.pact-of-the-chain",
+                    "srd521.option.warlock.invocation.devil-s-sight",
+                    "srd521.option.warlock.invocation.fiendish-vigor",
+                    "srd521.option.warlock.invocation.ascendant-step",
+                    "srd521.option.warlock.invocation.one-with-shadows",
+                ],
+                "changeOn": ["level-up"],
+                "replacementMaximum": 1,
             },
             "progression": [
                 {

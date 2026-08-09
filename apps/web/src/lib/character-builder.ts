@@ -23,6 +23,7 @@ export const paladinId = "srd521.class.paladin";
 export const rangerId = "srd521.class.ranger";
 export const rogueId = "srd521.class.rogue";
 export const sorcererId = "srd521.class.sorcerer";
+export const warlockId = "srd521.class.warlock";
 const abilityScoreImprovementId = "srd521.feat.general.ability-score-improvement";
 const skillPrefix = "srd521.skill.";
 
@@ -36,6 +37,7 @@ export const builderClassIds = [
   rangerId,
   rogueId,
   sorcererId,
+  warlockId,
   wizardId,
 ] as const;
 export type BuilderClassId = (typeof builderClassIds)[number];
@@ -176,6 +178,9 @@ export interface ClassFeatureChoiceOptionCatalog {
   description: string;
   additionalCantrips: number;
   alwaysPreparedSpellsByLevel: Readonly<Record<string, string[]>>;
+  minimumClassLevel: number;
+  prerequisiteOptionIds: string[];
+  repeatable: boolean;
   grantedFeatId?: string;
 }
 
@@ -198,6 +203,10 @@ export interface ClassSpellcastingCatalog {
   ability: Ability;
   preparation: SpellPreparationMode;
   preparationChange?: {
+    event: "level-up";
+    replacementMaximum: number;
+  };
+  cantripChange?: {
     event: "level-up";
     replacementMaximum: number;
   };
@@ -405,6 +414,9 @@ function classCatalog(
           name: localizedName(option),
           description: classOptionDescription(option),
           additionalCantrips: numericValue(optionBody?.additionalCantrips),
+          minimumClassLevel: numericValue(optionBody?.minimumWarlockLevel, 1),
+          prerequisiteOptionIds: stringArray(optionBody?.prerequisiteInvocationIds),
+          repeatable: optionBody?.repeatable === true,
           alwaysPreparedSpellsByLevel: Object.fromEntries(
             Object.entries(alwaysPreparedSpells ?? {}).map(([level, spellIds]) => [
               level,
@@ -487,6 +499,7 @@ function classCatalog(
     const spellbookStartingSpells = numericValue(classBody?.spellbookStartingSpells);
     const spellbookSpellsPerLevel = numericValue(classBody?.spellbookSpellsPerLevel);
     const preparationChange = objectValue(classBody?.spellPreparationChange);
+    const cantripChange = objectValue(classBody?.cantripChange);
     const subclassAlwaysPrepared = subclassBody?.alwaysPreparedSpells;
     const countsByLevel = Object.fromEntries(
       progression
@@ -541,6 +554,14 @@ function classCatalog(
             preparationChange: {
               event: "level-up" as const,
               replacementMaximum: numericValue(preparationChange.replacementMaximum),
+            },
+          }
+        : {}),
+      ...(cantripChange?.event === "level-up" && numericValue(cantripChange.replacementMaximum) > 0
+        ? {
+            cantripChange: {
+              event: "level-up" as const,
+              replacementMaximum: numericValue(cantripChange.replacementMaximum),
             },
           }
         : {}),
@@ -705,6 +726,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
       [rangerId]: classCatalog(rangerId, rulesPackage),
       [rogueId]: classCatalog(rogueId, rulesPackage),
       [sorcererId]: classCatalog(sorcererId, rulesPackage),
+      [warlockId]: classCatalog(warlockId, rulesPackage),
       [wizardId]: classCatalog(wizardId, rulesPackage),
     },
     species,
@@ -826,6 +848,83 @@ function fillSelections(current: string[], candidates: string[], count: number):
   return [...valid, ...candidates.filter((id) => !valid.includes(id))].slice(0, count);
 }
 
+export function featureChoiceCount(choice: ClassFeatureChoiceCatalog, level: number): number {
+  if (level < choice.level) return 0;
+  return choice.countByLevel?.[String(level)] ?? choice.maximum;
+}
+
+function featureChoiceSelectionLevels(
+  choice: ClassFeatureChoiceCatalog,
+  selectedIds: string[],
+  targetLevel: number,
+): ReadonlyMap<string, number> | undefined {
+  const selected = new Set(selectedIds);
+  const options = new Map(choice.options.map((option) => [option.id, option]));
+  if (selectedIds.some((optionId) => !options.has(optionId))) return undefined;
+
+  if (choice.countByLevel === undefined) {
+    const levels = new Map(selectedIds.map((optionId) => [optionId, choice.level]));
+    return selectedIds.some((optionId) => {
+      const option = options.get(optionId);
+      return (
+        option === undefined ||
+        option.minimumClassLevel > choice.level ||
+        option.prerequisiteOptionIds.some((prerequisiteId) => !selected.has(prerequisiteId))
+      );
+    })
+      ? undefined
+      : levels;
+  }
+
+  const slots: number[] = [];
+  let previousCount = 0;
+  for (let level = choice.level; level <= targetLevel; level += 1) {
+    const count = featureChoiceCount(choice, level);
+    for (let index = previousCount; index < count; index += 1) slots.push(level);
+    previousCount = count;
+  }
+  if (slots.length !== selectedIds.length) return undefined;
+
+  const remaining = [...selectedIds];
+  const ordered: string[] = [];
+  while (remaining.length > 0) {
+    const available = remaining
+      .filter((optionId) => {
+        const option = options.get(optionId);
+        return option?.prerequisiteOptionIds.every(
+          (prerequisiteId) => !selected.has(prerequisiteId) || ordered.includes(prerequisiteId),
+        );
+      })
+      .sort((left, right) => {
+        const levelDifference =
+          (options.get(left)?.minimumClassLevel ?? 1) -
+          (options.get(right)?.minimumClassLevel ?? 1);
+        return levelDifference || selectedIds.indexOf(left) - selectedIds.indexOf(right);
+      });
+    const next = available[0];
+    if (next === undefined) return undefined;
+    ordered.push(next);
+    remaining.splice(remaining.indexOf(next), 1);
+  }
+
+  const levels = new Map(ordered.map((optionId, index) => [optionId, slots[index] ?? 0]));
+  for (const optionId of ordered) {
+    const option = options.get(optionId);
+    const selectionLevel = levels.get(optionId) ?? 0;
+    if (
+      option === undefined ||
+      option.minimumClassLevel > selectionLevel ||
+      option.prerequisiteOptionIds.some(
+        (prerequisiteId) =>
+          !selected.has(prerequisiteId) || (levels.get(prerequisiteId) ?? 21) > selectionLevel,
+      )
+    ) {
+      return undefined;
+    }
+  }
+  return levels;
+}
+
 export function expertiseSkillCandidates(
   draft: CharacterBuilderDraft,
   catalog: BuilderCatalog,
@@ -891,9 +990,12 @@ function reconciledFeatureChoiceSelections(
         fillSelections(
           current[choice.id] ?? [],
           [...(choice.defaultOptionIds ?? []), ...choice.options.map((option) => option.id)].filter(
-            (optionId, index, options) => options.indexOf(optionId) === index,
+            (optionId, index, optionIds) =>
+              optionIds.indexOf(optionId) === index &&
+              (choice.options.find((option) => option.id === optionId)?.minimumClassLevel ?? 1) <=
+                level,
           ),
-          choice.minimum,
+          choice.countByLevel === undefined ? choice.minimum : featureChoiceCount(choice, level),
         ),
       ]),
   );
@@ -1127,13 +1229,41 @@ export function updateBuilderFeatureChoice(
   if (choice === undefined || choice.level > draft.level) return draft;
   const optionIds = choice.options.map((option) => option.id);
   if (!optionIds.includes(optionId)) return draft;
+  const option = choice.options.find((candidate) => candidate.id === optionId);
   const current = draft.featureChoiceSelections[choiceId] ?? [];
+  if (
+    option === undefined ||
+    option.minimumClassLevel > draft.level ||
+    (!current.includes(optionId) &&
+      option.prerequisiteOptionIds.some((prerequisiteId) => !current.includes(prerequisiteId)))
+  ) {
+    return draft;
+  }
+  const maximum = featureChoiceCount(choice, draft.level);
+  const withoutOptionAndDependents = (removedId: string): string[] => {
+    const removed = new Set([removedId]);
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const candidate of choice.options) {
+        if (
+          current.includes(candidate.id) &&
+          !removed.has(candidate.id) &&
+          candidate.prerequisiteOptionIds.some((prerequisiteId) => removed.has(prerequisiteId))
+        ) {
+          removed.add(candidate.id);
+          changed = true;
+        }
+      }
+    }
+    return current.filter((id) => !removed.has(id));
+  };
   const selected =
-    choice.maximum === 1
+    maximum === 1
       ? [optionId]
       : current.includes(optionId)
-        ? current.filter((id) => id !== optionId)
-        : [...current, optionId].slice(0, choice.maximum);
+        ? withoutOptionAndDependents(optionId)
+        : [...current, optionId].slice(0, maximum);
   const next = {
     ...draft,
     featureChoiceSelections: {
@@ -1259,15 +1389,27 @@ export function validateBuilderDraft(
   for (const choice of selectedClass.featureChoices) {
     const selected = draft.featureChoiceSelections[choice.id] ?? [];
     const optionIds = choice.options.map((option) => option.id);
+    const requiredCount = featureChoiceCount(choice, draft.level);
+    const selectionLevels =
+      choice.level <= draft.level
+        ? featureChoiceSelectionLevels(choice, selected, draft.level)
+        : undefined;
     if (
       (choice.level <= draft.level &&
-        (selected.length < choice.minimum || selected.length > choice.maximum)) ||
+        (choice.countByLevel === undefined
+          ? selected.length < choice.minimum || selected.length > choice.maximum
+          : selected.length !== requiredCount)) ||
       (choice.level > draft.level && selected.length > 0) ||
       new Set(selected).size !== selected.length ||
-      selected.some((id) => !optionIds.includes(id))
+      selected.some((id) => !optionIds.includes(id)) ||
+      (choice.level <= draft.level && selectionLevels === undefined)
     ) {
+      const range =
+        choice.countByLevel === undefined
+          ? `${String(choice.minimum)}–${String(choice.maximum)}`
+          : `exactly ${String(requiredCount)}`;
       issues.push(
-        `Choose ${String(choice.minimum)}–${String(choice.maximum)} valid ${selectedClass.name} feature option${choice.maximum === 1 ? "" : "s"}.`,
+        `Choose ${range} valid ${selectedClass.name} feature option${requiredCount === 1 ? "" : "s"}.`,
       );
     }
   }
@@ -1367,16 +1509,33 @@ function assembleCharacter(
   ) {
     throw new Error("Selected builder metadata is missing.");
   }
+  const selectedFeatureChoicesByLevel = new Map<
+    number,
+    { choiceId: string; optionIds: string[] }[]
+  >();
+  for (const choice of selectedClass.featureChoices.filter(
+    (candidate) => candidate.level <= draft.level,
+  )) {
+    const optionIds = draft.featureChoiceSelections[choice.id] ?? [];
+    const selectionLevels = featureChoiceSelectionLevels(choice, optionIds, draft.level);
+    if (selectionLevels === undefined) {
+      throw new Error(`${selectedClass.name} feature choices cannot be assigned to valid levels.`);
+    }
+    for (const optionId of optionIds) {
+      const level = selectionLevels.get(optionId);
+      if (level === undefined) continue;
+      const choices = selectedFeatureChoicesByLevel.get(level) ?? [];
+      const selection = choices.find((candidate) => candidate.choiceId === choice.id);
+      if (selection === undefined) choices.push({ choiceId: choice.id, optionIds: [optionId] });
+      else selection.optionIds.push(optionId);
+      selectedFeatureChoicesByLevel.set(level, choices);
+    }
+  }
   const levels = Array.from({ length: draft.level }, (_, index) => ({
     characterLevel: index + 1,
     classId: draft.classId,
     hitPointChoice: "fixed" as const,
-    selectedFeatureChoices: selectedClass.featureChoices
-      .filter((choice) => choice.level === index + 1)
-      .flatMap((choice) => {
-        const optionIds = draft.featureChoiceSelections[choice.id] ?? [];
-        return optionIds.length === 0 ? [] : [{ choiceId: choice.id, optionIds }];
-      }),
+    selectedFeatureChoices: selectedFeatureChoicesByLevel.get(index + 1) ?? [],
   }));
   const selectedFeatureFeatIds = selectedClass.featureChoices.flatMap((choice) => {
     const selectedOptions = new Set(draft.featureChoiceSelections[choice.id] ?? []);

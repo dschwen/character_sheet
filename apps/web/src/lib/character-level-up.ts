@@ -7,6 +7,7 @@ import {
   builderClassIds,
   characterBuilderCatalog,
   defaultBuilderDraft,
+  featureChoiceCount,
   spellSelectionCounts,
   updateBuilderLevel,
   validateBuilderDraft,
@@ -55,11 +56,11 @@ function abilityIncreases(
 }
 
 function choiceSelections(character: CharacterDocument): Readonly<Record<string, string[]>> {
-  return Object.fromEntries(
-    character.build.levels.flatMap((level) =>
-      level.selectedFeatureChoices.map((choice) => [choice.choiceId, [...choice.optionIds]]),
-    ),
-  );
+  const selections: Record<string, string[]> = {};
+  for (const choice of character.build.levels.flatMap((level) => level.selectedFeatureChoices)) {
+    selections[choice.choiceId] = [...(selections[choice.choiceId] ?? []), ...choice.optionIds];
+  }
+  return selections;
 }
 
 function chosenAsiAbility(character: CharacterDocument, fallback: Ability): Ability {
@@ -100,7 +101,7 @@ export function levelUpEligibility(
       eligible: false,
       currentLevel,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, and Wizard.",
+        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
     };
   }
   const selectedClass = catalog.classes[classId];
@@ -242,9 +243,28 @@ function advancementIssues(
     const removed = [...current].filter((optionId) => !next.has(optionId)).length;
     const added = [...next].filter((optionId) => !current.has(optionId)).length;
     const replacementMaximum = choice.replacementMaximum ?? 1;
-    if (removed > replacementMaximum || added > replacementMaximum) {
+    const selectionGrowth = Math.max(
+      0,
+      featureChoiceCount(choice, targetLevel) - featureChoiceCount(choice, targetLevel - 1),
+    );
+    if (removed > replacementMaximum || added > selectionGrowth + replacementMaximum) {
       issues.push(
         `Replace no more than ${String(replacementMaximum)} ${selectedClass.name} feature option during level up.`,
+      );
+    }
+  }
+  const cantripChange = selectedClass.spellcasting?.cantripChange;
+  if (cantripChange?.event === "level-up") {
+    const spellLevels = new Map(
+      selectedClass.spellcasting?.spells.map((spell) => [spell.id, spell.level]) ?? [],
+    );
+    const nextLearned = new Set(draft.learnedSpellIds);
+    const removedCantrips = character.build.learnedSpellIds.filter(
+      (spellId) => spellLevels.get(spellId) === 0 && !nextLearned.has(spellId),
+    ).length;
+    if (removedCantrips > cantripChange.replacementMaximum) {
+      issues.push(
+        `Replace no more than ${String(cantripChange.replacementMaximum)} ${selectedClass.name} cantrip during level up.`,
       );
     }
   }
@@ -274,14 +294,15 @@ function mergeAdvancement(
 ): CharacterDocument {
   const newLevel = target.build.levels[character.build.levels.length];
   if (newLevel === undefined) throw new Error("The new class level is missing.");
-  const targetChoices = choiceSelections(target);
-  const existingLevels = character.build.levels.map((level) => ({
+  const targetLevels = target.build.levels;
+  const existingLevels = character.build.levels.map((level, levelIndex) => ({
     ...level,
-    selectedFeatureChoices: level.selectedFeatureChoices.map((choice) =>
-      mutableChoiceIds.has(choice.choiceId) && targetChoices[choice.choiceId] !== undefined
-        ? { ...choice, optionIds: [...(targetChoices[choice.choiceId] ?? [])] }
-        : choice,
-    ),
+    selectedFeatureChoices: [
+      ...level.selectedFeatureChoices.filter((choice) => !mutableChoiceIds.has(choice.choiceId)),
+      ...(targetLevels[levelIndex]?.selectedFeatureChoices.filter((choice) =>
+        mutableChoiceIds.has(choice.choiceId),
+      ) ?? []),
+    ],
   }));
   return characterDocumentSchema.parse({
     ...character,

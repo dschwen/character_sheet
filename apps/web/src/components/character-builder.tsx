@@ -15,6 +15,7 @@ import {
   defaultBuilderDraft,
   expertiseCount,
   expertiseSkillCandidates,
+  featureChoiceCount,
   fighterId,
   masteryCount,
   previewBuilderCharacter,
@@ -508,7 +509,7 @@ export function CharacterBuilder({
                     <h2>Choose {shortEntityName(choice.id)}</h2>
                     <small>
                       {String((draft.featureChoiceSelections[choice.id] ?? []).length)} /{" "}
-                      {String(choice.maximum)} selected
+                      {String(featureChoiceCount(choice, draft.level))} selected
                     </small>
                   </div>
                   <div className="builder-choice-grid">
@@ -516,11 +517,21 @@ export function CharacterBuilder({
                       const selected = (draft.featureChoiceSelections[choice.id] ?? []).includes(
                         option.id,
                       );
+                      const selectedIds = draft.featureChoiceSelections[choice.id] ?? [];
+                      const missingPrerequisite = option.prerequisiteOptionIds.find(
+                        (optionId) => !selectedIds.includes(optionId),
+                      );
+                      const unavailable = option.minimumClassLevel > draft.level;
+                      const maximumReached =
+                        !selected && selectedIds.length >= featureChoiceCount(choice, draft.level);
                       return (
                         <button
                           key={option.id}
                           type="button"
                           className={selected ? "builder-choice selected" : "builder-choice"}
+                          disabled={
+                            unavailable || missingPrerequisite !== undefined || maximumReached
+                          }
                           onClick={() => {
                             setDraft((value) =>
                               updateBuilderFeatureChoice(value, catalog, choice.id, option.id),
@@ -530,7 +541,15 @@ export function CharacterBuilder({
                           <span>{shortEntityName(choice.id)}</span>
                           <h2>{option.name}</h2>
                           <p>{option.description}</p>
-                          <small>{selected ? "Selected" : "Choose option"}</small>
+                          <small>
+                            {selected
+                              ? "Selected"
+                              : unavailable
+                                ? `Requires level ${String(option.minimumClassLevel)}`
+                                : missingPrerequisite === undefined
+                                  ? "Choose option"
+                                  : `Requires ${choice.options.find((candidate) => candidate.id === missingPrerequisite)?.name ?? shortEntityName(missingPrerequisite)}`}
+                          </small>
                         </button>
                       );
                     })}

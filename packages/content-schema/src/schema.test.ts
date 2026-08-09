@@ -67,4 +67,23 @@ describe("content schemas", () => {
       }),
     ).toThrow("Defaults must be unique listed options within the choice bounds");
   });
+
+  it("rejects level-indexed feature-choice counts outside the authored bounds", () => {
+    expect(() =>
+      classFeatureChoiceSchema.parse({
+        id: "srd521.choice.warlock.eldritch-invocation",
+        level: 1,
+        minimum: 1,
+        maximum: 5,
+        countByLevel: { 1: 1, 5: 6 },
+        options: [
+          "srd521.option.warlock.invocation.pact-of-the-chain",
+          "srd521.option.warlock.invocation.devil-s-sight",
+          "srd521.option.warlock.invocation.fiendish-vigor",
+          "srd521.option.warlock.invocation.ascendant-step",
+          "srd521.option.warlock.invocation.one-with-shadows",
+        ],
+      }),
+    ).toThrow("Level-indexed choice counts must use levels 1–20 and fit the choice bounds");
+  });
 });

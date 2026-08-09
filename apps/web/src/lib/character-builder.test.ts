@@ -22,6 +22,7 @@ import {
   updateBuilderFeatureChoice,
   updateBuilderLevel,
   validateBuilderDraft,
+  warlockId,
   wizardId,
 } from "./character-builder";
 import { loadWebData } from "./server-data";
@@ -146,6 +147,33 @@ describe("guided character builder", () => {
         (option) => option.id === "srd521.option.sorcerer.metamagic.quickened",
       )?.description,
     ).toContain("Bonus Action");
+    expect(catalog.classes[warlockId]).toMatchObject({
+      name: "Warlock",
+      subclassId: "srd521.subclass.warlock.fiend-patron",
+      subclassLevel: 3,
+      spellcasting: {
+        preparation: "full-list",
+        preparationChange: { event: "level-up", replacementMaximum: 1 },
+        cantripChange: { event: "level-up", replacementMaximum: 1 },
+        ability: "charisma",
+      },
+      skillCountByLevel: { 1: 2, 3: 2, 5: 2 },
+    });
+    expect(catalog.classes[warlockId].featureChoices[0]).toMatchObject({
+      id: "srd521.choice.warlock.eldritch-invocation",
+      level: 1,
+      minimum: 1,
+      maximum: 5,
+      countByLevel: { 1: 1, 2: 3, 3: 3, 4: 3, 5: 5 },
+    });
+    expect(
+      catalog.classes[warlockId].featureChoices[0]?.options.find(
+        (option) => option.id === "srd521.option.warlock.invocation.thirsting-blade",
+      ),
+    ).toMatchObject({
+      minimumClassLevel: 5,
+      prerequisiteOptionIds: ["srd521.option.warlock.invocation.pact-of-the-blade"],
+    });
     expect(catalog.classes[wizardId].name).toBe("Wizard");
     expect(catalog.classes[barbarianId]).toMatchObject({
       name: "Barbarian",
@@ -818,6 +846,109 @@ describe("guided character builder", () => {
         expect(character.loadout.currency.gp).toBe(28);
       }
     }
+  });
+
+  it("builds Fiend Warlocks with Pact Magic and level-legal invocations through level 5", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [10, 17, 24, 31, 38];
+    const expectedCantrips = [2, 2, 2, 3, 3];
+    const expectedPrepared = [2, 3, 4, 5, 6];
+    const expectedAlwaysPrepared = [0, 0, 4, 4, 6];
+    const expectedInvocations = [1, 3, 3, 3, 5];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(
+        warlockId,
+        catalog,
+        level,
+        `Level ${String(level)} Warlock`,
+      );
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+      const invocations = character.build.levels.flatMap((entry) =>
+        entry.selectedFeatureChoices
+          .filter((choice) => choice.choiceId === "srd521.choice.warlock.eldritch-invocation")
+          .flatMap((choice) => choice.optionIds),
+      );
+
+      expect(validateBuilderDraft(draft, catalog), `draft level ${String(level)}`).toEqual([]);
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(evaluation.values.armorClass?.value).toBe(13);
+      expect(character.build.learnedSpellIds).toHaveLength(expectedCantrips[level - 1] ?? 0);
+      expect(character.loadout.preparedSpellIds).toHaveLength(expectedPrepared[level - 1] ?? 0);
+      expect(evaluation.spellcasting?.alwaysPreparedSpells).toBe(expectedAlwaysPrepared[level - 1]);
+      expect(invocations).toHaveLength(expectedInvocations[level - 1] ?? 0);
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.warlock.fiend-patron" : undefined,
+      );
+      expect(evaluation.actions.some((action) => action.id === "action.magical-cunning")).toBe(
+        level >= 2,
+      );
+      if (level === 5) {
+        expect(character.build.levels.map((entry) => entry.selectedFeatureChoices)).toEqual([
+          [
+            {
+              choiceId: "srd521.choice.warlock.eldritch-invocation",
+              optionIds: ["srd521.option.warlock.invocation.pact-of-the-chain"],
+            },
+          ],
+          [
+            {
+              choiceId: "srd521.choice.warlock.eldritch-invocation",
+              optionIds: [
+                "srd521.option.warlock.invocation.devil-s-sight",
+                "srd521.option.warlock.invocation.fiendish-vigor",
+              ],
+            },
+          ],
+          [],
+          [],
+          [
+            {
+              choiceId: "srd521.choice.warlock.eldritch-invocation",
+              optionIds: [
+                "srd521.option.warlock.invocation.ascendant-step",
+                "srd521.option.warlock.invocation.one-with-shadows",
+              ],
+            },
+          ],
+        ]);
+      }
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(7);
+        expect(character.loadout.equippedItemIds).toEqual(["leather-armor-1", "sickle-1"]);
+        expect(character.loadout.currency.gp).toBe(15);
+      }
+    }
+  });
+
+  it("rejects Warlock invocations before their level and prerequisite are available", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const levelOne = defaultBuilderDraft(warlockId, catalog, 1, "Novice Warlock");
+    const tooEarly = updateBuilderFeatureChoice(
+      levelOne,
+      catalog,
+      "srd521.choice.warlock.eldritch-invocation",
+      "srd521.option.warlock.invocation.ascendant-step",
+    );
+    const levelFive = defaultBuilderDraft(warlockId, catalog, 5, "Blade Warlock");
+    levelFive.featureChoiceSelections = {
+      "srd521.choice.warlock.eldritch-invocation": [
+        "srd521.option.warlock.invocation.pact-of-the-chain",
+        "srd521.option.warlock.invocation.devil-s-sight",
+        "srd521.option.warlock.invocation.fiendish-vigor",
+        "srd521.option.warlock.invocation.ascendant-step",
+        "srd521.option.warlock.invocation.thirsting-blade",
+      ],
+    };
+
+    expect(tooEarly).toEqual(levelOne);
+    expect(validateBuilderDraft(levelFive, catalog)).toContain(
+      "Choose exactly 5 valid Warlock feature options.",
+    );
   });
 
   it("reconciles Druid Primal Order cantrips and selected land spells", () => {
