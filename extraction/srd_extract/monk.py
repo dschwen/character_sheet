@@ -257,6 +257,52 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _starting_equipment() -> dict[str, Any]:
+    return {
+        "id": "srd521.choice.class.monk.starting-equipment",
+        "minimum": 1,
+        "maximum": 1,
+        "options": [
+            {
+                "id": "srd521.option.class.monk.starting-equipment.a",
+                "label": "Package A",
+                "items": [
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.spear",
+                        "quantity": 1,
+                        "equipped": True,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.weapon.dagger",
+                        "quantity": 5,
+                        "equipped": False,
+                    },
+                    {
+                        "kind": "text",
+                        "name": "Artisan’s Tools or Musical Instrument (choose one)",
+                        "quantity": 1,
+                    },
+                    {
+                        "kind": "entity",
+                        "entityId": "srd521.equipment.gear.explorers-pack",
+                        "quantity": 1,
+                        "equipped": False,
+                    },
+                ],
+                "currencyGp": 11,
+            },
+            {
+                "id": "srd521.option.class.monk.starting-equipment.b",
+                "label": "Package B",
+                "items": [],
+                "currencyGp": 50,
+            },
+        ],
+    }
+
+
 def _class_entity(
     traits: dict[str, Any],
     progression: tuple[MonkProgressionRow, ...],
@@ -272,6 +318,29 @@ def _class_entity(
         "source": source,
         "body": {
             **traits,
+            "skillProficiencyChoice": {
+                **traits["skillProficiencyChoice"],
+                "countByLevel": {str(level): 2 for level in range(1, 6)},
+            },
+            "startingEquipment": _starting_equipment(),
+            "builder": {
+                "supportedLevelMinimum": 1,
+                "supportedLevelMaximum": 5,
+                "defaultAbilityScores": {
+                    "strength": 8,
+                    "dexterity": 15,
+                    "constitution": 14,
+                    "intelligence": 10,
+                    "wisdom": 15,
+                    "charisma": 8,
+                },
+                "defaultAbilityScoreImprovementAbility": "dexterity",
+                "defaultClassSkillIds": [
+                    "srd521.skill.acrobatics",
+                    "srd521.skill.insight",
+                ],
+                "defaultGrantedFeatIds": [],
+            },
             "featureSaveAbility": "wisdom",
             "martialArts": {
                 "ability": "dexterity",

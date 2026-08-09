@@ -11,17 +11,25 @@ import {
 import type { CharacterEvaluation, LoadedRulesPackage } from "@dnd/rules-api";
 import { evaluateCharacter } from "@dnd/rules-core";
 
-import { abilities, type Ability, shortEntityName } from "./presentation";
+import { abilities, type Ability, shortEntityName, titleCase } from "./presentation";
 
 export const fighterId = "srd521.class.fighter";
 export const wizardId = "srd521.class.wizard";
 export const barbarianId = "srd521.class.barbarian";
 export const clericId = "srd521.class.cleric";
 export const druidId = "srd521.class.druid";
+export const monkId = "srd521.class.monk";
 const abilityScoreImprovementId = "srd521.feat.general.ability-score-improvement";
 const skillPrefix = "srd521.skill.";
 
-export const builderClassIds = [barbarianId, clericId, druidId, fighterId, wizardId] as const;
+export const builderClassIds = [
+  barbarianId,
+  clericId,
+  druidId,
+  fighterId,
+  monkId,
+  wizardId,
+] as const;
 export type BuilderClassId = (typeof builderClassIds)[number];
 
 export const skillIds = [
@@ -494,13 +502,29 @@ function classCatalog(
     .map((ability) => shortEntityName(ability))
     .join(" or ");
   const hitPointDie = numericValue(classBody?.hitPointDie);
+  const progressionResource = progression
+    .flatMap((row) => {
+      const body = objectValue(row);
+      if (body === undefined) return [];
+      return Object.entries(body).flatMap(([key, value]) =>
+        key !== "level" &&
+        key !== "proficiencyBonus" &&
+        key !== "features" &&
+        numericValue(value) > 0
+          ? [key]
+          : [],
+      );
+    })
+    .find((key) => key.toLowerCase().endsWith("points"));
   const focus = spellcasting
     ? spellcasting.preparation === "spellbook"
       ? "a growing spellbook"
       : "prepared magic"
-    : Math.max(0, ...Object.values(weaponMasteryCountByLevel)) > 0
-      ? "Weapon Mastery"
-      : "martial training";
+    : progressionResource !== undefined
+      ? titleCase(progressionResource.replace(/([a-z])([A-Z])/gu, "$1-$2"))
+      : Math.max(0, ...Object.values(weaponMasteryCountByLevel)) > 0
+        ? "Weapon Mastery"
+        : "martial training";
   return {
     id: classId,
     name: localizedName(classEntity),
@@ -625,6 +649,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
       [clericId]: classCatalog(clericId, rulesPackage),
       [druidId]: classCatalog(druidId, rulesPackage),
       [fighterId]: classCatalog(fighterId, rulesPackage),
+      [monkId]: classCatalog(monkId, rulesPackage),
       [wizardId]: classCatalog(wizardId, rulesPackage),
     },
     species,

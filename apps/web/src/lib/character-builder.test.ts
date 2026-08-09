@@ -11,6 +11,7 @@ import {
   defaultBuilderDraft,
   druidId,
   fighterId,
+  monkId,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
@@ -27,6 +28,13 @@ describe("guided character builder", () => {
     const catalog = characterBuilderCatalog(rulesPackage);
 
     expect(catalog.classes[fighterId].name).toBe("Fighter");
+    expect(catalog.classes[monkId]).toMatchObject({
+      name: "Monk",
+      subclassId: "srd521.subclass.monk.warrior-of-the-open-hand",
+      subclassLevel: 3,
+      skillCountByLevel: { 1: 2, 3: 2, 5: 2 },
+    });
+    expect(catalog.classes[monkId].description).toContain("Focus Points");
     expect(catalog.classes[wizardId].name).toBe("Wizard");
     expect(catalog.classes[barbarianId]).toMatchObject({
       name: "Barbarian",
@@ -415,6 +423,37 @@ describe("guided character builder", () => {
         expect(character.loadout.inventory).toHaveLength(5);
         expect(character.loadout.equippedItemIds).toHaveLength(3);
         expect(character.loadout.currency.gp).toBe(9);
+      }
+    }
+  });
+
+  it("builds Open Hand Monks with Martial Arts and Focus at every supported level", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [10, 17, 24, 31, 38];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(monkId, catalog, level, `Level ${String(level)} Monk`);
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+      const focus = evaluation.resources.find(
+        (resource) => resource.id === "srd521.resource.monk.focus-points",
+      );
+      const spear = evaluation.attacks.find((attack) => attack.id === "attack.spear-1");
+
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.monk.warrior-of-the-open-hand" : undefined,
+      );
+      expect(evaluation.values["speed.walking"]?.value).toBe(level >= 2 ? 40 : 30);
+      expect(evaluation.values["attackAction.attacks"]?.value).toBe(level >= 5 ? 2 : 1);
+      expect(spear?.damage).toMatchObject({ diceCount: 1, diceSize: level >= 5 ? 8 : 6 });
+      expect(focus?.maximum).toBe(level >= 2 ? level : undefined);
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(7);
+        expect(character.loadout.equippedItemIds).toEqual(["spear-1"]);
+        expect(character.loadout.currency.gp).toBe(11);
       }
     }
   });

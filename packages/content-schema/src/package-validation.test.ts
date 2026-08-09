@@ -202,6 +202,7 @@ describe("bootstrap content package", () => {
         "srd521.class.cleric",
         "srd521.class.druid",
         "srd521.class.fighter",
+        "srd521.class.monk",
         "srd521.class.wizard",
       ]),
     );
@@ -224,6 +225,7 @@ describe("bootstrap content package", () => {
       "srd521.class.cleric",
       "srd521.class.druid",
       "srd521.class.fighter",
+      "srd521.class.monk",
       "srd521.class.wizard",
     ]);
     const metadata = entities.flatMap((entity) => {
@@ -232,10 +234,15 @@ describe("bootstrap content package", () => {
       return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
     });
 
-    expect(metadata).toHaveLength(5);
+    expect(metadata).toHaveLength(6);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "strength",
+    });
+    expect(metadata.find(({ id }) => id === "srd521.class.monk")?.builder).toMatchObject({
+      supportedLevelMaximum: 5,
+      defaultAbilityScoreImprovementAbility: "dexterity",
+      defaultClassSkillIds: ["srd521.skill.acrobatics", "srd521.skill.insight"],
     });
     const cleric = entities.find((entity) => entity.id === "srd521.class.cleric");
     const clericBody = z.record(z.unknown()).parse(cleric?.body);
