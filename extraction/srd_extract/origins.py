@@ -1,4 +1,4 @@
-"""Parse the Human and Soldier origin vertical slice into typed content."""
+"""Parse the SRD backgrounds, Human, and Origin feats into typed content."""
 
 from __future__ import annotations
 
@@ -13,11 +13,38 @@ from typing import Any
 from srd_extract.io import read_json, write_json
 
 SOURCE_ID = "wotc-srd-5.2.1-en"
-SOLDIER_ID = "srd521.background.soldier"
+BACKGROUND_IDS = {
+    "Acolyte": "srd521.background.acolyte",
+    "Criminal": "srd521.background.criminal",
+    "Sage": "srd521.background.sage",
+    "Soldier": "srd521.background.soldier",
+}
 HUMAN_ID = "srd521.species.human"
+ALERT_ID = "srd521.feat.origin.alert"
+MAGIC_INITIATE_IDS = {
+    "cleric": "srd521.feat.origin.magic-initiate.cleric",
+    "druid": "srd521.feat.origin.magic-initiate.druid",
+    "wizard": "srd521.feat.origin.magic-initiate.wizard",
+}
 SAVAGE_ATTACKER_ID = "srd521.feat.origin.savage-attacker"
 SKILLED_ID = "srd521.feat.origin.skilled"
-ORIGIN_IDS = {SOLDIER_ID, HUMAN_ID, SAVAGE_ATTACKER_ID, SKILLED_ID}
+ORIGIN_IDS = {
+    *BACKGROUND_IDS.values(),
+    HUMAN_ID,
+    ALERT_ID,
+    *MAGIC_INITIATE_IDS.values(),
+    SAVAGE_ATTACKER_ID,
+    SKILLED_ID,
+}
+
+FEAT_IDS = {
+    "Alert": ALERT_ID,
+    "Magic Initiate (Cleric)": MAGIC_INITIATE_IDS["cleric"],
+    "Magic Initiate (Druid)": MAGIC_INITIATE_IDS["druid"],
+    "Magic Initiate (Wizard)": MAGIC_INITIATE_IDS["wizard"],
+    "Savage Attacker": SAVAGE_ATTACKER_ID,
+    "Skilled": SKILLED_ID,
+}
 
 
 def _quote_hash(text: str) -> str:
@@ -63,9 +90,9 @@ def _text(nodes: Iterable[dict[str, Any]]) -> str:
     return " ".join(str(node["normalizedText"]) for node in nodes)
 
 
-def parse_soldier(text: str) -> dict[str, Any]:
+def parse_background(name: str, text: str) -> dict[str, Any]:
     match = re.fullmatch(
-        r"Soldier Ability Scores: (?P<abilities>.+?) "
+        rf"{re.escape(name)} Ability Scores: (?P<abilities>.+?) "
         r"Feat: (?P<feat>.+?) \(see “Feats”\) "
         r"Skill Proficiencies: (?P<skills>.+?) "
         r"Tool Proficiency: (?P<tool>.+?) "
@@ -73,28 +100,34 @@ def parse_soldier(text: str) -> dict[str, Any]:
         text,
     )
     if match is None:
-        raise ValueError("Soldier background does not match the expected fields")
+        raise ValueError(f"{name} background does not match the expected fields")
     abilities = [value.casefold() for value in re.split(r", | and ", match.group("abilities"))]
     skills = [value.casefold() for value in match.group("skills").split(" and ")]
-    if abilities != ["strength", "dexterity", "constitution"]:
-        raise ValueError(f"Unexpected Soldier abilities: {abilities}")
-    if skills != ["athletics", "intimidation"]:
-        raise ValueError(f"Unexpected Soldier skills: {skills}")
-    if match.group("feat") != "Savage Attacker":
-        raise ValueError(f"Unexpected Soldier feat: {match.group('feat')}")
+    if len(abilities) != 3:
+        raise ValueError(f"{name} must grant exactly three ability-score options")
+    if len(skills) != 2:
+        raise ValueError(f"{name} must grant exactly two skill proficiencies")
+    feat_name = match.group("feat")
+    if feat_name not in FEAT_IDS:
+        raise ValueError(f"Unsupported {name} feat: {feat_name}")
     return {
         "abilityScoreOptions": abilities,
         "abilityScoreIncreasePatterns": [[2, 1], [1, 1, 1]],
-        "featId": SAVAGE_ATTACKER_ID,
-        "skillProficiencies": [f"srd521.skill.{skill}" for skill in skills],
+        "featId": FEAT_IDS[feat_name],
+        "skillProficiencies": [f"srd521.skill.{skill.replace(' ', '-')}" for skill in skills],
         "toolProficiencyChoice": {
             "minimum": 1,
             "maximum": 1,
-            "category": "gaming-set",
+            "category": "tool",
             "text": match.group("tool"),
         },
-        "equipmentText": match.group("equipment"),
+        "equipmentText": match.group("equipment").replace("Callig- rapher", "Calligrapher"),
     }
+
+
+def parse_soldier(text: str) -> dict[str, Any]:
+    """Retain the original focused parser API for downstream callers."""
+    return parse_background("Soldier", text)
 
 
 def parse_human(text: str) -> dict[str, Any]:
@@ -135,10 +168,48 @@ def parse_human(text: str) -> dict[str, Any]:
     }
 
 
-def parse_origin_feat(name: str, text: str) -> dict[str, Any]:
+def parse_origin_feat(
+    name: str,
+    text: str,
+    *,
+    spell_list: str | None = None,
+) -> dict[str, Any]:
     if not text.startswith(f"{name} Origin Feat "):
         raise ValueError(f"{name} is not labeled as an Origin Feat")
     description = text.removeprefix(f"{name} Origin Feat ")
+    if name == "Alert":
+        if (
+            "add your Proficiency Bonus" not in description
+            or "swap your Initiative" not in description
+        ):
+            raise ValueError("Alert benefit text is incomplete")
+        return {
+            "category": "origin",
+            "repeatable": False,
+            "initiativeProficiency": True,
+            "initiativeSwap": True,
+            "description": description,
+        }
+    if name == "Magic Initiate":
+        if (
+            "Two Cantrips" not in description
+            or "Level 1 Spell" not in description
+            or "Spell Change" not in description
+        ):
+            raise ValueError("Magic Initiate benefit text is incomplete")
+        if spell_list not in MAGIC_INITIATE_IDS:
+            raise ValueError("Magic Initiate requires a Cleric, Druid, or Wizard spell list")
+        return {
+            "category": "origin",
+            "repeatable": False,
+            "spellListClassId": f"srd521.class.{spell_list}",
+            "spellcastingAbilityChoice": ["intelligence", "wisdom", "charisma"],
+            "cantripChoice": {"minimum": 2, "maximum": 2},
+            "levelOneSpellChoice": {"minimum": 1, "maximum": 1},
+            "freeCastRecharge": "long-rest",
+            "spellChange": {"event": "level-up", "replacementMaximum": 1},
+            "description": description,
+        }
     if name == "Savage Attacker":
         if "roll the weapon’s damage dice twice and use either roll" not in description:
             raise ValueError("Savage Attacker benefit text is incomplete")
@@ -204,7 +275,7 @@ def _savage_attacker_ir(
         "schemaVersion": "0.1.0",
         "id": SAVAGE_ATTACKER_ID,
         "kind": "feat",
-        "parentId": SOLDIER_ID,
+        "parentId": BACKGROUND_IDS["Soldier"],
         "level": 1,
         "source": source,
         "text": {
@@ -243,22 +314,68 @@ def _savage_attacker_ir(
     }
 
 
+def _alert_ir(
+    source: list[dict[str, Any]],
+    body_nodes: list[dict[str, Any]],
+) -> dict[str, Any]:
+    return {
+        "schemaVersion": "0.1.0",
+        "id": ALERT_ID,
+        "kind": "feat",
+        "parentId": BACKGROUND_IDS["Criminal"],
+        "level": 1,
+        "source": source,
+        "text": {
+            "title": "Alert",
+            "nodes": [
+                {"kind": node["kind"], "text": node["normalizedText"]} for node in body_nodes
+            ],
+        },
+        "proposedRules": [
+            {
+                "id": "alert-initiative-proficiency",
+                "type": "add-modifier",
+                "target": "initiative",
+                "expression": {"kind": "ref", "path": "proficiencyBonus"},
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            }
+        ],
+        "review": {
+            "extraction": "approved",
+            "semantics": "needs-review",
+            "tests": "draft",
+            "notes": ["Initiative Swap remains a player-coordinated action."],
+        },
+    }
+
+
 def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, Any]:
     document = read_json(extraction_root / "normalized" / "document.json")
     nodes = document["nodes"]
-    soldier_nodes = _section(nodes, "Soldier", "Character Species")
+    background_sections = {
+        "Acolyte": _section(nodes, "Acolyte", "Criminal"),
+        "Criminal": _section(nodes, "Criminal", "Sage"),
+        "Sage": _section(nodes, "Sage", "Soldier"),
+        "Soldier": _section(nodes, "Soldier", "Character Species"),
+    }
     human_nodes = _section(nodes, "Human", "Orc")
+    alert_nodes = _section(nodes, "Alert", "Magic Initiate")
+    magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
     skilled_nodes = _section(nodes, "Skilled", "General Feats")
 
-    soldier = _entity(
-        SOLDIER_ID,
-        "background",
-        "Soldier",
-        ["background", "origin"],
-        _source_spans(soldier_nodes),
-        parse_soldier(_text(soldier_nodes)),
-    )
+    backgrounds = [
+        _entity(
+            BACKGROUND_IDS[name],
+            "background",
+            name,
+            ["background", "origin"],
+            _source_spans(background_sections[name]),
+            parse_background(name, _text(background_sections[name])),
+        )
+        for name in ("Soldier", "Acolyte", "Criminal", "Sage")
+    ]
     human = _entity(
         HUMAN_ID,
         "species",
@@ -267,6 +384,31 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         _source_spans(human_nodes),
         parse_human(_text(human_nodes)),
     )
+    alert_source = _source_spans(alert_nodes)
+    alert = _entity(
+        ALERT_ID,
+        "feat",
+        "Alert",
+        ["feat", "origin-feat"],
+        alert_source,
+        parse_origin_feat("Alert", _text(alert_nodes)),
+    )
+    magic_initiate_source = _source_spans(magic_initiate_nodes)
+    magic_initiates = [
+        _entity(
+            MAGIC_INITIATE_IDS[spell_list],
+            "feat",
+            f"Magic Initiate ({spell_list.title()})",
+            ["feat", "origin-feat", "magic-initiate", spell_list],
+            magic_initiate_source,
+            parse_origin_feat(
+                "Magic Initiate",
+                _text(magic_initiate_nodes),
+                spell_list=spell_list,
+            ),
+        )
+        for spell_list in ("cleric", "druid", "wizard")
+    ]
     savage_source = _source_spans(savage_nodes)
     savage_attacker = _entity(
         SAVAGE_ATTACKER_ID,
@@ -284,29 +426,50 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         _source_spans(skilled_nodes),
         parse_origin_feat("Skilled", _text(skilled_nodes)),
     )
-    origin_entities = [soldier, human, savage_attacker, skilled]
-    existing = [
-        entity for entity in read_json(output / "entities.json") if entity["id"] not in ORIGIN_IDS
+    origin_entities = [
+        *backgrounds,
+        human,
+        savage_attacker,
+        skilled,
+        alert,
+        *magic_initiates,
     ]
-    all_entities = [*existing, *origin_entities]
+    existing = read_json(output / "entities.json")
+    origin_positions = [
+        index for index, entity in enumerate(existing) if entity["id"] in ORIGIN_IDS
+    ]
+    insertion_index = min(origin_positions, default=len(existing))
+    retained = [entity for entity in existing if entity["id"] not in ORIGIN_IDS]
+    all_entities = [
+        *retained[:insertion_index],
+        *origin_entities,
+        *retained[insertion_index:],
+    ]
     write_json(output / "entities" / "origins.json", origin_entities)
     write_json(output / "entities.json", all_entities)
     write_json(
         output / "authoring-ir" / "origin.savage-attacker.json",
         _savage_attacker_ir(savage_source, savage_nodes[1:]),
     )
+    write_json(
+        output / "authoring-ir" / "origin.alert.json",
+        _alert_ir(alert_source, alert_nodes[1:]),
+    )
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Barbarian, Fighter level-1, Human, Soldier, origin-feat, and equipment "
-        "proof-of-concept content. Proposed executable rules remain under review."
+        "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
+        "Warlock, and Wizard through level 5; all four SRD backgrounds; Human; equipment; "
+        "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
     report = {
         "generatedEntities": [entity["id"] for entity in origin_entities],
-        "soldier": soldier["body"],
+        "backgrounds": {entity["id"]: entity["body"] for entity in backgrounds},
         "human": human["body"],
         "originFeats": {
+            ALERT_ID: alert["body"],
+            **{entity["id"]: entity["body"] for entity in magic_initiates},
             SAVAGE_ATTACKER_ID: savage_attacker["body"],
             SKILLED_ID: skilled["body"],
         },

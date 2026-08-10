@@ -31,8 +31,9 @@ has no account, server, or database dependency. A production build is emitted as
 
 Choose **New character** to open the guided Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin,
 Ranger, Rogue, Sorcerer, Warlock, and Wizard builder. It
-creates rules-valid characters from levels 1–5 with Human and Soldier origins, class-specific
-abilities and skills, reviewed subclasses, and complete choice validation. Barbarians gain Primal
+creates rules-valid characters from levels 1–5 with Human and all four SRD backgrounds,
+class-specific abilities and skills, reviewed subclasses, and complete choice validation.
+Barbarians gain Primal
 Knowledge, choose only eligible melee Weapon Masteries, and follow the Path of the Berserker.
 Bards choose any three skills, gain Expertise and Jack of All Trades, prepare Bard spells, use
 scaling Bardic Inspiration, and join the College of Lore.
@@ -50,6 +51,12 @@ Wizards build a level-appropriate spellbook,
 choose prepared spells, and select Scholar Expertise. The review step
 evaluates the complete draft before enabling creation, then opens the new character directly in the
 sheet.
+
+The Origin step offers Acolyte, Criminal, Sage, and Soldier. Changing the background immediately
+reconciles its ability-score options, granted feat, fixed skill proficiencies, and any conflicting
+class, Human, Skilled, or Expertise choices. Alert adds Proficiency Bonus to Initiative. Magic
+Initiate’s spell-list and spell-choice requirements are preserved as structured content; its
+dedicated spell picker and free-cast tracking are still a future increment.
 
 For a supported level 1–4 character, choose **Level up** to add the next level in its existing
 class. The advancement flow presents only newly introduced decisions, including class skills,
@@ -93,8 +100,9 @@ Character JSON remains the source document: copy one of the reviewed fixtures, g
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
 reviewed Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock,
-and Wizard level 1–5 vertical slices. Higher levels, multiclassing, and broader origin choices are
-the next builder increments. Direct JSON import remains available in the meantime.
+and Wizard level 1–5 vertical slices with every standard SRD background. Additional species,
+Magic Initiate spell choices, higher levels, and multiclassing are the next builder increments.
+Direct JSON import remains available in the meantime.
 
 ## Requirements
 
@@ -378,7 +386,7 @@ Eldritch Invocations and their prerequisites, and all five Fiend Patron features
 source-linked representative spells and authoring IR for Magical Cunning’s limited Pact-slot
 recovery.
 
-Generate the Human and Soldier origin slice from pages 83, 86, and 87:
+Generate all four SRD backgrounds, Human, and the Origin feat slice from pages 83, 86, and 87:
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
@@ -392,8 +400,9 @@ Generate the Human and Soldier origin slice from pages 83, 86, and 87:
   --output packages/content-srd-5.2.1/generated
 ```
 
-This parser generates typed Human, Soldier, Savage Attacker, and Skilled entities plus
-roll-assisted Savage Attacker authoring IR.
+This parser generates typed Acolyte, Criminal, Sage, Soldier, Human, Alert, Savage Attacker,
+Skilled, and Cleric/Druid/Wizard Magic Initiate entities. It also generates sheet-automated Alert
+Initiative and roll-assisted Savage Attacker authoring IR.
 
 Generate structured weapon, armor, adventuring-gear, and ammunition entities from SRD pages 91–92
 and 95–96:

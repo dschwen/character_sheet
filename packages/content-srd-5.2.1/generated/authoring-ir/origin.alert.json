@@ -1,0 +1,52 @@
+{
+  "id": "srd521.feat.origin.alert",
+  "kind": "feat",
+  "level": 1,
+  "parentId": "srd521.background.criminal",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "ref",
+        "path": "proficiencyBonus"
+      },
+      "id": "alert-initiative-proficiency",
+      "parameters": {},
+      "target": "initiative",
+      "type": "add-modifier"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Initiative Swap remains a player-coordinated action."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0087-b005",
+        "p0087-b006"
+      ],
+      "page": 87,
+      "quoteHash": "b2e95fe296c41a9aea59f42afc12345e626b811d41fba57d320a8f5830baba55",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Origin Feat"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "You gain the following benefits. Initiative Proficiency. When you roll Initiative, you can add your Proficiency Bonus to the roll. Initiative Swap. Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You can’t make this swap if you or the ally has the Incapacitated condition."
+      }
+    ],
+    "title": "Alert"
+  }
+}

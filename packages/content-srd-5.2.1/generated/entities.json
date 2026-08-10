@@ -23743,7 +23743,7 @@
         "srd521.skill.intimidation"
       ],
       "toolProficiencyChoice": {
-        "category": "gaming-set",
+        "category": "tool",
         "maximum": 1,
         "minimum": 1,
         "text": "Choose one kind of Gaming Set (see “Equipment”)"
@@ -23771,6 +23771,186 @@
         ],
         "page": 83,
         "quoteHash": "b11e10fca4273eda6f8fc2ffcbe5af75e719f65b50196ae3202966c17901a80b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "background",
+      "origin"
+    ]
+  },
+  {
+    "body": {
+      "abilityScoreIncreasePatterns": [
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "abilityScoreOptions": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ],
+      "equipmentText": "Choose A or B: (A) Calligrapher’s Supplies, Book (prayers), Holy Symbol, Parchment (10 sheets), Robe, 8 GP; or (B) 50 GP",
+      "featId": "srd521.feat.origin.magic-initiate.cleric",
+      "skillProficiencies": [
+        "srd521.skill.insight",
+        "srd521.skill.religion"
+      ],
+      "toolProficiencyChoice": {
+        "category": "tool",
+        "maximum": 1,
+        "minimum": 1,
+        "text": "Calligrapher’s Supplies"
+      }
+    },
+    "id": "srd521.background.acolyte",
+    "kind": "background",
+    "name": {
+      "en": "Acolyte"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Acolyte extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0083-b010",
+          "p0083-b011"
+        ],
+        "page": 83,
+        "quoteHash": "b03de9e89ac4328706be2b5350a7bdc815676dda55b684114c23c32322bb874e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "background",
+      "origin"
+    ]
+  },
+  {
+    "body": {
+      "abilityScoreIncreasePatterns": [
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "abilityScoreOptions": [
+        "dexterity",
+        "constitution",
+        "intelligence"
+      ],
+      "equipmentText": "Choose A or B: (A) 2 Daggers, Thieves’ Tools, Crowbar, 2 Pouches, Traveler’s Clothes, 16 GP; or (B) 50 GP",
+      "featId": "srd521.feat.origin.alert",
+      "skillProficiencies": [
+        "srd521.skill.sleight-of-hand",
+        "srd521.skill.stealth"
+      ],
+      "toolProficiencyChoice": {
+        "category": "tool",
+        "maximum": 1,
+        "minimum": 1,
+        "text": "Thieves’ Tools"
+      }
+    },
+    "id": "srd521.background.criminal",
+    "kind": "background",
+    "name": {
+      "en": "Criminal"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Criminal extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0083-b012",
+          "p0083-b013"
+        ],
+        "page": 83,
+        "quoteHash": "eb248b7159ec8721fe50663cdac9b2a396bf696939eacc5d1d1f8edafe05e603",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "background",
+      "origin"
+    ]
+  },
+  {
+    "body": {
+      "abilityScoreIncreasePatterns": [
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "abilityScoreOptions": [
+        "constitution",
+        "intelligence",
+        "wisdom"
+      ],
+      "equipmentText": "Choose A or B: (A) Quarterstaff, Calligrapher’s Supplies, Book (history), Parchment (8 sheets), Robe, 8 GP; or (B) 50 GP",
+      "featId": "srd521.feat.origin.magic-initiate.wizard",
+      "skillProficiencies": [
+        "srd521.skill.arcana",
+        "srd521.skill.history"
+      ],
+      "toolProficiencyChoice": {
+        "category": "tool",
+        "maximum": 1,
+        "minimum": 1,
+        "text": "Calligrapher’s Supplies"
+      }
+    },
+    "id": "srd521.background.sage",
+    "kind": "background",
+    "name": {
+      "en": "Sage"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Sage extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0083-b014",
+          "p0083-b015"
+        ],
+        "page": 83,
+        "quoteHash": "6224773607f7395e0abd8d26b0e4ba261cc46e92e4b063d2e750e74740e10426",
         "sourceId": "wotc-srd-5.2.1-en"
       }
     ],
@@ -23910,6 +24090,214 @@
     "tags": [
       "feat",
       "origin-feat"
+    ]
+  },
+  {
+    "body": {
+      "category": "origin",
+      "description": "You gain the following benefits. Initiative Proficiency. When you roll Initiative, you can add your Proficiency Bonus to the roll. Initiative Swap. Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You can’t make this swap if you or the ally has the Incapacitated condition.",
+      "initiativeProficiency": true,
+      "initiativeSwap": true,
+      "repeatable": false
+    },
+    "id": "srd521.feat.origin.alert",
+    "kind": "feat",
+    "name": {
+      "en": "Alert"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Alert extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0087-b005",
+          "p0087-b006"
+        ],
+        "page": 87,
+        "quoteHash": "b2e95fe296c41a9aea59f42afc12345e626b811d41fba57d320a8f5830baba55",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "origin-feat"
+    ]
+  },
+  {
+    "body": {
+      "cantripChoice": {
+        "maximum": 2,
+        "minimum": 2
+      },
+      "category": "origin",
+      "description": "You gain the following benefits. Two Cantrips. You learn two cantrips of your choice from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat’s spells (choose when you select this feat). Level 1 Spell. Choose a level 1 spell from the same list you selected for this feat’s cantrips. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time.",
+      "freeCastRecharge": "long-rest",
+      "levelOneSpellChoice": {
+        "maximum": 1,
+        "minimum": 1
+      },
+      "repeatable": false,
+      "spellChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
+      "spellListClassId": "srd521.class.cleric",
+      "spellcastingAbilityChoice": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ]
+    },
+    "id": "srd521.feat.origin.magic-initiate.cleric",
+    "kind": "feat",
+    "name": {
+      "en": "Magic Initiate (Cleric)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Magic Initiate (Cleric) extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0087-b007",
+          "p0087-b008",
+          "p0087-b009"
+        ],
+        "page": 87,
+        "quoteHash": "b16fe08618ffe5dda1635457da61ca2bb25452223ccfc7e0c3bc563977946139",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "origin-feat",
+      "magic-initiate",
+      "cleric"
+    ]
+  },
+  {
+    "body": {
+      "cantripChoice": {
+        "maximum": 2,
+        "minimum": 2
+      },
+      "category": "origin",
+      "description": "You gain the following benefits. Two Cantrips. You learn two cantrips of your choice from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat’s spells (choose when you select this feat). Level 1 Spell. Choose a level 1 spell from the same list you selected for this feat’s cantrips. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time.",
+      "freeCastRecharge": "long-rest",
+      "levelOneSpellChoice": {
+        "maximum": 1,
+        "minimum": 1
+      },
+      "repeatable": false,
+      "spellChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
+      "spellListClassId": "srd521.class.druid",
+      "spellcastingAbilityChoice": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ]
+    },
+    "id": "srd521.feat.origin.magic-initiate.druid",
+    "kind": "feat",
+    "name": {
+      "en": "Magic Initiate (Druid)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Magic Initiate (Druid) extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0087-b007",
+          "p0087-b008",
+          "p0087-b009"
+        ],
+        "page": 87,
+        "quoteHash": "b16fe08618ffe5dda1635457da61ca2bb25452223ccfc7e0c3bc563977946139",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "origin-feat",
+      "magic-initiate",
+      "druid"
+    ]
+  },
+  {
+    "body": {
+      "cantripChoice": {
+        "maximum": 2,
+        "minimum": 2
+      },
+      "category": "origin",
+      "description": "You gain the following benefits. Two Cantrips. You learn two cantrips of your choice from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat’s spells (choose when you select this feat). Level 1 Spell. Choose a level 1 spell from the same list you selected for this feat’s cantrips. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time.",
+      "freeCastRecharge": "long-rest",
+      "levelOneSpellChoice": {
+        "maximum": 1,
+        "minimum": 1
+      },
+      "repeatable": false,
+      "spellChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
+      "spellListClassId": "srd521.class.wizard",
+      "spellcastingAbilityChoice": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ]
+    },
+    "id": "srd521.feat.origin.magic-initiate.wizard",
+    "kind": "feat",
+    "name": {
+      "en": "Magic Initiate (Wizard)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Magic Initiate (Wizard) extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0087-b007",
+          "p0087-b008",
+          "p0087-b009"
+        ],
+        "page": 87,
+        "quoteHash": "b16fe08618ffe5dda1635457da61ca2bb25452223ccfc7e0c3bc563977946139",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "origin-feat",
+      "magic-initiate",
+      "wizard"
     ]
   },
   {

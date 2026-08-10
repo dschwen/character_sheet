@@ -775,11 +775,13 @@ export function builderOriginChoiceDefinitions(
       prompt: "Choose a background",
       minimum: 1,
       maximum: 1,
-      options: Object.values(catalog.backgrounds).map((background) => ({
-        id: background.id,
-        label: background.name,
-        description: background.description,
-      })),
+      options: Object.values(catalog.backgrounds)
+        .sort((left, right) => left.name.localeCompare(right.name))
+        .map((background) => ({
+          id: background.id,
+          label: background.name,
+          description: background.description,
+        })),
     },
     {
       id: `${draft.speciesId}.choice.size`,
@@ -849,6 +851,74 @@ function fillSelections(current: string[], candidates: string[], count: number):
     (id, index) => candidates.includes(id) && current.indexOf(id) === index,
   );
   return [...valid, ...candidates.filter((id) => !valid.includes(id))].slice(0, count);
+}
+
+export function updateBuilderBackground(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  backgroundId: string,
+): CharacterBuilderDraft {
+  const background = catalog.backgrounds[backgroundId];
+  if (background === undefined) return draft;
+  const selectedClass = catalog.classes[draft.classId];
+  const species = catalog.species[draft.speciesId];
+  if (species === undefined) return draft;
+  const abilityOption = background.abilityIncreaseOptions[0]?.abilityIncreases;
+  if (abilityOption === undefined) return draft;
+  const originFeats = Object.values(catalog.feats).filter((feat) => feat.category === "origin");
+  const currentOriginFeat = catalog.feats[draft.originFeatId];
+  const currentOriginFeatIsEligible =
+    currentOriginFeat !== undefined &&
+    (currentOriginFeat.id !== background.featId || currentOriginFeat.repeatable);
+  const originFeat = currentOriginFeatIsEligible
+    ? currentOriginFeat
+    : (originFeats.find(
+        (feat) =>
+          feat.id === species.recommendedOriginFeatId &&
+          (feat.id !== background.featId || feat.repeatable),
+      ) ?? originFeats.find((feat) => feat.id !== background.featId || feat.repeatable));
+  if (originFeat === undefined) return draft;
+
+  const classSkillIds = fillSelections(
+    draft.classSkillIds,
+    selectedClass.skillIds.filter((id) => !background.skillIds.includes(id)),
+    classSkillCount(draft, catalog),
+  );
+  const allSkillCandidates = skillIds.map((skill) => `${skillPrefix}${skill}`);
+  const speciesSkillIds = fillSelections(
+    draft.speciesSkillIds,
+    allSkillCandidates.filter(
+      (id) => !background.skillIds.includes(id) && !classSkillIds.includes(id),
+    ),
+    species.skillMaximum,
+  );
+  const originFeatSkillIds = fillSelections(
+    originFeat.id === draft.originFeatId ? draft.originFeatSkillIds : [],
+    allSkillCandidates.filter(
+      (id) =>
+        !background.skillIds.includes(id) &&
+        !classSkillIds.includes(id) &&
+        !speciesSkillIds.includes(id),
+    ),
+    originFeat.skillMaximum,
+  );
+  const reconciled = {
+    ...draft,
+    backgroundId: background.id,
+    backgroundAbilityScoreIncreases: { ...abilityOption },
+    originFeatId: originFeat.id,
+    classSkillIds,
+    speciesSkillIds,
+    originFeatSkillIds,
+  };
+  return {
+    ...reconciled,
+    expertiseSkillIds: fillSelections(
+      draft.expertiseSkillIds,
+      expertiseSkillCandidates(reconciled, catalog),
+      expertiseCount(reconciled, catalog),
+    ),
+  };
 }
 
 export function featureChoiceCount(choice: ClassFeatureChoiceCatalog, level: number): number {

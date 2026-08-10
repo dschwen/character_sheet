@@ -1879,7 +1879,10 @@ function ruleD20TestModifiers(
       rule.type !== "add-modifier" ||
       rule.target === undefined ||
       rule.expression === undefined ||
-      (rule.target !== "unproficient-skill-checks" && !rule.target.startsWith("skill."))
+      (rule.target !== "unproficient-skill-checks" &&
+        rule.target !== "initiative" &&
+        !rule.target.startsWith("skill.") &&
+        !rule.target.startsWith("savingThrow."))
     ) {
       return [];
     }

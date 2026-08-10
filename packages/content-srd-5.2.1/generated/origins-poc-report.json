@@ -1,9 +1,138 @@
 {
+  "backgrounds": {
+    "srd521.background.acolyte": {
+      "abilityScoreIncreasePatterns": [
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "abilityScoreOptions": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ],
+      "equipmentText": "Choose A or B: (A) Calligrapher’s Supplies, Book (prayers), Holy Symbol, Parchment (10 sheets), Robe, 8 GP; or (B) 50 GP",
+      "featId": "srd521.feat.origin.magic-initiate.cleric",
+      "skillProficiencies": [
+        "srd521.skill.insight",
+        "srd521.skill.religion"
+      ],
+      "toolProficiencyChoice": {
+        "category": "tool",
+        "maximum": 1,
+        "minimum": 1,
+        "text": "Calligrapher’s Supplies"
+      }
+    },
+    "srd521.background.criminal": {
+      "abilityScoreIncreasePatterns": [
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "abilityScoreOptions": [
+        "dexterity",
+        "constitution",
+        "intelligence"
+      ],
+      "equipmentText": "Choose A or B: (A) 2 Daggers, Thieves’ Tools, Crowbar, 2 Pouches, Traveler’s Clothes, 16 GP; or (B) 50 GP",
+      "featId": "srd521.feat.origin.alert",
+      "skillProficiencies": [
+        "srd521.skill.sleight-of-hand",
+        "srd521.skill.stealth"
+      ],
+      "toolProficiencyChoice": {
+        "category": "tool",
+        "maximum": 1,
+        "minimum": 1,
+        "text": "Thieves’ Tools"
+      }
+    },
+    "srd521.background.sage": {
+      "abilityScoreIncreasePatterns": [
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "abilityScoreOptions": [
+        "constitution",
+        "intelligence",
+        "wisdom"
+      ],
+      "equipmentText": "Choose A or B: (A) Quarterstaff, Calligrapher’s Supplies, Book (history), Parchment (8 sheets), Robe, 8 GP; or (B) 50 GP",
+      "featId": "srd521.feat.origin.magic-initiate.wizard",
+      "skillProficiencies": [
+        "srd521.skill.arcana",
+        "srd521.skill.history"
+      ],
+      "toolProficiencyChoice": {
+        "category": "tool",
+        "maximum": 1,
+        "minimum": 1,
+        "text": "Calligrapher’s Supplies"
+      }
+    },
+    "srd521.background.soldier": {
+      "abilityScoreIncreasePatterns": [
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "abilityScoreOptions": [
+        "strength",
+        "dexterity",
+        "constitution"
+      ],
+      "equipmentText": "Choose A or B: (A) Spear, Shortbow, 20 Arrows, Gaming Set (same as above), Healer’s Kit, Quiver, Traveler’s Clothes, 14 GP; or (B) 50 GP",
+      "featId": "srd521.feat.origin.savage-attacker",
+      "skillProficiencies": [
+        "srd521.skill.athletics",
+        "srd521.skill.intimidation"
+      ],
+      "toolProficiencyChoice": {
+        "category": "tool",
+        "maximum": 1,
+        "minimum": 1,
+        "text": "Choose one kind of Gaming Set (see “Equipment”)"
+      }
+    }
+  },
   "generatedEntities": [
     "srd521.background.soldier",
+    "srd521.background.acolyte",
+    "srd521.background.criminal",
+    "srd521.background.sage",
     "srd521.species.human",
     "srd521.feat.origin.savage-attacker",
-    "srd521.feat.origin.skilled"
+    "srd521.feat.origin.skilled",
+    "srd521.feat.origin.alert",
+    "srd521.feat.origin.magic-initiate.cleric",
+    "srd521.feat.origin.magic-initiate.druid",
+    "srd521.feat.origin.magic-initiate.wizard"
   ],
   "human": {
     "creatureType": "humanoid",
@@ -27,6 +156,85 @@
     "walkingSpeed": 30
   },
   "originFeats": {
+    "srd521.feat.origin.alert": {
+      "category": "origin",
+      "description": "You gain the following benefits. Initiative Proficiency. When you roll Initiative, you can add your Proficiency Bonus to the roll. Initiative Swap. Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You can’t make this swap if you or the ally has the Incapacitated condition.",
+      "initiativeProficiency": true,
+      "initiativeSwap": true,
+      "repeatable": false
+    },
+    "srd521.feat.origin.magic-initiate.cleric": {
+      "cantripChoice": {
+        "maximum": 2,
+        "minimum": 2
+      },
+      "category": "origin",
+      "description": "You gain the following benefits. Two Cantrips. You learn two cantrips of your choice from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat’s spells (choose when you select this feat). Level 1 Spell. Choose a level 1 spell from the same list you selected for this feat’s cantrips. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time.",
+      "freeCastRecharge": "long-rest",
+      "levelOneSpellChoice": {
+        "maximum": 1,
+        "minimum": 1
+      },
+      "repeatable": false,
+      "spellChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
+      "spellListClassId": "srd521.class.cleric",
+      "spellcastingAbilityChoice": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ]
+    },
+    "srd521.feat.origin.magic-initiate.druid": {
+      "cantripChoice": {
+        "maximum": 2,
+        "minimum": 2
+      },
+      "category": "origin",
+      "description": "You gain the following benefits. Two Cantrips. You learn two cantrips of your choice from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat’s spells (choose when you select this feat). Level 1 Spell. Choose a level 1 spell from the same list you selected for this feat’s cantrips. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time.",
+      "freeCastRecharge": "long-rest",
+      "levelOneSpellChoice": {
+        "maximum": 1,
+        "minimum": 1
+      },
+      "repeatable": false,
+      "spellChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
+      "spellListClassId": "srd521.class.druid",
+      "spellcastingAbilityChoice": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ]
+    },
+    "srd521.feat.origin.magic-initiate.wizard": {
+      "cantripChoice": {
+        "maximum": 2,
+        "minimum": 2
+      },
+      "category": "origin",
+      "description": "You gain the following benefits. Two Cantrips. You learn two cantrips of your choice from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat’s spells (choose when you select this feat). Level 1 Spell. Choose a level 1 spell from the same list you selected for this feat’s cantrips. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time.",
+      "freeCastRecharge": "long-rest",
+      "levelOneSpellChoice": {
+        "maximum": 1,
+        "minimum": 1
+      },
+      "repeatable": false,
+      "spellChange": {
+        "event": "level-up",
+        "replacementMaximum": 1
+      },
+      "spellListClassId": "srd521.class.wizard",
+      "spellcastingAbilityChoice": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ]
+    },
     "srd521.feat.origin.savage-attacker": {
       "category": "origin",
       "chooseDamageRoll": "either",
@@ -47,36 +255,6 @@
         "minimum": 3
       },
       "repeatable": true
-    }
-  },
-  "soldier": {
-    "abilityScoreIncreasePatterns": [
-      [
-        2,
-        1
-      ],
-      [
-        1,
-        1,
-        1
-      ]
-    ],
-    "abilityScoreOptions": [
-      "strength",
-      "dexterity",
-      "constitution"
-    ],
-    "equipmentText": "Choose A or B: (A) Spear, Shortbow, 20 Arrows, Gaming Set (same as above), Healer’s Kit, Quiver, Traveler’s Clothes, 14 GP; or (B) 50 GP",
-    "featId": "srd521.feat.origin.savage-attacker",
-    "skillProficiencies": [
-      "srd521.skill.athletics",
-      "srd521.skill.intimidation"
-    ],
-    "toolProficiencyChoice": {
-      "category": "gaming-set",
-      "maximum": 1,
-      "minimum": 1,
-      "text": "Choose one kind of Gaming Set (see “Equipment”)"
     }
   }
 }

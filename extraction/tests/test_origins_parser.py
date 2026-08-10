@@ -1,6 +1,6 @@
 import pytest
 
-from srd_extract.origins import parse_human, parse_origin_feat, parse_soldier
+from srd_extract.origins import parse_background, parse_human, parse_origin_feat, parse_soldier
 
 
 def test_parse_soldier_background() -> None:
@@ -19,6 +19,51 @@ def test_parse_soldier_background() -> None:
         "srd521.skill.athletics",
         "srd521.skill.intimidation",
     ]
+
+
+@pytest.mark.parametrize(
+    ("name", "abilities", "feat", "skills", "expected_feat_id"),
+    [
+        (
+            "Acolyte",
+            "Intelligence, Wisdom, Charisma",
+            "Magic Initiate (Cleric)",
+            "Insight and Religion",
+            "srd521.feat.origin.magic-initiate.cleric",
+        ),
+        (
+            "Criminal",
+            "Dexterity, Constitution, Intelligence",
+            "Alert",
+            "Sleight of Hand and Stealth",
+            "srd521.feat.origin.alert",
+        ),
+        (
+            "Sage",
+            "Constitution, Intelligence, Wisdom",
+            "Magic Initiate (Wizard)",
+            "Arcana and History",
+            "srd521.feat.origin.magic-initiate.wizard",
+        ),
+    ],
+)
+def test_parse_additional_backgrounds(
+    name: str,
+    abilities: str,
+    feat: str,
+    skills: str,
+    expected_feat_id: str,
+) -> None:
+    body = parse_background(
+        name,
+        f"{name} Ability Scores: {abilities} Feat: {feat} (see “Feats”) "
+        f"Skill Proficiencies: {skills} Tool Proficiency: Thieves’ Tools "
+        "Equipment: Choose A or B: (A) background gear; or (B) 50 GP",
+    )
+
+    assert body["featId"] == expected_feat_id
+    assert len(body["abilityScoreOptions"]) == 3
+    assert len(body["skillProficiencies"]) == 2
 
 
 def test_parse_human_species() -> None:
@@ -55,3 +100,21 @@ def test_parse_origin_feats_rejects_incomplete_benefits() -> None:
     assert skilled["proficiencyChoice"]["maximum"] == 3
     with pytest.raises(ValueError, match="incomplete"):
         parse_origin_feat("Savage Attacker", "Savage Attacker Origin Feat Once per turn.")
+
+
+def test_parse_alert_and_magic_initiate() -> None:
+    alert = parse_origin_feat(
+        "Alert",
+        "Alert Origin Feat Initiative Proficiency. You can add your Proficiency Bonus. "
+        "Initiative Swap. You can swap your Initiative with an ally.",
+    )
+    magic_initiate = parse_origin_feat(
+        "Magic Initiate",
+        "Magic Initiate Origin Feat Two Cantrips. Choose two. Level 1 Spell. Choose one. "
+        "Spell Change. Replace one spell. Repeatable. Choose a different spell list.",
+        spell_list="druid",
+    )
+
+    assert alert["initiativeProficiency"] is True
+    assert magic_initiate["spellListClassId"] == "srd521.class.druid"
+    assert magic_initiate["cantripChoice"] == {"minimum": 2, "maximum": 2}

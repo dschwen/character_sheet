@@ -21,6 +21,7 @@ import {
   previewBuilderCharacter,
   skillIds,
   spellSelectionCounts,
+  updateBuilderBackground,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
   type BuilderClassId,
@@ -393,14 +394,7 @@ export function CharacterBuilder({
                         : "builder-choice"
                     }
                     onClick={() => {
-                      const background = catalog.backgrounds[option.id];
-                      const allocation = background?.abilityIncreaseOptions[0]?.abilityIncreases;
-                      if (background === undefined || allocation === undefined) return;
-                      setDraft((value) => ({
-                        ...value,
-                        backgroundId: background.id,
-                        backgroundAbilityScoreIncreases: { ...allocation },
-                      }));
+                      setDraft((value) => updateBuilderBackground(value, catalog, option.id));
                     }}
                   >
                     <span>Background</span>

@@ -6,6 +6,7 @@ import {
   barbarianId,
   bardId,
   buildCharacter,
+  builderClassIds,
   builderOriginChoiceDefinitions,
   characterBuilderCatalog,
   clericId,
@@ -20,6 +21,7 @@ import {
   rogueId,
   sorcererId,
   spellSelectionCounts,
+  updateBuilderBackground,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
   validateBuilderDraft,
@@ -251,6 +253,19 @@ describe("guided character builder", () => {
       "srd521.skill.athletics",
       "srd521.skill.intimidation",
     ]);
+    expect(Object.keys(catalog.backgrounds)).toHaveLength(4);
+    expect(catalog.backgrounds["srd521.background.acolyte"]?.skillIds).toEqual([
+      "srd521.skill.insight",
+      "srd521.skill.religion",
+    ]);
+    expect(catalog.backgrounds["srd521.background.criminal"]?.featId).toBe(
+      "srd521.feat.origin.alert",
+    );
+    expect(catalog.backgrounds["srd521.background.sage"]?.abilityIds).toEqual([
+      "constitution",
+      "intelligence",
+      "wisdom",
+    ]);
     expect(catalog.classes[fighterId].weaponMasteryCountByLevel).toMatchObject({
       1: 3,
       4: 4,
@@ -297,16 +312,75 @@ describe("guided character builder", () => {
       "originFeatSkillIds",
     ]);
     expect(choice("speciesSize")?.options.map((option) => option.id)).toEqual(["medium", "small"]);
+    expect(choice("backgroundId")?.options.map((option) => option.label)).toEqual([
+      "Acolyte",
+      "Criminal",
+      "Sage",
+      "Soldier",
+    ]);
     expect(choice("backgroundAbilityScoreIncreases")?.options).toHaveLength(7);
     expect(choice("originFeatId")?.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: "srd521.feat.origin.skilled" }),
+        expect.objectContaining({ id: "srd521.feat.origin.alert" }),
+        expect.objectContaining({ id: "srd521.feat.origin.magic-initiate.cleric" }),
+        expect.objectContaining({ id: "srd521.feat.origin.magic-initiate.druid" }),
+        expect.objectContaining({ id: "srd521.feat.origin.magic-initiate.wizard" }),
         expect.objectContaining({
           id: "srd521.feat.origin.savage-attacker",
           disabledReason: "Already granted by Soldier.",
         }),
       ]),
     );
+  });
+
+  it("switches backgrounds while reconciling dependent skills and Alert", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const initial = defaultBuilderDraft(rogueId, catalog, 1, "Alert Criminal");
+    const draft = updateBuilderBackground(initial, catalog, "srd521.background.criminal");
+    const selectedSkills = [
+      ...draft.classSkillIds,
+      ...draft.speciesSkillIds,
+      ...draft.originFeatSkillIds,
+      ...(catalog.backgrounds[draft.backgroundId]?.skillIds ?? []),
+    ];
+    const character = buildCharacter(draft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+    const dexterityModifier = evaluation.values["ability.dexterity.modifier"]?.value ?? 0;
+
+    expect(draft.backgroundId).toBe("srd521.background.criminal");
+    expect(
+      Object.keys(draft.backgroundAbilityScoreIncreases).every((ability) =>
+        ["dexterity", "constitution", "intelligence"].includes(ability),
+      ),
+    ).toBe(true);
+    expect(new Set(selectedSkills).size).toBe(selectedSkills.length);
+    expect(character.build.featIds).toContain("srd521.feat.origin.alert");
+    expect(evaluation.proficiencies.skills["sleight-of-hand"]?.level).toBe("proficient");
+    expect(evaluation.proficiencies.skills.stealth?.level).toBe("proficient");
+    expect(evaluation.d20Tests.initiative?.modifier).toBe(dexterityModifier + 2);
+    expect(evaluation.validations).toEqual([]);
+  });
+
+  it("builds every supported class with each SRD background", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+
+    for (const classId of builderClassIds) {
+      for (const backgroundId of Object.keys(catalog.backgrounds)) {
+        const draft = updateBuilderBackground(
+          defaultBuilderDraft(classId, catalog, 1, "Background matrix hero"),
+          catalog,
+          backgroundId,
+        );
+        const character = buildCharacter(draft, rulesPackage, options);
+        const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+
+        expect(validateBuilderDraft(draft, catalog), `${classId} / ${backgroundId}`).toEqual([]);
+        expect(evaluation.validations, `${classId} / ${backgroundId}`).toEqual([]);
+      }
+    }
   });
 
   it("persists projected origin selections into a rules-valid character", () => {

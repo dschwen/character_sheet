@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(546);
+    expect(parsedEntities).toHaveLength(553);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -76,6 +76,11 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.feat.fighting-style.defense");
     expect(entityIds).toContain("srd521.species.human");
     expect(entityIds).toContain("srd521.background.soldier");
+    expect(entityIds).toContain("srd521.background.acolyte");
+    expect(entityIds).toContain("srd521.background.criminal");
+    expect(entityIds).toContain("srd521.background.sage");
+    expect(entityIds).toContain("srd521.feat.origin.alert");
+    expect(entityIds).toContain("srd521.feat.origin.magic-initiate.cleric");
     expect(entityIds).toContain("srd521.feat.origin.savage-attacker");
     expect(entityIds).toContain("srd521.feat.origin.skilled");
     expect(entityIds).toContain("srd521.subclass.fighter.champion");
@@ -431,7 +436,7 @@ describe("bootstrap content package", () => {
     expect(authoringIr.filter((ir) => ir.kind === "subclass-feature")).toHaveLength(2);
   });
 
-  it("validates the Human, Soldier, and Savage Attacker origin slice", () => {
+  it("validates all SRD backgrounds, Human, and the modeled Origin feats", () => {
     const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
     const entities = contentEntitySchema
       .array()
@@ -439,18 +444,35 @@ describe("bootstrap content package", () => {
     const savageAttacker = authoringIrSchema.parse(
       JSON.parse(readFileSync(new URL("authoring-ir/origin.savage-attacker.json", root), "utf8")),
     );
+    const alert = authoringIrSchema.parse(
+      JSON.parse(readFileSync(new URL("authoring-ir/origin.alert.json", root), "utf8")),
+    );
 
     expect(entities.map((entity) => entity.id)).toEqual([
       "srd521.background.soldier",
+      "srd521.background.acolyte",
+      "srd521.background.criminal",
+      "srd521.background.sage",
       "srd521.species.human",
       "srd521.feat.origin.savage-attacker",
       "srd521.feat.origin.skilled",
+      "srd521.feat.origin.alert",
+      "srd521.feat.origin.magic-initiate.cleric",
+      "srd521.feat.origin.magic-initiate.druid",
+      "srd521.feat.origin.magic-initiate.wizard",
     ]);
-    expect(entities.map((entity) => entity.source[0]?.page)).toEqual([83, 86, 87, 87]);
+    expect(entities.map((entity) => entity.source[0]?.page)).toEqual([
+      83, 83, 83, 83, 86, 87, 87, 87, 87, 87, 87,
+    ]);
     expect(savageAttacker.proposedRules[0]).toMatchObject({
       type: "grant-action",
       target: "action.savage-attacker",
       automationLevel: "roll-assisted",
+    });
+    expect(alert.proposedRules[0]).toMatchObject({
+      type: "add-modifier",
+      target: "initiative",
+      automationLevel: "sheet-automated",
     });
   });
 
