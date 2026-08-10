@@ -12,7 +12,7 @@ describe("web data boundary", () => {
     expect(data.rulesPackage.manifest.id).toBe("srd-5.2.1");
     expect(data.rulesPackage.entities.length).toBeGreaterThan(100);
     expect(data.rulesPackage.authoringIr?.length).toBeGreaterThan(40);
-    expect(data.fixtures).toHaveLength(12);
+    expect(data.fixtures).toHaveLength(13);
   });
 
   it("can evaluate every character embedded in the static app", () => {

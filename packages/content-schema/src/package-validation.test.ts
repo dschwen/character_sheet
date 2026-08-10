@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(523);
+    expect(parsedEntities).toHaveLength(546);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -58,6 +58,10 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.subclass.warlock.fiend-patron");
     expect(entityIds).toContain("srd521.option.warlock.invocation.pact-of-the-chain");
     expect(entityIds).toContain("srd521.spell.eldritch-blast");
+    expect(entityIds).toContain("srd521.class.bard");
+    expect(entityIds).toContain("srd521.subclass.bard.college-of-lore");
+    expect(entityIds).toContain("srd521.table.bard.bardic-inspiration-die");
+    expect(entityIds).toContain("srd521.spell.vicious-mockery");
     expect(entityIds).toContain("srd521.class-feature.barbarian.improved-brutal-strike.level-17");
     expect(entityIds).toContain("srd521.table.barbarian.rages");
     expect(entityIds).toContain("srd521.table.barbarian.rage-damage");
@@ -199,6 +203,7 @@ describe("bootstrap content package", () => {
     expect(parsedChoices.map(({ classId }) => classId)).toEqual(
       expect.arrayContaining([
         "srd521.class.barbarian",
+        "srd521.class.bard",
         "srd521.class.cleric",
         "srd521.class.druid",
         "srd521.class.fighter",
@@ -227,6 +232,7 @@ describe("bootstrap content package", () => {
       .parse(JSON.parse(readFileSync(new URL("entities.json", root), "utf8")));
     const builderClasses = new Set([
       "srd521.class.barbarian",
+      "srd521.class.bard",
       "srd521.class.cleric",
       "srd521.class.druid",
       "srd521.class.fighter",
@@ -244,10 +250,28 @@ describe("bootstrap content package", () => {
       return [{ id: entity.id, builder: classBuilderMetadataSchema.parse(body.builder) }];
     });
 
-    expect(metadata).toHaveLength(11);
+    expect(metadata).toHaveLength(12);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "strength",
+    });
+    expect(metadata.find(({ id }) => id === "srd521.class.bard")?.builder).toMatchObject({
+      supportedLevelMaximum: 5,
+      defaultAbilityScoreImprovementAbility: "charisma",
+      defaultClassSkillIds: [
+        "srd521.skill.performance",
+        "srd521.skill.persuasion",
+        "srd521.skill.deception",
+        "srd521.skill.arcana",
+        "srd521.skill.history",
+        "srd521.skill.nature",
+      ],
+      expertiseChoice: {
+        sourceId: "srd521.class-feature.bard.expertise",
+        minimumLevel: 2,
+        requireClassProficiency: false,
+        countByLevel: { 2: 2, 3: 2, 4: 2, 5: 2 },
+      },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.monk")?.builder).toMatchObject({
       supportedLevelMaximum: 5,

@@ -1,0 +1,67 @@
+{
+  "id": "srd521.subclass-feature.bard.lore.cutting-words",
+  "kind": "subclass-feature",
+  "level": 3,
+  "parentId": "srd521.subclass.bard.college-of-lore",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.bard"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.bard.bardic-inspiration-die"
+      },
+      "id": "use-cutting-words",
+      "parameters": {
+        "actionEconomy": "reaction",
+        "checkBonus": {
+          "appliesTo": [
+            "ability-check",
+            "attack-roll",
+            "damage-roll"
+          ],
+          "diceCount": 1,
+          "diceSizeFromExpression": true,
+          "mode": "subtract"
+        },
+        "resourceId": "srd521.resource.bard.bardic-inspiration",
+        "spends": 1
+      },
+      "target": "action.cutting-words",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.bard.bardic-inspiration"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0035-b021"
+      ],
+      "page": 35,
+      "quoteHash": "3725061d390333ebc053265094428eb9de10d1ad00c7135e2ff39b8b3a3ced8f",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You learn to use your wit to supernaturally distract, confuse, and otherwise sap the confidence and competence of others. When a creature that you can see within 60 feet of yourself makes a damage roll or succeeds on an ability check or attack roll, you can take a Reaction to expend one use of your Bardic Inspiration; roll your Bardic Inspiration die, and subtract the number rolled from the creature’s roll, reducing the damage or potentially turning the success into a failure."
+      }
+    ],
+    "title": "Cutting Words"
+  }
+}

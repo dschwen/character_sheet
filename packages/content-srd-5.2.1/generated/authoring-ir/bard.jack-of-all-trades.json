@@ -1,0 +1,57 @@
+{
+  "id": "srd521.class-feature.bard.jack-of-all-trades",
+  "kind": "class-feature",
+  "level": 2,
+  "parentId": "srd521.class.bard",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "floor",
+        "value": {
+          "args": [
+            {
+              "kind": "ref",
+              "path": "proficiencyBonus"
+            },
+            {
+              "kind": "literal",
+              "value": 0.5
+            }
+          ],
+          "kind": "multiply"
+        }
+      },
+      "id": "jack-of-all-trades-unproficient-skills",
+      "parameters": {},
+      "target": "unproficient-skill-checks",
+      "type": "add-modifier"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0032-b006"
+      ],
+      "page": 32,
+      "quoteHash": "199a46ae7c5cba2a8301acf4e26ead1a8303c8150a72ea9fbd1aac39ebaac01b",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can add half your Proficiency Bonus (round down) to any ability check you make that uses a skill proficiency you lack and that doesn’t otherwise use your Proficiency Bonus. For example, if you make a Strength (Athletics) check and lack Athletics proficiency, you can add half your Proficiency Bonus to the check."
+      }
+    ],
+    "title": "Jack of All Trades"
+  }
+}

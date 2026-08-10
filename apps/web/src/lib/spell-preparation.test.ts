@@ -101,6 +101,24 @@ describe("prepared spell loadouts", () => {
     });
   });
 
+  it("keeps Bard preparation changes in the level-up flow", () => {
+    const { rulesPackage } = loadWebData();
+    const bard = fixture("bard-5.json");
+    const editor = spellPreparationEditor(bard, rulesPackage);
+
+    expect(editor).toMatchObject({
+      classId: "srd521.class.bard",
+      mode: "full-list",
+      editable: false,
+      changeDescription: "Replace up to 1 prepared spell when gaining a Bard level",
+      requiredSelections: 9,
+    });
+    expect(proposePreparedSpellLoadout(bard, rulesPackage, [], updatedAt)).toEqual({
+      applicable: false,
+      issues: ["Bard prepared spells can change only during level up."],
+    });
+  });
+
   it("rejects incomplete and automatic prepared-spell selections", () => {
     const { rulesPackage } = loadWebData();
     const cleric = fixture("cleric-5.json");

@@ -29,11 +29,13 @@ locally, and can be undone once. Imported characters stay in the browser's local
 has no account, server, or database dependency. A production build is emitted as a static site in
 `apps/web/out` by `corepack pnpm build`.
 
-Choose **New character** to open the guided Barbarian, Cleric, Druid, Fighter, Monk, Paladin,
+Choose **New character** to open the guided Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin,
 Ranger, Rogue, Sorcerer, Warlock, and Wizard builder. It
 creates rules-valid characters from levels 1–5 with Human and Soldier origins, class-specific
 abilities and skills, reviewed subclasses, and complete choice validation. Barbarians gain Primal
 Knowledge, choose only eligible melee Weapon Masteries, and follow the Path of the Berserker.
+Bards choose any three skills, gain Expertise and Jack of All Trades, prepare Bard spells, use
+scaling Bardic Inspiration, and join the College of Lore.
 Clerics choose Protector or Thaumaturge, prepare divine magic, and follow the Life Domain. Druids
 choose Magician or Warden, prepare primal magic, and select a Circle of the Land environment.
 Fighters choose Weapon Masteries and receive a ready-to-play equipment package. Monks gain Martial
@@ -54,8 +56,9 @@ class. The advancement flow presents only newly introduced decisions, including 
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard
-advancement through level 5. Sorcerer advancement permits its one prepared-spell and Metamagic
+same-class Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock,
+and Wizard advancement through level 5. Bard advancement permits one cantrip and one prepared-spell
+replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
 one prepared-spell and cantrip replacement when gaining a level;
 multiclassing and higher levels remain future work.
@@ -65,6 +68,7 @@ a character JSON document to it:
 
 ```bash
 corepack pnpm build
+corepack pnpm character packages/test-fixtures/characters/bard-5.json
 corepack pnpm character packages/test-fixtures/characters/fighter-5.json
 corepack pnpm character packages/test-fixtures/characters/cleric-5.json
 corepack pnpm character packages/test-fixtures/characters/druid-5.json
@@ -88,8 +92,8 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-reviewed Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and
-Wizard level 1–5 vertical slices. Higher levels, multiclassing, and broader origin choices are
+reviewed Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock,
+and Wizard level 1–5 vertical slices. Higher levels, multiclassing, and broader origin choices are
 the next builder increments. Direct JSON import remains available in the meantime.
 
 ## Requirements
@@ -158,6 +162,26 @@ Generate the typed Barbarian proof-of-concept content and draft authoring IR:
 This command parses both class tables, reconciles the progression against feature headings,
 extracts Path of the Berserker, and generates source-linked draft mechanics for Rage, Unarmored
 Defense, and Extra Attack.
+
+Generate Bard content from pages 31–35 using the shared spell-description extraction:
+
+```bash
+.venv/bin/python -m srd_extract.pipeline \
+  --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
+  --out generated/extraction/srd-5.2.1-bard \
+  --pages 31-35 \
+  --overlays
+
+.venv/bin/python -m srd_extract.bard \
+  --class-extraction generated/extraction/srd-5.2.1-bard \
+  --spell-extraction generated/extraction/srd-5.2.1-spells \
+  --output packages/content-srd-5.2.1/generated
+```
+
+The Bard parser validates all 20 progression rows, the 129-entry class spell list, every Bard and
+College of Lore feature, and the level-5 Inspiration die and recharge changes. It generates seven
+source-linked representative spells plus authoring IR for Bardic Inspiration, Jack of All Trades,
+and Cutting Words.
 
 Generate the typed Fighter-through-level-5 content from class pages 47–49, Ability Score
 Improvement on page 87, and the Defense Fighting Style on page 88:
@@ -385,8 +409,8 @@ and 95–96:
   --output packages/content-srd-5.2.1/generated
 ```
 
-The rules kernel evaluates reviewed level-1 Barbarian and level-5 Fighter, Cleric, Druid, Monk,
-Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite. Results
+The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
+Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite. Results
 include origin and feat ability increases, subclass features, species size and speed, typed skill and saving-throw
 proficiencies, d20-test roll states, Initiative, Passive Perception, inventory, armor and Shield
 candidates, weapon and Martial Arts attacks and damage, spellbook, full-list, and Pact Magic

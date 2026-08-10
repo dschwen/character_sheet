@@ -101,7 +101,7 @@ export function levelUpEligibility(
       eligible: false,
       currentLevel,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
+        "Level-up support currently covers Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
     };
   }
   const selectedClass = catalog.classes[classId];

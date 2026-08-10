@@ -1,0 +1,118 @@
+{
+  "id": "srd521.class-feature.bard.bardic-inspiration",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.bard",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "args": [
+          {
+            "kind": "literal",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "path": "ability.charisma.modifier"
+          }
+        ],
+        "kind": "max"
+      },
+      "id": "bardic-inspiration-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          },
+          {
+            "amount": "all",
+            "classId": "srd521.class.bard",
+            "event": "short-rest",
+            "minimumClassLevel": 5
+          }
+        ]
+      },
+      "target": "srd521.resource.bard.bardic-inspiration",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.bard"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.bard.bardic-inspiration-die"
+      },
+      "id": "use-bardic-inspiration",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "checkBonus": {
+          "appliesTo": [
+            "d20-test"
+          ],
+          "diceCount": 1,
+          "diceSizeFromExpression": true,
+          "mode": "add"
+        },
+        "resourceId": "srd521.resource.bard.bardic-inspiration",
+        "spends": 1
+      },
+      "target": "action.bardic-inspiration",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.bard.bardic-inspiration"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0031-b018"
+      ],
+      "page": 31,
+      "quoteHash": "510f28c06fc405bc2e388ae4368dfb06b82609a244cacb8e722fdeff7c096040",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0032-b002"
+      ],
+      "page": 32,
+      "quoteHash": "3c7a5f157f54a36263003704a083d429d3259604077f6995bcb651cf6071309c",
+      "sourceId": "wotc-srd-5.2.1-en"
+    },
+    {
+      "blocks": [
+        "p0032-b009"
+      ],
+      "page": 32,
+      "quoteHash": "f352781fb314d02f794d415ff292dc37ad91d12153cdf29b673a97b5c19e2da1",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can supernaturally inspire others through words, music, or dance. This inspiration is represented by your Bardic Inspiration die, which is a d6. Using Bardic Inspiration. As a Bonus Action, you can inspire another creature within 60 feet of yourself who can see or hear you. That creature gains"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "one of your Bardic Inspiration dice. A creature can have only one Bardic Inspiration die at a time. Once within the next hour when the creature fails a D20 Test, the creature can roll the Bardic Inspiration die and add the number rolled to the d20, potentially turning the failure into a success. A Bardic Inspiration die is expended when it’s rolled. Number of Uses. You can confer a Bardic Inspiration die a number of times equal to your Charisma modifier (minimum of once), and you regain all expended uses when you finish a Long Rest. At Higher Levels. Your Bardic Inspiration die changes when you reach certain Bard levels, as shown in the Bardic Die column of the Bard Features table. The die becomes a d8 at level 5, a d10 at level 10, and a d12 at level 15."
+      }
+    ],
+    "title": "Bardic Inspiration"
+  }
+}

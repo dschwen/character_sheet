@@ -352,8 +352,12 @@ const rechargeRuleSchema = z
     amount: z.union([z.number().nonnegative(), z.literal("all")]),
   })
   .strict();
+const authoredRechargeRuleSchema = rechargeRuleSchema.extend({
+  classId: z.string().min(1).optional(),
+  minimumClassLevel: z.number().int().min(1).max(20).optional(),
+});
 const resourceParametersSchema = z
-  .object({ recharge: z.array(rechargeRuleSchema).default([]) })
+  .object({ recharge: z.array(authoredRechargeRuleSchema).default([]) })
   .passthrough();
 const actionParametersSchema = z
   .object({
@@ -424,9 +428,20 @@ const actionParametersSchema = z
     checkBonus: z
       .object({
         diceCount: z.number().int().positive(),
-        diceSize: z.number().int().positive(),
+        diceSize: z.number().int().positive().optional(),
+        diceSizeFromExpression: z.literal(true).optional(),
+        mode: z.enum(["add", "subtract"]).default("add"),
+        appliesTo: z.array(z.string().min(1)).default([]),
       })
       .strict()
+      .superRefine((bonus, context) => {
+        if ((bonus.diceSize === undefined) === (bonus.diceSizeFromExpression === undefined)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Check bonuses require one static or expression-derived die size",
+          });
+        }
+      })
       .optional(),
     refundIfCheckStillFails: z.boolean().optional(),
     movement: z
@@ -838,6 +853,7 @@ function validateProgressionSelections(
   const rogueLevel = classLevelCounts.get("srd521.class.rogue") ?? 0;
   const sorcererLevel = classLevelCounts.get("srd521.class.sorcerer") ?? 0;
   const warlockLevel = classLevelCounts.get("srd521.class.warlock") ?? 0;
+  const bardLevel = classLevelCounts.get("srd521.class.bard") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -1175,6 +1191,18 @@ function validateProgressionSelections(
       state,
       "ROGUE_EXPERTISE_CHOICE_COUNT",
       `A Rogue of level ${String(rogueLevel)} requires ${String(expectedRogueExpertise)} Expertise selections.`,
+      ["build.proficiencyChoices.expertise"],
+    );
+  }
+  const bardExpertise = character.build.proficiencyChoices.expertise.filter(
+    (choice) => choice.sourceId === "srd521.class-feature.bard.expertise",
+  );
+  const expectedBardExpertise = bardLevel >= 9 ? 4 : bardLevel >= 2 ? 2 : 0;
+  if (bardExpertise.length !== expectedBardExpertise) {
+    addValidation(
+      state,
+      "BARD_EXPERTISE_CHOICE_COUNT",
+      `A Bard of level ${String(bardLevel)} requires ${String(expectedBardExpertise)} Expertise selections.`,
       ["build.proficiencyChoices.expertise"],
     );
   }
@@ -1833,12 +1861,56 @@ function referencesForSources(sources: readonly string[], index: PackageIndex): 
   });
 }
 
+interface D20TestModifier {
+  readonly target: string;
+  readonly bonus: number;
+  readonly sourceId: string;
+  readonly sourceReferences: SourceReference[];
+}
+
+function ruleD20TestModifiers(
+  rules: { ir: AuthoringIr; rule: DraftRule }[],
+  state: EngineState,
+  index: PackageIndex,
+  granted: ReadonlySet<string>,
+): D20TestModifier[] {
+  return rules.flatMap(({ ir, rule }) => {
+    if (
+      rule.type !== "add-modifier" ||
+      rule.target === undefined ||
+      rule.expression === undefined ||
+      (rule.target !== "unproficient-skill-checks" && !rule.target.startsWith("skill."))
+    ) {
+      return [];
+    }
+    if (
+      rule.when !== undefined &&
+      evaluatePredicate(rule.when, `${rule.id}.d20-modifier-applicable`, state, index, granted)
+        .result !== true
+    ) {
+      return [];
+    }
+    const traceId = `${rule.id}.d20-modifier`;
+    const trace = evaluateExpression(rule.expression, traceId, state, index, granted);
+    state.traces[traceId] = withRuleSource(trace, ir);
+    return [
+      {
+        target: rule.target,
+        bonus: requireNumber(trace.result as JsonScalar, traceId),
+        sourceId: ir.id,
+        sourceReferences: sourceReferences(ir),
+      },
+    ];
+  });
+}
+
 function recordD20Test(
   testId: string,
   ability: Ability,
   proficiency: ProficiencyEntry,
   context: EvaluateCharacterInput["context"],
   additionalRollEffects: readonly D20RollEffect[],
+  ruleModifiers: readonly D20TestModifier[],
   sourceReferencesForTest: SourceReference[],
   state: EngineState,
 ): void {
@@ -1846,7 +1918,15 @@ function recordD20Test(
     state.facts[`ability.${ability}.modifier`] ?? null,
     `${ability} modifier`,
   );
-  const modifier = abilityModifier + proficiency.bonus;
+  const applicableModifiers = ruleModifiers.filter(
+    (modifier) =>
+      modifier.target === testId ||
+      (modifier.target === "unproficient-skill-checks" &&
+        testId.startsWith("skill.") &&
+        proficiency.level === "none"),
+  );
+  const ruleModifierBonus = applicableModifiers.reduce((total, value) => total + value.bonus, 0);
+  const modifier = abilityModifier + proficiency.bonus + ruleModifierBonus;
   const effects = [
     ...(context?.d20RollEffects?.filter((effect) => effect.testId === testId) ?? []),
     ...additionalRollEffects.filter((effect) => effect.testId === testId),
@@ -1875,10 +1955,16 @@ function recordD20Test(
         inputs: [proficiency.level, proficiency.bonus],
         output: proficiency.bonus,
       },
+      ...applicableModifiers.map((value, index) => ({
+        id: `${traceId}.rule-modifier-${String(index + 1)}`,
+        operation: "apply-rule-modifier",
+        inputs: [value.sourceId, value.bonus],
+        output: value.bonus,
+      })),
       {
         id: `${traceId}.total`,
         operation: "add",
-        inputs: [abilityModifier, proficiency.bonus],
+        inputs: [abilityModifier, proficiency.bonus, ruleModifierBonus],
         output: modifier,
       },
       {
@@ -1888,7 +1974,10 @@ function recordD20Test(
         output: rollMode,
       },
     ],
-    sourceReferences: sourceReferencesForTest,
+    sourceReferences: [
+      ...sourceReferencesForTest,
+      ...applicableModifiers.flatMap((value) => value.sourceReferences),
+    ],
   };
   state.facts[testId] = modifier;
   state.values[testId] = { value: modifier, traceId };
@@ -1911,6 +2000,7 @@ function evaluateD20Tests(
   state: EngineState,
   context: EvaluateCharacterInput["context"],
   additionalRollEffects: readonly D20RollEffect[],
+  ruleModifiers: readonly D20TestModifier[],
 ): void {
   const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
   const firstClassId = character.build.levels[0]?.classId;
@@ -2106,6 +2196,7 @@ function evaluateD20Tests(
       entry,
       context,
       additionalRollEffects,
+      ruleModifiers,
       testSourceReferences(`savingThrow.${ability}`, sources),
       state,
     );
@@ -2136,6 +2227,7 @@ function evaluateD20Tests(
       entry,
       context,
       additionalRollEffects,
+      ruleModifiers,
       testSourceReferences(`skill.${skill.id}`, sources),
       state,
     );
@@ -2148,6 +2240,7 @@ function evaluateD20Tests(
     noProficiency,
     context,
     additionalRollEffects,
+    ruleModifiers,
     testSourceReferences("initiative", []),
     state,
   );
@@ -2917,12 +3010,25 @@ function evaluateResources(
       sourceReferences: sourceReferences(ir),
     };
     const parameters = resourceParametersSchema.parse(rule.parameters);
+    const recharge = parameters.recharge
+      .filter((rechargeRule) => {
+        if (rechargeRule.classId === undefined || rechargeRule.minimumClassLevel === undefined) {
+          return true;
+        }
+        const className = rechargeRule.classId.split(".").at(-1);
+        return (
+          className !== undefined &&
+          typeof state.facts[`classLevel.${className}`] === "number" &&
+          Number(state.facts[`classLevel.${className}`]) >= rechargeRule.minimumClassLevel
+        );
+      })
+      .map(({ event, amount }) => ({ event, amount }));
     state.resources.push({
       id: resourceId,
       maximum,
       expended,
       current,
-      recharge: parameters.recharge,
+      recharge,
       traceId,
     });
     state.values[maximumTraceId] = { value: maximum, traceId: maximumTraceId };
@@ -3657,7 +3763,29 @@ function evaluateConditionalRules(
         actionParameters.excludes = parameters.excludes;
       }
       if (parameters.checkBonus !== undefined) {
-        actionParameters.checkBonus = parameters.checkBonus;
+        let diceSize = parameters.checkBonus.diceSize;
+        if (diceSize === undefined && rule.expression !== undefined) {
+          const checkBonusTraceId = `${rule.target ?? rule.id}.checkBonus.diceSize`;
+          const checkBonusTrace = evaluateExpression(
+            rule.expression,
+            checkBonusTraceId,
+            state,
+            index,
+            granted,
+            resourceAmounts,
+          );
+          state.traces[checkBonusTraceId] = withRuleSource(checkBonusTrace, ir);
+          diceSize = requireNumber(checkBonusTrace.result as JsonScalar, checkBonusTraceId);
+        }
+        if (diceSize === undefined) {
+          throw new TypeError(`${rule.target ?? rule.id} has no check-bonus die size.`);
+        }
+        actionParameters.checkBonus = {
+          diceCount: parameters.checkBonus.diceCount,
+          diceSize,
+          mode: parameters.checkBonus.mode,
+          appliesTo: parameters.checkBonus.appliesTo,
+        };
       }
       if (parameters.refundIfCheckStillFails !== undefined) {
         actionParameters.refundIfCheckStillFails = parameters.refundIfCheckStillFails;
@@ -3860,10 +3988,15 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const equipment = resolveEquipment(character, index, state);
   evaluateWalkingSpeed(character, index, state);
   evaluateMovementRules(rules, granted, index, state);
-  evaluateD20Tests(character, origins, index, state, input.context, [
-    ...equipment.rollEffects,
-    ...ruleRollEffects(rules, state, index, granted),
-  ]);
+  evaluateD20Tests(
+    character,
+    origins,
+    index,
+    state,
+    input.context,
+    [...equipment.rollEffects, ...ruleRollEffects(rules, state, index, granted)],
+    ruleD20TestModifiers(rules, state, index, granted),
+  );
   evaluateHitPoints(character, rules, granted, index, state);
   evaluateSpellcasting(character, classLevels, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);

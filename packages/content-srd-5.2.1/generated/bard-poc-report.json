@@ -1,0 +1,511 @@
+{
+  "authoringIr": [
+    "bard.bardic-inspiration.json",
+    "bard.jack-of-all-trades.json",
+    "college-of-lore.cutting-words.json"
+  ],
+  "bardSpellListEntries": 129,
+  "classId": "srd521.class.bard",
+  "coreTraits": {
+    "armorTraining": [
+      "light"
+    ],
+    "hitPointDie": 8,
+    "primaryAbilities": [
+      "charisma"
+    ],
+    "savingThrowProficiencies": [
+      "dexterity",
+      "charisma"
+    ],
+    "skillProficiencyChoice": {
+      "maximum": 3,
+      "minimum": 3,
+      "options": [
+        "acrobatics",
+        "animal handling",
+        "arcana",
+        "athletics",
+        "deception",
+        "history",
+        "insight",
+        "intimidation",
+        "investigation",
+        "medicine",
+        "nature",
+        "perception",
+        "performance",
+        "persuasion",
+        "religion",
+        "sleight of hand",
+        "stealth",
+        "survival"
+      ]
+    },
+    "startingEquipmentText": "Choose A or B: (A) Leather Armor, 2 Daggers, Musical Instrument of your choice, Entertainer’s Pack, and 19 GP; or (B) 90 GP",
+    "toolProficiencyChoice": {
+      "category": "musical-instrument",
+      "maximum": 3,
+      "minimum": 3
+    },
+    "weaponProficiencies": [
+      "simple"
+    ]
+  },
+  "extractedClassFeatures": 12,
+  "extractedLoreFeatures": 4,
+  "generatedEntities": [
+    "srd521.class.bard",
+    "srd521.class-feature.bard.bardic-inspiration",
+    "srd521.class-feature.bard.spellcasting",
+    "srd521.class-feature.bard.expertise",
+    "srd521.class-feature.bard.jack-of-all-trades",
+    "srd521.class-feature.bard.bard-subclass",
+    "srd521.class-feature.bard.ability-score-improvement",
+    "srd521.class-feature.bard.font-of-inspiration",
+    "srd521.class-feature.bard.countercharm",
+    "srd521.class-feature.bard.magical-secrets",
+    "srd521.class-feature.bard.superior-inspiration",
+    "srd521.class-feature.bard.epic-boon",
+    "srd521.class-feature.bard.words-of-creation",
+    "srd521.table.bard.bardic-inspiration-die",
+    "srd521.subclass.bard.college-of-lore",
+    "srd521.subclass-feature.bard.lore.bonus-proficiencies",
+    "srd521.subclass-feature.bard.lore.cutting-words",
+    "srd521.subclass-feature.bard.lore.magical-discoveries",
+    "srd521.subclass-feature.bard.lore.peerless-skill",
+    "srd521.spell.dancing-lights",
+    "srd521.spell.dissonant-whispers",
+    "srd521.spell.healing-word",
+    "srd521.spell.hypnotic-pattern",
+    "srd521.spell.mass-healing-word",
+    "srd521.spell.shatter",
+    "srd521.spell.vicious-mockery"
+  ],
+  "progression": [
+    {
+      "bardic_die_size": 6,
+      "cantrips": 2,
+      "feature_names": [
+        "Bardic Inspiration",
+        "Spellcasting"
+      ],
+      "level": 1,
+      "prepared_spells": 4,
+      "proficiency_bonus": 2,
+      "spell_slots": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 6,
+      "cantrips": 2,
+      "feature_names": [
+        "Expertise",
+        "Jack of All Trades"
+      ],
+      "level": 2,
+      "prepared_spells": 5,
+      "proficiency_bonus": 2,
+      "spell_slots": [
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 6,
+      "cantrips": 2,
+      "feature_names": [
+        "Bard Subclass"
+      ],
+      "level": 3,
+      "prepared_spells": 6,
+      "proficiency_bonus": 2,
+      "spell_slots": [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 6,
+      "cantrips": 3,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 4,
+      "prepared_spells": 7,
+      "proficiency_bonus": 2,
+      "spell_slots": [
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 8,
+      "cantrips": 3,
+      "feature_names": [
+        "Font of Inspiration"
+      ],
+      "level": 5,
+      "prepared_spells": 9,
+      "proficiency_bonus": 3,
+      "spell_slots": [
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 8,
+      "cantrips": 3,
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 6,
+      "prepared_spells": 10,
+      "proficiency_bonus": 3,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 8,
+      "cantrips": 3,
+      "feature_names": [
+        "Countercharm"
+      ],
+      "level": 7,
+      "prepared_spells": 11,
+      "proficiency_bonus": 3,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 8,
+      "cantrips": 3,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 8,
+      "prepared_spells": 12,
+      "proficiency_bonus": 3,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 8,
+      "cantrips": 3,
+      "feature_names": [
+        "Expertise"
+      ],
+      "level": 9,
+      "prepared_spells": 14,
+      "proficiency_bonus": 4,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 10,
+      "cantrips": 4,
+      "feature_names": [
+        "Magical Secrets"
+      ],
+      "level": 10,
+      "prepared_spells": 15,
+      "proficiency_bonus": 4,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 10,
+      "cantrips": 4,
+      "feature_names": [],
+      "level": 11,
+      "prepared_spells": 16,
+      "proficiency_bonus": 4,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 10,
+      "cantrips": 4,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 12,
+      "prepared_spells": 16,
+      "proficiency_bonus": 4,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 10,
+      "cantrips": 4,
+      "feature_names": [],
+      "level": 13,
+      "prepared_spells": 17,
+      "proficiency_bonus": 5,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 10,
+      "cantrips": 4,
+      "feature_names": [
+        "Subclass feature"
+      ],
+      "level": 14,
+      "prepared_spells": 17,
+      "proficiency_bonus": 5,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 12,
+      "cantrips": 4,
+      "feature_names": [],
+      "level": 15,
+      "prepared_spells": 18,
+      "proficiency_bonus": 5,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 12,
+      "cantrips": 4,
+      "feature_names": [
+        "Ability Score Improvement"
+      ],
+      "level": 16,
+      "prepared_spells": 18,
+      "proficiency_bonus": 5,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "bardic_die_size": 12,
+      "cantrips": 4,
+      "feature_names": [],
+      "level": 17,
+      "prepared_spells": 19,
+      "proficiency_bonus": 6,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "bardic_die_size": 12,
+      "cantrips": 4,
+      "feature_names": [
+        "Superior Inspiration"
+      ],
+      "level": 18,
+      "prepared_spells": 20,
+      "proficiency_bonus": 6,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        3,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "bardic_die_size": 12,
+      "cantrips": 4,
+      "feature_names": [
+        "Epic Boon"
+      ],
+      "level": 19,
+      "prepared_spells": 21,
+      "proficiency_bonus": 6,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        3,
+        2,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "bardic_die_size": 12,
+      "cantrips": 4,
+      "feature_names": [
+        "Words of Creation"
+      ],
+      "level": 20,
+      "prepared_spells": 22,
+      "proficiency_bonus": 6,
+      "spell_slots": [
+        4,
+        3,
+        3,
+        3,
+        3,
+        2,
+        2,
+        1,
+        1
+      ]
+    }
+  ],
+  "progressionRows": 20,
+  "representativeSpells": [
+    "srd521.spell.dancing-lights",
+    "srd521.spell.dissonant-whispers",
+    "srd521.spell.healing-word",
+    "srd521.spell.hypnotic-pattern",
+    "srd521.spell.mass-healing-word",
+    "srd521.spell.shatter",
+    "srd521.spell.vicious-mockery"
+  ]
+}

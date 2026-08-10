@@ -16,6 +16,7 @@ import { abilities, type Ability, shortEntityName, titleCase } from "./presentat
 export const fighterId = "srd521.class.fighter";
 export const wizardId = "srd521.class.wizard";
 export const barbarianId = "srd521.class.barbarian";
+export const bardId = "srd521.class.bard";
 export const clericId = "srd521.class.cleric";
 export const druidId = "srd521.class.druid";
 export const monkId = "srd521.class.monk";
@@ -29,6 +30,7 @@ const skillPrefix = "srd521.skill.";
 
 export const builderClassIds = [
   barbarianId,
+  bardId,
   clericId,
   druidId,
   fighterId,
@@ -718,6 +720,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
   return {
     classes: {
       [barbarianId]: classCatalog(barbarianId, rulesPackage),
+      [bardId]: classCatalog(bardId, rulesPackage),
       [clericId]: classCatalog(clericId, rulesPackage),
       [druidId]: classCatalog(druidId, rulesPackage),
       [fighterId]: classCatalog(fighterId, rulesPackage),

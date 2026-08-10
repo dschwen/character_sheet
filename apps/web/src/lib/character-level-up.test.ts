@@ -10,6 +10,7 @@ import {
 } from "./character-level-up";
 import {
   barbarianId,
+  bardId,
   buildCharacter,
   characterBuilderCatalog,
   clericId,
@@ -36,6 +37,7 @@ const initialOptions = {
 describe("guided character level up", () => {
   it.each([
     barbarianId,
+    bardId,
     clericId,
     druidId,
     fighterId,
@@ -155,6 +157,10 @@ describe("guided character level up", () => {
       if (classId === rogueId) {
         expect(character.build.proficiencyChoices.expertise).toHaveLength(2);
       }
+      if (classId === bardId) {
+        expect(character.build.proficiencyChoices.expertise).toHaveLength(2);
+        expect(character.loadout.preparedSpellIds).toHaveLength(9);
+      }
       if (classId === sorcererId) {
         expect(character.build.levels[1]?.selectedFeatureChoices).toEqual([
           {
@@ -229,6 +235,51 @@ describe("guided character level up", () => {
         ],
       },
     ]);
+    expect(preview.character?.loadout.preparedSpellIds).toContain(replacementSpell.id);
+    expect(preview.character?.loadout.preparedSpellIds).not.toContain(replacedSpellId);
+  });
+
+  it("allows one Bard cantrip and prepared-spell replacement during level up", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const bard = buildCharacter(
+      defaultBuilderDraft(bardId, catalog, 2, "Changing Bard"),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(bard, catalog);
+    const replacedCantripId = bard.build.learnedSpellIds[0];
+    const replacedSpellId = bard.loadout.preparedSpellIds[0];
+    if (replacedCantripId === undefined || replacedSpellId === undefined) {
+      throw new Error("Expected Bard spells to replace.");
+    }
+    const spellcasting = catalog.classes[bardId].spellcasting;
+    const replacementCantrip = spellcasting?.spells.find(
+      (spell) => spell.level === 0 && !draft.learnedSpellIds.includes(spell.id),
+    );
+    const replacementSpell = spellcasting?.spells.find(
+      (spell) => spell.level > 0 && spell.level <= 2 && !draft.preparedSpellIds.includes(spell.id),
+    );
+    if (replacementCantrip === undefined || replacementSpell === undefined) {
+      throw new Error("Expected replacement Bard spell options.");
+    }
+    draft.learnedSpellIds = [
+      ...draft.learnedSpellIds.filter((id) => id !== replacedCantripId),
+      replacementCantrip.id,
+    ];
+    draft.preparedSpellIds = [
+      ...draft.preparedSpellIds.filter((id) => id !== replacedSpellId),
+      replacementSpell.id,
+    ];
+
+    const preview = previewLevelUp(bard, draft, rulesPackage, {
+      id: bard.id,
+      now: new Date("2026-08-09T11:00:00.000Z"),
+    });
+
+    expect(preview.issues).toEqual([]);
+    expect(preview.character?.build.learnedSpellIds).toContain(replacementCantrip.id);
+    expect(preview.character?.build.learnedSpellIds).not.toContain(replacedCantripId);
     expect(preview.character?.loadout.preparedSpellIds).toContain(replacementSpell.id);
     expect(preview.character?.loadout.preparedSpellIds).not.toContain(replacedSpellId);
   });
@@ -393,7 +444,7 @@ describe("guided character level up", () => {
     if (firstLevel === undefined) throw new Error("Expected a first character level.");
     unsupported.build.levels[0] = {
       ...firstLevel,
-      classId: "srd521.class.bard",
+      classId: "srd521.class.artificer",
     };
 
     expect(levelUpEligibility(levelFive, catalog)).toMatchObject({
@@ -404,7 +455,7 @@ describe("guided character level up", () => {
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
       reason:
-        "Level-up support currently covers Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
+        "Level-up support currently covers Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
     });
     expect(() => createLevelUpDraft(levelFive, catalog)).toThrow(
       "Fighter advancement is currently reviewed through level 5.",

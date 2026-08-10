@@ -4,6 +4,7 @@ import { evaluateCharacter } from "@dnd/rules-core";
 
 import {
   barbarianId,
+  bardId,
   buildCharacter,
   builderOriginChoiceDefinitions,
   characterBuilderCatalog,
@@ -187,6 +188,21 @@ describe("guided character builder", () => {
     expect(catalog.classes[barbarianId].weaponMasteryIds).not.toContain(
       "srd521.equipment.weapon.longbow",
     );
+    expect(catalog.classes[bardId]).toMatchObject({
+      name: "Bard",
+      subclassId: "srd521.subclass.bard.college-of-lore",
+      subclassLevel: 3,
+      spellcasting: {
+        preparation: "full-list",
+        preparationChange: { event: "level-up", replacementMaximum: 1 },
+        cantripChange: { event: "level-up", replacementMaximum: 1 },
+        ability: "charisma",
+      },
+      skillCountByLevel: { 1: 3, 3: 6, 5: 6 },
+      builder: {
+        expertiseChoice: { countByLevel: { 2: 2, 3: 2, 4: 2, 5: 2 } },
+      },
+    });
     expect(catalog.classes[clericId]).toMatchObject({
       name: "Cleric",
       subclassId: "srd521.subclass.cleric.life-domain",
@@ -844,6 +860,57 @@ describe("guided character builder", () => {
         expect(character.loadout.inventory).toHaveLength(5);
         expect(character.loadout.equippedItemIds).toEqual(["spear-1"]);
         expect(character.loadout.currency.gp).toBe(28);
+      }
+    }
+  });
+
+  it("builds College of Lore Bards with Expertise and prepared spells through level 5", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const expectedHitPoints = [10, 17, 24, 31, 38];
+    const expectedCantrips = [2, 2, 2, 3, 3];
+    const expectedPrepared = [4, 5, 6, 7, 9];
+    const expectedSkills = [3, 3, 6, 6, 6];
+
+    for (let level = 1; level <= 5; level += 1) {
+      const draft = defaultBuilderDraft(bardId, catalog, level, `Level ${String(level)} Bard`);
+      const character = buildCharacter(draft, rulesPackage, options);
+      const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+      const inspiration = evaluation.resources.find(
+        (resource) => resource.id === "srd521.resource.bard.bardic-inspiration",
+      );
+      const inspirationAction = evaluation.actions.find(
+        (action) => action.id === "action.bardic-inspiration",
+      );
+
+      expect(validateBuilderDraft(draft, catalog), `draft level ${String(level)}`).toEqual([]);
+      expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
+      expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
+      expect(evaluation.values.armorClass?.value).toBe(13);
+      expect(draft.classSkillIds).toHaveLength(expectedSkills[level - 1] ?? 0);
+      expect(draft.expertiseSkillIds).toHaveLength(level >= 2 ? 2 : 0);
+      expect(character.build.learnedSpellIds).toHaveLength(expectedCantrips[level - 1] ?? 0);
+      expect(character.loadout.preparedSpellIds).toHaveLength(expectedPrepared[level - 1] ?? 0);
+      expect(character.build.subclassId).toBe(
+        level >= 3 ? "srd521.subclass.bard.college-of-lore" : undefined,
+      );
+      expect(inspiration?.maximum).toBe(level >= 4 ? 3 : 2);
+      expect(inspirationAction).toMatchObject({
+        parameters: {
+          checkBonus: {
+            diceCount: 1,
+            diceSize: level >= 5 ? 8 : 6,
+            mode: "add",
+          },
+        },
+      });
+      expect(evaluation.actions.some((action) => action.id === "action.cutting-words")).toBe(
+        level >= 3,
+      );
+      if (level === 1) {
+        expect(character.loadout.inventory).toHaveLength(4);
+        expect(character.loadout.equippedItemIds).toEqual(["leather-armor-1", "dagger-1"]);
+        expect(character.loadout.currency.gp).toBe(19);
       }
     }
   });
