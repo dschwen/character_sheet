@@ -995,6 +995,51 @@ export function updateMagicInitiateSelection(
   };
 }
 
+export function migrateMagicInitiateChoices(
+  character: CharacterDocument,
+  catalog: BuilderCatalog,
+): CharacterDocument {
+  const existingChoiceIds = new Set(character.build.choices.map((choice) => choice.choiceId));
+  const classId = character.build.levels[0]?.classId;
+  const selectedClass =
+    classId === undefined ? undefined : catalog.classes[classId as BuilderClassId];
+  const additions = character.build.featIds.flatMap((featId) => {
+    const definition = catalog.feats[featId]?.magicInitiate;
+    if (definition === undefined) return [];
+    const ability =
+      definition.abilityIds.find(
+        (candidate) => candidate === selectedClass?.spellcasting?.ability,
+      ) ??
+      [...definition.abilityIds].sort(
+        (left, right) => character.build.abilityScores[right] - character.build.abilityScores[left],
+      )[0];
+    const cantripIds = definition.cantrips
+      .slice(0, definition.cantripMaximum)
+      .map((spell) => spell.id);
+    const levelOneSpellId = definition.levelOneSpells[0]?.id;
+    if (ability === undefined || levelOneSpellId === undefined) return [];
+    return [
+      {
+        choiceId: `${featId}.choice.spellcasting-ability`,
+        optionIds: [`srd521.ability.${ability}`],
+      },
+      { choiceId: `${featId}.choice.cantrips`, optionIds: cantripIds },
+      {
+        choiceId: `${featId}.choice.level-one-spell`,
+        optionIds: [levelOneSpellId],
+      },
+    ].filter((choice) => !existingChoiceIds.has(choice.choiceId));
+  });
+  if (additions.length === 0) return character;
+  return characterDocumentSchema.parse({
+    ...character,
+    build: {
+      ...character.build,
+      choices: [...character.build.choices, ...additions],
+    },
+  });
+}
+
 export function updateBuilderBackground(
   draft: CharacterBuilderDraft,
   catalog: BuilderCatalog,

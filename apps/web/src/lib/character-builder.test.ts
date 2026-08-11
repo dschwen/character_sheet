@@ -16,6 +16,7 @@ import {
   expertiseSkillCandidates,
   expertiseCount,
   monkId,
+  migrateMagicInitiateChoices,
   paladinId,
   rangerId,
   rogueId,
@@ -1242,6 +1243,28 @@ describe("guided character builder", () => {
     );
     expect(rest.applicable).toBe(true);
     expect(rest.nextState.expendedResources[freeCastResourceId]).toBe(0);
+  });
+
+  it("migrates Magic Initiate defaults into characters saved before spell choices", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const current = buildCharacter(
+      updateBuilderBackground(
+        defaultBuilderDraft(fighterId, catalog, 1, "Legacy Initiate"),
+        catalog,
+        "srd521.background.acolyte",
+      ),
+      rulesPackage,
+      options,
+    );
+    const legacy = { ...current, build: { ...current.build, choices: [] } };
+    const migrated = migrateMagicInitiateChoices(legacy, catalog);
+
+    expect(migrated.build.choices).toHaveLength(3);
+    expect(
+      evaluateCharacter({ character: migrated, packages: [rulesPackage] }).validations,
+    ).toEqual([]);
+    expect(migrateMagicInitiateChoices(migrated, catalog)).toBe(migrated);
   });
 
   it("reconciles dependent choices when a draft changes level", () => {

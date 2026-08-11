@@ -22,7 +22,7 @@ import type {
 import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
-import { characterBuilderCatalog } from "../lib/character-builder";
+import { characterBuilderCatalog, migrateMagicInitiateChoices } from "../lib/character-builder";
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
 import { CharacterLevelUp } from "./character-level-up";
@@ -248,15 +248,21 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       return;
     }
     try {
-      setCharacter(characterDocumentSchema.parse(JSON.parse(saved) as unknown));
+      const parsed = characterDocumentSchema.parse(JSON.parse(saved) as unknown);
+      const restored = migrateMagicInitiateChoices(parsed, characterBuilderCatalog(rulesPackage));
+      setCharacter(restored);
       setSource("browser-save");
-      setNotice("Restored your last browser-local character.");
+      setNotice(
+        restored === parsed
+          ? "Restored your last browser-local character."
+          : "Restored your character and added default choices for Magic Initiate; review them on the Spells tab.",
+      );
     } catch {
       window.localStorage.removeItem(storageKey);
     } finally {
       setStorageReady(true);
     }
-  }, []);
+  }, [rulesPackage]);
 
   useEffect(() => {
     if (!storageReady) return;
@@ -399,14 +405,19 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     if (file === undefined) return;
     try {
       const parsed = characterDocumentSchema.parse(JSON.parse(await file.text()) as unknown);
-      setCharacter(parsed);
+      const imported = migrateMagicInitiateChoices(parsed, builderCatalog);
+      setCharacter(imported);
       setPreviousCharacter(undefined);
       setSource("imported");
       setSelectedTraceId(undefined);
       setActionDrafts({});
       setSpellLevels({});
       setPreparedSpellDraft(undefined);
-      setNotice(`Imported ${parsed.name}; it is saved only in this browser.`);
+      setNotice(
+        imported === parsed
+          ? `Imported ${parsed.name}; it is saved only in this browser.`
+          : `Imported ${parsed.name} and added default choices for Magic Initiate; review them on the Spells tab.`,
+      );
     } catch (error) {
       setNotice(`Import failed: ${errorMessage(error)}`);
     } finally {
