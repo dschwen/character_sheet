@@ -1805,6 +1805,63 @@ td:first-child small {
 .compact-field {
   width: min(440px, 100%);
 }
+.builder-subsection {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+}
+.builder-section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+}
+.builder-section-heading span {
+  color: var(--green-bright);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.builder-section-heading h3 {
+  margin: 4px 0 0;
+  font:
+    700 20px/1.2 Georgia,
+    serif;
+}
+.builder-section-heading small {
+  color: var(--muted);
+  font-size: 10px;
+  text-align: right;
+}
+.builder-spell-group {
+  display: grid;
+  gap: 8px;
+}
+.builder-spell-group > strong {
+  font-size: 12px;
+}
+.builder-token-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.builder-token-grid button {
+  padding: 8px 11px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  cursor: pointer;
+}
+.builder-token-grid button.selected {
+  color: white;
+  border-color: var(--green);
+  background: var(--green);
+}
 .builder-choice-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

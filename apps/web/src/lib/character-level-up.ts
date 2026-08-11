@@ -8,6 +8,7 @@ import {
   characterBuilderCatalog,
   defaultBuilderDraft,
   featureChoiceCount,
+  magicInitiateFeatIds,
   spellSelectionCounts,
   updateBuilderLevel,
   validateBuilderDraft,
@@ -15,6 +16,7 @@ import {
   type BuilderClassId,
   type BuildCharacterOptions,
   type CharacterBuilderDraft,
+  type MagicInitiateSelection,
 } from "./character-builder";
 import { abilities, type Ability } from "./presentation";
 
@@ -67,6 +69,34 @@ function chosenAsiAbility(character: CharacterDocument, fallback: Ability): Abil
   return (
     abilities.find((ability) => character.build.featAbilityScoreIncreases[ability] === 2) ??
     fallback
+  );
+}
+
+export function magicInitiateSelections(
+  character: CharacterDocument,
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): Readonly<Record<string, MagicInitiateSelection>> {
+  return Object.fromEntries(
+    magicInitiateFeatIds(draft, catalog).flatMap((featId) => {
+      const definition = catalog.feats[featId]?.magicInitiate;
+      const abilityId = character.build.choices.find(
+        (choice) => choice.choiceId === `${featId}.choice.spellcasting-ability`,
+      )?.optionIds[0];
+      const ability = abilities.find((candidate) => abilityId === `srd521.ability.${candidate}`);
+      const cantripIds = character.build.choices.find(
+        (choice) => choice.choiceId === `${featId}.choice.cantrips`,
+      )?.optionIds;
+      const levelOneSpellId = character.build.choices.find(
+        (choice) => choice.choiceId === `${featId}.choice.level-one-spell`,
+      )?.optionIds[0];
+      return definition !== undefined &&
+        ability !== undefined &&
+        cantripIds !== undefined &&
+        levelOneSpellId !== undefined
+        ? [[featId, { ability, cantripIds: [...cantripIds], levelOneSpellId }]]
+        : [];
+    }),
   );
 }
 
@@ -194,6 +224,7 @@ export function createLevelUpDraft(
     originFeatSkillIds: skills
       .filter((choice) => choice.sourceId === originFeatId)
       .map((choice) => choice.skillId),
+    magicInitiateChoices: {},
     expertiseSkillIds: character.build.proficiencyChoices.expertise
       .filter((choice) => choice.sourceId === expertiseSource)
       .map((choice) => choice.skillId),
@@ -203,6 +234,7 @@ export function createLevelUpDraft(
     learnedSpellIds: [...character.build.learnedSpellIds],
     preparedSpellIds: [...character.loadout.preparedSpellIds],
   };
+  currentDraft.magicInitiateChoices = magicInitiateSelections(character, currentDraft, catalog);
   return updateBuilderLevel(currentDraft, catalog, eligibility.targetLevel);
 }
 
@@ -283,6 +315,27 @@ function advancementIssues(
       );
     }
   }
+  const currentMagicInitiate = magicInitiateSelections(character, draft, catalog);
+  for (const featId of magicInitiateFeatIds(draft, catalog)) {
+    const before = currentMagicInitiate[featId];
+    const after = draft.magicInitiateChoices[featId];
+    if (before === undefined || after === undefined) continue;
+    if (before.ability !== after.ability) {
+      issues.push(
+        `${catalog.feats[featId]?.name ?? featId} cannot change its spellcasting ability.`,
+      );
+    }
+    const removed = [
+      ...before.cantripIds.filter((spellId) => !after.cantripIds.includes(spellId)),
+      ...(before.levelOneSpellId === after.levelOneSpellId ? [] : [before.levelOneSpellId]),
+    ];
+    const replacementMaximum = catalog.feats[featId]?.magicInitiate?.replacementMaximum ?? 1;
+    if (removed.length > replacementMaximum) {
+      issues.push(
+        `Replace no more than ${String(replacementMaximum)} ${catalog.feats[featId]?.name ?? featId} spell during level up.`,
+      );
+    }
+  }
   return issues;
 }
 
@@ -312,6 +365,13 @@ function mergeAdvancement(
       subclassId: target.build.subclassId,
       featAbilityScoreIncreases: target.build.featAbilityScoreIncreases,
       featIds: [...new Set([...character.build.featIds, ...target.build.featIds])],
+      choices: [
+        ...character.build.choices.filter(
+          (choice) =>
+            !target.build.choices.some((candidate) => candidate.choiceId === choice.choiceId),
+        ),
+        ...target.build.choices,
+      ],
       learnedSpellIds: target.build.learnedSpellIds,
       proficiencyChoices: {
         skills: uniqueBySourceAndSkill([

@@ -177,6 +177,17 @@ export interface SpellDamageSummary {
   type: string;
 }
 
+export interface SpellCastingOptionSummary {
+  sourceId: string;
+  ability: string;
+  attackBonus: number;
+  saveDifficultyClass: number;
+  attackTraceId: string;
+  saveTraceId: string;
+  freeCastResourceId?: string;
+  freeCastAvailable?: boolean;
+}
+
 export interface SpellSummary {
   id: string;
   name: string;
@@ -193,6 +204,7 @@ export interface SpellSummary {
   damage: SpellDamageSummary[];
   hasHigherLevelEffect: boolean;
   sources: SourceReference[];
+  castingOptions?: SpellCastingOptionSummary[];
 }
 
 export type RestEvent = "short-rest" | "long-rest";
@@ -245,6 +257,8 @@ export interface SpellCastRequest {
   spellId: string;
   slotLevel?: number;
   asRitual?: boolean;
+  castingSourceId?: string;
+  useFreeCast?: boolean;
 }
 
 export interface SpellCastTransitionProposal {

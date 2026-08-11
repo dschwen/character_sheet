@@ -92,6 +92,7 @@ interface ActionRequirements {
 interface CastFeedback {
   spell: SpellSummary;
   asRitual: boolean;
+  freeCast?: boolean;
   slotLevel?: number;
   slotsRemaining?: number;
 }
@@ -283,6 +284,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     [builderCatalog, character],
   );
   const evaluation = result.evaluation;
+  const featSpellcastingOption = evaluation?.spells
+    .flatMap((spell) => spell.castingOptions ?? [])
+    .find((option) => option.sourceId.includes(".feat.origin.magic-initiate."));
   const statefulActions = evaluation?.actions.filter(supportsStateTransition) ?? [];
   const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
 
@@ -318,8 +322,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
   function spellRollControls(spell: SpellSummary): React.ReactNode {
     const spellcasting = evaluation?.spellcasting;
+    const castingOption = spell.castingOptions?.[0];
+    const attackBonus = castingOption?.attackBonus ?? spellcasting?.attackBonus;
+    const saveDifficultyClass =
+      castingOption?.saveDifficultyClass ?? spellcasting?.saveDifficultyClass;
+    const attackTraceId = castingOption?.attackTraceId ?? spellcasting?.attackTraceId;
     const damageRolls = spellDamageRolls(spell);
-    if (spellcasting === undefined) return null;
     if (
       spell.attackType === undefined &&
       damageRolls.length === 0 &&
@@ -328,23 +336,23 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       return null;
     return (
       <div className="spell-roll-actions">
-        {spell.attackType === undefined ? null : (
+        {spell.attackType === undefined || attackBonus === undefined ? null : (
           <button
             type="button"
             onClick={(event) => {
               if (event.shiftKey) {
-                setSelectedTraceId(spellcasting.attackTraceId);
+                setSelectedTraceId(attackTraceId);
               } else {
                 performRoll({
                   label: `${spell.name} spell attack`,
-                  modifier: spellcasting.attackBonus,
+                  modifier: attackBonus,
                   mode: "normal",
                 });
               }
             }}
             title="Roll spell attack · Shift-click to inspect calculation"
           >
-            Attack {signed(spellcasting.attackBonus)}
+            Attack {signed(attackBonus)}
           </button>
         )}
         {damageRolls.map((damage, index) => (
@@ -363,11 +371,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             {String(damage.diceCount)}d{String(damage.diceSize)} {titleCase(damage.type)}
           </button>
         ))}
-        {spell.savingThrows.map((ability) => (
-          <span key={ability}>
-            {ability.slice(0, 3).toUpperCase()} save · DC {String(spellcasting.saveDifficultyClass)}
-          </span>
-        ))}
+        {saveDifficultyClass === undefined
+          ? null
+          : spell.savingThrows.map((ability) => (
+              <span key={ability}>
+                {ability.slice(0, 3).toUpperCase()} save · DC {String(saveDifficultyClass)}
+              </span>
+            ))}
       </div>
     );
   }
@@ -596,9 +606,20 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     );
   }
 
-  function castSpell(spell: SpellSummary, asRitual: boolean): void {
-    const request: SpellCastRequest = { spellId: spell.id, asRitual };
-    const slotLevel = spell.level > 0 && !asRitual ? selectedSlotLevel(spell) : undefined;
+  function castSpell(
+    spell: SpellSummary,
+    asRitual: boolean,
+    castingSourceId?: string,
+    useFreeCast = false,
+  ): void {
+    const request: SpellCastRequest = {
+      spellId: spell.id,
+      asRitual,
+      useFreeCast,
+      ...(castingSourceId === undefined ? {} : { castingSourceId }),
+    };
+    const slotLevel =
+      spell.level > 0 && !asRitual && !useFreeCast ? selectedSlotLevel(spell) : undefined;
     if (slotLevel !== undefined) request.slotLevel = slotLevel;
     try {
       const proposal = proposeSpellCast({ character, packages: [rulesPackage] }, request);
@@ -609,13 +630,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         setCastFeedback({
           spell,
           asRitual,
+          ...(useFreeCast ? { freeCast: true } : {}),
           ...(slotLevel === undefined ? {} : { slotLevel }),
           ...(slot === undefined ? {} : { slotsRemaining: Math.max(0, slot.current - 1) }),
         });
       }
       applyTransition(
         proposal,
-        `${spell.name}${asRitual ? " was cast as a ritual" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.`,
+        `${spell.name}${asRitual ? " was cast as a ritual" : useFreeCast ? " used its free casting" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.`,
       );
     } catch (error) {
       setNotice(`Spell cast failed: ${errorMessage(error)}`);
@@ -1126,7 +1148,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   )}
                 </Section>
 
-                {evaluation.spellcasting === undefined ? null : (
+                {evaluation.spells.length === 0 ? null : (
                   <Section title="Cast a spell" eyebrow="Spell-slot transitions">
                     {castFeedback === undefined ? null : (
                       <div className="cast-feedback" role="status" aria-live="polite">
@@ -1137,9 +1159,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           <p>
                             {castFeedback.asRitual
                               ? "Ritual · no spell slot spent"
-                              : castFeedback.slotLevel === undefined
-                                ? "Cantrip · no spell slot spent"
-                                : `Level ${String(castFeedback.slotLevel)} slot spent · ${String(castFeedback.slotsRemaining ?? 0)} remaining`}
+                              : castFeedback.freeCast === true
+                                ? "Magic Initiate · free casting spent"
+                                : castFeedback.slotLevel === undefined
+                                  ? "Cantrip · no spell slot spent"
+                                  : `Level ${String(castFeedback.slotLevel)} slot spent · ${String(castFeedback.slotsRemaining ?? 0)} remaining`}
                             {castFeedback.spell.concentration ? " · Concentration started" : ""}
                           </p>
                           {castFeedback.slotLevel !== undefined &&
@@ -1171,8 +1195,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           ) ?? [];
                         const slotLevel = selectedSlotLevel(spell);
                         const selectedSlot = eligibleSlots.find((slot) => slot.level === slotLevel);
-                        const canCast =
+                        const canCastWithSlot =
                           spell.level === 0 || (spell.prepared && (selectedSlot?.current ?? 0) > 0);
+                        const freeCastingOption = spell.castingOptions?.find(
+                          (option) => option.freeCastResourceId !== undefined,
+                        );
                         return (
                           <div key={spell.id}>
                             <div className="spell-summary">
@@ -1186,7 +1213,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               {spellRollControls(spell)}
                             </div>
                             <div className="spell-cast-controls">
-                              {spell.level === 0 ? null : (
+                              {spell.level === 0 || eligibleSlots.length === 0 ? null : (
                                 <select
                                   aria-label={`Slot level for ${spell.name}`}
                                   value={String(slotLevel)}
@@ -1208,16 +1235,32 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   ))}
                                 </select>
                               )}
-                              <button
-                                className="button primary compact"
-                                type="button"
-                                disabled={!canCast}
-                                onClick={() => {
-                                  castSpell(spell, false);
-                                }}
-                              >
-                                Cast
-                              </button>
+                              {spell.level === 0 || eligibleSlots.length > 0 ? (
+                                <button
+                                  className="button primary compact"
+                                  type="button"
+                                  disabled={!canCastWithSlot}
+                                  onClick={() => {
+                                    castSpell(spell, false);
+                                  }}
+                                >
+                                  Cast
+                                </button>
+                              ) : null}
+                              {freeCastingOption === undefined ? null : (
+                                <button
+                                  className="button secondary compact"
+                                  type="button"
+                                  disabled={freeCastingOption.freeCastAvailable !== true}
+                                  onClick={() => {
+                                    castSpell(spell, false, freeCastingOption.sourceId, true);
+                                  }}
+                                >
+                                  {freeCastingOption.freeCastAvailable === true
+                                    ? "Free cast"
+                                    : "Free cast spent"}
+                                </button>
+                              )}
                               {spell.ritual ? (
                                 <button
                                   className="button secondary compact"
@@ -1583,8 +1626,44 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             {tab === "spells" ? (
               <div className="sheet-grid two-column">
                 <Section title="Spellcasting" eyebrow="Magic">
-                  {evaluation.spellcasting === undefined ? (
+                  {evaluation.spellcasting === undefined && featSpellcastingOption === undefined ? (
                     <p className="empty">This character does not have spellcasting.</p>
+                  ) : evaluation.spellcasting === undefined ? (
+                    <>
+                      <div className="spell-metrics">
+                        <TraceButton
+                          traceId={featSpellcastingOption?.attackTraceId ?? ""}
+                          onSelect={setSelectedTraceId}
+                          roll={{
+                            label: "Magic Initiate spell attack",
+                            modifier: featSpellcastingOption?.attackBonus ?? 0,
+                            mode: "normal",
+                          }}
+                          onRoll={performRoll}
+                        >
+                          <span>Spell attack</span>
+                          <strong>{signed(featSpellcastingOption?.attackBonus ?? 0)}</strong>
+                        </TraceButton>
+                        <TraceButton
+                          traceId={featSpellcastingOption?.saveTraceId ?? ""}
+                          onSelect={setSelectedTraceId}
+                        >
+                          <span>Save DC</span>
+                          <strong>
+                            {String(featSpellcastingOption?.saveDifficultyClass ?? 0)}
+                          </strong>
+                        </TraceButton>
+                        <div>
+                          <span>Ability</span>
+                          <strong>
+                            {(featSpellcastingOption?.ability ?? "").slice(0, 3).toUpperCase()}
+                          </strong>
+                        </div>
+                      </div>
+                      <p className="empty">
+                        Magic Initiate’s level 1 spell can be cast free once per Long Rest.
+                      </p>
+                    </>
                   ) : (
                     <>
                       <div className="spell-metrics">
@@ -1768,6 +1847,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             {spell.prepared ? <i>Prepared</i> : null}
                             {spell.concentration ? <i>Concentration</i> : null}
                             {spell.ritual ? <i>Ritual</i> : null}
+                            {spell.castingOptions?.some((option) =>
+                              option.sourceId.includes(".feat.origin.magic-initiate."),
+                            ) ? (
+                              <i>Magic Initiate</i>
+                            ) : null}
                           </span>
                           <small>
                             {spell.castingTime} · {spell.range} · {spell.duration}

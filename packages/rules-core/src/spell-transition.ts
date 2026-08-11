@@ -17,6 +17,8 @@ const spellCastRequestSchema = z
     spellId: z.string().min(1),
     slotLevel: z.number().int().min(1).max(9).optional(),
     asRitual: z.boolean().default(false),
+    castingSourceId: z.string().min(1).optional(),
+    useFreeCast: z.boolean().default(false),
   })
   .strict();
 
@@ -88,6 +90,14 @@ export function proposeSpellCast(
   const spell = evaluation.spells.find((candidate) => candidate.id === request.spellId);
   const originalState = cloneState(character.state);
   const validations: ValidationMessage[] = [];
+  const castingOption =
+    spell === undefined
+      ? undefined
+      : request.castingSourceId === undefined
+        ? request.useFreeCast
+          ? spell.castingOptions?.find((option) => option.freeCastResourceId !== undefined)
+          : spell.castingOptions?.[0]
+        : spell.castingOptions?.find((option) => option.sourceId === request.castingSourceId);
   if (spell === undefined) {
     addValidation(
       validations,
@@ -95,6 +105,58 @@ export function proposeSpellCast(
       `${request.spellId} is not known by this character.`,
       ["request.spellId"],
     );
+  } else if (request.castingSourceId !== undefined && castingOption === undefined) {
+    addValidation(
+      validations,
+      "SPELL_CASTING_SOURCE_UNAVAILABLE",
+      `${request.castingSourceId} cannot cast ${request.spellId}.`,
+      ["request.castingSourceId"],
+    );
+  } else if (request.useFreeCast) {
+    if (spell.level === 0) {
+      addValidation(
+        validations,
+        "CANTRIP_DOES_NOT_USE_FREE_CAST",
+        `${request.spellId} is a cantrip and does not expend a free casting.`,
+        ["request.useFreeCast"],
+      );
+    }
+    if (request.asRitual) {
+      addValidation(
+        validations,
+        "RITUAL_DOES_NOT_USE_FREE_CAST",
+        "A ritual casting does not expend a free casting.",
+        ["request.useFreeCast", "request.asRitual"],
+      );
+    }
+    if (request.slotLevel !== undefined) {
+      addValidation(
+        validations,
+        "FREE_CAST_DOES_NOT_USE_SLOT",
+        "A free casting does not expend a spell slot.",
+        ["request.slotLevel", "request.useFreeCast"],
+      );
+    }
+    if (castingOption?.freeCastResourceId === undefined) {
+      addValidation(
+        validations,
+        "SPELL_FREE_CAST_UNAVAILABLE",
+        `${request.spellId} has no free casting from the selected source.`,
+        ["request.useFreeCast"],
+      );
+    } else {
+      const resource = evaluation.resources.find(
+        (candidate) => candidate.id === castingOption.freeCastResourceId,
+      );
+      if (resource === undefined || resource.current < 1) {
+        addValidation(
+          validations,
+          "SPELL_FREE_CAST_EXPENDED",
+          `The free casting of ${request.spellId} has already been expended.`,
+          ["request.useFreeCast"],
+        );
+      }
+    }
   } else if (spell.level === 0 && request.slotLevel !== undefined) {
     addValidation(
       validations,
@@ -161,7 +223,23 @@ export function proposeSpellCast(
   const nextState = cloneState(character.state);
   const changes: StateChange[] = [];
   const traces: Record<string, CalculationTrace> = {};
-  if (spell.level > 0 && !request.asRitual && request.slotLevel !== undefined) {
+  if (request.useFreeCast && castingOption?.freeCastResourceId !== undefined) {
+    const resourceId = castingOption.freeCastResourceId;
+    const before = character.state.expendedResources[resourceId] ?? 0;
+    const after = before + 1;
+    nextState.expendedResources[resourceId] = after;
+    recordChange(
+      changes,
+      traces,
+      `state.expendedResources.${resourceId}`,
+      before,
+      after,
+      `${request.spellId} expends its free casting.`,
+      "expend-free-spell-cast",
+      [before, resourceId],
+      spell.sources,
+    );
+  } else if (spell.level > 0 && !request.asRitual && request.slotLevel !== undefined) {
     const before = character.state.expendedSpellSlots[String(request.slotLevel)] ?? 0;
     const after = before + 1;
     nextState.expendedSpellSlots[String(request.slotLevel)] = after;

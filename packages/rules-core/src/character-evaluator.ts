@@ -259,6 +259,33 @@ const featBodySchema = z
       .optional(),
   })
   .passthrough();
+const magicInitiateFeatBodySchema = z
+  .object({
+    category: z.literal("origin"),
+    spellListClassId: z.string().min(1),
+    spellcastingAbilityChoice: z.array(z.enum(abilities)).min(1),
+    cantripChoice: z
+      .object({
+        minimum: z.number().int().nonnegative(),
+        maximum: z.number().int().nonnegative(),
+      })
+      .strict(),
+    levelOneSpellChoice: z
+      .object({
+        minimum: z.number().int().nonnegative(),
+        maximum: z.number().int().nonnegative(),
+      })
+      .strict(),
+    freeCastRecharge: z.literal("long-rest"),
+    spellChange: z
+      .object({
+        event: z.literal("level-up"),
+        replacementMaximum: z.number().int().nonnegative(),
+        sameLevel: z.boolean().default(true),
+      })
+      .strict(),
+  })
+  .passthrough();
 const subclassBodySchema = z
   .object({
     parentClassId: z.string().min(1),
@@ -2763,28 +2790,17 @@ function evaluateSpellcasting(
       })),
       hasHigherLevelEffect: body.hasHigherLevelEffect,
       sources: entitySourceReferences(entity),
+      castingOptions: [
+        {
+          sourceId: classId,
+          ability: classBody.spellcastingAbility,
+          attackBonus,
+          saveDifficultyClass,
+          attackTraceId,
+          saveTraceId,
+        },
+      ],
     });
-  }
-  if (character.state.concentrationSpellId !== undefined) {
-    const concentration = index.entities.get(character.state.concentrationSpellId);
-    if (
-      concentration?.kind !== "spell" ||
-      !spellBodySchema.parse(concentration.body).concentration
-    ) {
-      addValidation(
-        state,
-        "CONCENTRATION_SPELL_INVALID",
-        `${character.state.concentrationSpellId} is not a loaded Concentration spell.`,
-        ["state.concentrationSpellId"],
-      );
-    } else if (!displayedSpellIds.includes(character.state.concentrationSpellId)) {
-      addValidation(
-        state,
-        "CONCENTRATION_SPELL_NOT_KNOWN",
-        `${character.state.concentrationSpellId} is not available to this ${className}.`,
-        ["state.concentrationSpellId"],
-      );
-    }
   }
   state.spells.sort(
     (left, right) => left.level - right.level || left.name.localeCompare(right.name),
@@ -2814,6 +2830,337 @@ function evaluateSpellcasting(
     attackTraceId,
     saveTraceId,
   };
+}
+
+function magicInitiateChoice(
+  character: CharacterDocument,
+  state: EngineState,
+  choiceId: string,
+): string[] {
+  const choices = character.build.choices.filter((choice) => choice.choiceId === choiceId);
+  if (choices.length > 1) {
+    addValidation(
+      state,
+      "DUPLICATE_MAGIC_INITIATE_CHOICE",
+      `${choiceId} must be recorded only once.`,
+      ["build.choices"],
+    );
+  }
+  return choices[0]?.optionIds ?? [];
+}
+
+function addMagicInitiateSpell(
+  character: CharacterDocument,
+  spellId: string,
+  prepared: boolean,
+  castingOption: NonNullable<SpellSummary["castingOptions"]>[number],
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  const entity = index.entities.get(spellId);
+  if (entity?.kind !== "spell") return;
+  const body = spellBodySchema.parse(entity.body);
+  const existing = state.spells.find((spell) => spell.id === spellId);
+  if (existing !== undefined) {
+    existing.prepared ||= prepared;
+    existing.castingOptions = [
+      ...(existing.castingOptions ?? []),
+      ...((existing.castingOptions ?? []).some(
+        (option) => option.sourceId === castingOption.sourceId,
+      )
+        ? []
+        : [castingOption]),
+    ];
+    return;
+  }
+  const cantripDamageMultiplier =
+    body.level !== 0
+      ? 1
+      : character.build.levels.length >= 17
+        ? 4
+        : character.build.levels.length >= 11
+          ? 3
+          : character.build.levels.length >= 5
+            ? 2
+            : 1;
+  state.spells.push({
+    id: spellId,
+    name: entity.name.en ?? spellId,
+    level: body.level,
+    school: body.school,
+    prepared,
+    ritual: body.ritual,
+    concentration: body.concentration,
+    castingTime: body.castingTime,
+    range: body.range,
+    duration: body.duration,
+    ...(body.attackType === null ? {} : { attackType: body.attackType }),
+    savingThrows: body.savingThrows,
+    damage: body.damage.map((damage) => ({
+      ...damage,
+      diceCount: damage.diceCount * cantripDamageMultiplier,
+    })),
+    hasHigherLevelEffect: body.hasHigherLevelEffect,
+    sources: entitySourceReferences(entity),
+    castingOptions: [castingOption],
+  });
+}
+
+function evaluateMagicInitiate(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  for (const featId of character.build.featIds) {
+    const feat = index.entities.get(featId);
+    if (feat?.kind !== "feat") continue;
+    const parsed = magicInitiateFeatBodySchema.safeParse(feat.body);
+    if (!parsed.success) continue;
+    const body = parsed.data;
+    const listClass = index.entities.get(body.spellListClassId);
+    const classBody =
+      listClass?.kind === "class"
+        ? spellcastingClassBodySchema.safeParse(listClass.body)
+        : undefined;
+    if (classBody?.success !== true) {
+      addValidation(
+        state,
+        "MAGIC_INITIATE_SPELL_LIST_MISSING",
+        `${featId} references an unavailable spell list.`,
+        ["build.featIds"],
+      );
+      continue;
+    }
+    const abilityOptions = magicInitiateChoice(
+      character,
+      state,
+      `${featId}.choice.spellcasting-ability`,
+    );
+    const abilityId = abilityOptions[0];
+    const ability = abilities.find((candidate) => abilityId === `srd521.ability.${candidate}`);
+    if (
+      abilityOptions.length !== 1 ||
+      ability === undefined ||
+      !body.spellcastingAbilityChoice.includes(ability)
+    ) {
+      addValidation(
+        state,
+        "MAGIC_INITIATE_ABILITY_CHOICE_INVALID",
+        `${feat.name.en ?? featId} requires one allowed spellcasting ability.`,
+        ["build.choices"],
+      );
+      continue;
+    }
+    const cantripIds = magicInitiateChoice(character, state, `${featId}.choice.cantrips`);
+    const levelOneSpellIds = magicInitiateChoice(
+      character,
+      state,
+      `${featId}.choice.level-one-spell`,
+    );
+    const spellList = new Set(classBody.data.spellList);
+    const validateSpells = (
+      spellIds: string[],
+      expectedLevel: number,
+      minimum: number,
+      maximum: number,
+      label: string,
+    ): string[] => {
+      if (
+        spellIds.length < minimum ||
+        spellIds.length > maximum ||
+        new Set(spellIds).size !== spellIds.length
+      ) {
+        addValidation(
+          state,
+          "MAGIC_INITIATE_SPELL_COUNT_INVALID",
+          `${feat.name.en ?? featId} requires ${String(minimum)}–${String(maximum)} ${label}.`,
+          ["build.choices"],
+        );
+      }
+      return spellIds.filter((spellId) => {
+        const spell = index.entities.get(spellId);
+        if (
+          spell?.kind === "spell" &&
+          spellList.has(spellId) &&
+          spellBodySchema.parse(spell.body).level === expectedLevel
+        ) {
+          return true;
+        }
+        addValidation(
+          state,
+          "MAGIC_INITIATE_SPELL_INVALID",
+          `${spellId} is not a level ${String(expectedLevel)} spell on the ${listClass?.name.en ?? body.spellListClassId} spell list.`,
+          ["build.choices"],
+        );
+        return false;
+      });
+    };
+    const validCantrips = validateSpells(
+      cantripIds,
+      0,
+      body.cantripChoice.minimum,
+      body.cantripChoice.maximum,
+      "cantrips",
+    );
+    const validLevelOneSpells = validateSpells(
+      levelOneSpellIds,
+      1,
+      body.levelOneSpellChoice.minimum,
+      body.levelOneSpellChoice.maximum,
+      "level 1 spells",
+    );
+    const abilityModifier = requireNumber(
+      state.facts[`ability.${ability}.modifier`] ?? null,
+      `${feat.name.en ?? featId} spellcasting ability modifier`,
+    );
+    const proficiencyBonus = requireNumber(
+      state.facts.proficiencyBonus ?? null,
+      "Proficiency Bonus",
+    );
+    const attackBonus = abilityModifier + proficiencyBonus;
+    const saveDifficultyClass = 8 + abilityModifier + proficiencyBonus;
+    const featSlug = featId.split(".").slice(-2).join(".");
+    const attackTraceId = `spellcasting.${featSlug}.attackBonus`;
+    const saveTraceId = `spellcasting.${featSlug}.saveDifficultyClass`;
+    const sources = entitySourceReferences(feat);
+    for (const [traceId, result, operation, inputs] of [
+      [
+        attackTraceId,
+        attackBonus,
+        "add-ability-and-proficiency",
+        [abilityModifier, proficiencyBonus],
+      ],
+      [
+        saveTraceId,
+        saveDifficultyClass,
+        "add-spell-save-base-ability-and-proficiency",
+        [8, abilityModifier, proficiencyBonus],
+      ],
+    ] as const) {
+      state.facts[traceId] = result;
+      state.values[traceId] = { value: result, traceId };
+      state.traces[traceId] = {
+        id: traceId,
+        result,
+        nodes: [
+          {
+            id: `${traceId}.sum`,
+            operation,
+            inputs: [...inputs],
+            output: result,
+          },
+        ],
+        sourceReferences: sources,
+      };
+    }
+    const resourceId = `${featId}.free-cast`;
+    const maximum = 1;
+    const expended = character.state.expendedResources[resourceId] ?? 0;
+    const current = Math.max(0, maximum - expended);
+    const resourceTraceId = `${resourceId}.current`;
+    if (expended > maximum) {
+      addValidation(
+        state,
+        "RESOURCE_EXPENDED_ABOVE_MAXIMUM",
+        `Expended ${resourceId} uses exceed its maximum.`,
+        [`state.expendedResources.${resourceId}`],
+      );
+    }
+    state.resources.push({
+      id: resourceId,
+      maximum,
+      expended,
+      current,
+      recharge: [{ event: body.freeCastRecharge, amount: "all" }],
+      traceId: resourceTraceId,
+    });
+    state.facts[`${resourceId}.maximum`] = maximum;
+    state.facts[resourceTraceId] = current;
+    state.values[`${resourceId}.maximum`] = {
+      value: maximum,
+      traceId: `${resourceId}.maximum`,
+    };
+    state.values[resourceTraceId] = { value: current, traceId: resourceTraceId };
+    state.traces[`${resourceId}.maximum`] = {
+      id: `${resourceId}.maximum`,
+      result: maximum,
+      nodes: [
+        {
+          id: `${resourceId}.maximum.grant`,
+          operation: "grant-free-spell-cast",
+          inputs: [featId],
+          output: maximum,
+        },
+      ],
+      sourceReferences: sources,
+    };
+    state.traces[resourceTraceId] = {
+      id: resourceTraceId,
+      result: current,
+      nodes: [
+        {
+          id: `${resourceTraceId}.subtract`,
+          operation: "subtract-expended",
+          inputs: [maximum, expended],
+          output: current,
+        },
+      ],
+      sourceReferences: sources,
+    };
+    const baseCastingOption = {
+      sourceId: featId,
+      ability,
+      attackBonus,
+      saveDifficultyClass,
+      attackTraceId,
+      saveTraceId,
+    };
+    validCantrips.forEach((spellId) => {
+      addMagicInitiateSpell(character, spellId, false, baseCastingOption, index, state);
+    });
+    validLevelOneSpells.forEach((spellId) => {
+      addMagicInitiateSpell(
+        character,
+        spellId,
+        true,
+        {
+          ...baseCastingOption,
+          freeCastResourceId: resourceId,
+          freeCastAvailable: current > 0,
+        },
+        index,
+        state,
+      );
+    });
+  }
+  state.spells.sort(
+    (left, right) => left.level - right.level || left.name.localeCompare(right.name),
+  );
+}
+
+function validateConcentration(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  if (character.state.concentrationSpellId === undefined) return;
+  const spellId = character.state.concentrationSpellId;
+  const concentration = index.entities.get(spellId);
+  if (concentration?.kind !== "spell" || !spellBodySchema.parse(concentration.body).concentration) {
+    addValidation(
+      state,
+      "CONCENTRATION_SPELL_INVALID",
+      `${spellId} is not a loaded Concentration spell.`,
+      ["state.concentrationSpellId"],
+    );
+  } else if (!state.spells.some((spell) => spell.id === spellId)) {
+    addValidation(
+      state,
+      "CONCENTRATION_SPELL_NOT_KNOWN",
+      `${spellId} is not available to this character.`,
+      ["state.concentrationSpellId"],
+    );
+  }
 }
 
 function grantedFeatureIds(classLevels: Map<string, number>, index: PackageIndex): Set<string> {
@@ -4002,6 +4349,8 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   );
   evaluateHitPoints(character, rules, granted, index, state);
   evaluateSpellcasting(character, classLevels, index, state);
+  evaluateMagicInitiate(character, index, state);
+  validateConcentration(character, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);

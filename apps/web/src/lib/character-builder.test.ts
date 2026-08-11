@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateCharacter } from "@dnd/rules-core";
+import { evaluateCharacter, proposeRest, proposeSpellCast } from "@dnd/rules-core";
 
 import {
   barbarianId,
@@ -1173,6 +1173,75 @@ describe("guided character builder", () => {
       );
       expect(character.build.proficiencyChoices.expertise).toHaveLength(level >= 2 ? 1 : 0);
     }
+  });
+
+  it("builds, evaluates, casts, and recharges Magic Initiate spells", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const featId = "srd521.feat.origin.magic-initiate.cleric";
+    const draft = updateBuilderBackground(
+      defaultBuilderDraft(fighterId, catalog, 1, "Initiate Fighter"),
+      catalog,
+      "srd521.background.acolyte",
+    );
+    const selection = draft.magicInitiateChoices[featId];
+    if (selection === undefined) throw new Error("Expected Magic Initiate choices.");
+
+    expect(selection.cantripIds).toHaveLength(2);
+    expect(selection.levelOneSpellId).toMatch(/^srd521\.spell\./);
+    expect(validateBuilderDraft(draft, catalog)).toEqual([]);
+
+    const character = buildCharacter(draft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+    const levelOneSpell = evaluation.spells.find((spell) => spell.id === selection.levelOneSpellId);
+    const freeCastResourceId = `${featId}.free-cast`;
+
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.spellcasting).toBeUndefined();
+    expect(evaluation.spells.map((spell) => spell.id)).toEqual(
+      expect.arrayContaining([...selection.cantripIds, selection.levelOneSpellId]),
+    );
+    expect(levelOneSpell?.castingOptions).toEqual([
+      expect.objectContaining({
+        sourceId: featId,
+        ability: selection.ability,
+        freeCastResourceId,
+        freeCastAvailable: true,
+      }),
+    ]);
+    expect(evaluation.resources).toContainEqual(
+      expect.objectContaining({ id: freeCastResourceId, current: 1 }),
+    );
+
+    const cast = proposeSpellCast(
+      { character, packages: [rulesPackage] },
+      {
+        spellId: selection.levelOneSpellId,
+        castingSourceId: featId,
+        useFreeCast: true,
+      },
+    );
+    expect(cast.applicable).toBe(true);
+    expect(cast.nextState.expendedResources[freeCastResourceId]).toBe(1);
+
+    const spent = { ...character, state: cast.nextState };
+    expect(
+      proposeSpellCast(
+        { character: spent, packages: [rulesPackage] },
+        {
+          spellId: selection.levelOneSpellId,
+          castingSourceId: featId,
+          useFreeCast: true,
+        },
+      ).validations.map((validation) => validation.code),
+    ).toContain("SPELL_FREE_CAST_EXPENDED");
+
+    const rest = proposeRest(
+      { character: spent, packages: [rulesPackage] },
+      { event: "long-rest" },
+    );
+    expect(rest.applicable).toBe(true);
+    expect(rest.nextState.expendedResources[freeCastResourceId]).toBe(0);
   });
 
   it("reconciles dependent choices when a draft changes level", () => {

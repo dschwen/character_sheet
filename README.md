@@ -22,12 +22,12 @@ calculation instead. The Play view tracks damage,
 healing, Temporary Hit Points, Heroic Inspiration, Exhaustion, Concentration, rests, modeled feature
 uses, and spell-slot expenditure. Weapon rows provide attack, damage, and critical-damage rolls.
 Spells expose structured attack, damage, and saving-throw details, while cast confirmations report
-the slot spent, remaining slots, and Concentration changes. The Combat view’s Equipment panel edits
-coin denominations, adds loot, purchases source-priced gear, adjusts stack quantities, and equips or
-removes inventory instances. Every saved character change advances the document revision, persists
-locally, and can be undone once. Imported characters stay in the browser's local storage; the app
-has no account, server, or database dependency. A production build is emitted as a static site in
-`apps/web/out` by `corepack pnpm build`.
+the slot or free casting spent, remaining slots, and Concentration changes. The Combat view’s
+Equipment panel edits coin denominations, adds loot, purchases source-priced gear, adjusts stack
+quantities, and equips or removes inventory instances. Every saved character change advances the
+document revision, persists locally, and can be undone once. Imported characters stay in the
+browser's local storage; the app has no account, server, or database dependency. A production build
+is emitted as a static site in `apps/web/out` by `corepack pnpm build`.
 
 Choose **New character** to open the guided Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin,
 Ranger, Rogue, Sorcerer, Warlock, and Wizard builder. It
@@ -55,8 +55,9 @@ sheet.
 The Origin step offers Acolyte, Criminal, Sage, and Soldier. Changing the background immediately
 reconciles its ability-score options, granted feat, fixed skill proficiencies, and any conflicting
 class, Human, Skilled, or Expertise choices. Alert adds Proficiency Bonus to Initiative. Magic
-Initiate’s spell-list and spell-choice requirements are preserved as structured content; its
-dedicated spell picker and free-cast tracking are still a future increment.
+Initiate presents its data-driven spellcasting-ability, two-cantrip, and level 1 spell choices. Its
+spells appear on the sheet with their own attack bonus and save DC; the level 1 spell can use an
+available class spell slot or its tracked free casting, which returns on a Long Rest.
 
 For a supported level 1–4 character, choose **Level up** to add the next level in its existing
 class. The advancement flow presents only newly introduced decisions, including class skills,
@@ -67,8 +68,9 @@ same-class Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue
 and Wizard advancement through level 5. Bard advancement permits one cantrip and one prepared-spell
 replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
-one prepared-spell and cantrip replacement when gaining a level;
-multiclassing and higher levels remain future work.
+one prepared-spell and cantrip replacement when gaining a level. Magic Initiate permits one
+same-level feat spell replacement while preserving its original casting ability. Multiclassing and
+higher levels remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -101,7 +103,7 @@ name, and edit its choices and play-state. The schemas reject malformed document
 reports rules-invalid choices without changing the input. The builder currently covers the complete
 reviewed Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock,
 and Wizard level 1–5 vertical slices with every standard SRD background. Additional species,
-Magic Initiate spell choices, higher levels, and multiclassing are the next builder increments.
+higher levels, and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 
 ## Requirements

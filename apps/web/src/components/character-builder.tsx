@@ -18,12 +18,15 @@ import {
   featureChoiceCount,
   fighterId,
   masteryCount,
+  magicInitiateFeatIds,
   previewBuilderCharacter,
+  reconcileMagicInitiateChoices,
   skillIds,
   spellSelectionCounts,
   updateBuilderBackground,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
+  updateMagicInitiateSelection,
   type BuilderClassId,
   type CharacterBuilderDraft,
 } from "../lib/character-builder";
@@ -80,6 +83,7 @@ export function CharacterBuilder({
     (choice) => choice.selection === "backgroundAbilityScoreIncreases",
   );
   const originFeatChoice = originChoices.find((choice) => choice.selection === "originFeatId");
+  const magicInitiateIds = magicInitiateFeatIds(draft, catalog);
   const spellcasting = selectedClass.spellcasting;
   const spellCounts = spellSelectionCounts(draft, catalog);
   const activeFeatureChoices = selectedClass.featureChoices.filter(
@@ -449,11 +453,16 @@ export function CharacterBuilder({
                       const candidates = skillIds
                         .map((skill) => `srd521.skill.${skill}`)
                         .filter((id) => !unavailable.has(id));
-                      setDraft((value) => ({
-                        ...value,
-                        originFeatId: feat.id,
-                        originFeatSkillIds: candidates.slice(0, feat.skillMaximum),
-                      }));
+                      setDraft((value) =>
+                        reconcileMagicInitiateChoices(
+                          {
+                            ...value,
+                            originFeatId: feat.id,
+                            originFeatSkillIds: candidates.slice(0, feat.skillMaximum),
+                          },
+                          catalog,
+                        ),
+                      );
                     }}
                   >
                     <span>Origin feat</span>
@@ -466,6 +475,95 @@ export function CharacterBuilder({
                   </button>
                 ))}
               </div>
+              {magicInitiateIds.map((featId) => {
+                const feat = catalog.feats[featId];
+                const definition = feat?.magicInitiate;
+                const selection = draft.magicInitiateChoices[featId];
+                if (feat === undefined || definition === undefined || selection === undefined) {
+                  return null;
+                }
+                return (
+                  <div className="builder-subsection" key={featId}>
+                    <div className="builder-section-heading">
+                      <div>
+                        <span>Origin feat spells</span>
+                        <h3>{feat.name}</h3>
+                      </div>
+                      <small>Two cantrips · One level 1 spell · One free cast per Long Rest</small>
+                    </div>
+                    <label className="builder-field compact-field">
+                      Spellcasting ability
+                      <select
+                        value={selection.ability}
+                        onChange={(event) => {
+                          setDraft((value) =>
+                            updateMagicInitiateSelection(value, catalog, featId, {
+                              ability: event.target.value as Ability,
+                            }),
+                          );
+                        }}
+                      >
+                        {definition.abilityIds.map((ability) => (
+                          <option key={ability} value={ability}>
+                            {titleCase(ability)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <div className="builder-spell-group">
+                      <strong>
+                        Cantrips · {String(selection.cantripIds.length)} /{" "}
+                        {String(definition.cantripMaximum)}
+                      </strong>
+                      <div className="builder-token-grid">
+                        {definition.cantrips.map((spell) => (
+                          <button
+                            key={spell.id}
+                            type="button"
+                            className={
+                              selection.cantripIds.includes(spell.id) ? "selected" : undefined
+                            }
+                            onClick={() => {
+                              setDraft((value) => {
+                                const current = value.magicInitiateChoices[featId];
+                                if (current === undefined) return value;
+                                return updateMagicInitiateSelection(value, catalog, featId, {
+                                  cantripIds: toggleList(
+                                    current.cantripIds,
+                                    spell.id,
+                                    definition.cantripMaximum,
+                                  ),
+                                });
+                              });
+                            }}
+                          >
+                            {spell.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <label className="builder-field compact-field">
+                      Level 1 spell
+                      <select
+                        value={selection.levelOneSpellId}
+                        onChange={(event) => {
+                          setDraft((value) =>
+                            updateMagicInitiateSelection(value, catalog, featId, {
+                              levelOneSpellId: event.target.value,
+                            }),
+                          );
+                        }}
+                      >
+                        {definition.levelOneSpells.map((spell) => (
+                          <option key={spell.id} value={spell.id}>
+                            {spell.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                );
+              })}
               <label className="builder-field compact-field">
                 Starting level
                 <select

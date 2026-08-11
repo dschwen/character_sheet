@@ -5,16 +5,23 @@ import { useMemo, useState } from "react";
 import type { CharacterDocument } from "@dnd/character-model";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 
-import { createLevelUpDraft, levelUpCharacter, previewLevelUp } from "../lib/character-level-up";
+import {
+  createLevelUpDraft,
+  levelUpCharacter,
+  magicInitiateSelections,
+  previewLevelUp,
+} from "../lib/character-level-up";
 import {
   characterBuilderCatalog,
   classSkillCount,
   expertiseCount,
   expertiseSkillCandidates,
   featureChoiceCount,
+  magicInitiateFeatIds,
   masteryCount,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
+  updateMagicInitiateSelection,
   type CharacterBuilderDraft,
 } from "../lib/character-builder";
 import { abilities, numericFact, shortEntityName, signed, titleCase } from "../lib/presentation";
@@ -158,12 +165,14 @@ export function CharacterLevelUp({
   const introducesExpertise = newExpertiseCount > 0;
   const introducesSubclass = selectedClass.subclassLevel === targetLevel;
   const introducesAsi = targetLevel === 4;
+  const magicInitiateIds = magicInitiateFeatIds(draft, catalog);
   const hasChoiceSections =
     newClassSkillCount > 0 ||
     newMasteryCount > 0 ||
     targetFeatureChoices.length > 0 ||
     introducesExpertise ||
     introducesAsi ||
+    magicInitiateIds.length > 0 ||
     spellcasting !== undefined;
 
   function toggleClassSkill(skillId: string): void {
@@ -580,6 +589,115 @@ export function CharacterLevelUp({
                   </div>
                 </div>
               ) : null}
+
+              {magicInitiateIds.map((featId) => {
+                const feat = catalog.feats[featId];
+                const definition = feat?.magicInitiate;
+                const selection = draft.magicInitiateChoices[featId];
+                if (definition === undefined || selection === undefined) return null;
+                const original = magicInitiateSelections(character, draft, catalog)[featId];
+                const replaced =
+                  original === undefined
+                    ? 0
+                    : original.cantripIds.filter(
+                        (spellId) => !selection.cantripIds.includes(spellId),
+                      ).length + (original.levelOneSpellId === selection.levelOneSpellId ? 0 : 1);
+                return (
+                  <div className="spell-choice-section" key={featId}>
+                    <div className="spell-choice-heading">
+                      <div>
+                        <span>Origin feat</span>
+                        <h2>{feat?.name ?? featId}</h2>
+                      </div>
+                      <small>
+                        {String(replaced)} / {String(definition.replacementMaximum)} spell replaced
+                      </small>
+                    </div>
+                    <label className="builder-field compact-field">
+                      Spellcasting ability
+                      <select value={selection.ability} disabled>
+                        <option value={selection.ability}>{titleCase(selection.ability)}</option>
+                      </select>
+                      <small>This choice is fixed when you gain the feat.</small>
+                    </label>
+                    <div className="spell-choice-heading">
+                      <div>
+                        <span>Magic Initiate</span>
+                        <h2>Cantrips</h2>
+                      </div>
+                      <small>
+                        {String(selection.cantripIds.length)} / {String(definition.cantripMaximum)}
+                      </small>
+                    </div>
+                    <div className="spell-choice-grid">
+                      {definition.cantrips.map((spell) => {
+                        const selected = selection.cantripIds.includes(spell.id);
+                        return (
+                          <button
+                            key={spell.id}
+                            type="button"
+                            className={selected ? "selected" : undefined}
+                            disabled={
+                              (!selected &&
+                                selection.cantripIds.length >= definition.cantripMaximum) ||
+                              (selected &&
+                                original?.cantripIds.includes(spell.id) === true &&
+                                replaced >= definition.replacementMaximum)
+                            }
+                            onClick={() => {
+                              setDraft((value) =>
+                                value === undefined
+                                  ? value
+                                  : updateMagicInitiateSelection(value, catalog, featId, {
+                                      cantripIds: selected
+                                        ? selection.cantripIds.filter((id) => id !== spell.id)
+                                        : [...selection.cantripIds, spell.id],
+                                    }),
+                              );
+                            }}
+                          >
+                            <i>{selected ? "✓" : ""}</i>
+                            <span>
+                              <strong>{spell.name}</strong>
+                              <small>{titleCase(spell.school)} cantrip</small>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <label className="builder-field compact-field">
+                      Level 1 spell
+                      <select
+                        value={selection.levelOneSpellId}
+                        onChange={(event) => {
+                          setDraft((value) =>
+                            value === undefined
+                              ? value
+                              : updateMagicInitiateSelection(value, catalog, featId, {
+                                  levelOneSpellId: event.target.value,
+                                }),
+                          );
+                        }}
+                      >
+                        {definition.levelOneSpells.map((spell) => (
+                          <option
+                            key={spell.id}
+                            value={spell.id}
+                            disabled={
+                              selection.levelOneSpellId === original?.levelOneSpellId &&
+                              spell.id !== original.levelOneSpellId &&
+                              replaced >= definition.replacementMaximum
+                            }
+                          >
+                            {spell.name} · {titleCase(spell.school)}
+                          </option>
+                        ))}
+                      </select>
+                      <small>Replace at most one feat spell each level.</small>
+                    </label>
+                  </div>
+                );
+              })}
 
               {spellcasting === undefined || spellCounts === undefined ? null : (
                 <>

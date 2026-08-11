@@ -23,6 +23,7 @@ import {
   rogueId,
   sorcererId,
   spellSelectionCounts,
+  updateBuilderBackground,
   updateBuilderFeatureChoice,
   warlockId,
   wizardId,
@@ -428,6 +429,71 @@ describe("guided character level up", () => {
     });
 
     expect(preview.issues).toContain("Replace no more than 1 Warlock cantrip during level up.");
+  });
+
+  it("allows one Magic Initiate spell replacement per level and fixes its ability", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const featId = "srd521.feat.origin.magic-initiate.cleric";
+    const original = buildCharacter(
+      updateBuilderBackground(
+        defaultBuilderDraft(fighterId, catalog, 1, "Advancing Initiate"),
+        catalog,
+        "srd521.background.acolyte",
+      ),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(original, catalog);
+    const definition = catalog.feats[featId]?.magicInitiate;
+    const selection = draft.magicInitiateChoices[featId];
+    if (definition === undefined || selection === undefined) {
+      throw new Error("Expected Magic Initiate choices.");
+    }
+    const replacement = definition.cantrips.find(
+      (spell) => !selection.cantripIds.includes(spell.id),
+    );
+    if (replacement === undefined) throw new Error("Expected a replacement cantrip.");
+    draft.magicInitiateChoices = {
+      ...draft.magicInitiateChoices,
+      [featId]: {
+        ...selection,
+        cantripIds: [selection.cantripIds[1] ?? selection.cantripIds[0] ?? "", replacement.id],
+      },
+    };
+
+    const accepted = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-09T16:00:00.000Z"),
+    });
+    expect(accepted.issues).toEqual([]);
+    expect(accepted.character?.build.choices).toContainEqual({
+      choiceId: `${featId}.choice.cantrips`,
+      optionIds: draft.magicInitiateChoices[featId]?.cantripIds,
+    });
+
+    const invalid = structuredClone(draft);
+    invalid.magicInitiateChoices = {
+      ...invalid.magicInitiateChoices,
+      [featId]: {
+        ...selection,
+        cantripIds: draft.magicInitiateChoices[featId]?.cantripIds ?? selection.cantripIds,
+        ability: selection.ability === "wisdom" ? "charisma" : "wisdom",
+        levelOneSpellId:
+          definition.levelOneSpells.find((spell) => spell.id !== selection.levelOneSpellId)?.id ??
+          selection.levelOneSpellId,
+      },
+    };
+    const rejected = previewLevelUp(original, invalid, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-09T17:00:00.000Z"),
+    });
+    expect(rejected.issues).toEqual(
+      expect.arrayContaining([
+        "Magic Initiate (Cleric) cannot change its spellcasting ability.",
+        "Replace no more than 1 Magic Initiate (Cleric) spell during level up.",
+      ]),
+    );
   });
 
   it("explains unsupported and fully reviewed advancement limits", () => {

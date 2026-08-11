@@ -79,12 +79,19 @@ export interface CharacterBuilderDraft {
   classSkillIds: string[];
   speciesSkillIds: string[];
   originFeatSkillIds: string[];
+  magicInitiateChoices: Readonly<Record<string, MagicInitiateSelection>>;
   expertiseSkillIds: string[];
   featureChoiceSelections: Readonly<Record<string, string[]>>;
   startingEquipmentOptionId: string;
   weaponMasteryIds: string[];
   learnedSpellIds: string[];
   preparedSpellIds: string[];
+}
+
+export interface MagicInitiateSelection {
+  ability: Ability;
+  cantripIds: string[];
+  levelOneSpellId: string;
 }
 
 export type SpeciesSize = NonNullable<CharacterDocument["build"]["speciesSize"]>;
@@ -146,6 +153,19 @@ export interface FeatBuilderCatalog {
   repeatable: boolean;
   skillMinimum: number;
   skillMaximum: number;
+  magicInitiate?: MagicInitiateCatalog;
+}
+
+export interface MagicInitiateCatalog {
+  spellListClassId: string;
+  abilityIds: Ability[];
+  cantripMinimum: number;
+  cantripMaximum: number;
+  levelOneSpellMinimum: number;
+  levelOneSpellMaximum: number;
+  cantrips: SpellOption[];
+  levelOneSpells: SpellOption[];
+  replacementMaximum: number;
 }
 
 export interface SpellOption {
@@ -691,6 +711,32 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
         const body = objectValue(candidate.body);
         const proficiencyChoice = objectValue(body?.proficiencyChoice);
         const categories = stringArray(proficiencyChoice?.categories);
+        const spellListClassId =
+          typeof body?.spellListClassId === "string" ? body.spellListClassId : undefined;
+        const spellListClass =
+          spellListClassId === undefined ? undefined : objectValue(entity(spellListClassId)?.body);
+        const spellListIds = stringArray(spellListClass?.spellList);
+        const featSpells = spellListIds.flatMap((spellId) => {
+          const spell = entity(spellId);
+          const spellBody = objectValue(spell?.body);
+          const level = numericValue(spellBody?.level, -1);
+          return spell?.kind === "spell" && level >= 0
+            ? [
+                {
+                  id: spell.id,
+                  name: localizedName(spell),
+                  level,
+                  school: typeof spellBody?.school === "string" ? spellBody.school : "unknown",
+                },
+              ]
+            : [];
+        });
+        const cantripChoice = objectValue(body?.cantripChoice);
+        const levelOneSpellChoice = objectValue(body?.levelOneSpellChoice);
+        const spellChange = objectValue(body?.spellChange);
+        const abilityIds = stringArray(body?.spellcastingAbilityChoice)
+          .map(abilityValue)
+          .filter((ability): ability is Ability => ability !== undefined);
         return [
           candidate.id,
           {
@@ -705,6 +751,21 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
             skillMaximum: categories.includes("skill")
               ? numericValue(proficiencyChoice?.maximum)
               : 0,
+            ...(spellListClassId === undefined
+              ? {}
+              : {
+                  magicInitiate: {
+                    spellListClassId,
+                    abilityIds,
+                    cantripMinimum: numericValue(cantripChoice?.minimum),
+                    cantripMaximum: numericValue(cantripChoice?.maximum),
+                    levelOneSpellMinimum: numericValue(levelOneSpellChoice?.minimum),
+                    levelOneSpellMaximum: numericValue(levelOneSpellChoice?.maximum),
+                    cantrips: featSpells.filter((spell) => spell.level === 0),
+                    levelOneSpells: featSpells.filter((spell) => spell.level === 1),
+                    replacementMaximum: numericValue(spellChange?.replacementMaximum, 1),
+                  },
+                }),
           },
         ];
       }),
@@ -853,6 +914,87 @@ function fillSelections(current: string[], candidates: string[], count: number):
   return [...valid, ...candidates.filter((id) => !valid.includes(id))].slice(0, count);
 }
 
+export function magicInitiateFeatIds(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): string[] {
+  const backgroundFeatId = catalog.backgrounds[draft.backgroundId]?.featId;
+  return [...new Set([backgroundFeatId, draft.originFeatId])].filter(
+    (featId): featId is string =>
+      featId !== undefined && catalog.feats[featId]?.magicInitiate !== undefined,
+  );
+}
+
+export function reconcileMagicInitiateChoices(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): CharacterBuilderDraft {
+  const selectedClass = catalog.classes[draft.classId];
+  const choices = Object.fromEntries(
+    magicInitiateFeatIds(draft, catalog).flatMap((featId) => {
+      const definition = catalog.feats[featId]?.magicInitiate;
+      if (definition === undefined) return [];
+      const current = draft.magicInitiateChoices[featId];
+      const ability = definition.abilityIds.includes(current?.ability ?? "strength")
+        ? (current?.ability ?? definition.abilityIds[0])
+        : definition.abilityIds.includes(selectedClass.spellcasting?.ability ?? "strength")
+          ? (selectedClass.spellcasting?.ability ?? definition.abilityIds[0])
+          : definition.abilityIds.includes(
+                selectedClass.builder.defaultAbilityScoreImprovementAbility,
+              )
+            ? selectedClass.builder.defaultAbilityScoreImprovementAbility
+            : definition.abilityIds[0];
+      const cantripIds = fillSelections(
+        current?.cantripIds ?? [],
+        definition.cantrips.map((spell) => spell.id),
+        definition.cantripMaximum,
+      );
+      const levelOneSpellId = definition.levelOneSpells.some(
+        (spell) => spell.id === current?.levelOneSpellId,
+      )
+        ? (current?.levelOneSpellId ?? "")
+        : (definition.levelOneSpells[0]?.id ?? "");
+      if (ability === undefined) return [];
+      return [[featId, { ability, cantripIds, levelOneSpellId }]];
+    }),
+  );
+  return { ...draft, magicInitiateChoices: choices };
+}
+
+export function updateMagicInitiateSelection(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  featId: string,
+  selection: Partial<MagicInitiateSelection>,
+): CharacterBuilderDraft {
+  if (!magicInitiateFeatIds(draft, catalog).includes(featId)) return draft;
+  const current = draft.magicInitiateChoices[featId];
+  if (current === undefined) return reconcileMagicInitiateChoices(draft, catalog);
+  const definition = catalog.feats[featId]?.magicInitiate;
+  if (definition === undefined) return draft;
+  const requested = { ...current, ...selection };
+  const ability = definition.abilityIds.includes(requested.ability)
+    ? requested.ability
+    : current.ability;
+  const cantripIds = requested.cantripIds.filter(
+    (spellId, index) =>
+      definition.cantrips.some((spell) => spell.id === spellId) &&
+      requested.cantripIds.indexOf(spellId) === index,
+  );
+  const levelOneSpellId = definition.levelOneSpells.some(
+    (spell) => spell.id === requested.levelOneSpellId,
+  )
+    ? requested.levelOneSpellId
+    : current.levelOneSpellId;
+  return {
+    ...draft,
+    magicInitiateChoices: {
+      ...draft.magicInitiateChoices,
+      [featId]: { ability, cantripIds, levelOneSpellId },
+    },
+  };
+}
+
 export function updateBuilderBackground(
   draft: CharacterBuilderDraft,
   catalog: BuilderCatalog,
@@ -910,15 +1052,19 @@ export function updateBuilderBackground(
     classSkillIds,
     speciesSkillIds,
     originFeatSkillIds,
+    magicInitiateChoices: {},
   };
-  return {
-    ...reconciled,
-    expertiseSkillIds: fillSelections(
-      draft.expertiseSkillIds,
-      expertiseSkillCandidates(reconciled, catalog),
-      expertiseCount(reconciled, catalog),
-    ),
-  };
+  return reconcileMagicInitiateChoices(
+    {
+      ...reconciled,
+      expertiseSkillIds: fillSelections(
+        draft.expertiseSkillIds,
+        expertiseSkillCandidates(reconciled, catalog),
+        expertiseCount(reconciled, catalog),
+      ),
+    },
+    catalog,
+  );
 }
 
 export function featureChoiceCount(choice: ClassFeatureChoiceCatalog, level: number): number {
@@ -1217,6 +1363,7 @@ export function defaultBuilderDraft(
     classSkillIds,
     speciesSkillIds,
     originFeatSkillIds,
+    magicInitiateChoices: {},
     expertiseSkillIds: [],
     featureChoiceSelections,
     startingEquipmentOptionId: startingEquipmentOption.id,
@@ -1235,9 +1382,11 @@ export function defaultBuilderDraft(
       expertiseCount(initialDraft, catalog),
     ),
   };
-  return selectedClass.spellcasting === undefined
-    ? draft
-    : { ...draft, ...spellSelections(draft, catalog, level) };
+  const completedDraft =
+    selectedClass.spellcasting === undefined
+      ? draft
+      : { ...draft, ...spellSelections(draft, catalog, level) };
+  return reconcileMagicInitiateChoices(completedDraft, catalog);
 }
 
 export function updateBuilderLevel(
@@ -1286,9 +1435,12 @@ export function updateBuilderLevel(
       requiredExpertise,
     ),
   };
-  return selectedClass.spellcasting === undefined
-    ? next
-    : { ...next, ...spellSelections(next, catalog, level) };
+  return reconcileMagicInitiateChoices(
+    selectedClass.spellcasting === undefined
+      ? next
+      : { ...next, ...spellSelections(next, catalog, level) },
+    catalog,
+  );
 }
 
 export function updateBuilderFeatureChoice(
@@ -1457,6 +1609,31 @@ export function validateBuilderDraft(
   ];
   if (new Set(allSkills).size !== allSkills.length) {
     issues.push("Each selected skill proficiency must be unique.");
+  }
+  for (const featId of magicInitiateFeatIds(draft, catalog)) {
+    const feat = catalog.feats[featId];
+    const definition = feat?.magicInitiate;
+    const selection = draft.magicInitiateChoices[featId];
+    if (
+      definition === undefined ||
+      selection === undefined ||
+      !definition.abilityIds.includes(selection.ability) ||
+      selection.cantripIds.length !== definition.cantripMaximum ||
+      new Set(selection.cantripIds).size !== selection.cantripIds.length ||
+      selection.cantripIds.some(
+        (spellId) => !definition.cantrips.some((spell) => spell.id === spellId),
+      ) ||
+      !definition.levelOneSpells.some((spell) => spell.id === selection.levelOneSpellId)
+    ) {
+      issues.push(`Complete the ${feat?.name ?? featId} spell choices.`);
+    }
+  }
+  if (
+    Object.keys(draft.magicInitiateChoices).some(
+      (featId) => !magicInitiateFeatIds(draft, catalog).includes(featId),
+    )
+  ) {
+    issues.push("Remove Magic Initiate choices for feats this character does not have.");
   }
 
   for (const choice of selectedClass.featureChoices) {
@@ -1685,7 +1862,21 @@ function assembleCharacter(
       featAbilityScoreIncreases: draft.level >= 4 ? { [draft.asiAbility]: 2 } : {},
       featIds,
       learnedSpellIds: spellcaster ? draft.learnedSpellIds : [],
-      choices: [],
+      choices: magicInitiateFeatIds(draft, catalog).flatMap((featId) => {
+        const selection = draft.magicInitiateChoices[featId];
+        if (selection === undefined) return [];
+        return [
+          {
+            choiceId: `${featId}.choice.spellcasting-ability`,
+            optionIds: [`srd521.ability.${selection.ability}`],
+          },
+          { choiceId: `${featId}.choice.cantrips`, optionIds: selection.cantripIds },
+          {
+            choiceId: `${featId}.choice.level-one-spell`,
+            optionIds: [selection.levelOneSpellId],
+          },
+        ];
+      }),
       proficiencyChoices: {
         skills: [
           ...draft.classSkillIds.map((skillId) => ({ skillId, sourceId: draft.classId })),
