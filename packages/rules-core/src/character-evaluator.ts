@@ -240,6 +240,28 @@ const speciesBodySchema = z
     darkvisionRange: z.number().int().positive().optional(),
     damageResistances: z.array(z.string().min(1)).default([]),
     hitPointMaximumPerCharacterLevel: z.number().int().nonnegative().default(0),
+    choices: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            prompt: z.string().min(1),
+            minimum: z.number().int().nonnegative(),
+            maximum: z.number().int().nonnegative(),
+            options: z.array(
+              z
+                .object({
+                  id: z.string().min(1),
+                  name: z.string().min(1),
+                  damageType: z.string().min(1).optional(),
+                })
+                .passthrough(),
+            ),
+          })
+          .strict(),
+      )
+      .default([]),
+    resistanceFromChoiceId: z.string().min(1).optional(),
     conditionalRollEffects: z
       .array(
         z
@@ -258,6 +280,7 @@ const speciesBodySchema = z
           .object({
             id: z.string().min(1),
             maximum: z.union([z.number().int().positive(), z.literal("proficiency-bonus")]),
+            minimumLevel: z.number().int().positive().default(1),
             recharge: z.array(
               z
                 .object({
@@ -278,10 +301,29 @@ const speciesBodySchema = z
             actionEconomy: z.string().min(1),
             resourceId: z.string().min(1),
             spends: z.number().int().positive(),
+            minimumLevel: z.number().int().positive().default(1),
             sense: z.string().min(1).optional(),
             range: z.number().int().positive().optional(),
             duration: z.string().min(1).optional(),
             requirement: z.string().min(1).optional(),
+            effect: z.string().min(1).optional(),
+            damage: z
+              .object({
+                diceSize: z.number().int().positive(),
+                diceCountByLevel: z.record(z.string(), z.number().int().positive()),
+                typeFromChoiceId: z.string().min(1),
+              })
+              .strict()
+              .optional(),
+            savingThrow: z
+              .object({
+                ability: z.enum(abilities),
+                difficultyClassAbility: z.enum(abilities),
+              })
+              .strict()
+              .optional(),
+            areaOptions: z.array(z.string().min(1)).optional(),
+            halfDamageOnSave: z.boolean().optional(),
           })
           .passthrough(),
       )
@@ -3508,8 +3550,50 @@ function evaluateSpeciesTraits(
   body.damageResistances.forEach((damageType) => {
     state.resistances.add(damageType);
   });
+  const selectedSpeciesOptions = new Map<
+    string,
+    z.infer<typeof speciesBodySchema>["choices"][number]["options"][number]
+  >();
+  for (const choice of body.choices) {
+    const recorded = character.build.choices.filter(
+      (selection) => selection.choiceId === choice.id,
+    );
+    const optionIds = recorded[0]?.optionIds ?? [];
+    if (
+      recorded.length !== 1 ||
+      optionIds.length < choice.minimum ||
+      optionIds.length > choice.maximum ||
+      new Set(optionIds).size !== optionIds.length
+    ) {
+      addValidation(
+        state,
+        "SPECIES_CHOICE_COUNT_INVALID",
+        `${species.name.en ?? species.id} requires ${String(choice.minimum)} selection for ${choice.prompt}.`,
+        ["build.choices"],
+      );
+    }
+    for (const optionId of optionIds) {
+      const option = choice.options.find((candidate) => candidate.id === optionId);
+      if (option === undefined) {
+        addValidation(
+          state,
+          "SPECIES_CHOICE_OPTION_INVALID",
+          `${optionId} is not available for ${choice.prompt}.`,
+          ["build.choices"],
+        );
+      } else {
+        selectedSpeciesOptions.set(choice.id, option);
+      }
+    }
+  }
+  if (body.resistanceFromChoiceId !== undefined) {
+    const damageType = selectedSpeciesOptions.get(body.resistanceFromChoiceId)?.damageType;
+    if (damageType !== undefined) state.resistances.add(damageType);
+  }
   const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
+  const characterLevel = character.build.levels.length;
   for (const resource of body.resources) {
+    if (resource.minimumLevel > characterLevel) continue;
     const maximum = resource.maximum === "proficiency-bonus" ? proficiencyBonus : resource.maximum;
     const expended = character.state.expendedResources[resource.id] ?? 0;
     const current = Math.max(0, maximum - expended);
@@ -3566,24 +3650,72 @@ function evaluateSpeciesTraits(
     };
   }
   for (const action of body.actions) {
+    if (action.minimumLevel > characterLevel) continue;
     const resource = state.resources.find((candidate) => candidate.id === action.resourceId);
     const available = resource !== undefined && resource.current >= action.spends;
     const traceId = `${action.id}.available`;
+    const actionParameters: Record<string, JsonValue> = {
+      resourceId: action.resourceId,
+      spends: action.spends,
+      ...(action.effect === undefined ? {} : { effect: action.effect }),
+      ...(action.requirement === undefined ? {} : { requirement: action.requirement }),
+      ...(action.areaOptions === undefined ? {} : { areaOptions: action.areaOptions }),
+      ...(action.halfDamageOnSave === undefined
+        ? {}
+        : { halfDamageOnSave: action.halfDamageOnSave }),
+    };
+    if (action.sense !== undefined) {
+      actionParameters.effect = `${action.sense}${action.range === undefined ? "" : ` ${String(action.range)} feet`}${action.duration === undefined ? "" : ` for ${action.duration}`}`;
+    } else if (action.effect !== undefined && action.duration !== undefined) {
+      actionParameters.effect = `${action.effect} for ${action.duration}`;
+    }
+    if (action.damage !== undefined) {
+      const diceCount = Object.entries(action.damage.diceCountByLevel)
+        .filter(([level]) => Number(level) <= characterLevel)
+        .sort(([left], [right]) => Number(right) - Number(left))[0]?.[1];
+      const damageType = selectedSpeciesOptions.get(action.damage.typeFromChoiceId)?.damageType;
+      if (diceCount !== undefined && damageType !== undefined) {
+        actionParameters.damage = {
+          diceCount,
+          diceSize: action.damage.diceSize,
+          type: damageType,
+        };
+      }
+    }
+    if (action.savingThrow !== undefined) {
+      const abilityModifier = requireNumber(
+        state.facts[`ability.${action.savingThrow.difficultyClassAbility}.modifier`] ?? null,
+        `${action.id} difficulty class ability modifier`,
+      );
+      const difficultyClass = 8 + abilityModifier + proficiencyBonus;
+      const saveTraceId = `${action.id}.saveDifficultyClass`;
+      actionParameters.savingThrow = {
+        ability: action.savingThrow.ability,
+        difficultyClass,
+        traceId: saveTraceId,
+      };
+      state.facts[saveTraceId] = difficultyClass;
+      state.values[saveTraceId] = { value: difficultyClass, traceId: saveTraceId };
+      state.traces[saveTraceId] = {
+        id: saveTraceId,
+        result: difficultyClass,
+        nodes: [
+          {
+            id: `${saveTraceId}.sum`,
+            operation: "add-save-base-ability-and-proficiency",
+            inputs: [8, abilityModifier, proficiencyBonus],
+            output: difficultyClass,
+          },
+        ],
+        sourceReferences: sources,
+      };
+    }
     state.actions.push({
       id: action.id,
       available,
       reasons: available ? [] : [`${action.resourceId} has no uses remaining.`],
       actionEconomy: action.actionEconomy,
-      parameters: {
-        resourceId: action.resourceId,
-        spends: action.spends,
-        ...(action.sense === undefined
-          ? {}
-          : {
-              effect: `${action.sense}${action.range === undefined ? "" : ` ${String(action.range)} feet`}${action.duration === undefined ? "" : ` for ${action.duration}`}`,
-            }),
-        ...(action.requirement === undefined ? {} : { requirement: action.requirement }),
-      },
+      parameters: actionParameters,
       traceId,
     });
     state.traces[traceId] = {

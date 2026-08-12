@@ -423,6 +423,31 @@ export function CharacterBuilder({
                   </select>
                   <small>Walking speed {String(selectedSpecies.walkingSpeed)} feet.</small>
                 </label>
+                {selectedSpecies.choices.map((choice) => (
+                  <label className="builder-field compact-field" key={choice.id}>
+                    {choice.prompt}
+                    <select
+                      value={draft.speciesChoiceSelections[choice.id]?.[0] ?? ""}
+                      onChange={(event) => {
+                        setDraft((value) => ({
+                          ...value,
+                          speciesChoiceSelections: {
+                            ...value.speciesChoiceSelections,
+                            [choice.id]: [event.target.value],
+                          },
+                        }));
+                      }}
+                    >
+                      {choice.options.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.label}
+                          {option.description === undefined ? "" : ` · ${option.description}`}
+                        </option>
+                      ))}
+                    </select>
+                    <small>This permanent species choice is preserved when you level up.</small>
+                  </label>
+                ))}
               </div>
               {selectedSpecies.originFeatMaximum === 0 ? null : (
                 <div className="builder-choice-grid origin-feat-grid">

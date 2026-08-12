@@ -376,6 +376,182 @@
   },
   {
     "body": {
+      "actions": [
+        {
+          "actionEconomy": "replace-one-attack",
+          "areaOptions": [
+            "15-foot cone",
+            "30-foot by 5-foot line"
+          ],
+          "damage": {
+            "diceCountByLevel": {
+              "1": 1,
+              "11": 3,
+              "17": 4,
+              "5": 2
+            },
+            "diceSize": 10,
+            "typeFromChoiceId": "srd521.species.dragonborn.choice.draconic-ancestry"
+          },
+          "halfDamageOnSave": true,
+          "id": "srd521.action.dragonborn.breath-weapon",
+          "resourceId": "srd521.resource.dragonborn.breath-weapon",
+          "savingThrow": {
+            "ability": "dexterity",
+            "difficultyClassAbility": "constitution"
+          },
+          "spends": 1
+        },
+        {
+          "actionEconomy": "bonus-action",
+          "duration": "10 minutes",
+          "effect": "Fly Speed equal to Speed",
+          "id": "srd521.action.dragonborn.draconic-flight",
+          "minimumLevel": 5,
+          "resourceId": "srd521.resource.dragonborn.draconic-flight",
+          "spends": 1
+        }
+      ],
+      "choices": [
+        {
+          "id": "srd521.species.dragonborn.choice.draconic-ancestry",
+          "maximum": 1,
+          "minimum": 1,
+          "options": [
+            {
+              "damageType": "acid",
+              "id": "srd521.species.dragonborn.ancestry.black",
+              "name": "Black"
+            },
+            {
+              "damageType": "lightning",
+              "id": "srd521.species.dragonborn.ancestry.blue",
+              "name": "Blue"
+            },
+            {
+              "damageType": "fire",
+              "id": "srd521.species.dragonborn.ancestry.brass",
+              "name": "Brass"
+            },
+            {
+              "damageType": "lightning",
+              "id": "srd521.species.dragonborn.ancestry.bronze",
+              "name": "Bronze"
+            },
+            {
+              "damageType": "acid",
+              "id": "srd521.species.dragonborn.ancestry.copper",
+              "name": "Copper"
+            },
+            {
+              "damageType": "fire",
+              "id": "srd521.species.dragonborn.ancestry.gold",
+              "name": "Gold"
+            },
+            {
+              "damageType": "poison",
+              "id": "srd521.species.dragonborn.ancestry.green",
+              "name": "Green"
+            },
+            {
+              "damageType": "fire",
+              "id": "srd521.species.dragonborn.ancestry.red",
+              "name": "Red"
+            },
+            {
+              "damageType": "cold",
+              "id": "srd521.species.dragonborn.ancestry.silver",
+              "name": "Silver"
+            },
+            {
+              "damageType": "cold",
+              "id": "srd521.species.dragonborn.ancestry.white",
+              "name": "White"
+            }
+          ],
+          "prompt": "Choose a Draconic Ancestor"
+        }
+      ],
+      "creatureType": "humanoid",
+      "darkvisionRange": 60,
+      "resistanceFromChoiceId": "srd521.species.dragonborn.choice.draconic-ancestry",
+      "resources": [
+        {
+          "id": "srd521.resource.dragonborn.breath-weapon",
+          "maximum": "proficiency-bonus",
+          "recharge": [
+            {
+              "amount": "all",
+              "event": "long-rest"
+            }
+          ]
+        },
+        {
+          "id": "srd521.resource.dragonborn.draconic-flight",
+          "maximum": 1,
+          "minimumLevel": 5,
+          "recharge": [
+            {
+              "amount": "all",
+              "event": "long-rest"
+            }
+          ]
+        }
+      ],
+      "sizeOptions": [
+        "medium"
+      ],
+      "traitNames": [
+        "Draconic Ancestry",
+        "Breath Weapon",
+        "Damage Resistance",
+        "Darkvision",
+        "Draconic Flight"
+      ],
+      "traitsText": "Draconic Ancestry. Your lineage stems from a dragon progenitor. Choose the kind of dragon from the Draconic Ancestors table. Your choice affects your Breath Weapon and Damage Resistance traits as well as your appearance. Draconic Ancestors Dragon Damage Type Dragon Damage Type Black Acid Gold Fire Blue Lightning Green Poison Brass Fire Red Fire Bronze Lightning Silver Cold Copper Acid White Cold Breath Weapon. When you take the Attack action on your turn, you can replace one of your attacks with an exhalation of magical energy in either a 15-foot Cone or a 30-foot Line that is 5 feet wide (choose the shape each time). Each creature in that area must make a Dexterity saving throw (DC 8 plus your Constitution modifier and Proficiency Bonus). On a failed save, a creature takes 1d10 damage of the type determined by your Draconic Ancestry trait. On a successful save, a creature takes half as much damage. This damage increases by 1d10 when you reach character levels 5 (2d10), 11 (3d10), and 17 (4d10). You can use this Breath Weapon a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. Damage Resistance. You have Resistance to the damage type determined by your Draconic Ancestry trait. Darkvision. You have Darkvision with a range of 60 feet. Draconic Flight. When you reach character level 5, you can channel draconic magic to give yourself temporary flight. As a Bonus Action, you sprout spectral wings on your back that last for 10 minutes or until you retract the wings (no action required) or have the Incapacitated condition. During that time, you have a Fly Speed equal to your Speed. Your wings appear to be made of the same energy as your Breath Weapon. Once you use this trait, you can’t use it again until you finish a Long Rest.",
+      "walkingSpeed": 30
+    },
+    "id": "srd521.species.dragonborn",
+    "kind": "species",
+    "name": {
+      "en": "Dragonborn"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Dragonborn extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0084-b005",
+          "p0084-b006",
+          "p0084-b007",
+          "p0084-b008",
+          "p0084-b009",
+          "p0084-b010",
+          "p0084-b011",
+          "p0084-b012",
+          "p0084-b013",
+          "p0084-b014",
+          "p0084-b015"
+        ],
+        "page": 84,
+        "quoteHash": "59d7410d4f3dda65a73a0ed7db13bb1111dba963cd2d8f85c3075ebedb99987e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "species",
+      "humanoid",
+      "dragonborn"
+    ]
+  },
+  {
+    "body": {
       "category": "origin",
       "chooseDamageRoll": "either",
       "description": "You’ve trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",

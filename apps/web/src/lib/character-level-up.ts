@@ -100,6 +100,19 @@ export function magicInitiateSelections(
   );
 }
 
+function speciesChoiceSelections(
+  character: CharacterDocument,
+  species: BuilderCatalog["species"][string],
+): Readonly<Record<string, string[]>> {
+  return Object.fromEntries(
+    species.choices.map((choice) => [
+      choice.id,
+      character.build.choices.find((selection) => selection.choiceId === choice.id)?.optionIds ??
+        [],
+    ]),
+  );
+}
+
 function uniqueBySourceAndSkill<T extends { sourceId: string; skillId: string }>(values: T[]): T[] {
   return values.filter(
     (value, index) =>
@@ -221,6 +234,7 @@ export function createLevelUpDraft(
     speciesSkillIds: skills
       .filter((choice) => choice.sourceId === speciesId)
       .map((choice) => choice.skillId),
+    speciesChoiceSelections: speciesChoiceSelections(character, species),
     originFeatSkillIds: skills
       .filter((choice) => choice.sourceId === originFeatId)
       .map((choice) => choice.skillId),
@@ -334,6 +348,17 @@ function advancementIssues(
       issues.push(
         `Replace no more than ${String(replacementMaximum)} ${catalog.feats[featId]?.name ?? featId} spell during level up.`,
       );
+    }
+  }
+  const selectedSpecies = catalog.species[draft.speciesId];
+  if (selectedSpecies !== undefined) {
+    const currentSpeciesChoices = speciesChoiceSelections(character, selectedSpecies);
+    for (const choice of selectedSpecies.choices) {
+      const before = currentSpeciesChoices[choice.id] ?? [];
+      const after = draft.speciesChoiceSelections[choice.id] ?? [];
+      if (before.length !== after.length || before.some((optionId) => !after.includes(optionId))) {
+        issues.push(`${choice.prompt} cannot change during level up.`);
+      }
     }
   }
   return issues;

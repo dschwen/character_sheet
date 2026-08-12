@@ -21,6 +21,7 @@ BACKGROUND_IDS = {
 }
 HUMAN_ID = "srd521.species.human"
 DWARF_ID = "srd521.species.dwarf"
+DRAGONBORN_ID = "srd521.species.dragonborn"
 ALERT_ID = "srd521.feat.origin.alert"
 MAGIC_INITIATE_IDS = {
     "cleric": "srd521.feat.origin.magic-initiate.cleric",
@@ -33,6 +34,7 @@ ORIGIN_IDS = {
     *BACKGROUND_IDS.values(),
     HUMAN_ID,
     DWARF_ID,
+    DRAGONBORN_ID,
     ALERT_ID,
     *MAGIC_INITIATE_IDS.values(),
     SAVAGE_ATTACKER_ID,
@@ -224,6 +226,109 @@ def parse_dwarf(text: str) -> dict[str, Any]:
             }
         ],
         "traitNames": ["Darkvision", "Dwarven Resilience", "Dwarven Toughness", "Stonecunning"],
+        "traitsText": trait_text,
+    }
+
+
+def parse_dragonborn(text: str) -> dict[str, Any]:
+    creature_type = re.search(r"Creature Type: (?P<value>\w+)", text)
+    size = re.search(r"Size: (?P<value>Medium|Small)", text)
+    speed = re.search(r"Speed: (?P<value>\d+) feet", text)
+    traits = re.search(r"As a Dragonborn, you have these special traits\. (?P<value>.+)", text)
+    if creature_type is None or size is None or speed is None or traits is None:
+        raise ValueError("Dragonborn species does not match the expected fields")
+    trait_text = traits.group("value")
+    required_phrases = (
+        "Draconic Ancestry",
+        "Breath Weapon",
+        "DC 8 plus your Constitution modifier and Proficiency Bonus",
+        "number of times equal to your Proficiency Bonus",
+        "Damage Resistance",
+        "Darkvision with a range of 60 feet",
+        "Draconic Flight",
+        "character level 5",
+    )
+    if not all(phrase in trait_text for phrase in required_phrases):
+        raise ValueError("Dragonborn trait text is incomplete")
+    ancestors = [
+        ("black", "Black", "acid"),
+        ("blue", "Blue", "lightning"),
+        ("brass", "Brass", "fire"),
+        ("bronze", "Bronze", "lightning"),
+        ("copper", "Copper", "acid"),
+        ("gold", "Gold", "fire"),
+        ("green", "Green", "poison"),
+        ("red", "Red", "fire"),
+        ("silver", "Silver", "cold"),
+        ("white", "White", "cold"),
+    ]
+    return {
+        "creatureType": creature_type.group("value").casefold(),
+        "sizeOptions": [size.group("value").casefold()],
+        "walkingSpeed": int(speed.group("value")),
+        "darkvisionRange": 60,
+        "choices": [
+            {
+                "id": "srd521.species.dragonborn.choice.draconic-ancestry",
+                "prompt": "Choose a Draconic Ancestor",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": f"srd521.species.dragonborn.ancestry.{slug}",
+                        "name": name,
+                        "damageType": damage_type,
+                    }
+                    for slug, name, damage_type in ancestors
+                ],
+            }
+        ],
+        "resistanceFromChoiceId": "srd521.species.dragonborn.choice.draconic-ancestry",
+        "resources": [
+            {
+                "id": "srd521.resource.dragonborn.breath-weapon",
+                "maximum": "proficiency-bonus",
+                "recharge": [{"event": "long-rest", "amount": "all"}],
+            },
+            {
+                "id": "srd521.resource.dragonborn.draconic-flight",
+                "maximum": 1,
+                "minimumLevel": 5,
+                "recharge": [{"event": "long-rest", "amount": "all"}],
+            },
+        ],
+        "actions": [
+            {
+                "id": "srd521.action.dragonborn.breath-weapon",
+                "actionEconomy": "replace-one-attack",
+                "resourceId": "srd521.resource.dragonborn.breath-weapon",
+                "spends": 1,
+                "damage": {
+                    "diceSize": 10,
+                    "diceCountByLevel": {"1": 1, "5": 2, "11": 3, "17": 4},
+                    "typeFromChoiceId": "srd521.species.dragonborn.choice.draconic-ancestry",
+                },
+                "savingThrow": {"ability": "dexterity", "difficultyClassAbility": "constitution"},
+                "areaOptions": ["15-foot cone", "30-foot by 5-foot line"],
+                "halfDamageOnSave": True,
+            },
+            {
+                "id": "srd521.action.dragonborn.draconic-flight",
+                "actionEconomy": "bonus-action",
+                "resourceId": "srd521.resource.dragonborn.draconic-flight",
+                "spends": 1,
+                "minimumLevel": 5,
+                "effect": "Fly Speed equal to Speed",
+                "duration": "10 minutes",
+            },
+        ],
+        "traitNames": [
+            "Draconic Ancestry",
+            "Breath Weapon",
+            "Damage Resistance",
+            "Darkvision",
+            "Draconic Flight",
+        ],
         "traitsText": trait_text,
     }
 
@@ -421,6 +526,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     }
     human_nodes = _section(nodes, "Human", "Orc")
     dwarf_nodes = _section(nodes, "Dwarf", "Elf")
+    dragonborn_nodes = _section(nodes, "Dragonborn", "Dwarf")
     alert_nodes = _section(nodes, "Alert", "Magic Initiate")
     magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
@@ -452,6 +558,14 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         ["species", "humanoid", "dwarf"],
         _source_spans(dwarf_nodes),
         parse_dwarf(_text(dwarf_nodes)),
+    )
+    dragonborn = _entity(
+        DRAGONBORN_ID,
+        "species",
+        "Dragonborn",
+        ["species", "humanoid", "dragonborn"],
+        _source_spans(dragonborn_nodes),
+        parse_dragonborn(_text(dragonborn_nodes)),
     )
     alert_source = _source_spans(alert_nodes)
     alert = _entity(
@@ -499,6 +613,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         *backgrounds,
         human,
         dwarf,
+        dragonborn,
         savage_attacker,
         skilled,
         alert,
@@ -529,7 +644,8 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
         "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
-        "Warlock, and Wizard through level 5; all four SRD backgrounds; Human and Dwarf; equipment; "
+        "Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, and "
+        "Dragonborn; equipment; "
         "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
@@ -538,6 +654,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "backgrounds": {entity["id"]: entity["body"] for entity in backgrounds},
         "human": human["body"],
         "dwarf": dwarf["body"],
+        "dragonborn": dragonborn["body"],
         "originFeats": {
             ALERT_ID: alert["body"],
             **{entity["id"]: entity["body"] for entity in magic_initiates},

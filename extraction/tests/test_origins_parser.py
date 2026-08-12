@@ -2,6 +2,7 @@ import pytest
 
 from srd_extract.origins import (
     parse_background,
+    parse_dragonborn,
     parse_dwarf,
     parse_human,
     parse_origin_feat,
@@ -110,6 +111,30 @@ def test_parse_dwarf_species() -> None:
     assert body["hitPointMaximumPerCharacterLevel"] == 1
     assert body["resources"][0]["maximum"] == "proficiency-bonus"
     assert body["actions"][0]["sense"] == "tremorsense"
+
+
+def test_parse_dragonborn_species() -> None:
+    body = parse_dragonborn(
+        "Dragonborn Creature Type: Humanoid Size: Medium (about 5–7 feet tall) Speed: 30 feet "
+        "As a Dragonborn, you have these special traits. Draconic Ancestry. Choose the kind of "
+        "dragon. Breath Weapon. The save DC is DC 8 plus your Constitution modifier and "
+        "Proficiency Bonus. You can use this Breath Weapon a number of times equal to your "
+        "Proficiency Bonus. Damage Resistance. You have Resistance to the chosen damage type. "
+        "Darkvision. You have Darkvision with a range of 60 feet. Draconic Flight. When you reach "
+        "character level 5, you gain temporary flight."
+    )
+
+    choice = body["choices"][0]
+    assert len(choice["options"]) == 10
+    assert {option["damageType"] for option in choice["options"]} == {
+        "acid",
+        "cold",
+        "fire",
+        "lightning",
+        "poison",
+    }
+    assert body["actions"][0]["damage"]["diceCountByLevel"]["5"] == 2
+    assert body["actions"][1]["minimumLevel"] == 5
 
 
 def test_parse_origin_feats_rejects_incomplete_benefits() -> None:

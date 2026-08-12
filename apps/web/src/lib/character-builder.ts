@@ -78,6 +78,7 @@ export interface CharacterBuilderDraft {
   asiAbility: Ability;
   classSkillIds: string[];
   speciesSkillIds: string[];
+  speciesChoiceSelections: Readonly<Record<string, string[]>>;
   originFeatSkillIds: string[];
   magicInitiateChoices: Readonly<Record<string, MagicInitiateSelection>>;
   expertiseSkillIds: string[];
@@ -134,6 +135,15 @@ export interface SpeciesBuilderCatalog {
   originFeatMinimum: number;
   originFeatMaximum: number;
   traitNames: string[];
+  choices: SpeciesChoiceCatalog[];
+}
+
+export interface SpeciesChoiceCatalog {
+  id: string;
+  prompt: string;
+  minimum: number;
+  maximum: number;
+  options: BuilderChoiceOption[];
 }
 
 export interface BackgroundBuilderCatalog {
@@ -660,6 +670,40 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
           .filter((size): size is SpeciesSize => size !== undefined);
         const walkingSpeed = numericValue(body?.walkingSpeed);
         const traitNames = stringArray(body?.traitNames);
+        const choices = Array.isArray(body?.choices)
+          ? body.choices.flatMap((value) => {
+              const choice = objectValue(value);
+              if (
+                typeof choice?.id !== "string" ||
+                typeof choice.prompt !== "string" ||
+                !Array.isArray(choice.options)
+              ) {
+                return [];
+              }
+              const options = choice.options.flatMap((optionValue) => {
+                const option = objectValue(optionValue);
+                if (typeof option?.id !== "string" || typeof option.name !== "string") return [];
+                return [
+                  {
+                    id: option.id,
+                    label: option.name,
+                    ...(typeof option.damageType === "string"
+                      ? { description: `${titleCase(option.damageType)} damage` }
+                      : {}),
+                  },
+                ];
+              });
+              return [
+                {
+                  id: choice.id,
+                  prompt: choice.prompt,
+                  minimum: numericValue(choice.minimum),
+                  maximum: numericValue(choice.maximum),
+                  options,
+                },
+              ];
+            })
+          : [];
         return [
           candidate.id,
           {
@@ -676,6 +720,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
             originFeatMinimum: numericValue(originFeatChoice?.minimum),
             originFeatMaximum: numericValue(originFeatChoice?.maximum),
             traitNames,
+            choices,
           },
         ];
       }),
@@ -1162,6 +1207,20 @@ export function updateBuilderSpecies(
       ? draft.speciesSize
       : (species.sizeOptions[0] ?? "medium"),
     speciesSkillIds,
+    speciesChoiceSelections: Object.fromEntries(
+      species.choices.map((choice) => {
+        const current =
+          draft.speciesId === species.id ? draft.speciesChoiceSelections[choice.id] : [];
+        return [
+          choice.id,
+          fillSelections(
+            current ?? [],
+            choice.options.map((option) => option.id),
+            choice.maximum,
+          ),
+        ];
+      }),
+    ),
     originFeatId: originFeat?.id ?? "",
     originFeatSkillIds,
     magicInitiateChoices: {},
@@ -1474,6 +1533,12 @@ export function defaultBuilderDraft(
     asiAbility: selectedClass.builder.defaultAbilityScoreImprovementAbility,
     classSkillIds,
     speciesSkillIds,
+    speciesChoiceSelections: Object.fromEntries(
+      species.choices.map((choice) => [
+        choice.id,
+        choice.options.slice(0, choice.maximum).map((option) => option.id),
+      ]),
+    ),
     originFeatSkillIds,
     magicInitiateChoices: {},
     expertiseSkillIds: [],
@@ -1681,6 +1746,24 @@ export function validateBuilderDraft(
       selectedOriginFeatOption?.disabledReason !== undefined)
   ) {
     issues.push("Choose an eligible Origin feat granted by your species.");
+  }
+  for (const choice of selectedSpecies?.choices ?? []) {
+    const selections = draft.speciesChoiceSelections[choice.id] ?? [];
+    if (
+      selections.length < choice.minimum ||
+      selections.length > choice.maximum ||
+      new Set(selections).size !== selections.length ||
+      selections.some((optionId) => !choice.options.some((option) => option.id === optionId))
+    ) {
+      issues.push(`Complete the ${choice.prompt} species choice.`);
+    }
+  }
+  if (
+    Object.keys(draft.speciesChoiceSelections).some(
+      (choiceId) => !selectedSpecies?.choices.some((choice) => choice.id === choiceId),
+    )
+  ) {
+    issues.push("Remove choices belonging to a different species.");
   }
   if (
     selectedSpecies?.originFeatMaximum === 0 &&
@@ -1982,21 +2065,27 @@ function assembleCharacter(
       featAbilityScoreIncreases: draft.level >= 4 ? { [draft.asiAbility]: 2 } : {},
       featIds,
       learnedSpellIds: spellcaster ? draft.learnedSpellIds : [],
-      choices: magicInitiateFeatIds(draft, catalog).flatMap((featId) => {
-        const selection = draft.magicInitiateChoices[featId];
-        if (selection === undefined) return [];
-        return [
-          {
-            choiceId: `${featId}.choice.spellcasting-ability`,
-            optionIds: [`srd521.ability.${selection.ability}`],
-          },
-          { choiceId: `${featId}.choice.cantrips`, optionIds: selection.cantripIds },
-          {
-            choiceId: `${featId}.choice.level-one-spell`,
-            optionIds: [selection.levelOneSpellId],
-          },
-        ];
-      }),
+      choices: [
+        ...selectedSpecies.choices.map((choice) => ({
+          choiceId: choice.id,
+          optionIds: draft.speciesChoiceSelections[choice.id] ?? [],
+        })),
+        ...magicInitiateFeatIds(draft, catalog).flatMap((featId) => {
+          const selection = draft.magicInitiateChoices[featId];
+          if (selection === undefined) return [];
+          return [
+            {
+              choiceId: `${featId}.choice.spellcasting-ability`,
+              optionIds: [`srd521.ability.${selection.ability}`],
+            },
+            { choiceId: `${featId}.choice.cantrips`, optionIds: selection.cantripIds },
+            {
+              choiceId: `${featId}.choice.level-one-spell`,
+              optionIds: [selection.levelOneSpellId],
+            },
+          ];
+        }),
+      ],
       proficiencyChoices: {
         skills: [
           ...draft.classSkillIds.map((skillId) => ({ skillId, sourceId: draft.classId })),

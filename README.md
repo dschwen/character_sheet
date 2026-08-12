@@ -391,7 +391,8 @@ Eldritch Invocations and their prerequisites, and all five Fiend Patron features
 source-linked representative spells and authoring IR for Magical Cunning’s limited Pact-slot
 recovery.
 
-Generate all four SRD backgrounds, Human, Dwarf, and the Origin feat slice from pages 83–87:
+Generate all four SRD backgrounds, Human, Dwarf, Dragonborn, and the Origin feat slice from pages
+83–87:
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
@@ -405,9 +406,11 @@ Generate all four SRD backgrounds, Human, Dwarf, and the Origin feat slice from 
   --output packages/content-srd-5.2.1/generated
 ```
 
-This parser generates typed Acolyte, Criminal, Sage, Soldier, Human, Dwarf, Alert, Savage Attacker,
-Skilled, and Cleric/Druid/Wizard Magic Initiate entities. It also generates sheet-automated Alert
-Initiative and roll-assisted Savage Attacker authoring IR.
+This parser generates typed Acolyte, Criminal, Sage, Soldier, Human, Dwarf, Dragonborn, Alert,
+Savage Attacker, Skilled, and Cleric/Druid/Wizard Magic Initiate entities. Dragonborn includes a
+data-driven Draconic Ancestry selection, its matching resistance and Breath Weapon, Darkvision,
+and level-5 Draconic Flight. The parser also generates sheet-automated Alert Initiative and
+roll-assisted Savage Attacker authoring IR.
 
 Generate structured weapon, armor, adventuring-gear, and ammunition entities from SRD pages 91–92
 and 95–96:

@@ -527,6 +527,38 @@ describe("guided character level up", () => {
     );
   });
 
+  it("preserves a Dragonborn's Draconic Ancestry during level up", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const choiceId = "srd521.species.dragonborn.choice.draconic-ancestry";
+    const greenId = "srd521.species.dragonborn.ancestry.green";
+    const redId = "srd521.species.dragonborn.ancestry.red";
+    const originalDraft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 1, "Green Dragonborn"),
+      catalog,
+      "srd521.species.dragonborn",
+    );
+    originalDraft.speciesChoiceSelections = { [choiceId]: [greenId] };
+    const original = buildCharacter(originalDraft, rulesPackage, initialOptions);
+    const draft = createLevelUpDraft(original, catalog);
+
+    expect(draft.speciesChoiceSelections).toEqual({ [choiceId]: [greenId] });
+    expect(
+      previewLevelUp(original, draft, rulesPackage, {
+        id: original.id,
+        now: new Date("2026-08-10T13:00:00.000Z"),
+      }).issues,
+    ).toEqual([]);
+
+    draft.speciesChoiceSelections = { [choiceId]: [redId] };
+    expect(
+      previewLevelUp(original, draft, rulesPackage, {
+        id: original.id,
+        now: new Date("2026-08-10T14:00:00.000Z"),
+      }).issues,
+    ).toContain("Choose a Draconic Ancestor cannot change during level up.");
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

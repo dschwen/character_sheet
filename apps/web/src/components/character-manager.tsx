@@ -87,6 +87,11 @@ interface ActionRequirements {
   diceCount?: number;
   diceSize?: number;
   minimumSpend?: number;
+  damageDiceCount?: number;
+  damageDiceSize?: number;
+  damageType?: string;
+  saveAbility?: string;
+  saveDifficultyClass?: number;
 }
 
 interface CastFeedback {
@@ -109,11 +114,28 @@ function actionRequirements(action: ActionSummary): ActionRequirements {
   const diceCount = healing?.diceCount;
   const diceSize = healing?.diceSize;
   const minimumSpend = variableSpend?.minimum;
+  const damage = objectValue(action.parameters?.damage);
+  const savingThrow = objectValue(action.parameters?.savingThrow);
   return {
     ...(typeof diceCount === "number" ? { diceCount } : {}),
     ...(typeof diceSize === "number" ? { diceSize } : {}),
     ...(typeof minimumSpend === "number" ? { minimumSpend } : {}),
+    ...(typeof damage?.diceCount === "number" ? { damageDiceCount: damage.diceCount } : {}),
+    ...(typeof damage?.diceSize === "number" ? { damageDiceSize: damage.diceSize } : {}),
+    ...(typeof damage?.type === "string" ? { damageType: damage.type } : {}),
+    ...(typeof savingThrow?.ability === "string" ? { saveAbility: savingThrow.ability } : {}),
+    ...(typeof savingThrow?.difficultyClass === "number"
+      ? { saveDifficultyClass: savingThrow.difficultyClass }
+      : {}),
   };
+}
+
+function actionDamageLabel(action: ActionSummary): string {
+  const requirements = actionRequirements(action);
+  if (requirements.damageDiceCount === undefined || requirements.damageDiceSize === undefined) {
+    return "";
+  }
+  return ` · ${String(requirements.damageDiceCount)}d${String(requirements.damageDiceSize)} ${requirements.damageType ?? "damage"}`;
 }
 
 function supportsStateTransition(action: ActionSummary): boolean {
@@ -1118,6 +1140,31 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               </small>
                             </span>
                             <div className="action-inputs">
+                              {requirements.damageDiceCount === undefined ||
+                              requirements.damageDiceSize === undefined ? null : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setLatestRoll(
+                                      rollDice({
+                                        label: `${names.get(action.id) ?? shortEntityName(action.id)} · ${titleCase(requirements.damageType ?? "damage")}`,
+                                        diceCount: requirements.damageDiceCount ?? 1,
+                                        diceSize: requirements.damageDiceSize ?? 10,
+                                      }),
+                                    );
+                                  }}
+                                >
+                                  Roll {String(requirements.damageDiceCount)}d
+                                  {String(requirements.damageDiceSize)} {requirements.damageType}
+                                </button>
+                              )}
+                              {requirements.saveAbility === undefined ||
+                              requirements.saveDifficultyClass === undefined ? null : (
+                                <span>
+                                  {requirements.saveAbility.slice(0, 3).toUpperCase()} save · DC{" "}
+                                  {String(requirements.saveDifficultyClass)}
+                                </span>
+                              )}
                               {requirements.diceCount === undefined ? null : (
                                 <label>
                                   Rolls
@@ -1937,6 +1984,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             {typeof action.parameters?.effect === "string"
                               ? ` · ${titleCase(action.parameters.effect)}`
                               : ""}
+                            {actionDamageLabel(action)}
                           </small>
                         </span>
                         <i className={action.available ? "ready" : "blocked"}>

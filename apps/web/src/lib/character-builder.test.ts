@@ -1312,6 +1312,93 @@ describe("guided character builder", () => {
     expect(rest.nextState.expendedResources["srd521.resource.dwarf.stonecunning"]).toBe(0);
   });
 
+  it("builds Dragonborn ancestry-driven resistance, Breath Weapon, and level-5 flight", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const speciesId = "srd521.species.dragonborn";
+    const choiceId = "srd521.species.dragonborn.choice.draconic-ancestry";
+    const greenId = "srd521.species.dragonborn.ancestry.green";
+    const levelOneDraft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 1, "Green Dragonborn"),
+      catalog,
+      speciesId,
+    );
+    levelOneDraft.speciesChoiceSelections = { [choiceId]: [greenId] };
+
+    expect(catalog.species[speciesId]?.choices[0]).toMatchObject({
+      id: choiceId,
+      minimum: 1,
+      maximum: 1,
+    });
+    expect(catalog.species[speciesId]?.choices[0]?.options).toHaveLength(10);
+    expect(validateBuilderDraft(levelOneDraft, catalog)).toEqual([]);
+    expect(
+      validateBuilderDraft(
+        { ...levelOneDraft, speciesChoiceSelections: { [choiceId]: [] } },
+        catalog,
+      ),
+    ).toContain("Complete the Choose a Draconic Ancestor species choice.");
+
+    const levelOne = buildCharacter(levelOneDraft, rulesPackage, options);
+    const levelOneEvaluation = evaluateCharacter({ character: levelOne, packages: [rulesPackage] });
+    const breath = levelOneEvaluation.actions.find(
+      (action) => action.id === "srd521.action.dragonborn.breath-weapon",
+    );
+
+    expect(levelOne.build.choices).toContainEqual({ choiceId, optionIds: [greenId] });
+    expect(
+      levelOneEvaluation.validations.filter((message) => message.severity === "error"),
+    ).toEqual([]);
+    expect(levelOneEvaluation.resistances).toContain("poison");
+    expect(levelOneEvaluation.facts["sense.darkvision.range"]).toBe(60);
+    expect(levelOneEvaluation.resources).toContainEqual(
+      expect.objectContaining({ id: "srd521.resource.dragonborn.breath-weapon", maximum: 2 }),
+    );
+    expect(levelOneEvaluation.resources).not.toContainEqual(
+      expect.objectContaining({ id: "srd521.resource.dragonborn.draconic-flight" }),
+    );
+    expect(breath?.parameters).toMatchObject({
+      damage: { diceCount: 1, diceSize: 10, type: "poison" },
+      savingThrow: { ability: "dexterity", difficultyClass: 12 },
+      areaOptions: ["15-foot cone", "30-foot by 5-foot line"],
+      halfDamageOnSave: true,
+    });
+    const invalidCharacter = structuredClone(levelOne);
+    invalidCharacter.build.choices = invalidCharacter.build.choices.filter(
+      (choice) => choice.choiceId !== choiceId,
+    );
+    expect(
+      evaluateCharacter({ character: invalidCharacter, packages: [rulesPackage] }).validations,
+    ).toContainEqual(expect.objectContaining({ code: "SPECIES_CHOICE_COUNT_INVALID" }));
+    const use = proposeAction(
+      { character: levelOne, packages: [rulesPackage] },
+      { actionId: "srd521.action.dragonborn.breath-weapon" },
+    );
+    expect(use.applicable).toBe(true);
+    expect(use.nextState.expendedResources["srd521.resource.dragonborn.breath-weapon"]).toBe(1);
+
+    const levelFiveDraft = updateBuilderLevel(levelOneDraft, catalog, 5);
+    const levelFive = buildCharacter(levelFiveDraft, rulesPackage, options);
+    const levelFiveEvaluation = evaluateCharacter({
+      character: levelFive,
+      packages: [rulesPackage],
+    });
+    expect(
+      levelFiveEvaluation.actions.find(
+        (action) => action.id === "srd521.action.dragonborn.breath-weapon",
+      )?.parameters?.damage,
+    ).toMatchObject({ diceCount: 2, diceSize: 10, type: "poison" });
+    expect(levelFiveEvaluation.actions).toContainEqual(
+      expect.objectContaining({ id: "srd521.action.dragonborn.draconic-flight", available: true }),
+    );
+    expect(levelFiveEvaluation.resources).toContainEqual(
+      expect.objectContaining({
+        id: "srd521.resource.dragonborn.draconic-flight",
+        maximum: 1,
+      }),
+    );
+  });
+
   it("migrates Magic Initiate defaults into characters saved before spell choices", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
