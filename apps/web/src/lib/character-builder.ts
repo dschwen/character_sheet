@@ -133,6 +133,7 @@ export interface SpeciesBuilderCatalog {
   skillMaximum: number;
   originFeatMinimum: number;
   originFeatMaximum: number;
+  traitNames: string[];
 }
 
 export interface BackgroundBuilderCatalog {
@@ -658,12 +659,13 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
           .map(speciesSizeValue)
           .filter((size): size is SpeciesSize => size !== undefined);
         const walkingSpeed = numericValue(body?.walkingSpeed);
+        const traitNames = stringArray(body?.traitNames);
         return [
           candidate.id,
           {
             id: candidate.id,
             name: localizedName(candidate),
-            description: `${shortEntityName(typeof body?.creatureType === "string" ? body.creatureType : "creature")} · ${String(walkingSpeed)}-foot speed · ${sizeOptions.map(shortEntityName).join(" or ")} size.`,
+            description: `${shortEntityName(typeof body?.creatureType === "string" ? body.creatureType : "creature")} · ${String(walkingSpeed)}-foot speed · ${sizeOptions.map(shortEntityName).join(" or ")} size${traitNames.length === 0 ? "." : ` · ${traitNames.join(", ")}.`}`,
             walkingSpeed,
             sizeOptions,
             ...(typeof body?.recommendedOriginFeatId === "string"
@@ -673,6 +675,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
             skillMaximum: numericValue(skillChoice?.maximum),
             originFeatMinimum: numericValue(originFeatChoice?.minimum),
             originFeatMaximum: numericValue(originFeatChoice?.maximum),
+            traitNames,
           },
         ];
       }),
@@ -1057,14 +1060,17 @@ export function updateBuilderBackground(
   const currentOriginFeatIsEligible =
     currentOriginFeat !== undefined &&
     (currentOriginFeat.id !== background.featId || currentOriginFeat.repeatable);
-  const originFeat = currentOriginFeatIsEligible
-    ? currentOriginFeat
-    : (originFeats.find(
-        (feat) =>
-          feat.id === species.recommendedOriginFeatId &&
-          (feat.id !== background.featId || feat.repeatable),
-      ) ?? originFeats.find((feat) => feat.id !== background.featId || feat.repeatable));
-  if (originFeat === undefined) return draft;
+  const originFeat =
+    species.originFeatMaximum === 0
+      ? undefined
+      : currentOriginFeatIsEligible
+        ? currentOriginFeat
+        : (originFeats.find(
+            (feat) =>
+              feat.id === species.recommendedOriginFeatId &&
+              (feat.id !== background.featId || feat.repeatable),
+          ) ?? originFeats.find((feat) => feat.id !== background.featId || feat.repeatable));
+  if (species.originFeatMaximum > 0 && originFeat === undefined) return draft;
 
   const classSkillIds = fillSelections(
     draft.classSkillIds,
@@ -1080,22 +1086,83 @@ export function updateBuilderBackground(
     species.skillMaximum,
   );
   const originFeatSkillIds = fillSelections(
-    originFeat.id === draft.originFeatId ? draft.originFeatSkillIds : [],
+    originFeat?.id === draft.originFeatId ? draft.originFeatSkillIds : [],
     allSkillCandidates.filter(
       (id) =>
         !background.skillIds.includes(id) &&
         !classSkillIds.includes(id) &&
         !speciesSkillIds.includes(id),
     ),
-    originFeat.skillMaximum,
+    originFeat?.skillMaximum ?? 0,
   );
   const reconciled = {
     ...draft,
     backgroundId: background.id,
     backgroundAbilityScoreIncreases: { ...abilityOption },
-    originFeatId: originFeat.id,
+    originFeatId: originFeat?.id ?? "",
     classSkillIds,
     speciesSkillIds,
+    originFeatSkillIds,
+    magicInitiateChoices: {},
+  };
+  return reconcileMagicInitiateChoices(
+    {
+      ...reconciled,
+      expertiseSkillIds: fillSelections(
+        draft.expertiseSkillIds,
+        expertiseSkillCandidates(reconciled, catalog),
+        expertiseCount(reconciled, catalog),
+      ),
+    },
+    catalog,
+  );
+}
+
+export function updateBuilderSpecies(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  speciesId: string,
+): CharacterBuilderDraft {
+  const species = catalog.species[speciesId];
+  const background = catalog.backgrounds[draft.backgroundId];
+  if (species === undefined || background === undefined) return draft;
+  const allSkillCandidates = skillIds.map((skill) => `${skillPrefix}${skill}`);
+  const speciesSkillIds = fillSelections(
+    draft.speciesSkillIds,
+    allSkillCandidates.filter(
+      (id) => !background.skillIds.includes(id) && !draft.classSkillIds.includes(id),
+    ),
+    species.skillMaximum,
+  );
+  const originFeats = Object.values(catalog.feats).filter(
+    (feat) => feat.category === "origin" && (feat.id !== background.featId || feat.repeatable),
+  );
+  const currentOriginFeat = catalog.feats[draft.originFeatId];
+  const originFeat =
+    species.originFeatMaximum === 0
+      ? undefined
+      : currentOriginFeat !== undefined && originFeats.includes(currentOriginFeat)
+        ? currentOriginFeat
+        : (originFeats.find((feat) => feat.id === species.recommendedOriginFeatId) ??
+          originFeats[0]);
+  const originFeatSkillIds = fillSelections(
+    originFeat?.id === draft.originFeatId ? draft.originFeatSkillIds : [],
+    allSkillCandidates.filter(
+      (id) =>
+        !background.skillIds.includes(id) &&
+        !draft.classSkillIds.includes(id) &&
+        !speciesSkillIds.includes(id),
+    ),
+    originFeat?.skillMaximum ?? 0,
+  );
+  const reconciled = {
+    ...draft,
+    speciesId: species.id,
+    speciesSize: species.sizeOptions.includes(draft.speciesSize)
+      ? draft.speciesSize
+      : (species.sizeOptions[0] ?? "medium"),
+    speciesSkillIds,
+    originFeatId: originFeat?.id ?? "",
     originFeatSkillIds,
     magicInitiateChoices: {},
   };
@@ -1608,10 +1675,18 @@ export function validateBuilderDraft(
     (option) => option.id === draft.originFeatId,
   );
   if (
-    selectedOriginFeat?.category !== "origin" ||
-    selectedOriginFeatOption?.disabledReason !== undefined
+    selectedSpecies !== undefined &&
+    selectedSpecies.originFeatMaximum > 0 &&
+    (selectedOriginFeat?.category !== "origin" ||
+      selectedOriginFeatOption?.disabledReason !== undefined)
   ) {
     issues.push("Choose an eligible Origin feat granted by your species.");
+  }
+  if (
+    selectedSpecies?.originFeatMaximum === 0 &&
+    (draft.originFeatId.length > 0 || draft.originFeatSkillIds.length > 0)
+  ) {
+    issues.push(`${selectedSpecies.name} does not grant an additional Origin feat.`);
   }
   const requiredClassSkills = classSkillCount(draft, catalog);
   if (
@@ -1799,7 +1874,7 @@ function assembleCharacter(
   if (
     selectedSpecies === undefined ||
     selectedBackground === undefined ||
-    selectedOriginFeat === undefined ||
+    (selectedSpecies.originFeatMaximum > 0 && selectedOriginFeat === undefined) ||
     equipmentOption === undefined
   ) {
     throw new Error("Selected builder metadata is missing.");
@@ -1845,7 +1920,7 @@ function assembleCharacter(
       ...selectedClass.builder.defaultGrantedFeatIds,
       ...selectedFeatureFeatIds,
       selectedBackground.featId,
-      selectedOriginFeat.id,
+      ...(selectedOriginFeat === undefined ? [] : [selectedOriginFeat.id]),
     ]),
   ];
   if (draft.level >= 4) featIds.push(abilityScoreImprovementId);
@@ -1929,10 +2004,12 @@ function assembleCharacter(
             skillId,
             sourceId: selectedSpecies.id,
           })),
-          ...draft.originFeatSkillIds.map((skillId) => ({
-            skillId,
-            sourceId: selectedOriginFeat.id,
-          })),
+          ...(selectedOriginFeat === undefined
+            ? []
+            : draft.originFeatSkillIds.map((skillId) => ({
+                skillId,
+                sourceId: selectedOriginFeat.id,
+              }))),
         ],
         expertise:
           selectedClass.builder.expertiseChoice !== undefined &&

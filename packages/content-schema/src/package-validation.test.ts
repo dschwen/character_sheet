@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(553);
+    expect(parsedEntities).toHaveLength(554);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -436,7 +436,7 @@ describe("bootstrap content package", () => {
     expect(authoringIr.filter((ir) => ir.kind === "subclass-feature")).toHaveLength(2);
   });
 
-  it("validates all SRD backgrounds, Human, and the modeled Origin feats", () => {
+  it("validates all SRD backgrounds, Human, Dwarf, and the modeled Origin feats", () => {
     const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
     const entities = contentEntitySchema
       .array()
@@ -454,6 +454,7 @@ describe("bootstrap content package", () => {
       "srd521.background.criminal",
       "srd521.background.sage",
       "srd521.species.human",
+      "srd521.species.dwarf",
       "srd521.feat.origin.savage-attacker",
       "srd521.feat.origin.skilled",
       "srd521.feat.origin.alert",
@@ -462,7 +463,7 @@ describe("bootstrap content package", () => {
       "srd521.feat.origin.magic-initiate.wizard",
     ]);
     expect(entities.map((entity) => entity.source[0]?.page)).toEqual([
-      83, 83, 83, 83, 86, 87, 87, 87, 87, 87, 87,
+      83, 83, 83, 83, 86, 84, 87, 87, 87, 87, 87, 87,
     ]);
     expect(savageAttacker.proposedRules[0]).toMatchObject({
       type: "grant-action",

@@ -1109,6 +1109,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   ? "Special action"
                                   : titleCase(action.actionEconomy)}{" "}
                                 · {action.available ? "Ready" : "Unavailable"}
+                                {typeof action.parameters?.effect === "string"
+                                  ? ` · ${titleCase(action.parameters.effect)}`
+                                  : ""}
+                                {typeof action.parameters?.requirement === "string"
+                                  ? ` · Requires ${action.parameters.requirement}`
+                                  : ""}
                               </small>
                             </span>
                             <div className="action-inputs">
@@ -1380,6 +1386,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         {evaluation.resistances.length === 0
                           ? "None"
                           : evaluation.resistances.map(titleCase).join(", ")}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Darkvision</dt>
+                      <dd>
+                        {typeof evaluation.facts["sense.darkvision.range"] === "number"
+                          ? `${String(evaluation.facts["sense.darkvision.range"])} feet`
+                          : "None"}
                       </dd>
                     </div>
                   </dl>
@@ -1920,6 +1934,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             {action.actionEconomy === undefined
                               ? "Special action"
                               : titleCase(action.actionEconomy)}
+                            {typeof action.parameters?.effect === "string"
+                              ? ` · ${titleCase(action.parameters.effect)}`
+                              : ""}
                           </small>
                         </span>
                         <i className={action.available ? "ready" : "blocked"}>
@@ -1931,6 +1948,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 </Section>
                 <Section title="Build selections" eyebrow="Character record">
                   <div className="tag-list">
+                    <span>
+                      {character.build.speciesId === undefined
+                        ? "No species"
+                        : (names.get(character.build.speciesId) ??
+                          shortEntityName(character.build.speciesId))}
+                    </span>
+                    {(character.build.speciesId === undefined
+                      ? []
+                      : (builderCatalog.species[character.build.speciesId]?.traitNames ?? [])
+                    ).map((trait) => (
+                      <span key={trait}>{trait}</span>
+                    ))}
                     {character.build.featIds.map((id) => (
                       <span key={id}>{names.get(id) ?? shortEntityName(id)}</span>
                     ))}

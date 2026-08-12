@@ -24013,6 +24013,88 @@
   },
   {
     "body": {
+      "actions": [
+        {
+          "actionEconomy": "bonus-action",
+          "duration": "10 minutes",
+          "id": "srd521.action.dwarf.stonecunning",
+          "range": 60,
+          "requirement": "Touching a natural or worked stone surface",
+          "resourceId": "srd521.resource.dwarf.stonecunning",
+          "sense": "tremorsense",
+          "spends": 1
+        }
+      ],
+      "conditionalRollEffects": [
+        {
+          "kind": "advantage",
+          "situationalTag": "avoid-or-end-poisoned",
+          "source": "Dwarven Resilience",
+          "testIds": "saving-throws"
+        }
+      ],
+      "creatureType": "humanoid",
+      "damageResistances": [
+        "poison"
+      ],
+      "darkvisionRange": 120,
+      "hitPointMaximumPerCharacterLevel": 1,
+      "resources": [
+        {
+          "id": "srd521.resource.dwarf.stonecunning",
+          "maximum": "proficiency-bonus",
+          "recharge": [
+            {
+              "amount": "all",
+              "event": "long-rest"
+            }
+          ]
+        }
+      ],
+      "sizeOptions": [
+        "medium"
+      ],
+      "traitNames": [
+        "Darkvision",
+        "Dwarven Resilience",
+        "Dwarven Toughness",
+        "Stonecunning"
+      ],
+      "traitsText": "Darkvision. You have Darkvision with a range of 120 feet. Dwarven Resilience. You have Resistance to Poison damage. You also have Advantage on saving throws you make to avoid or end the Poisoned condition. Dwarven Toughness. Your Hit Point maximum increases by 1, and it increases by 1 again whenever you gain a level. Stonecunning. As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching a stone surface to use this Tremorsense. The stone can be natural or worked. You can use this Bonus Action a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
+      "walkingSpeed": 30
+    },
+    "id": "srd521.species.dwarf",
+    "kind": "species",
+    "name": {
+      "en": "Dwarf"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Dwarf extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0084-b016",
+          "p0084-b017"
+        ],
+        "page": 84,
+        "quoteHash": "8dd644e64ba00807d25bc94e26dbf695ec8a0c8dadba5aa2b20716f73cceada5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "species",
+      "humanoid",
+      "dwarf"
+    ]
+  },
+  {
+    "body": {
       "category": "origin",
       "chooseDamageRoll": "either",
       "description": "You’ve trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",

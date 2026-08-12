@@ -187,7 +187,7 @@ export function createLevelUpDraft(
     const feat = catalog.feats[featId];
     return feat?.category === "origin" && (featId !== background.featId || feat.repeatable);
   });
-  if (originFeatId === undefined) {
+  if (originFeatId === undefined && species.originFeatMaximum > 0) {
     throw new Error("The character's species-granted Origin feat could not be identified.");
   }
   const startingEquipmentOptionId =
@@ -209,7 +209,7 @@ export function createLevelUpDraft(
     backgroundAbilityScoreIncreases: abilityIncreases(
       character.build.backgroundAbilityScoreIncreases,
     ),
-    originFeatId,
+    originFeatId: originFeatId ?? "",
     abilityScores: { ...character.build.abilityScores },
     asiAbility: chosenAsiAbility(
       character,

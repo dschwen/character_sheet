@@ -26,6 +26,7 @@ import {
   updateBuilderBackground,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
+  updateBuilderSpecies,
   updateMagicInitiateSelection,
   type BuilderClassId,
   type CharacterBuilderDraft,
@@ -68,12 +69,11 @@ export function CharacterBuilder({
   const selectedSpecies = catalog.species[draft.speciesId];
   const selectedBackground = catalog.backgrounds[draft.backgroundId];
   const selectedOriginFeat = catalog.feats[draft.originFeatId];
-  if (
-    selectedSpecies === undefined ||
-    selectedBackground === undefined ||
-    selectedOriginFeat === undefined
-  ) {
+  if (selectedSpecies === undefined || selectedBackground === undefined) {
     throw new Error("The selected builder origin is unavailable.");
+  }
+  if (selectedSpecies.originFeatMaximum > 0 && selectedOriginFeat === undefined) {
+    throw new Error("The selected species Origin feat is unavailable.");
   }
   const originChoices = builderOriginChoiceDefinitions(draft, catalog);
   const speciesChoice = originChoices.find((choice) => choice.selection === "speciesId");
@@ -372,14 +372,7 @@ export function CharacterBuilder({
                     onClick={() => {
                       const species = catalog.species[option.id];
                       if (species === undefined) return;
-                      setDraft((value) => ({
-                        ...value,
-                        speciesId: species.id,
-                        speciesSize: species.sizeOptions.includes(value.speciesSize)
-                          ? value.speciesSize
-                          : (species.sizeOptions[0] ?? "medium"),
-                        speciesSkillIds: value.speciesSkillIds.slice(0, species.skillMaximum),
-                      }));
+                      setDraft((value) => updateBuilderSpecies(value, catalog, species.id));
                     }}
                   >
                     <span>Species</span>
@@ -431,50 +424,52 @@ export function CharacterBuilder({
                   <small>Walking speed {String(selectedSpecies.walkingSpeed)} feet.</small>
                 </label>
               </div>
-              <div className="builder-choice-grid origin-feat-grid">
-                {originFeatChoice?.options.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    className={
-                      draft.originFeatId === option.id
-                        ? "builder-choice selected"
-                        : "builder-choice"
-                    }
-                    disabled={option.disabledReason !== undefined}
-                    onClick={() => {
-                      const feat = catalog.feats[option.id];
-                      if (feat === undefined) return;
-                      const unavailable = new Set([
-                        ...selectedBackground.skillIds,
-                        ...draft.classSkillIds,
-                        ...draft.speciesSkillIds,
-                      ]);
-                      const candidates = skillIds
-                        .map((skill) => `srd521.skill.${skill}`)
-                        .filter((id) => !unavailable.has(id));
-                      setDraft((value) =>
-                        reconcileMagicInitiateChoices(
-                          {
-                            ...value,
-                            originFeatId: feat.id,
-                            originFeatSkillIds: candidates.slice(0, feat.skillMaximum),
-                          },
-                          catalog,
-                        ),
-                      );
-                    }}
-                  >
-                    <span>Origin feat</span>
-                    <h2>{option.label}</h2>
-                    <p>{option.description}</p>
-                    <small>
-                      {option.disabledReason ??
-                        (draft.originFeatId === option.id ? "Selected" : "Choose feat")}
-                    </small>
-                  </button>
-                ))}
-              </div>
+              {selectedSpecies.originFeatMaximum === 0 ? null : (
+                <div className="builder-choice-grid origin-feat-grid">
+                  {originFeatChoice?.options.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={
+                        draft.originFeatId === option.id
+                          ? "builder-choice selected"
+                          : "builder-choice"
+                      }
+                      disabled={option.disabledReason !== undefined}
+                      onClick={() => {
+                        const feat = catalog.feats[option.id];
+                        if (feat === undefined) return;
+                        const unavailable = new Set([
+                          ...selectedBackground.skillIds,
+                          ...draft.classSkillIds,
+                          ...draft.speciesSkillIds,
+                        ]);
+                        const candidates = skillIds
+                          .map((skill) => `srd521.skill.${skill}`)
+                          .filter((id) => !unavailable.has(id));
+                        setDraft((value) =>
+                          reconcileMagicInitiateChoices(
+                            {
+                              ...value,
+                              originFeatId: feat.id,
+                              originFeatSkillIds: candidates.slice(0, feat.skillMaximum),
+                            },
+                            catalog,
+                          ),
+                        );
+                      }}
+                    >
+                      <span>Origin feat</span>
+                      <h2>{option.label}</h2>
+                      <p>{option.description}</p>
+                      <small>
+                        {option.disabledReason ??
+                          (draft.originFeatId === option.id ? "Selected" : "Choose feat")}
+                      </small>
+                    </button>
+                  ))}
+                </div>
+              )}
               {magicInitiateIds.map((featId) => {
                 const feat = catalog.feats[featId];
                 const definition = feat?.magicInitiate;
@@ -861,7 +856,7 @@ export function CharacterBuilder({
                   })}
                 </div>
               </div>
-              {selectedOriginFeat.skillMaximum === 0 ? null : (
+              {selectedOriginFeat === undefined || selectedOriginFeat.skillMaximum === 0 ? null : (
                 <div className="skill-choice-section">
                   <div>
                     <span>{selectedOriginFeat.name} feat</span>

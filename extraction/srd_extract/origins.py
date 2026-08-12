@@ -20,6 +20,7 @@ BACKGROUND_IDS = {
     "Soldier": "srd521.background.soldier",
 }
 HUMAN_ID = "srd521.species.human"
+DWARF_ID = "srd521.species.dwarf"
 ALERT_ID = "srd521.feat.origin.alert"
 MAGIC_INITIATE_IDS = {
     "cleric": "srd521.feat.origin.magic-initiate.cleric",
@@ -31,6 +32,7 @@ SKILLED_ID = "srd521.feat.origin.skilled"
 ORIGIN_IDS = {
     *BACKGROUND_IDS.values(),
     HUMAN_ID,
+    DWARF_ID,
     ALERT_ID,
     *MAGIC_INITIATE_IDS.values(),
     SAVAGE_ATTACKER_ID,
@@ -164,6 +166,64 @@ def parse_human(text: str) -> dict[str, Any]:
             "category": "origin",
         },
         "recommendedOriginFeatId": SKILLED_ID,
+        "traitsText": trait_text,
+    }
+
+
+def parse_dwarf(text: str) -> dict[str, Any]:
+    creature_type = re.search(r"Creature Type: (?P<value>\w+)", text)
+    size = re.search(r"Size: (?P<value>Medium|Small)", text)
+    speed = re.search(r"Speed: (?P<value>\d+) feet", text)
+    traits = re.search(r"As a Dwarf, you have these special traits\. (?P<value>.+)", text)
+    if creature_type is None or size is None or speed is None or traits is None:
+        raise ValueError("Dwarf species does not match the expected fields")
+    trait_text = traits.group("value")
+    required_phrases = (
+        "Darkvision with a range of 120 feet",
+        "Resistance to Poison damage",
+        "Advantage on saving throws you make to avoid or end the Poisoned condition",
+        "Hit Point maximum increases by 1",
+        "Tremorsense with a range of 60 feet for 10 minutes",
+        "number of times equal to your Proficiency Bonus",
+        "finish a Long Rest",
+    )
+    if not all(phrase in trait_text for phrase in required_phrases):
+        raise ValueError("Dwarf trait text is incomplete")
+    return {
+        "creatureType": creature_type.group("value").casefold(),
+        "sizeOptions": [size.group("value").casefold()],
+        "walkingSpeed": int(speed.group("value")),
+        "darkvisionRange": 120,
+        "damageResistances": ["poison"],
+        "hitPointMaximumPerCharacterLevel": 1,
+        "conditionalRollEffects": [
+            {
+                "testIds": "saving-throws",
+                "kind": "advantage",
+                "situationalTag": "avoid-or-end-poisoned",
+                "source": "Dwarven Resilience",
+            }
+        ],
+        "resources": [
+            {
+                "id": "srd521.resource.dwarf.stonecunning",
+                "maximum": "proficiency-bonus",
+                "recharge": [{"event": "long-rest", "amount": "all"}],
+            }
+        ],
+        "actions": [
+            {
+                "id": "srd521.action.dwarf.stonecunning",
+                "actionEconomy": "bonus-action",
+                "resourceId": "srd521.resource.dwarf.stonecunning",
+                "spends": 1,
+                "sense": "tremorsense",
+                "range": 60,
+                "duration": "10 minutes",
+                "requirement": "Touching a natural or worked stone surface",
+            }
+        ],
+        "traitNames": ["Darkvision", "Dwarven Resilience", "Dwarven Toughness", "Stonecunning"],
         "traitsText": trait_text,
     }
 
@@ -360,6 +420,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "Soldier": _section(nodes, "Soldier", "Character Species"),
     }
     human_nodes = _section(nodes, "Human", "Orc")
+    dwarf_nodes = _section(nodes, "Dwarf", "Elf")
     alert_nodes = _section(nodes, "Alert", "Magic Initiate")
     magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
@@ -383,6 +444,14 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         ["species", "humanoid"],
         _source_spans(human_nodes),
         parse_human(_text(human_nodes)),
+    )
+    dwarf = _entity(
+        DWARF_ID,
+        "species",
+        "Dwarf",
+        ["species", "humanoid", "dwarf"],
+        _source_spans(dwarf_nodes),
+        parse_dwarf(_text(dwarf_nodes)),
     )
     alert_source = _source_spans(alert_nodes)
     alert = _entity(
@@ -429,6 +498,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     origin_entities = [
         *backgrounds,
         human,
+        dwarf,
         savage_attacker,
         skilled,
         alert,
@@ -459,7 +529,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
         "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
-        "Warlock, and Wizard through level 5; all four SRD backgrounds; Human; equipment; "
+        "Warlock, and Wizard through level 5; all four SRD backgrounds; Human and Dwarf; equipment; "
         "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
@@ -467,6 +537,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "generatedEntities": [entity["id"] for entity in origin_entities],
         "backgrounds": {entity["id"]: entity["body"] for entity in backgrounds},
         "human": human["body"],
+        "dwarf": dwarf["body"],
         "originFeats": {
             ALERT_ID: alert["body"],
             **{entity["id"]: entity["body"] for entity in magic_initiates},

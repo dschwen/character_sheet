@@ -121,12 +121,64 @@
       }
     }
   },
+  "dwarf": {
+    "actions": [
+      {
+        "actionEconomy": "bonus-action",
+        "duration": "10 minutes",
+        "id": "srd521.action.dwarf.stonecunning",
+        "range": 60,
+        "requirement": "Touching a natural or worked stone surface",
+        "resourceId": "srd521.resource.dwarf.stonecunning",
+        "sense": "tremorsense",
+        "spends": 1
+      }
+    ],
+    "conditionalRollEffects": [
+      {
+        "kind": "advantage",
+        "situationalTag": "avoid-or-end-poisoned",
+        "source": "Dwarven Resilience",
+        "testIds": "saving-throws"
+      }
+    ],
+    "creatureType": "humanoid",
+    "damageResistances": [
+      "poison"
+    ],
+    "darkvisionRange": 120,
+    "hitPointMaximumPerCharacterLevel": 1,
+    "resources": [
+      {
+        "id": "srd521.resource.dwarf.stonecunning",
+        "maximum": "proficiency-bonus",
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      }
+    ],
+    "sizeOptions": [
+      "medium"
+    ],
+    "traitNames": [
+      "Darkvision",
+      "Dwarven Resilience",
+      "Dwarven Toughness",
+      "Stonecunning"
+    ],
+    "traitsText": "Darkvision. You have Darkvision with a range of 120 feet. Dwarven Resilience. You have Resistance to Poison damage. You also have Advantage on saving throws you make to avoid or end the Poisoned condition. Dwarven Toughness. Your Hit Point maximum increases by 1, and it increases by 1 again whenever you gain a level. Stonecunning. As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching a stone surface to use this Tremorsense. The stone can be natural or worked. You can use this Bonus Action a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
+    "walkingSpeed": 30
+  },
   "generatedEntities": [
     "srd521.background.soldier",
     "srd521.background.acolyte",
     "srd521.background.criminal",
     "srd521.background.sage",
     "srd521.species.human",
+    "srd521.species.dwarf",
     "srd521.feat.origin.savage-attacker",
     "srd521.feat.origin.skilled",
     "srd521.feat.origin.alert",

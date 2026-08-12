@@ -25,6 +25,7 @@ import {
   spellSelectionCounts,
   updateBuilderBackground,
   updateBuilderFeatureChoice,
+  updateBuilderSpecies,
   warlockId,
   wizardId,
 } from "./character-builder";
@@ -493,6 +494,36 @@ describe("guided character level up", () => {
         "Magic Initiate (Cleric) cannot change its spellcasting ability.",
         "Replace no more than 1 Magic Initiate (Cleric) spell during level up.",
       ]),
+    );
+  });
+
+  it("advances a Dwarf without requiring a Human species feat", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const original = buildCharacter(
+      updateBuilderSpecies(
+        defaultBuilderDraft(fighterId, catalog, 1, "Dwarf Veteran"),
+        catalog,
+        "srd521.species.dwarf",
+      ),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-10T12:00:00.000Z"),
+    });
+
+    expect(draft.originFeatId).toBe("");
+    expect(preview.issues).toEqual([]);
+    expect(preview.character?.build.speciesId).toBe("srd521.species.dwarf");
+    expect(preview.evaluation?.facts["hitPoints.maximum"]).toBe(
+      Number(
+        evaluateCharacter({ character: original, packages: [rulesPackage] }).facts[
+          "hitPoints.maximum"
+        ],
+      ) + 9,
     );
   });
 

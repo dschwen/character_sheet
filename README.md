@@ -31,7 +31,7 @@ is emitted as a static site in `apps/web/out` by `corepack pnpm build`.
 
 Choose **New character** to open the guided Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin,
 Ranger, Rogue, Sorcerer, Warlock, and Wizard builder. It
-creates rules-valid characters from levels 1–5 with Human and all four SRD backgrounds,
+creates rules-valid characters from levels 1–5 with Human or Dwarf and all four SRD backgrounds,
 class-specific abilities and skills, reviewed subclasses, and complete choice validation.
 Barbarians gain Primal
 Knowledge, choose only eligible melee Weapon Masteries, and follow the Path of the Berserker.
@@ -58,6 +58,9 @@ class, Human, Skilled, or Expertise choices. Alert adds Proficiency Bonus to Ini
 Initiate presents its data-driven spellcasting-ability, two-cantrip, and level 1 spell choices. Its
 spells appear on the sheet with their own attack bonus and save DC; the level 1 spell can use an
 available class spell slot or its tracked free casting, which returns on a Long Rest.
+Dwarves gain their source-defined 120-foot Darkvision, Poison resistance, situational saving-throw
+Advantage, one additional Hit Point per character level, and Proficiency Bonus uses of
+Stonecunning. Stonecunning is spent from the Play UI and recharges on a Long Rest.
 
 For a supported level 1–4 character, choose **Level up** to add the next level in its existing
 class. The advancement flow presents only newly introduced decisions, including class skills,
@@ -388,13 +391,13 @@ Eldritch Invocations and their prerequisites, and all five Fiend Patron features
 source-linked representative spells and authoring IR for Magical Cunning’s limited Pact-slot
 recovery.
 
-Generate all four SRD backgrounds, Human, and the Origin feat slice from pages 83, 86, and 87:
+Generate all four SRD backgrounds, Human, Dwarf, and the Origin feat slice from pages 83–87:
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
   --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
   --out generated/extraction/srd-5.2.1-origins \
-  --pages 83,86-87 \
+  --pages 83-87 \
   --overlays
 
 .venv/bin/python -m srd_extract.origins \
@@ -402,7 +405,7 @@ Generate all four SRD backgrounds, Human, and the Origin feat slice from pages 8
   --output packages/content-srd-5.2.1/generated
 ```
 
-This parser generates typed Acolyte, Criminal, Sage, Soldier, Human, Alert, Savage Attacker,
+This parser generates typed Acolyte, Criminal, Sage, Soldier, Human, Dwarf, Alert, Savage Attacker,
 Skilled, and Cleric/Druid/Wizard Magic Initiate entities. It also generates sheet-automated Alert
 Initiative and roll-assisted Savage Attacker authoring IR.
 
@@ -422,8 +425,9 @@ and 95–96:
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
 Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite. Results
-include origin and feat ability increases, subclass features, species size and speed, typed skill and saving-throw
-proficiencies, d20-test roll states, Initiative, Passive Perception, inventory, armor and Shield
+include origin and feat ability increases, subclass features, species size, speed, senses, traits,
+typed skill and saving-throw proficiencies, d20-test roll states, Initiative, Passive Perception,
+inventory, armor and Shield
 candidates, weapon and Martial Arts attacks and damage, spellbook, full-list, and Pact Magic
 models, class- and subclass-granted always-prepared spells, selectable Circle of the Land spells,
 spell slots, spell attacks and save DC, Weapon Mastery metadata, attacks per Attack action, critical-hit

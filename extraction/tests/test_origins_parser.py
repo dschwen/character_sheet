@@ -1,6 +1,12 @@
 import pytest
 
-from srd_extract.origins import parse_background, parse_human, parse_origin_feat, parse_soldier
+from srd_extract.origins import (
+    parse_background,
+    parse_dwarf,
+    parse_human,
+    parse_origin_feat,
+    parse_soldier,
+)
 
 
 def test_parse_soldier_background() -> None:
@@ -82,6 +88,28 @@ def test_parse_human_species() -> None:
     assert body["walkingSpeed"] == 30
     assert body["longRestGrantsHeroicInspiration"] is True
     assert body["recommendedOriginFeatId"] == "srd521.feat.origin.skilled"
+
+
+def test_parse_dwarf_species() -> None:
+    body = parse_dwarf(
+        "Dwarf Creature Type: Humanoid Size: Medium (about 4–5 feet tall) Speed: 30 feet "
+        "As a Dwarf, you have these special traits. "
+        "Darkvision. You have Darkvision with a range of 120 feet. "
+        "Dwarven Resilience. You have Resistance to Poison damage. You also have Advantage "
+        "on saving throws you make to avoid or end the Poisoned condition. "
+        "Dwarven Toughness. Your Hit Point maximum increases by 1, and it increases by 1 "
+        "again whenever you gain a level. Stonecunning. As a Bonus Action, you gain "
+        "Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface. "
+        "You can use this Bonus Action a number of times equal to your Proficiency Bonus, "
+        "and you regain all expended uses when you finish a Long Rest."
+    )
+
+    assert body["sizeOptions"] == ["medium"]
+    assert body["darkvisionRange"] == 120
+    assert body["damageResistances"] == ["poison"]
+    assert body["hitPointMaximumPerCharacterLevel"] == 1
+    assert body["resources"][0]["maximum"] == "proficiency-bonus"
+    assert body["actions"][0]["sense"] == "tremorsense"
 
 
 def test_parse_origin_feats_rejects_incomplete_benefits() -> None:

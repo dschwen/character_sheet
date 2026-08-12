@@ -237,6 +237,55 @@ const speciesBodySchema = z
         category: z.literal("origin"),
       })
       .optional(),
+    darkvisionRange: z.number().int().positive().optional(),
+    damageResistances: z.array(z.string().min(1)).default([]),
+    hitPointMaximumPerCharacterLevel: z.number().int().nonnegative().default(0),
+    conditionalRollEffects: z
+      .array(
+        z
+          .object({
+            testIds: z.union([z.literal("saving-throws"), z.array(z.string().min(1))]),
+            kind: z.enum(["advantage", "disadvantage"]),
+            situationalTag: z.string().min(1),
+            source: z.string().min(1),
+          })
+          .strict(),
+      )
+      .default([]),
+    resources: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            maximum: z.union([z.number().int().positive(), z.literal("proficiency-bonus")]),
+            recharge: z.array(
+              z
+                .object({
+                  event: z.enum(["short-rest", "long-rest", "initiative", "dawn", "manual"]),
+                  amount: z.union([z.number().nonnegative(), z.literal("all")]),
+                })
+                .strict(),
+            ),
+          })
+          .strict(),
+      )
+      .default([]),
+    actions: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            actionEconomy: z.string().min(1),
+            resourceId: z.string().min(1),
+            spends: z.number().int().positive(),
+            sense: z.string().min(1).optional(),
+            range: z.number().int().positive().optional(),
+            duration: z.string().min(1).optional(),
+            requirement: z.string().min(1).optional(),
+          })
+          .passthrough(),
+      )
+      .default([]),
   })
   .passthrough();
 const featBodySchema = z
@@ -2303,6 +2352,25 @@ function evaluateD20Tests(
   }
 }
 
+function speciesRollEffects(
+  origins: OriginContext,
+  context: EvaluateCharacterInput["context"],
+): D20RollEffect[] {
+  const situationalTags = new Set(context?.situationalTags ?? []);
+  return (origins.speciesBody?.conditionalRollEffects ?? []).flatMap((effect) => {
+    if (!situationalTags.has(effect.situationalTag)) return [];
+    const testIds =
+      effect.testIds === "saving-throws"
+        ? abilities.map((ability) => `savingThrow.${ability}`)
+        : effect.testIds;
+    return testIds.map((testId) => ({
+      testId,
+      kind: effect.kind,
+      source: origins.species?.id ?? effect.source,
+    }));
+  });
+}
+
 function hitPointBase(
   level: CharacterLevel,
   hitPointDie: number,
@@ -2402,6 +2470,25 @@ function evaluateHitPoints(
       label: ir.text.title,
     });
     sources.push(...sourceReferences(ir));
+  }
+  const speciesEntity =
+    character.build.speciesId === undefined
+      ? undefined
+      : index.entities.get(character.build.speciesId);
+  const speciesBody =
+    speciesEntity?.kind === "species" ? speciesBodySchema.parse(speciesEntity.body) : undefined;
+  const speciesBonus =
+    (speciesBody?.hitPointMaximumPerCharacterLevel ?? 0) * character.build.levels.length;
+  if (speciesBonus > 0 && speciesEntity !== undefined) {
+    maximum += speciesBonus;
+    nodes.push({
+      id: "hitPoints.maximum.species",
+      operation: "apply-species-hit-point-modifier",
+      inputs: [speciesBody?.hitPointMaximumPerCharacterLevel ?? 0, character.build.levels.length],
+      output: speciesBonus,
+      label: speciesEntity.name.en ?? speciesEntity.id,
+    });
+    sources.push(...entitySourceReferences(speciesEntity));
   }
   const traceId = "hitPoints.maximum";
   nodes.push({
@@ -3390,6 +3477,132 @@ function evaluateResources(
   return remaining;
 }
 
+function evaluateSpeciesTraits(
+  character: CharacterDocument,
+  origins: OriginContext,
+  state: EngineState,
+): void {
+  const species = origins.species;
+  const body = origins.speciesBody;
+  if (species === undefined || body === undefined) return;
+  const sources = entitySourceReferences(species);
+  if (body.darkvisionRange !== undefined) {
+    const traceId = "sense.darkvision.range";
+    state.facts[traceId] = body.darkvisionRange;
+    state.values[traceId] = { value: body.darkvisionRange, traceId };
+    state.traces[traceId] = {
+      id: traceId,
+      result: body.darkvisionRange,
+      nodes: [
+        {
+          id: `${traceId}.species`,
+          operation: "grant-sense-range",
+          inputs: [species.id],
+          output: body.darkvisionRange,
+          label: species.name.en ?? species.id,
+        },
+      ],
+      sourceReferences: sources,
+    };
+  }
+  body.damageResistances.forEach((damageType) => {
+    state.resistances.add(damageType);
+  });
+  const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
+  for (const resource of body.resources) {
+    const maximum = resource.maximum === "proficiency-bonus" ? proficiencyBonus : resource.maximum;
+    const expended = character.state.expendedResources[resource.id] ?? 0;
+    const current = Math.max(0, maximum - expended);
+    const maximumTraceId = `${resource.id}.maximum`;
+    const traceId = `${resource.id}.current`;
+    if (expended > maximum) {
+      addValidation(
+        state,
+        "RESOURCE_EXPENDED_ABOVE_MAXIMUM",
+        `Expended ${resource.id} uses exceed its maximum.`,
+        [`state.expendedResources.${resource.id}`],
+      );
+    }
+    state.resources.push({
+      id: resource.id,
+      maximum,
+      expended,
+      current,
+      recharge: resource.recharge,
+      traceId,
+    });
+    state.facts[maximumTraceId] = maximum;
+    state.facts[traceId] = current;
+    state.values[maximumTraceId] = { value: maximum, traceId: maximumTraceId };
+    state.values[traceId] = { value: current, traceId };
+    state.traces[maximumTraceId] = {
+      id: maximumTraceId,
+      result: maximum,
+      nodes: [
+        {
+          id: `${maximumTraceId}.species`,
+          operation:
+            resource.maximum === "proficiency-bonus"
+              ? "use-proficiency-bonus"
+              : "grant-species-resource",
+          inputs: [resource.maximum],
+          output: maximum,
+        },
+      ],
+      sourceReferences: sources,
+    };
+    state.traces[traceId] = {
+      id: traceId,
+      result: current,
+      nodes: [
+        {
+          id: `${traceId}.subtract`,
+          operation: "subtract-expended",
+          inputs: [maximum, expended],
+          output: current,
+        },
+      ],
+      sourceReferences: sources,
+    };
+  }
+  for (const action of body.actions) {
+    const resource = state.resources.find((candidate) => candidate.id === action.resourceId);
+    const available = resource !== undefined && resource.current >= action.spends;
+    const traceId = `${action.id}.available`;
+    state.actions.push({
+      id: action.id,
+      available,
+      reasons: available ? [] : [`${action.resourceId} has no uses remaining.`],
+      actionEconomy: action.actionEconomy,
+      parameters: {
+        resourceId: action.resourceId,
+        spends: action.spends,
+        ...(action.sense === undefined
+          ? {}
+          : {
+              effect: `${action.sense}${action.range === undefined ? "" : ` ${String(action.range)} feet`}${action.duration === undefined ? "" : ` for ${action.duration}`}`,
+            }),
+        ...(action.requirement === undefined ? {} : { requirement: action.requirement }),
+      },
+      traceId,
+    });
+    state.traces[traceId] = {
+      id: traceId,
+      result: available,
+      nodes: [
+        {
+          id: `${traceId}.resource`,
+          operation: "resource-availability",
+          inputs: [resource?.current ?? 0, action.spends],
+          output: available,
+        },
+      ],
+      sourceReferences: sources,
+    };
+    state.facts[traceId] = available;
+  }
+}
+
 function evaluateArmorClass(
   rules: { ir: AuthoringIr; rule: DraftRule }[],
   granted: ReadonlySet<string>,
@@ -4344,7 +4557,11 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     index,
     state,
     input.context,
-    [...equipment.rollEffects, ...ruleRollEffects(rules, state, index, granted)],
+    [
+      ...equipment.rollEffects,
+      ...speciesRollEffects(origins, input.context),
+      ...ruleRollEffects(rules, state, index, granted),
+    ],
     ruleD20TestModifiers(rules, state, index, granted),
   );
   evaluateHitPoints(character, rules, granted, index, state);
@@ -4354,6 +4571,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
+  evaluateSpeciesTraits(character, origins, state);
   const attackRules = evaluateAttackRules(rules, granted, index, state);
   evaluateAttacks(character, equipment, attackRules, index, state);
   validateActiveState(character, state);

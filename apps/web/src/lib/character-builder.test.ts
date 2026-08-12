@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateCharacter, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
 
 import {
   barbarianId,
@@ -25,6 +25,7 @@ import {
   updateBuilderBackground,
   updateBuilderFeatureChoice,
   updateBuilderLevel,
+  updateBuilderSpecies,
   validateBuilderDraft,
   warlockId,
   wizardId,
@@ -364,22 +365,28 @@ describe("guided character builder", () => {
     expect(evaluation.validations).toEqual([]);
   });
 
-  it("builds every supported class with each SRD background", () => {
+  it("builds every supported class with each reviewed species and SRD background", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
 
     for (const classId of builderClassIds) {
       for (const backgroundId of Object.keys(catalog.backgrounds)) {
-        const draft = updateBuilderBackground(
+        const backgroundDraft = updateBuilderBackground(
           defaultBuilderDraft(classId, catalog, 1, "Background matrix hero"),
           catalog,
           backgroundId,
         );
-        const character = buildCharacter(draft, rulesPackage, options);
-        const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+        for (const speciesId of Object.keys(catalog.species)) {
+          const draft = updateBuilderSpecies(backgroundDraft, catalog, speciesId);
+          const character = buildCharacter(draft, rulesPackage, options);
+          const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
 
-        expect(validateBuilderDraft(draft, catalog), `${classId} / ${backgroundId}`).toEqual([]);
-        expect(evaluation.validations, `${classId} / ${backgroundId}`).toEqual([]);
+          expect(
+            validateBuilderDraft(draft, catalog),
+            `${classId} / ${speciesId} / ${backgroundId}`,
+          ).toEqual([]);
+          expect(evaluation.validations, `${classId} / ${speciesId} / ${backgroundId}`).toEqual([]);
+        }
       }
     }
   });
@@ -1243,6 +1250,66 @@ describe("guided character builder", () => {
     );
     expect(rest.applicable).toBe(true);
     expect(rest.nextState.expendedResources[freeCastResourceId]).toBe(0);
+  });
+
+  it("builds a Dwarf with source-driven toughness, resilience, senses, and Stonecunning", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const humanDraft = defaultBuilderDraft(fighterId, catalog, 5, "Human comparison");
+    const dwarfDraft = updateBuilderSpecies(humanDraft, catalog, "srd521.species.dwarf");
+
+    expect(catalog.species["srd521.species.dwarf"]).toMatchObject({
+      name: "Dwarf",
+      walkingSpeed: 30,
+      sizeOptions: ["medium"],
+      originFeatMaximum: 0,
+      traitNames: ["Darkvision", "Dwarven Resilience", "Dwarven Toughness", "Stonecunning"],
+    });
+    expect(dwarfDraft.originFeatId).toBe("");
+    expect(dwarfDraft.speciesSkillIds).toEqual([]);
+    expect(validateBuilderDraft(dwarfDraft, catalog)).toEqual([]);
+
+    const human = buildCharacter(humanDraft, rulesPackage, options);
+    const dwarf = buildCharacter(dwarfDraft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character: dwarf, packages: [rulesPackage] });
+    const poisonedEvaluation = evaluateCharacter({
+      character: dwarf,
+      packages: [rulesPackage],
+      context: { situationalTags: ["avoid-or-end-poisoned"] },
+    });
+    const humanMaximum = evaluateCharacter({ character: human, packages: [rulesPackage] }).facts[
+      "hitPoints.maximum"
+    ];
+
+    expect(evaluation.validations.filter((validation) => validation.severity === "error")).toEqual(
+      [],
+    );
+    expect(evaluation.facts["hitPoints.maximum"]).toBe(Number(humanMaximum) + 5);
+    expect(evaluation.facts["sense.darkvision.range"]).toBe(120);
+    expect(evaluation.resistances).toContain("poison");
+    expect(poisonedEvaluation.d20Tests["savingThrow.constitution"]?.rollMode).toBe("advantage");
+    expect(evaluation.resources).toContainEqual(
+      expect.objectContaining({
+        id: "srd521.resource.dwarf.stonecunning",
+        maximum: 3,
+        current: 3,
+      }),
+    );
+    expect(evaluation.actions).toContainEqual(
+      expect.objectContaining({ id: "srd521.action.dwarf.stonecunning", available: true }),
+    );
+
+    const use = proposeAction(
+      { character: dwarf, packages: [rulesPackage] },
+      { actionId: "srd521.action.dwarf.stonecunning" },
+    );
+    expect(use.applicable).toBe(true);
+    expect(use.nextState.expendedResources["srd521.resource.dwarf.stonecunning"]).toBe(1);
+    const rest = proposeRest(
+      { character: { ...dwarf, state: use.nextState }, packages: [rulesPackage] },
+      { event: "long-rest" },
+    );
+    expect(rest.nextState.expendedResources["srd521.resource.dwarf.stonecunning"]).toBe(0);
   });
 
   it("migrates Magic Initiate defaults into characters saved before spell choices", () => {
