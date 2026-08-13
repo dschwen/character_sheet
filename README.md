@@ -62,18 +62,20 @@ Dwarves gain their source-defined 120-foot Darkvision, Poison resistance, situat
 Advantage, one additional Hit Point per character level, and Proficiency Bonus uses of
 Stonecunning. Stonecunning is spent from the Play UI and recharges on a Long Rest.
 
-For a supported level 1–4 character, choose **Level up** to add the next level in its existing
-class. The advancement flow presents only newly introduced decisions, including class skills,
+For a supported character below its class's reviewed maximum, choose **Level up** to add the next
+level in its existing class. The advancement flow presents only newly introduced decisions, including class skills,
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock,
-and Wizard advancement through level 5. Bard advancement permits one cantrip and one prepared-spell
+same-class Ranger advancement through level 6 and Barbarian, Bard, Cleric, Druid, Fighter, Monk,
+Paladin, Rogue, Sorcerer, Warlock, and Wizard advancement through level 5. At Ranger level 6,
+Roving automatically increases walking Speed when eligible and grants matching Climb and Swim
+Speeds. Bard advancement permits one cantrip and one prepared-spell
 replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
 one prepared-spell and cantrip replacement when gaining a level. Magic Initiate permits one
-same-level feat spell replacement while preserving its original casting ability. Multiclassing and
-higher levels remain future work.
+same-level feat spell replacement while preserving its original casting ability. Multiclassing,
+Ranger levels 7–20, and levels 6–20 for the other classes remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -104,9 +106,9 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-reviewed Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock,
-and Wizard level 1–5 vertical slices with every standard SRD background. Additional species,
-higher levels, and multiclassing are the next builder increments.
+reviewed Ranger level 1–6 vertical slice plus Barbarian, Bard, Cleric, Druid, Fighter, Monk,
+Paladin, Rogue, Sorcerer, Warlock, and Wizard levels 1–5, with every standard SRD background and
+species. Higher levels and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 
 ## Requirements
@@ -436,7 +438,8 @@ and 95–96:
 ```
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
-Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite. Results
+Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite; the
+web integration suite also covers Ranger creation and advancement through level 6. Results
 include origin and feat ability increases, subclass features, species size, speed, senses, traits,
 typed skill and saving-throw proficiencies, d20-test roll states, Initiative, Passive Perception,
 inventory, armor and Shield

@@ -1,7 +1,8 @@
 {
   "authoringIr": [
     "ranger.favored-enemy.json",
-    "ranger.extra-attack.json"
+    "ranger.extra-attack.json",
+    "ranger.roving.json"
   ],
   "classId": "srd521.class.ranger",
   "coreTraits": {

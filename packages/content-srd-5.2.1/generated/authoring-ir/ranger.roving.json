@@ -1,0 +1,89 @@
+{
+  "id": "srd521.class-feature.ranger.roving",
+  "kind": "class-feature",
+  "level": 6,
+  "parentId": "srd521.class.ranger",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "args": [
+          {
+            "kind": "ref",
+            "path": "speed.walking"
+          },
+          {
+            "kind": "literal",
+            "value": 10
+          }
+        ],
+        "kind": "add"
+      },
+      "id": "ranger-roving-walking-speed",
+      "parameters": {},
+      "target": "speed.walking",
+      "type": "add-candidate-calculation",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "equipment.wearingHeavyArmor"
+        },
+        "right": {
+          "kind": "literal",
+          "value": false
+        }
+      }
+    },
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "ref",
+        "path": "speed.walking"
+      },
+      "id": "ranger-roving-climb-speed",
+      "parameters": {},
+      "target": "speed.climb",
+      "type": "add-candidate-calculation"
+    },
+    {
+      "automationLevel": "sheet-automated",
+      "expression": {
+        "kind": "ref",
+        "path": "speed.walking"
+      },
+      "id": "ranger-roving-swim-speed",
+      "parameters": {},
+      "target": "speed.swim",
+      "type": "add-candidate-calculation"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Walking, Climb, and Swim speeds are calculated from the equipped armor state."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0059-b008"
+      ],
+      "page": 59,
+      "quoteHash": "70a2fefbae41f316f127e24688c8e7e395dc480e1a33cdf6d0972363a9c08271",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Your Speed increases by 10 feet while you aren’t wearing Heavy armor. You also have a Climb Speed and a Swim Speed equal to your Speed."
+      }
+    ],
+    "title": "Roving"
+  }
+}

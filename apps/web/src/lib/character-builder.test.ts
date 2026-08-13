@@ -750,13 +750,13 @@ describe("guided character builder", () => {
     }
   });
 
-  it("builds Hunters with Expertise, Favored Enemy, and prepared magic through level 5", () => {
+  it("builds Hunters with Expertise, Favored Enemy, Roving, and prepared magic through level 6", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [12, 20, 28, 36, 44];
-    const expectedFavoredEnemy = [2, 2, 2, 2, 3];
+    const expectedHitPoints = [12, 20, 28, 36, 44, 52];
+    const expectedFavoredEnemy = [2, 2, 2, 2, 3, 3];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(rangerId, catalog, level, `Level ${String(level)} Ranger`);
       const counts = spellSelectionCounts(draft, catalog);
       const character = buildCharacter(draft, rulesPackage, options);
@@ -793,6 +793,9 @@ describe("guided character builder", () => {
       ]);
       expect(favoredEnemy?.maximum).toBe(expectedFavoredEnemy[level - 1]);
       expect(evaluation.values["attackAction.attacks"]?.value).toBe(level >= 5 ? 2 : 1);
+      expect(evaluation.values["speed.walking"]?.value).toBe(level >= 6 ? 40 : 30);
+      expect(evaluation.values["speed.climb"]?.value).toBe(level >= 6 ? 40 : undefined);
+      expect(evaluation.values["speed.swim"]?.value).toBe(level >= 6 ? 40 : undefined);
       if (level === 1) {
         expect(character.loadout.inventory).toHaveLength(7);
         expect(character.loadout.equippedItemIds).toEqual([

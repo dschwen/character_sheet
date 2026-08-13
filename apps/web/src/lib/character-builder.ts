@@ -477,7 +477,9 @@ function classCatalog(
     progression
       .map((row) => objectValue(row))
       .filter((row): row is Readonly<Record<string, unknown>> => row !== undefined)
-      .filter((row) => typeof row.level === "number" && row.level <= 5)
+      .filter(
+        (row) => typeof row.level === "number" && row.level <= builder.data.supportedLevelMaximum,
+      )
       .map((row) => [row.level as number, numericValue(row.weaponMastery)]),
   ) as Record<number, number>;
   const masteryChoice = objectValue(classBody?.weaponMasteryChoice);
@@ -541,7 +543,9 @@ function classCatalog(
       progression
         .map((row) => objectValue(row))
         .filter((row): row is Readonly<Record<string, unknown>> => row !== undefined)
-        .filter((row) => typeof row.level === "number" && row.level <= 5)
+        .filter(
+          (row) => typeof row.level === "number" && row.level <= builder.data.supportedLevelMaximum,
+        )
         .map((row) => {
           const level = row.level as number;
           const slots = objectValue(row.spellSlots);

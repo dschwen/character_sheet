@@ -494,7 +494,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 3 for level in range(1, 6)},
+                "countByLevel": {str(level): 3 for level in range(1, 7)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple", "martial"],
@@ -503,7 +503,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 15,
@@ -765,6 +765,53 @@ def _extra_attack_ir(feature: dict[str, Any]) -> dict[str, Any]:
     )
 
 
+def _roving_ir(feature: dict[str, Any]) -> dict[str, Any]:
+    ir = _feature_ir(
+        feature,
+        [
+            {
+                "id": "ranger-roving-walking-speed",
+                "type": "add-candidate-calculation",
+                "target": "speed.walking",
+                "when": {
+                    "kind": "equals",
+                    "left": {"kind": "ref", "path": "equipment.wearingHeavyArmor"},
+                    "right": {"kind": "literal", "value": False},
+                },
+                "expression": {
+                    "kind": "add",
+                    "args": [
+                        {"kind": "ref", "path": "speed.walking"},
+                        {"kind": "literal", "value": 10},
+                    ],
+                },
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            },
+            {
+                "id": "ranger-roving-climb-speed",
+                "type": "add-candidate-calculation",
+                "target": "speed.climb",
+                "expression": {"kind": "ref", "path": "speed.walking"},
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            },
+            {
+                "id": "ranger-roving-swim-speed",
+                "type": "add-candidate-calculation",
+                "target": "speed.swim",
+                "expression": {"kind": "ref", "path": "speed.walking"},
+                "parameters": {},
+                "automationLevel": "sheet-automated",
+            },
+        ],
+    )
+    ir["review"]["notes"] = [
+        "Walking, Climb, and Swim speeds are calculated from the equipped armor state."
+    ]
+    return ir
+
+
 def generate_ranger_content(
     class_extraction_root: Path, spell_extraction_root: Path, output: Path
 ) -> dict[str, Any]:
@@ -803,18 +850,24 @@ def generate_ranger_content(
         *spell_entities,
     ]
     replacement_ids = {entity["id"] for entity in ranger_entities}
-    existing = [
-        entity
-        for entity in read_json(output / "entities.json")
-        if entity["id"] not in replacement_ids
+    current_entities = read_json(output / "entities.json")
+    replacement_positions = [
+        index for index, entity in enumerate(current_entities) if entity["id"] in replacement_ids
     ]
-    all_entities = [*existing, *ranger_entities]
+    insertion_index = min(replacement_positions, default=len(current_entities))
+    existing = [entity for entity in current_entities if entity["id"] not in replacement_ids]
+    all_entities = [
+        *existing[:insertion_index],
+        *ranger_entities,
+        *existing[insertion_index:],
+    ]
     write_json(output / "entities" / "ranger.json", ranger_entities)
     write_json(output / "entities.json", all_entities)
     by_name = {feature["name"]: feature for feature in features}
     authoring = {
         "ranger.favored-enemy.json": _favored_enemy_ir(by_name["Favored Enemy"]),
         "ranger.extra-attack.json": _extra_attack_ir(by_name["Extra Attack"]),
+        "ranger.roving.json": _roving_ir(by_name["Roving"]),
     }
     for filename, ir in authoring.items():
         write_json(output / "authoring-ir" / filename, ir)
@@ -822,7 +875,7 @@ def generate_ranger_content(
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
         "Barbarian, Cleric through level 5, Druid through level 5, Fighter through level 5, "
-        "Monk through level 5, Paladin through level 5, Ranger through level 5, Wizard through "
+        "Monk through level 5, Paladin through level 5, Ranger through level 6, Wizard through "
         "level 5, Human, Soldier, equipment, and representative spells."
     )
     write_json(output / "coverage.json", coverage)

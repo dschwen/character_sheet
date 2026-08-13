@@ -52,7 +52,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.ranger.deft-explorer"
         },
-        "supportedLevelMaximum": 5,
+        "supportedLevelMaximum": 6,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -473,7 +473,8 @@
           "2": 3,
           "3": 3,
           "4": 3,
-          "5": 3
+          "5": 3,
+          "6": 3
         },
         "maximum": 3,
         "minimum": 3,

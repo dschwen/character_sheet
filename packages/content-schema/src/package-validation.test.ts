@@ -301,7 +301,7 @@ describe("bootstrap content package", () => {
       options: ["srd521.feat.fighting-style.defense"],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.ranger")?.builder).toMatchObject({
-      supportedLevelMaximum: 5,
+      supportedLevelMaximum: 6,
       defaultAbilityScoreImprovementAbility: "wisdom",
       expertiseChoice: {
         sourceId: "srd521.class-feature.ranger.deft-explorer",
@@ -309,6 +309,17 @@ describe("bootstrap content package", () => {
         requireClassProficiency: false,
       },
     });
+    expect(rangerBody.progression).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          level: 6,
+          proficiencyBonus: 3,
+          favoredEnemy: 3,
+          preparedSpells: 6,
+          spellSlots: { 1: 4, 2: 2 },
+        }),
+      ]),
+    );
     expect(metadata.find(({ id }) => id === "srd521.class.rogue")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "dexterity",

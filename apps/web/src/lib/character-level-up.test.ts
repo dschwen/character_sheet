@@ -781,6 +781,68 @@ describe("guided character level up", () => {
     ).toContain("Choose a Fiendish Legacy cannot change during level up.");
   });
 
+  it("advances a Ranger from level 5 to 6 and unlocks Roving without resetting play state", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const built = buildCharacter(
+      defaultBuilderDraft(rangerId, catalog, 5, "Roving Pathfinder"),
+      rulesPackage,
+      initialOptions,
+    );
+    const original = {
+      ...built,
+      state: {
+        ...built.state,
+        currentHitPoints: 9,
+        temporaryHitPoints: 4,
+        expendedResources: {
+          ...built.state.expendedResources,
+          "srd521.resource.ranger.favored-enemy": 2,
+        },
+        expendedSpellSlots: { "1": 2, "2": 1 },
+      },
+    };
+
+    expect(levelUpEligibility(original, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 5,
+      targetLevel: 6,
+      classId: rangerId,
+    });
+
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-11T01:00:00.000Z"),
+    });
+
+    expect(draft.level).toBe(6);
+    expect(preview.issues).toEqual([]);
+    expect(preview.evaluation?.values["hitPoints.maximum"]?.value).toBe(52);
+    expect(preview.evaluation?.values["speed.walking"]?.value).toBe(40);
+    expect(preview.evaluation?.values["speed.climb"]?.value).toBe(40);
+    expect(preview.evaluation?.values["speed.swim"]?.value).toBe(40);
+    expect(preview.evaluation?.spellcasting).toMatchObject({
+      preparedSpellLimit: 6,
+      slots: [
+        { level: 1, maximum: 4, expended: 2, current: 2 },
+        { level: 2, maximum: 2, expended: 1, current: 1 },
+      ],
+    });
+
+    const advanced = levelUpCharacter(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-11T01:00:00.000Z"),
+    });
+    expect(advanced.state).toEqual(original.state);
+    expect(advanced.build.levels).toHaveLength(6);
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({
+      eligible: false,
+      currentLevel: 6,
+      reason: "Ranger advancement is currently reviewed through level 6.",
+    });
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
