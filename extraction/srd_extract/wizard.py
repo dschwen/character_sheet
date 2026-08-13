@@ -34,6 +34,7 @@ REPRESENTATIVE_SPELLS = (
     "Burning Hands",
     "Chromatic Orb",
     "Counterspell",
+    "Darkness",
     "Detect Magic",
     "Feather Fall",
     "Fireball",
@@ -736,25 +737,56 @@ def generate_wizard_content(
         *_subclass_entities(class_document, evoker_features),
         *spell_entities,
     ]
+    current_entities = read_json(output / "entities.json")
+    representative_spell_ids = {
+        f"srd521.spell.{_slug(name)}" for name in REPRESENTATIVE_SPELLS
+    }
+    externally_owned_spell_ids = {
+        str(entity["id"])
+        for entity in current_entities
+        if entity["id"] in representative_spell_ids
+        and entity["kind"] == "spell"
+        and "wizard" not in entity["tags"]
+    }
+    wizard_entity_ids = {
+        CLASS_ID,
+        SUBCLASS_ID,
+        SPELLBOOK_ID,
+        *(representative_spell_ids - externally_owned_spell_ids),
+    }
+    wizard_positions = [
+        index
+        for index, entity in enumerate(current_entities)
+        if entity["id"] in wizard_entity_ids
+        or str(entity["id"]).startswith("srd521.class-feature.wizard.")
+        or str(entity["id"]).startswith("srd521.subclass-feature.wizard.")
+    ]
+    insertion_index = min(wizard_positions, default=0)
     existing = [
         entity
-        for entity in read_json(output / "entities.json")
+        for entity in current_entities
         if entity["id"] != CLASS_ID
         and entity["id"] != SUBCLASS_ID
         and entity["id"] != SPELLBOOK_ID
         and not str(entity["id"]).startswith("srd521.class-feature.wizard.")
         and not str(entity["id"]).startswith("srd521.subclass-feature.wizard.")
-        and str(entity["id"])
-        not in {f"srd521.spell.{_slug(name)}" for name in REPRESENTATIVE_SPELLS}
+        and str(entity["id"]) not in representative_spell_ids - externally_owned_spell_ids
     ]
-    all_entities = [*existing, *wizard_entities]
+    package_wizard_entities = [
+        entity for entity in wizard_entities if entity["id"] not in externally_owned_spell_ids
+    ]
+    all_entities = [
+        *existing[:insertion_index],
+        *package_wizard_entities,
+        *existing[insertion_index:],
+    ]
     write_json(output / "entities" / "wizard.json", wizard_entities)
     write_json(output / "entities.json", all_entities)
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
         "Barbarian, Fighter through level 5, Wizard source content, Human, Soldier, "
-        "equipment, and 20 representative spells. Proposed executable rules remain under review."
+        "equipment, and 21 representative spells. Proposed executable rules remain under review."
     )
     write_json(output / "coverage.json", coverage)
     report = {

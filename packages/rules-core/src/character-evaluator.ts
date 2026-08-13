@@ -227,7 +227,7 @@ const speciesBodySchema = z
       .object({
         minimum: z.number().int().nonnegative(),
         maximum: z.number().int().nonnegative(),
-        options: z.literal("any-skill"),
+        options: z.union([z.literal("any-skill"), z.array(z.string().min(1)).min(1)]),
       })
       .optional(),
     originFeatChoice: z
@@ -254,6 +254,21 @@ const speciesBodySchema = z
                   id: z.string().min(1),
                   name: z.string().min(1),
                   damageType: z.string().min(1).optional(),
+                  ability: z.enum(abilities).optional(),
+                  darkvisionRange: z.number().int().positive().optional(),
+                  walkingSpeed: z.number().int().positive().optional(),
+                  spellChoiceId: z.string().min(1).optional(),
+                  spellGrants: z
+                    .array(
+                      z
+                        .object({
+                          spellId: z.string().min(1),
+                          minimumLevel: z.number().int().positive(),
+                          freeCastResourceId: z.string().min(1).optional(),
+                        })
+                        .strict(),
+                    )
+                    .default([]),
                 })
                 .passthrough(),
             ),
@@ -261,6 +276,26 @@ const speciesBodySchema = z
           .strict(),
       )
       .default([]),
+    spellChoices: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1),
+            prompt: z.string().min(1),
+            minimum: z.number().int().nonnegative(),
+            maximum: z.number().int().nonnegative(),
+            requiredWhen: z
+              .object({ choiceId: z.string().min(1), optionId: z.string().min(1) })
+              .strict(),
+            spellListClassId: z.string().min(1),
+            spellLevel: z.number().int().nonnegative(),
+            defaultSpellId: z.string().min(1),
+            changeOn: z.array(z.string().min(1)).default([]),
+          })
+          .strict(),
+      )
+      .default([]),
+    spellcastingAbilityChoiceId: z.string().min(1).optional(),
     resistanceFromChoiceId: z.string().min(1).optional(),
     conditionalRollEffects: z
       .array(
@@ -910,18 +945,27 @@ function resolveOrigins(
       ],
       sourceReferences: entitySourceReferences(species),
     };
+    const selectedWalkingSpeed = speciesBody.choices
+      .flatMap((speciesChoice) => {
+        const selectedIds = character.build.choices.find(
+          (selection) => selection.choiceId === speciesChoice.id,
+        )?.optionIds;
+        return speciesChoice.options.filter((option) => selectedIds?.includes(option.id) === true);
+      })
+      .find((option) => option.walkingSpeed !== undefined)?.walkingSpeed;
+    const walkingSpeed = selectedWalkingSpeed ?? speciesBody.walkingSpeed;
     const speedTraceId = "speed.walking.base";
-    state.facts[speedTraceId] = speciesBody.walkingSpeed;
-    state.values[speedTraceId] = { value: speciesBody.walkingSpeed, traceId: speedTraceId };
+    state.facts[speedTraceId] = walkingSpeed;
+    state.values[speedTraceId] = { value: walkingSpeed, traceId: speedTraceId };
     state.traces[speedTraceId] = {
       id: speedTraceId,
-      result: speciesBody.walkingSpeed,
+      result: walkingSpeed,
       nodes: [
         {
           id: `${speedTraceId}.species`,
           operation: "grant-species-walking-speed",
-          inputs: [species.id],
-          output: speciesBody.walkingSpeed,
+          inputs: [species.id, selectedWalkingSpeed ?? null],
+          output: walkingSpeed,
         },
       ],
       sourceReferences: entitySourceReferences(species),
@@ -2264,6 +2308,18 @@ function evaluateD20Tests(
         ["build.proficiencyChoices.skills"],
       );
     }
+    const allowed =
+      requirement.options === "any-skill" ? knownSkillIds : new Set(requirement.options);
+    for (const choice of speciesChoices) {
+      if (!allowed.has(choice.skillId)) {
+        addValidation(
+          state,
+          "SPECIES_SKILL_PROFICIENCY_NOT_ALLOWED",
+          `${choice.skillId} is not available from ${origins.species.id}.`,
+          ["build.proficiencyChoices.skills"],
+        );
+      }
+    }
   }
   for (const featId of character.build.featIds) {
     const feat = index.entities.get(featId);
@@ -3522,6 +3578,7 @@ function evaluateResources(
 function evaluateSpeciesTraits(
   character: CharacterDocument,
   origins: OriginContext,
+  index: PackageIndex,
   state: EngineState,
 ): void {
   const species = origins.species;
@@ -3592,6 +3649,217 @@ function evaluateSpeciesTraits(
   }
   const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
   const characterLevel = character.build.levels.length;
+  const selectedDarkvisionRange = [...selectedSpeciesOptions.values()].find(
+    (option) => option.darkvisionRange !== undefined,
+  )?.darkvisionRange;
+  if (selectedDarkvisionRange !== undefined) {
+    const traceId = "sense.darkvision.range";
+    state.facts[traceId] = selectedDarkvisionRange;
+    state.values[traceId] = { value: selectedDarkvisionRange, traceId };
+    state.traces[traceId] = {
+      id: traceId,
+      result: selectedDarkvisionRange,
+      nodes: [
+        {
+          id: `${traceId}.species-choice`,
+          operation: "grant-lineage-sense-range",
+          inputs: [species.id],
+          output: selectedDarkvisionRange,
+        },
+      ],
+      sourceReferences: sources,
+    };
+  }
+
+  const selectedSpellIds: string[] = [];
+  for (const choice of body.spellChoices) {
+    const active =
+      selectedSpeciesOptions.get(choice.requiredWhen.choiceId)?.id === choice.requiredWhen.optionId;
+    const recorded = character.build.choices.filter(
+      (selection) => selection.choiceId === choice.id,
+    );
+    if (!active) {
+      if (recorded.length > 0) {
+        addValidation(
+          state,
+          "INACTIVE_SPECIES_SPELL_CHOICE",
+          `${choice.prompt} is not available for the selected species option.`,
+          ["build.choices"],
+        );
+      }
+      continue;
+    }
+    const optionIds = recorded[0]?.optionIds ?? [];
+    if (
+      recorded.length !== 1 ||
+      optionIds.length < choice.minimum ||
+      optionIds.length > choice.maximum ||
+      new Set(optionIds).size !== optionIds.length
+    ) {
+      addValidation(
+        state,
+        "SPECIES_SPELL_CHOICE_COUNT_INVALID",
+        `${species.name.en ?? species.id} requires ${String(choice.minimum)} selection for ${choice.prompt}.`,
+        ["build.choices"],
+      );
+    }
+    const listClass = index.entities.get(choice.spellListClassId);
+    const spellList =
+      listClass?.kind === "class"
+        ? new Set(spellcastingClassBodySchema.parse(listClass.body).spellList)
+        : new Set<string>();
+    for (const spellId of optionIds) {
+      const spell = index.entities.get(spellId);
+      if (
+        spell?.kind !== "spell" ||
+        !spellList.has(spellId) ||
+        spellBodySchema.parse(spell.body).level !== choice.spellLevel
+      ) {
+        addValidation(
+          state,
+          "SPECIES_SPELL_CHOICE_INVALID",
+          `${spellId} is not an available level ${String(choice.spellLevel)} spell for ${choice.prompt}.`,
+          ["build.choices"],
+        );
+      } else {
+        selectedSpellIds.push(spellId);
+      }
+    }
+  }
+
+  const spellGrants = [...selectedSpeciesOptions.values()].flatMap((option) =>
+    option.spellGrants.filter((grant) => grant.minimumLevel <= characterLevel),
+  );
+  if (spellGrants.length > 0 || selectedSpellIds.length > 0) {
+    const ability =
+      body.spellcastingAbilityChoiceId === undefined
+        ? undefined
+        : selectedSpeciesOptions.get(body.spellcastingAbilityChoiceId)?.ability;
+    if (ability === undefined) {
+      addValidation(
+        state,
+        "SPECIES_SPELLCASTING_ABILITY_INVALID",
+        `${species.name.en ?? species.id} requires a spellcasting ability choice.`,
+        ["build.choices"],
+      );
+    } else {
+      const abilityModifier = requireNumber(
+        state.facts[`ability.${ability}.modifier`] ?? null,
+        `${species.name.en ?? species.id} spellcasting ability modifier`,
+      );
+      const attackBonus = abilityModifier + proficiencyBonus;
+      const saveDifficultyClass = 8 + abilityModifier + proficiencyBonus;
+      const attackTraceId = `spellcasting.${species.id}.attackBonus`;
+      const saveTraceId = `spellcasting.${species.id}.saveDifficultyClass`;
+      for (const [traceId, result, operation, inputs] of [
+        [
+          attackTraceId,
+          attackBonus,
+          "add-ability-and-proficiency",
+          [abilityModifier, proficiencyBonus],
+        ],
+        [
+          saveTraceId,
+          saveDifficultyClass,
+          "add-spell-save-base-ability-and-proficiency",
+          [8, abilityModifier, proficiencyBonus],
+        ],
+      ] as const) {
+        state.facts[traceId] = result;
+        state.values[traceId] = { value: result, traceId };
+        state.traces[traceId] = {
+          id: traceId,
+          result,
+          nodes: [{ id: `${traceId}.sum`, operation, inputs: [...inputs], output: result }],
+          sourceReferences: sources,
+        };
+      }
+      const baseCastingOption = {
+        sourceId: species.id,
+        ability,
+        attackBonus,
+        saveDifficultyClass,
+        attackTraceId,
+        saveTraceId,
+      };
+      selectedSpellIds.forEach((spellId) => {
+        addMagicInitiateSpell(character, spellId, false, baseCastingOption, index, state);
+      });
+      for (const grant of spellGrants) {
+        let castingOption: NonNullable<SpellSummary["castingOptions"]>[number] = baseCastingOption;
+        if (grant.freeCastResourceId !== undefined) {
+          const resourceId = grant.freeCastResourceId;
+          const maximum = 1;
+          const expended = character.state.expendedResources[resourceId] ?? 0;
+          const current = Math.max(0, maximum - expended);
+          const maximumTraceId = `${resourceId}.maximum`;
+          const currentTraceId = `${resourceId}.current`;
+          if (expended > maximum) {
+            addValidation(
+              state,
+              "RESOURCE_EXPENDED_ABOVE_MAXIMUM",
+              `Expended ${resourceId} uses exceed its maximum.`,
+              [`state.expendedResources.${resourceId}`],
+            );
+          }
+          state.resources.push({
+            id: resourceId,
+            maximum,
+            expended,
+            current,
+            recharge: [{ event: "long-rest", amount: "all" }],
+            traceId: currentTraceId,
+          });
+          state.facts[maximumTraceId] = maximum;
+          state.facts[currentTraceId] = current;
+          state.values[maximumTraceId] = { value: maximum, traceId: maximumTraceId };
+          state.values[currentTraceId] = { value: current, traceId: currentTraceId };
+          state.traces[maximumTraceId] = {
+            id: maximumTraceId,
+            result: maximum,
+            nodes: [
+              {
+                id: `${maximumTraceId}.species-spell`,
+                operation: "grant-free-species-spell-cast",
+                inputs: [species.id, grant.spellId],
+                output: maximum,
+              },
+            ],
+            sourceReferences: sources,
+          };
+          state.traces[currentTraceId] = {
+            id: currentTraceId,
+            result: current,
+            nodes: [
+              {
+                id: `${currentTraceId}.subtract`,
+                operation: "subtract-expended",
+                inputs: [maximum, expended],
+                output: current,
+              },
+            ],
+            sourceReferences: sources,
+          };
+          castingOption = {
+            ...baseCastingOption,
+            freeCastResourceId: resourceId,
+            freeCastAvailable: current > 0,
+          };
+        }
+        addMagicInitiateSpell(
+          character,
+          grant.spellId,
+          grant.freeCastResourceId !== undefined,
+          castingOption,
+          index,
+          state,
+        );
+      }
+      state.spells.sort(
+        (left, right) => left.level - right.level || left.name.localeCompare(right.name),
+      );
+    }
+  }
   for (const resource of body.resources) {
     if (resource.minimumLevel > characterLevel) continue;
     const maximum = resource.maximum === "proficiency-bonus" ? proficiencyBonus : resource.maximum;
@@ -4699,11 +4967,11 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateHitPoints(character, rules, granted, index, state);
   evaluateSpellcasting(character, classLevels, index, state);
   evaluateMagicInitiate(character, index, state);
+  evaluateSpeciesTraits(character, origins, index, state);
   validateConcentration(character, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
-  evaluateSpeciesTraits(character, origins, state);
   const attackRules = evaluateAttackRules(rules, granted, index, state);
   evaluateAttacks(character, equipment, attackRules, index, state);
   validateActiveState(character, state);

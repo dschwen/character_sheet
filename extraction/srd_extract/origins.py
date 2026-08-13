@@ -22,6 +22,7 @@ BACKGROUND_IDS = {
 HUMAN_ID = "srd521.species.human"
 DWARF_ID = "srd521.species.dwarf"
 DRAGONBORN_ID = "srd521.species.dragonborn"
+ELF_ID = "srd521.species.elf"
 ALERT_ID = "srd521.feat.origin.alert"
 MAGIC_INITIATE_IDS = {
     "cleric": "srd521.feat.origin.magic-initiate.cleric",
@@ -35,6 +36,7 @@ ORIGIN_IDS = {
     HUMAN_ID,
     DWARF_ID,
     DRAGONBORN_ID,
+    ELF_ID,
     ALERT_ID,
     *MAGIC_INITIATE_IDS.values(),
     SAVAGE_ATTACKER_ID,
@@ -92,6 +94,18 @@ def _section(
 
 def _text(nodes: Iterable[dict[str, Any]]) -> str:
     return " ".join(str(node["normalizedText"]) for node in nodes)
+
+
+def _raw_continuation_node(raw_page: dict[str, Any], block_id: str) -> dict[str, Any]:
+    block = next(block for block in raw_page["blocks"] if block["block_id"] == block_id)
+    normalized = re.sub(r"-\n(?=[a-z])", "", str(block["text"]))
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    return {
+        "kind": "ParagraphNode",
+        "parentId": f"page-{int(raw_page['page']['number']):04d}",
+        "sourceBlocks": [block_id],
+        "normalizedText": normalized,
+    }
 
 
 def parse_background(name: str, text: str) -> dict[str, Any]:
@@ -333,6 +347,158 @@ def parse_dragonborn(text: str) -> dict[str, Any]:
     }
 
 
+def parse_elf(text: str) -> dict[str, Any]:
+    creature_type = re.search(r"Creature Type: (?P<value>\w+)", text)
+    size = re.search(r"Size: (?P<value>Medium|Small)", text)
+    speed = re.search(r"Speed: (?P<value>\d+) feet", text)
+    required_phrases = (
+        "Darkvision with a range of 60 feet",
+        "Elven Lineages",
+        "Dancing Lights",
+        "Faerie Fire",
+        "Darkness",
+        "Prestidigitation",
+        "Detect Magic",
+        "Misty Step",
+        "Druidcraft",
+        "Longstrider",
+        "Pass without Trace",
+        "Intelligence, Wisdom, or Charisma is your spellcasting ability",
+        "avoid or end the Charmed condition",
+        "Insight, Perception, or Survival skill",
+        "Long Rest in 4 hours",
+    )
+    if creature_type is None or size is None or speed is None:
+        raise ValueError("Elf species does not match the expected fields")
+    if not all(phrase in text for phrase in required_phrases):
+        raise ValueError("Elf trait text is incomplete")
+    lineage_choice_id = "srd521.species.elf.choice.elven-lineage"
+    ability_choice_id = "srd521.species.elf.choice.spellcasting-ability"
+    high_elf_cantrip_choice_id = "srd521.species.elf.choice.high-elf-cantrip"
+    return {
+        "creatureType": creature_type.group("value").casefold(),
+        "sizeOptions": [size.group("value").casefold()],
+        "walkingSpeed": int(speed.group("value")),
+        "darkvisionRange": 60,
+        "skillProficiencyChoice": {
+            "minimum": 1,
+            "maximum": 1,
+            "options": [
+                "srd521.skill.insight",
+                "srd521.skill.perception",
+                "srd521.skill.survival",
+            ],
+        },
+        "choices": [
+            {
+                "id": lineage_choice_id,
+                "prompt": "Choose an Elven Lineage",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": "srd521.species.elf.lineage.drow",
+                        "name": "Drow",
+                        "darkvisionRange": 120,
+                        "spellGrants": [
+                            {"spellId": "srd521.spell.dancing-lights", "minimumLevel": 1},
+                            {
+                                "spellId": "srd521.spell.faerie-fire",
+                                "minimumLevel": 3,
+                                "freeCastResourceId": "srd521.resource.elf.drow.faerie-fire",
+                            },
+                            {
+                                "spellId": "srd521.spell.darkness",
+                                "minimumLevel": 5,
+                                "freeCastResourceId": "srd521.resource.elf.drow.darkness",
+                            },
+                        ],
+                    },
+                    {
+                        "id": "srd521.species.elf.lineage.high",
+                        "name": "High Elf",
+                        "spellChoiceId": high_elf_cantrip_choice_id,
+                        "spellGrants": [
+                            {
+                                "spellId": "srd521.spell.detect-magic",
+                                "minimumLevel": 3,
+                                "freeCastResourceId": "srd521.resource.elf.high.detect-magic",
+                            },
+                            {
+                                "spellId": "srd521.spell.misty-step",
+                                "minimumLevel": 5,
+                                "freeCastResourceId": "srd521.resource.elf.high.misty-step",
+                            },
+                        ],
+                    },
+                    {
+                        "id": "srd521.species.elf.lineage.wood",
+                        "name": "Wood Elf",
+                        "walkingSpeed": 35,
+                        "spellGrants": [
+                            {"spellId": "srd521.spell.druidcraft", "minimumLevel": 1},
+                            {
+                                "spellId": "srd521.spell.longstrider",
+                                "minimumLevel": 3,
+                                "freeCastResourceId": "srd521.resource.elf.wood.longstrider",
+                            },
+                            {
+                                "spellId": "srd521.spell.pass-without-trace",
+                                "minimumLevel": 5,
+                                "freeCastResourceId": "srd521.resource.elf.wood.pass-without-trace",
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                "id": ability_choice_id,
+                "prompt": "Choose an Elven Lineage spellcasting ability",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": f"srd521.species.elf.spellcasting-ability.{ability}",
+                        "name": ability.title(),
+                        "ability": ability,
+                    }
+                    for ability in ("intelligence", "wisdom", "charisma")
+                ],
+            },
+        ],
+        "spellChoices": [
+            {
+                "id": high_elf_cantrip_choice_id,
+                "prompt": "Choose a High Elf cantrip",
+                "minimum": 1,
+                "maximum": 1,
+                "requiredWhen": {
+                    "choiceId": lineage_choice_id,
+                    "optionId": "srd521.species.elf.lineage.high",
+                },
+                "spellListClassId": "srd521.class.wizard",
+                "spellLevel": 0,
+                "defaultSpellId": "srd521.spell.prestidigitation",
+                "changeOn": ["long-rest"],
+            }
+        ],
+        "spellcastingAbilityChoiceId": ability_choice_id,
+        "conditionalRollEffects": [
+            {
+                "testIds": "saving-throws",
+                "kind": "advantage",
+                "situationalTag": "avoid-or-end-charmed",
+                "source": "Fey Ancestry",
+            }
+        ],
+        "longRestHours": 4,
+        "sleepRequired": False,
+        "immuneToMagicalSleep": True,
+        "traitNames": ["Darkvision", "Elven Lineage", "Fey Ancestry", "Keen Senses", "Trance"],
+        "traitsText": text,
+    }
+
+
 def parse_origin_feat(
     name: str,
     text: str,
@@ -527,6 +693,9 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     human_nodes = _section(nodes, "Human", "Orc")
     dwarf_nodes = _section(nodes, "Dwarf", "Elf")
     dragonborn_nodes = _section(nodes, "Dragonborn", "Dwarf")
+    elf_nodes = [node for node in _section(nodes, "Elf", "Gnome") if node["kind"] != "MetadataNode"]
+    raw_page_85 = read_json(extraction_root / "raw" / "pages" / "0085.json")
+    elf_nodes.append(_raw_continuation_node(raw_page_85, "p0085-b002"))
     alert_nodes = _section(nodes, "Alert", "Magic Initiate")
     magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
@@ -566,6 +735,14 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         ["species", "humanoid", "dragonborn"],
         _source_spans(dragonborn_nodes),
         parse_dragonborn(_text(dragonborn_nodes)),
+    )
+    elf = _entity(
+        ELF_ID,
+        "species",
+        "Elf",
+        ["species", "humanoid", "elf"],
+        _source_spans(elf_nodes),
+        parse_elf(_text(elf_nodes)),
     )
     alert_source = _source_spans(alert_nodes)
     alert = _entity(
@@ -614,6 +791,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         human,
         dwarf,
         dragonborn,
+        elf,
         savage_attacker,
         skilled,
         alert,
@@ -644,8 +822,8 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
         "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
-        "Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, and "
-        "Dragonborn; equipment; "
+        "Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, "
+        "and Elf; equipment; "
         "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
@@ -655,6 +833,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "human": human["body"],
         "dwarf": dwarf["body"],
         "dragonborn": dragonborn["body"],
+        "elf": elf["body"],
         "originFeats": {
             ALERT_ID: alert["body"],
             **{entity["id"]: entity["body"] for entity in magic_initiates},

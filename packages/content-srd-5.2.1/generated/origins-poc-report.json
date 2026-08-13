@@ -308,6 +308,153 @@
     "traitsText": "Darkvision. You have Darkvision with a range of 120 feet. Dwarven Resilience. You have Resistance to Poison damage. You also have Advantage on saving throws you make to avoid or end the Poisoned condition. Dwarven Toughness. Your Hit Point maximum increases by 1, and it increases by 1 again whenever you gain a level. Stonecunning. As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching a stone surface to use this Tremorsense. The stone can be natural or worked. You can use this Bonus Action a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
     "walkingSpeed": 30
   },
+  "elf": {
+    "choices": [
+      {
+        "id": "srd521.species.elf.choice.elven-lineage",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "darkvisionRange": 120,
+            "id": "srd521.species.elf.lineage.drow",
+            "name": "Drow",
+            "spellGrants": [
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.dancing-lights"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.elf.drow.faerie-fire",
+                "minimumLevel": 3,
+                "spellId": "srd521.spell.faerie-fire"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.elf.drow.darkness",
+                "minimumLevel": 5,
+                "spellId": "srd521.spell.darkness"
+              }
+            ]
+          },
+          {
+            "id": "srd521.species.elf.lineage.high",
+            "name": "High Elf",
+            "spellChoiceId": "srd521.species.elf.choice.high-elf-cantrip",
+            "spellGrants": [
+              {
+                "freeCastResourceId": "srd521.resource.elf.high.detect-magic",
+                "minimumLevel": 3,
+                "spellId": "srd521.spell.detect-magic"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.elf.high.misty-step",
+                "minimumLevel": 5,
+                "spellId": "srd521.spell.misty-step"
+              }
+            ]
+          },
+          {
+            "id": "srd521.species.elf.lineage.wood",
+            "name": "Wood Elf",
+            "spellGrants": [
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.druidcraft"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.elf.wood.longstrider",
+                "minimumLevel": 3,
+                "spellId": "srd521.spell.longstrider"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.elf.wood.pass-without-trace",
+                "minimumLevel": 5,
+                "spellId": "srd521.spell.pass-without-trace"
+              }
+            ],
+            "walkingSpeed": 35
+          }
+        ],
+        "prompt": "Choose an Elven Lineage"
+      },
+      {
+        "id": "srd521.species.elf.choice.spellcasting-ability",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "ability": "intelligence",
+            "id": "srd521.species.elf.spellcasting-ability.intelligence",
+            "name": "Intelligence"
+          },
+          {
+            "ability": "wisdom",
+            "id": "srd521.species.elf.spellcasting-ability.wisdom",
+            "name": "Wisdom"
+          },
+          {
+            "ability": "charisma",
+            "id": "srd521.species.elf.spellcasting-ability.charisma",
+            "name": "Charisma"
+          }
+        ],
+        "prompt": "Choose an Elven Lineage spellcasting ability"
+      }
+    ],
+    "conditionalRollEffects": [
+      {
+        "kind": "advantage",
+        "situationalTag": "avoid-or-end-charmed",
+        "source": "Fey Ancestry",
+        "testIds": "saving-throws"
+      }
+    ],
+    "creatureType": "humanoid",
+    "darkvisionRange": 60,
+    "immuneToMagicalSleep": true,
+    "longRestHours": 4,
+    "sizeOptions": [
+      "medium"
+    ],
+    "skillProficiencyChoice": {
+      "maximum": 1,
+      "minimum": 1,
+      "options": [
+        "srd521.skill.insight",
+        "srd521.skill.perception",
+        "srd521.skill.survival"
+      ]
+    },
+    "sleepRequired": false,
+    "spellChoices": [
+      {
+        "changeOn": [
+          "long-rest"
+        ],
+        "defaultSpellId": "srd521.spell.prestidigitation",
+        "id": "srd521.species.elf.choice.high-elf-cantrip",
+        "maximum": 1,
+        "minimum": 1,
+        "prompt": "Choose a High Elf cantrip",
+        "requiredWhen": {
+          "choiceId": "srd521.species.elf.choice.elven-lineage",
+          "optionId": "srd521.species.elf.lineage.high"
+        },
+        "spellLevel": 0,
+        "spellListClassId": "srd521.class.wizard"
+      }
+    ],
+    "spellcastingAbilityChoiceId": "srd521.species.elf.choice.spellcasting-ability",
+    "traitNames": [
+      "Darkvision",
+      "Elven Lineage",
+      "Fey Ancestry",
+      "Keen Senses",
+      "Trance"
+    ],
+    "traitsText": "Elf Creature Type: Humanoid Size: Medium (about 5–6 feet tall) Speed: 30 feet As an Elf, you have these special traits. Darkvision. You have Darkvision with a range of 60 feet. Elven Lineage. You are part of a lineage that grants you supernatural abilities. Choose a lineage from the Elven Lineages table. You gain the level 1 benefit of that lineage. When you reach character levels 3 and 5, you learn a higher-level spell, as shown on the table. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have of the appropriate level. Elven Lineages Lineage Level 1 Level 3 Level 5 Drow The range of your Darkvision increases to 120 feet. ​ You also know the Dancing Lights cantrip. Faerie Fire Darkness High Elf You know the Prestidigitation cantrip. Whenever you finish a Long Rest, you can replace that cantrip with a different cantrip from the Wizard spell list. Detect Magic Misty Step Wood Elf Your Speed increases to 35 feet. You also know the Druidcraft cantrip. Longstrider Pass without Trace Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the lineage). Fey Ancestry. You have Advantage on saving throws you make to avoid or end the Charmed condition. Keen Senses. You have proficiency in the Insight, Perception, or Survival skill. Trance. You don’t need to sleep, and magic can’t put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in a trancelike meditation, during which you retain consciousness.",
+    "walkingSpeed": 30
+  },
   "generatedEntities": [
     "srd521.background.soldier",
     "srd521.background.acolyte",
@@ -316,6 +463,7 @@
     "srd521.species.human",
     "srd521.species.dwarf",
     "srd521.species.dragonborn",
+    "srd521.species.elf",
     "srd521.feat.origin.savage-attacker",
     "srd521.feat.origin.skilled",
     "srd521.feat.origin.alert",

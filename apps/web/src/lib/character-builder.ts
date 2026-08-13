@@ -132,6 +132,7 @@ export interface SpeciesBuilderCatalog {
   recommendedOriginFeatId?: string;
   skillMinimum: number;
   skillMaximum: number;
+  skillIds: string[];
   originFeatMinimum: number;
   originFeatMaximum: number;
   traitNames: string[];
@@ -144,6 +145,8 @@ export interface SpeciesChoiceCatalog {
   minimum: number;
   maximum: number;
   options: BuilderChoiceOption[];
+  requiredWhen?: { choiceId: string; optionId: string };
+  changeOn: string[];
 }
 
 export interface BackgroundBuilderCatalog {
@@ -670,7 +673,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
           .filter((size): size is SpeciesSize => size !== undefined);
         const walkingSpeed = numericValue(body?.walkingSpeed);
         const traitNames = stringArray(body?.traitNames);
-        const choices = Array.isArray(body?.choices)
+        const choices: SpeciesChoiceCatalog[] = Array.isArray(body?.choices)
           ? body.choices.flatMap((value) => {
               const choice = objectValue(value);
               if (
@@ -683,13 +686,25 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
               const options = choice.options.flatMap((optionValue) => {
                 const option = objectValue(optionValue);
                 if (typeof option?.id !== "string" || typeof option.name !== "string") return [];
+                const details = [
+                  typeof option.damageType === "string"
+                    ? `${titleCase(option.damageType)} damage`
+                    : undefined,
+                  typeof option.darkvisionRange === "number"
+                    ? `${String(option.darkvisionRange)}-foot Darkvision`
+                    : undefined,
+                  typeof option.walkingSpeed === "number"
+                    ? `${String(option.walkingSpeed)}-foot speed`
+                    : undefined,
+                  typeof option.ability === "string"
+                    ? `${titleCase(option.ability)} spellcasting`
+                    : undefined,
+                ].filter((detail): detail is string => detail !== undefined);
                 return [
                   {
                     id: option.id,
                     label: option.name,
-                    ...(typeof option.damageType === "string"
-                      ? { description: `${titleCase(option.damageType)} damage` }
-                      : {}),
+                    ...(details.length === 0 ? {} : { description: details.join(" · ") }),
                   },
                 ];
               });
@@ -700,10 +715,53 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
                   minimum: numericValue(choice.minimum),
                   maximum: numericValue(choice.maximum),
                   options,
+                  changeOn: [],
                 },
               ];
             })
           : [];
+        if (Array.isArray(body?.spellChoices)) {
+          for (const value of body.spellChoices) {
+            const choice = objectValue(value);
+            const requiredWhen = objectValue(choice?.requiredWhen);
+            const listClass =
+              typeof choice?.spellListClassId === "string"
+                ? objectValue(entity(choice.spellListClassId)?.body)
+                : undefined;
+            const spellLevel = numericValue(choice?.spellLevel);
+            const options = stringArray(listClass?.spellList).flatMap((spellId) => {
+              const spell = entity(spellId);
+              const spellBody = objectValue(spell?.body);
+              return spell?.kind === "spell" && numericValue(spellBody?.level) === spellLevel
+                ? [{ id: spell.id, label: localizedName(spell) }]
+                : [];
+            });
+            if (
+              typeof choice?.id === "string" &&
+              typeof choice.prompt === "string" &&
+              typeof requiredWhen?.choiceId === "string" &&
+              typeof requiredWhen.optionId === "string"
+            ) {
+              const defaultSpellId =
+                typeof choice.defaultSpellId === "string" ? choice.defaultSpellId : undefined;
+              options.sort((left, right) =>
+                left.id === defaultSpellId ? -1 : right.id === defaultSpellId ? 1 : 0,
+              );
+              choices.push({
+                id: choice.id,
+                prompt: choice.prompt,
+                minimum: numericValue(choice.minimum),
+                maximum: numericValue(choice.maximum),
+                options,
+                requiredWhen: {
+                  choiceId: requiredWhen.choiceId,
+                  optionId: requiredWhen.optionId,
+                },
+                changeOn: stringArray(choice.changeOn),
+              });
+            }
+          }
+        }
         return [
           candidate.id,
           {
@@ -717,6 +775,10 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
               : {}),
             skillMinimum: numericValue(skillChoice?.minimum),
             skillMaximum: numericValue(skillChoice?.maximum),
+            skillIds:
+              skillChoice?.options === "any-skill"
+                ? skillIds.map((skill) => `${skillPrefix}${skill}`)
+                : stringArray(skillChoice?.options),
             originFeatMinimum: numericValue(originFeatChoice?.minimum),
             originFeatMaximum: numericValue(originFeatChoice?.maximum),
             traitNames,
@@ -940,7 +1002,7 @@ export function builderOriginChoiceDefinitions(
       prompt: `Choose ${String(selectedSpecies?.skillMaximum ?? 0)} species skill`,
       minimum: selectedSpecies?.skillMinimum ?? 0,
       maximum: selectedSpecies?.skillMaximum ?? 0,
-      options: allSkills,
+      options: allSkills.filter((option) => selectedSpecies?.skillIds.includes(option.id) === true),
     },
     {
       id: `${draft.originFeatId}.choice.skill`,
@@ -960,6 +1022,90 @@ function fillSelections(current: string[], candidates: string[], count: number):
     (id, index) => candidates.includes(id) && current.indexOf(id) === index,
   );
   return [...valid, ...candidates.filter((id) => !valid.includes(id))].slice(0, count);
+}
+
+function reconciledOriginSkills(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  species: SpeciesBuilderCatalog,
+  background: BackgroundBuilderCatalog,
+): { classSkillIds: string[]; speciesSkillIds: string[] } {
+  const selectedClass = catalog.classes[draft.classId];
+  const requiredClassSkills = classSkillCount(draft, catalog);
+  const classCandidates = selectedClass.skillIds.filter((id) => !background.skillIds.includes(id));
+  const reservedSpeciesSkill = species.skillIds.find(
+    (id) =>
+      !background.skillIds.includes(id) &&
+      classCandidates.filter((candidate) => candidate !== id).length >= requiredClassSkills,
+  );
+  const orderedClassCandidates = [
+    ...classCandidates.filter((id) => id !== reservedSpeciesSkill),
+    ...classCandidates.filter((id) => id === reservedSpeciesSkill),
+  ];
+  const classSkillIds = fillSelections(
+    draft.classSkillIds.filter((id) => id !== reservedSpeciesSkill),
+    orderedClassCandidates,
+    requiredClassSkills,
+  );
+  const preferredSpeciesSkills = species.skillIds.filter(
+    (id) => !background.skillIds.includes(id) && !classSkillIds.includes(id),
+  );
+  const speciesSkillIds = fillSelections(
+    draft.speciesSkillIds,
+    [
+      ...preferredSpeciesSkills,
+      ...species.skillIds.filter((id) => !preferredSpeciesSkills.includes(id)),
+    ],
+    species.skillMaximum,
+  );
+  return { classSkillIds, speciesSkillIds };
+}
+
+export function activeSpeciesChoices(
+  species: SpeciesBuilderCatalog,
+  selections: Readonly<Record<string, string[]>>,
+): SpeciesChoiceCatalog[] {
+  return species.choices.filter(
+    (choice) =>
+      choice.requiredWhen === undefined ||
+      selections[choice.requiredWhen.choiceId]?.includes(choice.requiredWhen.optionId) === true,
+  );
+}
+
+function reconcileSpeciesChoiceSelections(
+  species: SpeciesBuilderCatalog,
+  current: Readonly<Record<string, string[]>>,
+): Readonly<Record<string, string[]>> {
+  const next: Record<string, string[]> = {};
+  for (const choice of species.choices) {
+    const context = { ...current, ...next };
+    if (!activeSpeciesChoices(species, context).includes(choice)) continue;
+    next[choice.id] = fillSelections(
+      current[choice.id] ?? [],
+      choice.options.map((option) => option.id),
+      choice.maximum,
+    );
+  }
+  return next;
+}
+
+export function updateBuilderSpeciesChoice(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  choiceId: string,
+  optionIds: string[],
+): CharacterBuilderDraft {
+  const species = catalog.species[draft.speciesId];
+  if (species?.choices.some((choice) => choice.id === choiceId) !== true) {
+    return draft;
+  }
+  return {
+    ...draft,
+    speciesChoiceSelections: reconcileSpeciesChoiceSelections(species, {
+      ...draft.speciesChoiceSelections,
+      [choiceId]: optionIds,
+    }),
+  };
 }
 
 export function magicInitiateFeatIds(
@@ -1095,7 +1241,6 @@ export function updateBuilderBackground(
 ): CharacterBuilderDraft {
   const background = catalog.backgrounds[backgroundId];
   if (background === undefined) return draft;
-  const selectedClass = catalog.classes[draft.classId];
   const species = catalog.species[draft.speciesId];
   if (species === undefined) return draft;
   const abilityOption = background.abilityIncreaseOptions[0]?.abilityIncreases;
@@ -1117,19 +1262,13 @@ export function updateBuilderBackground(
           ) ?? originFeats.find((feat) => feat.id !== background.featId || feat.repeatable));
   if (species.originFeatMaximum > 0 && originFeat === undefined) return draft;
 
-  const classSkillIds = fillSelections(
-    draft.classSkillIds,
-    selectedClass.skillIds.filter((id) => !background.skillIds.includes(id)),
-    classSkillCount(draft, catalog),
+  const { classSkillIds, speciesSkillIds } = reconciledOriginSkills(
+    draft,
+    catalog,
+    species,
+    background,
   );
   const allSkillCandidates = skillIds.map((skill) => `${skillPrefix}${skill}`);
-  const speciesSkillIds = fillSelections(
-    draft.speciesSkillIds,
-    allSkillCandidates.filter(
-      (id) => !background.skillIds.includes(id) && !classSkillIds.includes(id),
-    ),
-    species.skillMaximum,
-  );
   const originFeatSkillIds = fillSelections(
     originFeat?.id === draft.originFeatId ? draft.originFeatSkillIds : [],
     allSkillCandidates.filter(
@@ -1172,12 +1311,11 @@ export function updateBuilderSpecies(
   const background = catalog.backgrounds[draft.backgroundId];
   if (species === undefined || background === undefined) return draft;
   const allSkillCandidates = skillIds.map((skill) => `${skillPrefix}${skill}`);
-  const speciesSkillIds = fillSelections(
-    draft.speciesSkillIds,
-    allSkillCandidates.filter(
-      (id) => !background.skillIds.includes(id) && !draft.classSkillIds.includes(id),
-    ),
-    species.skillMaximum,
+  const { classSkillIds, speciesSkillIds } = reconciledOriginSkills(
+    draft,
+    catalog,
+    species,
+    background,
   );
   const originFeats = Object.values(catalog.feats).filter(
     (feat) => feat.category === "origin" && (feat.id !== background.featId || feat.repeatable),
@@ -1195,7 +1333,7 @@ export function updateBuilderSpecies(
     allSkillCandidates.filter(
       (id) =>
         !background.skillIds.includes(id) &&
-        !draft.classSkillIds.includes(id) &&
+        !classSkillIds.includes(id) &&
         !speciesSkillIds.includes(id),
     ),
     originFeat?.skillMaximum ?? 0,
@@ -1206,20 +1344,11 @@ export function updateBuilderSpecies(
     speciesSize: species.sizeOptions.includes(draft.speciesSize)
       ? draft.speciesSize
       : (species.sizeOptions[0] ?? "medium"),
+    classSkillIds,
     speciesSkillIds,
-    speciesChoiceSelections: Object.fromEntries(
-      species.choices.map((choice) => {
-        const current =
-          draft.speciesId === species.id ? draft.speciesChoiceSelections[choice.id] : [];
-        return [
-          choice.id,
-          fillSelections(
-            current ?? [],
-            choice.options.map((option) => option.id),
-            choice.maximum,
-          ),
-        ];
-      }),
+    speciesChoiceSelections: reconcileSpeciesChoiceSelections(
+      species,
+      draft.speciesId === species.id ? draft.speciesChoiceSelections : {},
     ),
     originFeatId: originFeat?.id ?? "",
     originFeatSkillIds,
@@ -1506,9 +1635,13 @@ export function defaultBuilderDraft(
     classSkillCount,
   );
   const allSkillCandidates = skillIds.map((skill) => `${skillPrefix}${skill}`);
-  const speciesSkillIds = allSkillCandidates
-    .filter((id) => !background.skillIds.includes(id) && !classSkillIds.includes(id))
-    .slice(0, species.skillMaximum);
+  const preferredSpeciesSkills = species.skillIds.filter(
+    (id) => !background.skillIds.includes(id) && !classSkillIds.includes(id),
+  );
+  const speciesSkillIds = [
+    ...preferredSpeciesSkills,
+    ...species.skillIds.filter((id) => !preferredSpeciesSkills.includes(id)),
+  ].slice(0, species.skillMaximum);
   const originFeatSkillIds = allSkillCandidates
     .filter(
       (id) =>
@@ -1533,12 +1666,7 @@ export function defaultBuilderDraft(
     asiAbility: selectedClass.builder.defaultAbilityScoreImprovementAbility,
     classSkillIds,
     speciesSkillIds,
-    speciesChoiceSelections: Object.fromEntries(
-      species.choices.map((choice) => [
-        choice.id,
-        choice.options.slice(0, choice.maximum).map((option) => option.id),
-      ]),
-    ),
+    speciesChoiceSelections: reconcileSpeciesChoiceSelections(species, {}),
     originFeatSkillIds,
     magicInitiateChoices: {},
     expertiseSkillIds: [],
@@ -1747,7 +1875,11 @@ export function validateBuilderDraft(
   ) {
     issues.push("Choose an eligible Origin feat granted by your species.");
   }
-  for (const choice of selectedSpecies?.choices ?? []) {
+  const activeChoices =
+    selectedSpecies === undefined
+      ? []
+      : activeSpeciesChoices(selectedSpecies, draft.speciesChoiceSelections);
+  for (const choice of activeChoices) {
     const selections = draft.speciesChoiceSelections[choice.id] ?? [];
     if (
       selections.length < choice.minimum ||
@@ -1760,7 +1892,7 @@ export function validateBuilderDraft(
   }
   if (
     Object.keys(draft.speciesChoiceSelections).some(
-      (choiceId) => !selectedSpecies?.choices.some((choice) => choice.id === choiceId),
+      (choiceId) => !activeChoices.some((choice) => choice.id === choiceId),
     )
   ) {
     issues.push("Remove choices belonging to a different species.");
@@ -1787,7 +1919,7 @@ export function validateBuilderDraft(
     (draft.speciesSkillIds.length < selectedSpecies.skillMinimum ||
       draft.speciesSkillIds.length > selectedSpecies.skillMaximum ||
       new Set(draft.speciesSkillIds).size !== draft.speciesSkillIds.length ||
-      draft.speciesSkillIds.some((id) => !allSkillOptions.includes(id)))
+      draft.speciesSkillIds.some((id) => !selectedSpecies.skillIds.includes(id)))
   ) {
     issues.push(
       `Choose exactly ${String(selectedSpecies.skillMaximum)} ${selectedSpecies.name} skill proficiency.`,
@@ -2066,7 +2198,7 @@ function assembleCharacter(
       featIds,
       learnedSpellIds: spellcaster ? draft.learnedSpellIds : [],
       choices: [
-        ...selectedSpecies.choices.map((choice) => ({
+        ...activeSpeciesChoices(selectedSpecies, draft.speciesChoiceSelections).map((choice) => ({
           choiceId: choice.id,
           optionIds: draft.speciesChoiceSelections[choice.id] ?? [],
         })),

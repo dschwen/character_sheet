@@ -559,6 +559,48 @@ describe("guided character level up", () => {
     ).toContain("Choose a Draconic Ancestor cannot change during level up.");
   });
 
+  it("preserves Elven Lineage choices and unlocks lineage spells by character level", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const lineageChoiceId = "srd521.species.elf.choice.elven-lineage";
+    const original = buildCharacter(
+      updateBuilderSpecies(
+        defaultBuilderDraft(fighterId, catalog, 2, "Drow Traveler"),
+        catalog,
+        "srd521.species.elf",
+      ),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-10T15:00:00.000Z"),
+    });
+
+    expect(draft.speciesChoiceSelections[lineageChoiceId]).toEqual([
+      "srd521.species.elf.lineage.drow",
+    ]);
+    expect(preview.issues).toEqual([]);
+    expect(preview.evaluation?.spells).toContainEqual(
+      expect.objectContaining({ id: "srd521.spell.faerie-fire", prepared: true }),
+    );
+    expect(preview.evaluation?.resources).toContainEqual(
+      expect.objectContaining({ id: "srd521.resource.elf.drow.faerie-fire", current: 1 }),
+    );
+
+    draft.speciesChoiceSelections = {
+      ...draft.speciesChoiceSelections,
+      [lineageChoiceId]: ["srd521.species.elf.lineage.wood"],
+    };
+    expect(
+      previewLevelUp(original, draft, rulesPackage, {
+        id: original.id,
+        now: new Date("2026-08-10T16:00:00.000Z"),
+      }).issues,
+    ).toContain("Choose an Elven Lineage cannot change during level up.");
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

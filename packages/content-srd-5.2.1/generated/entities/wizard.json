@@ -1635,6 +1635,65 @@
   {
     "body": {
       "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "bat fur and a piece of coal",
+        "somatic": false,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "For the duration, magical Darkness spreads from a point within range and fills a 15-foot-radius Sphere. Darkvision can’t see through it, and nonmagical light can’t illuminate it. Alternatively, you cast the spell on an object that isn’t being worn or carried, causing the Darkness to fill a 15-foot Emanation originating from that object. Covering that object with something opaque, such as a bowl or helm, blocks the Darkness. If any of this spell’s area overlaps with an area of Bright Light or Dim Light created by a spell of level 2 or lower, that other spell is dispelled.",
+      "duration": "Concentration, up to 10 minutes",
+      "hasHigherLevelEffect": false,
+      "level": 2,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "evocation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.darkness",
+    "kind": "spell",
+    "name": {
+      "en": "Darkness"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0122-b003",
+          "p0122-b004",
+          "p0122-b005"
+        ],
+        "page": 122,
+        "quoteHash": "3e970d181ad4409022f3a980b4e11c2f012ca50f2363fb80e20feb050d399b2b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "evocation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
       "castingTime": "Action or Ritual",
       "classes": [
         "bard",

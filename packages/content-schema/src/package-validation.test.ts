@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(555);
+    expect(parsedEntities).toHaveLength(557);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -436,7 +436,7 @@ describe("bootstrap content package", () => {
     expect(authoringIr.filter((ir) => ir.kind === "subclass-feature")).toHaveLength(2);
   });
 
-  it("validates all SRD backgrounds, Human, Dwarf, Dragonborn, and the modeled Origin feats", () => {
+  it("validates all SRD backgrounds, the reviewed species, and modeled Origin feats", () => {
     const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
     const entities = contentEntitySchema
       .array()
@@ -456,6 +456,7 @@ describe("bootstrap content package", () => {
       "srd521.species.human",
       "srd521.species.dwarf",
       "srd521.species.dragonborn",
+      "srd521.species.elf",
       "srd521.feat.origin.savage-attacker",
       "srd521.feat.origin.skilled",
       "srd521.feat.origin.alert",
@@ -464,7 +465,7 @@ describe("bootstrap content package", () => {
       "srd521.feat.origin.magic-initiate.wizard",
     ]);
     expect(entities.map((entity) => entity.source[0]?.page)).toEqual([
-      83, 83, 83, 83, 86, 84, 84, 87, 87, 87, 87, 87, 87,
+      83, 83, 83, 83, 86, 84, 84, 84, 87, 87, 87, 87, 87, 87,
     ]);
     expect(savageAttacker.proposedRules[0]).toMatchObject({
       type: "grant-action",
@@ -500,8 +501,9 @@ describe("bootstrap content package", () => {
       })
       .parse(wizard?.body);
 
-    expect(entities).toHaveLength(38);
-    expect(spells).toHaveLength(20);
+    expect(entities).toHaveLength(39);
+    expect(spells).toHaveLength(21);
+    expect(spells).toContainEqual(expect.objectContaining({ id: "srd521.spell.darkness" }));
     expect(wizardBody.spellList).toHaveLength(217);
     expect(wizardBody.progression[4]).toMatchObject({
       level: 5,

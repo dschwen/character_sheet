@@ -7,6 +7,7 @@ import type { StartingEquipmentItem } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 
 import {
+  activeSpeciesChoices,
   buildCharacter,
   builderClassIds,
   builderOriginChoiceDefinitions,
@@ -27,6 +28,7 @@ import {
   updateBuilderFeatureChoice,
   updateBuilderLevel,
   updateBuilderSpecies,
+  updateBuilderSpeciesChoice,
   updateMagicInitiateSelection,
   type BuilderClassId,
   type CharacterBuilderDraft,
@@ -423,31 +425,35 @@ export function CharacterBuilder({
                   </select>
                   <small>Walking speed {String(selectedSpecies.walkingSpeed)} feet.</small>
                 </label>
-                {selectedSpecies.choices.map((choice) => (
-                  <label className="builder-field compact-field" key={choice.id}>
-                    {choice.prompt}
-                    <select
-                      value={draft.speciesChoiceSelections[choice.id]?.[0] ?? ""}
-                      onChange={(event) => {
-                        setDraft((value) => ({
-                          ...value,
-                          speciesChoiceSelections: {
-                            ...value.speciesChoiceSelections,
-                            [choice.id]: [event.target.value],
-                          },
-                        }));
-                      }}
-                    >
-                      {choice.options.map((option) => (
-                        <option key={option.id} value={option.id}>
-                          {option.label}
-                          {option.description === undefined ? "" : ` · ${option.description}`}
-                        </option>
-                      ))}
-                    </select>
-                    <small>This permanent species choice is preserved when you level up.</small>
-                  </label>
-                ))}
+                {activeSpeciesChoices(selectedSpecies, draft.speciesChoiceSelections).map(
+                  (choice) => (
+                    <label className="builder-field compact-field" key={choice.id}>
+                      {choice.prompt}
+                      <select
+                        value={draft.speciesChoiceSelections[choice.id]?.[0] ?? ""}
+                        onChange={(event) => {
+                          setDraft((value) =>
+                            updateBuilderSpeciesChoice(value, catalog, choice.id, [
+                              event.target.value,
+                            ]),
+                          );
+                        }}
+                      >
+                        {choice.options.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.label}
+                            {option.description === undefined ? "" : ` · ${option.description}`}
+                          </option>
+                        ))}
+                      </select>
+                      <small>
+                        {choice.changeOn.includes("long-rest")
+                          ? "This choice can be replaced after a Long Rest."
+                          : "This permanent species choice is preserved when you level up."}
+                      </small>
+                    </label>
+                  ),
+                )}
               </div>
               {selectedSpecies.originFeatMaximum === 0 ? null : (
                 <div className="builder-choice-grid origin-feat-grid">
@@ -856,8 +862,7 @@ export function CharacterBuilder({
                   </small>
                 </div>
                 <div className="choice-pills">
-                  {skillIds.map((skill) => {
-                    const id = `srd521.skill.${skill}`;
+                  {selectedSpecies.skillIds.map((id) => {
                     return (
                       <button
                         key={id}

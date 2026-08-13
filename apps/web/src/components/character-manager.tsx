@@ -312,9 +312,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     [builderCatalog, character],
   );
   const evaluation = result.evaluation;
-  const featSpellcastingOption = evaluation?.spells
+  const additionalSpellcastingOption = evaluation?.spells
     .flatMap((spell) => spell.castingOptions ?? [])
-    .find((option) => option.sourceId.includes(".feat.origin.magic-initiate."));
+    .find((option) => evaluation.spellcasting?.classId !== option.sourceId);
   const statefulActions = evaluation?.actions.filter(supportsStateTransition) ?? [];
   const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
 
@@ -1224,7 +1224,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             {castFeedback.asRitual
                               ? "Ritual · no spell slot spent"
                               : castFeedback.freeCast === true
-                                ? "Magic Initiate · free casting spent"
+                                ? "Innate feature · free casting spent"
                                 : castFeedback.slotLevel === undefined
                                   ? "Cantrip · no spell slot spent"
                                   : `Level ${String(castFeedback.slotLevel)} slot spent · ${String(castFeedback.slotsRemaining ?? 0)} remaining`}
@@ -1698,42 +1698,46 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             {tab === "spells" ? (
               <div className="sheet-grid two-column">
                 <Section title="Spellcasting" eyebrow="Magic">
-                  {evaluation.spellcasting === undefined && featSpellcastingOption === undefined ? (
+                  {evaluation.spellcasting === undefined &&
+                  additionalSpellcastingOption === undefined ? (
                     <p className="empty">This character does not have spellcasting.</p>
                   ) : evaluation.spellcasting === undefined ? (
                     <>
                       <div className="spell-metrics">
                         <TraceButton
-                          traceId={featSpellcastingOption?.attackTraceId ?? ""}
+                          traceId={additionalSpellcastingOption?.attackTraceId ?? ""}
                           onSelect={setSelectedTraceId}
                           roll={{
-                            label: "Magic Initiate spell attack",
-                            modifier: featSpellcastingOption?.attackBonus ?? 0,
+                            label: "Innate spell attack",
+                            modifier: additionalSpellcastingOption?.attackBonus ?? 0,
                             mode: "normal",
                           }}
                           onRoll={performRoll}
                         >
                           <span>Spell attack</span>
-                          <strong>{signed(featSpellcastingOption?.attackBonus ?? 0)}</strong>
+                          <strong>{signed(additionalSpellcastingOption?.attackBonus ?? 0)}</strong>
                         </TraceButton>
                         <TraceButton
-                          traceId={featSpellcastingOption?.saveTraceId ?? ""}
+                          traceId={additionalSpellcastingOption?.saveTraceId ?? ""}
                           onSelect={setSelectedTraceId}
                         >
                           <span>Save DC</span>
                           <strong>
-                            {String(featSpellcastingOption?.saveDifficultyClass ?? 0)}
+                            {String(additionalSpellcastingOption?.saveDifficultyClass ?? 0)}
                           </strong>
                         </TraceButton>
                         <div>
                           <span>Ability</span>
                           <strong>
-                            {(featSpellcastingOption?.ability ?? "").slice(0, 3).toUpperCase()}
+                            {(additionalSpellcastingOption?.ability ?? "")
+                              .slice(0, 3)
+                              .toUpperCase()}
                           </strong>
                         </div>
                       </div>
                       <p className="empty">
-                        Magic Initiate’s level 1 spell can be cast free once per Long Rest.
+                        Innate leveled spells can be cast free as shown, then recharge on a Long
+                        Rest.
                       </p>
                     </>
                   ) : (
@@ -1923,6 +1927,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               option.sourceId.includes(".feat.origin.magic-initiate."),
                             ) ? (
                               <i>Magic Initiate</i>
+                            ) : null}
+                            {spell.castingOptions?.some((option) =>
+                              option.sourceId.startsWith("srd521.species."),
+                            ) ? (
+                              <i>Species Magic</i>
                             ) : null}
                           </span>
                           <small>

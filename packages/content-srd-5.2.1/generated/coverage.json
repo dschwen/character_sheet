@@ -1,13 +1,13 @@
 {
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 555,
+    "STRUCTURED": 557,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
     "VERIFIED": 0
   },
   "generatedAt": null,
-  "note": "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, and Dragonborn; equipment; and representative spells.",
+  "note": "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, and Elf; equipment; and representative spells.",
   "package": "srd-5.2.1"
 }

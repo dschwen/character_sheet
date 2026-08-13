@@ -3,6 +3,7 @@ import type { CharacterEvaluation, LoadedRulesPackage } from "@dnd/rules-api";
 import { evaluateCharacter } from "@dnd/rules-core";
 
 import {
+  activeSpeciesChoices,
   buildCharacter,
   builderClassIds,
   characterBuilderCatalog,
@@ -104,11 +105,17 @@ function speciesChoiceSelections(
   character: CharacterDocument,
   species: BuilderCatalog["species"][string],
 ): Readonly<Record<string, string[]>> {
-  return Object.fromEntries(
+  const selections = Object.fromEntries(
     species.choices.map((choice) => [
       choice.id,
       character.build.choices.find((selection) => selection.choiceId === choice.id)?.optionIds ??
         [],
+    ]),
+  );
+  return Object.fromEntries(
+    activeSpeciesChoices(species, selections).map((choice) => [
+      choice.id,
+      selections[choice.id] ?? [],
     ]),
   );
 }
@@ -353,7 +360,8 @@ function advancementIssues(
   const selectedSpecies = catalog.species[draft.speciesId];
   if (selectedSpecies !== undefined) {
     const currentSpeciesChoices = speciesChoiceSelections(character, selectedSpecies);
-    for (const choice of selectedSpecies.choices) {
+    for (const choice of activeSpeciesChoices(selectedSpecies, draft.speciesChoiceSelections)) {
+      if (choice.changeOn.includes("level-up")) continue;
       const before = currentSpeciesChoices[choice.id] ?? [];
       const after = draft.speciesChoiceSelections[choice.id] ?? [];
       if (before.length !== after.length || before.some((optionId) => !after.includes(optionId))) {

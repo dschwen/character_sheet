@@ -26,6 +26,7 @@ import {
   updateBuilderFeatureChoice,
   updateBuilderLevel,
   updateBuilderSpecies,
+  updateBuilderSpeciesChoice,
   validateBuilderDraft,
   warlockId,
   wizardId,
@@ -1396,6 +1397,104 @@ describe("guided character builder", () => {
         id: "srd521.resource.dragonborn.draconic-flight",
         maximum: 1,
       }),
+    );
+  });
+
+  it("builds Elf lineages with source-driven senses, movement, and innate spellcasting", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const speciesId = "srd521.species.elf";
+    const lineageChoiceId = "srd521.species.elf.choice.elven-lineage";
+    const abilityChoiceId = "srd521.species.elf.choice.spellcasting-ability";
+    const highCantripChoiceId = "srd521.species.elf.choice.high-elf-cantrip";
+    const base = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 5, "Lineage Adept"),
+      catalog,
+      speciesId,
+    );
+
+    expect(catalog.species[speciesId]).toMatchObject({
+      skillIds: ["srd521.skill.insight", "srd521.skill.perception", "srd521.skill.survival"],
+    });
+    expect(base.speciesChoiceSelections).toMatchObject({
+      [lineageChoiceId]: ["srd521.species.elf.lineage.drow"],
+      [abilityChoiceId]: ["srd521.species.elf.spellcasting-ability.intelligence"],
+    });
+    expect(base.speciesChoiceSelections[highCantripChoiceId]).toBeUndefined();
+
+    const drow = buildCharacter(base, rulesPackage, options);
+    const drowEvaluation = evaluateCharacter({
+      character: drow,
+      packages: [rulesPackage],
+      context: { situationalTags: ["avoid-or-end-charmed"] },
+    });
+    expect(drowEvaluation.validations.filter((message) => message.severity === "error")).toEqual(
+      [],
+    );
+    expect(drowEvaluation.facts["sense.darkvision.range"]).toBe(120);
+    expect(drowEvaluation.d20Tests["savingThrow.wisdom"]?.rollMode).toBe("advantage");
+    expect(drowEvaluation.spells).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.spell.dancing-lights", prepared: false }),
+        expect.objectContaining({ id: "srd521.spell.faerie-fire", prepared: true }),
+        expect.objectContaining({ id: "srd521.spell.darkness", prepared: true }),
+      ]),
+    );
+    expect(drowEvaluation.resources).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.resource.elf.drow.faerie-fire", current: 1 }),
+        expect.objectContaining({ id: "srd521.resource.elf.drow.darkness", current: 1 }),
+      ]),
+    );
+    const darkness = proposeSpellCast(
+      { character: drow, packages: [rulesPackage] },
+      {
+        spellId: "srd521.spell.darkness",
+        castingSourceId: speciesId,
+        useFreeCast: true,
+      },
+    );
+    expect(darkness.applicable).toBe(true);
+    expect(darkness.nextState.expendedResources["srd521.resource.elf.drow.darkness"]).toBe(1);
+    expect(darkness.nextState.concentrationSpellId).toBe("srd521.spell.darkness");
+
+    const highDraft = updateBuilderSpeciesChoice(base, catalog, lineageChoiceId, [
+      "srd521.species.elf.lineage.high",
+    ]);
+    expect(highDraft.speciesChoiceSelections[highCantripChoiceId]).toEqual([
+      "srd521.spell.prestidigitation",
+    ]);
+    expect(
+      catalog.species[speciesId]?.choices.find((choice) => choice.id === highCantripChoiceId)
+        ?.options.length,
+    ).toBeGreaterThan(1);
+    expect(
+      evaluateCharacter({
+        character: buildCharacter(highDraft, rulesPackage, options),
+        packages: [rulesPackage],
+      }).spells,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.spell.prestidigitation" }),
+        expect.objectContaining({ id: "srd521.spell.detect-magic" }),
+        expect.objectContaining({ id: "srd521.spell.misty-step" }),
+      ]),
+    );
+
+    const woodDraft = updateBuilderSpeciesChoice(base, catalog, lineageChoiceId, [
+      "srd521.species.elf.lineage.wood",
+    ]);
+    const woodEvaluation = evaluateCharacter({
+      character: buildCharacter(woodDraft, rulesPackage, options),
+      packages: [rulesPackage],
+    });
+    expect(woodEvaluation.facts["speed.walking"]).toBe(35);
+    expect(woodEvaluation.spells).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.spell.druidcraft" }),
+        expect.objectContaining({ id: "srd521.spell.longstrider" }),
+        expect.objectContaining({ id: "srd521.spell.pass-without-trace" }),
+      ]),
     );
   });
 

@@ -4,6 +4,7 @@ from srd_extract.origins import (
     parse_background,
     parse_dragonborn,
     parse_dwarf,
+    parse_elf,
     parse_human,
     parse_origin_feat,
     parse_soldier,
@@ -135,6 +136,31 @@ def test_parse_dragonborn_species() -> None:
     }
     assert body["actions"][0]["damage"]["diceCountByLevel"]["5"] == 2
     assert body["actions"][1]["minimumLevel"] == 5
+
+
+def test_parse_elf_species() -> None:
+    body = parse_elf(
+        "Elf Creature Type: Humanoid Size: Medium (about 5–6 feet tall) Speed: 30 feet "
+        "As an Elf, you have these special traits. Darkvision. You have Darkvision with a range "
+        "of 60 feet. Elven Lineage. Choose from the Elven Lineages table. Drow know Dancing "
+        "Lights, Faerie Fire, and Darkness. High Elves know Prestidigitation, Detect Magic, and "
+        "Misty Step. Wood Elves know Druidcraft, Longstrider, and Pass without Trace. "
+        "Intelligence, Wisdom, or Charisma is your spellcasting ability. Fey Ancestry gives "
+        "Advantage on saves to avoid or end the Charmed condition. Keen Senses grants the "
+        "Insight, Perception, or Survival skill. Trance lets you finish a Long Rest in 4 hours."
+    )
+
+    lineage = body["choices"][0]
+    assert [option["name"] for option in lineage["options"]] == ["Drow", "High Elf", "Wood Elf"]
+    assert lineage["options"][0]["darkvisionRange"] == 120
+    assert lineage["options"][2]["walkingSpeed"] == 35
+    assert lineage["options"][1]["spellGrants"][1]["minimumLevel"] == 5
+    assert body["spellChoices"][0]["defaultSpellId"] == "srd521.spell.prestidigitation"
+    assert body["skillProficiencyChoice"]["options"] == [
+        "srd521.skill.insight",
+        "srd521.skill.perception",
+        "srd521.skill.survival",
+    ]
 
 
 def test_parse_origin_feats_rejects_incomplete_benefits() -> None:
