@@ -26,6 +26,7 @@ ELF_ID = "srd521.species.elf"
 GNOME_ID = "srd521.species.gnome"
 GOLIATH_ID = "srd521.species.goliath"
 HALFLING_ID = "srd521.species.halfling"
+ORC_ID = "srd521.species.orc"
 ALERT_ID = "srd521.feat.origin.alert"
 MAGIC_INITIATE_IDS = {
     "cleric": "srd521.feat.origin.magic-initiate.cleric",
@@ -43,6 +44,7 @@ ORIGIN_IDS = {
     GNOME_ID,
     GOLIATH_ID,
     HALFLING_ID,
+    ORC_ID,
     ALERT_ID,
     *MAGIC_INITIATE_IDS.values(),
     SAVAGE_ATTACKER_ID,
@@ -829,6 +831,70 @@ def parse_halfling(text: str) -> dict[str, Any]:
     }
 
 
+def parse_orc(text: str) -> dict[str, Any]:
+    creature_type = re.search(r"Creature Type: (?P<value>\w+)", text)
+    size = re.search(r"Size: (?P<value>Medium|Small)", text)
+    speed = re.search(r"Speed: (?P<value>\d+) feet", text)
+    required_phrases = (
+        "Dash action as a Bonus Action",
+        "Temporary Hit Points equal to your Proficiency Bonus",
+        "number of times equal to your Proficiency Bonus",
+        "finish a Short or Long Rest",
+        "Darkvision with a range of 120 feet",
+        "reduced to 0 Hit Points but not killed outright",
+        "drop to 1 Hit Point instead",
+    )
+    if creature_type is None or size is None or speed is None:
+        raise ValueError("Orc species does not match the expected fields")
+    if not all(phrase in text for phrase in required_phrases):
+        raise ValueError("Orc trait text is incomplete")
+    adrenaline_resource_id = "srd521.resource.orc.adrenaline-rush"
+    endurance_resource_id = "srd521.resource.orc.relentless-endurance"
+    return {
+        "creatureType": creature_type.group("value").casefold(),
+        "sizeOptions": [size.group("value").casefold()],
+        "walkingSpeed": int(speed.group("value")),
+        "darkvisionRange": 120,
+        "resources": [
+            {
+                "id": adrenaline_resource_id,
+                "maximum": "proficiency-bonus",
+                "recharge": [
+                    {"event": "short-rest", "amount": "all"},
+                    {"event": "long-rest", "amount": "all"},
+                ],
+            },
+            {
+                "id": endurance_resource_id,
+                "maximum": 1,
+                "recharge": [{"event": "long-rest", "amount": "all"}],
+            },
+        ],
+        "actions": [
+            {
+                "id": "srd521.action.orc.adrenaline-rush",
+                "actionEconomy": "bonus-action",
+                "resourceId": adrenaline_resource_id,
+                "spends": 1,
+                "effect": "Take the Dash action and gain Temporary Hit Points",
+                "temporaryHitPointsFact": "proficiencyBonus",
+            },
+            {
+                "id": "srd521.action.orc.relentless-endurance",
+                "actionEconomy": "no-action",
+                "resourceId": endurance_resource_id,
+                "spends": 1,
+                "requiredCurrentHitPoints": 0,
+                "requirement": "Be reduced to 0 Hit Points without being killed outright",
+                "effect": "Drop to 1 Hit Point instead",
+                "minimumCurrentHitPoints": 1,
+            },
+        ],
+        "traitNames": ["Adrenaline Rush", "Darkvision", "Relentless Endurance"],
+        "traitsText": text,
+    }
+
+
 def parse_origin_feat(
     name: str,
     text: str,
@@ -1034,6 +1100,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         node for node in _section(nodes, "Goliath", "Halfling") if node["kind"] != "MetadataNode"
     ]
     halfling_nodes = _section(nodes, "Halfling", "Human")
+    orc_nodes = _section(nodes, "Orc", "Tiefling")
     alert_nodes = _section(nodes, "Alert", "Magic Initiate")
     magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
@@ -1106,6 +1173,14 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         _source_spans(halfling_nodes),
         parse_halfling(_text(halfling_nodes)),
     )
+    orc = _entity(
+        ORC_ID,
+        "species",
+        "Orc",
+        ["species", "humanoid", "orc"],
+        _source_spans(orc_nodes),
+        parse_orc(_text(orc_nodes)),
+    )
     alert_source = _source_spans(alert_nodes)
     alert = _entity(
         ALERT_ID,
@@ -1157,6 +1232,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         gnome,
         goliath,
         halfling,
+        orc,
         savage_attacker,
         skilled,
         alert,
@@ -1188,7 +1264,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["note"] = (
         "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
         "Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, "
-        "Elf, Gnome, Goliath, and Halfling; equipment; "
+        "Elf, Gnome, Goliath, Halfling, and Orc; equipment; "
         "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
@@ -1202,6 +1278,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "gnome": gnome["body"],
         "goliath": goliath["body"],
         "halfling": halfling["body"],
+        "orc": orc["body"],
         "originFeats": {
             ALERT_ID: alert["body"],
             **{entity["id"]: entity["body"] for entity in magic_initiates},

@@ -97,6 +97,8 @@ interface ActionRequirements {
   rollDiceSize?: number;
   rollLabel?: string;
   rollModifier?: number;
+  temporaryHitPoints?: number;
+  minimumCurrentHitPoints?: number;
 }
 
 interface CastFeedback {
@@ -122,6 +124,8 @@ function actionRequirements(action: ActionSummary): ActionRequirements {
   const damage = objectValue(action.parameters?.damage);
   const roll = objectValue(action.parameters?.roll);
   const savingThrow = objectValue(action.parameters?.savingThrow);
+  const temporaryHitPoints = action.parameters?.temporaryHitPoints;
+  const minimumCurrentHitPoints = action.parameters?.minimumCurrentHitPoints;
   return {
     ...(typeof diceCount === "number" ? { diceCount } : {}),
     ...(typeof diceSize === "number" ? { diceSize } : {}),
@@ -137,6 +141,8 @@ function actionRequirements(action: ActionSummary): ActionRequirements {
     ...(typeof roll?.diceSize === "number" ? { rollDiceSize: roll.diceSize } : {}),
     ...(typeof roll?.label === "string" ? { rollLabel: roll.label } : {}),
     ...(typeof roll?.modifier === "number" ? { rollModifier: roll.modifier } : {}),
+    ...(typeof temporaryHitPoints === "number" ? { temporaryHitPoints } : {}),
+    ...(typeof minimumCurrentHitPoints === "number" ? { minimumCurrentHitPoints } : {}),
   };
 }
 
@@ -1216,6 +1222,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 <span>
                                   {requirements.saveAbility.slice(0, 3).toUpperCase()} save · DC{" "}
                                   {String(requirements.saveDifficultyClass)}
+                                </span>
+                              )}
+                              {requirements.temporaryHitPoints === undefined ? null : (
+                                <span>
+                                  Gain {String(requirements.temporaryHitPoints)} Temporary HP
+                                </span>
+                              )}
+                              {requirements.minimumCurrentHitPoints === undefined ? null : (
+                                <span>
+                                  Raise HP to {String(requirements.minimumCurrentHitPoints)}
                                 </span>
                               )}
                               {requirements.diceCount === undefined ? null : (

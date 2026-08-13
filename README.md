@@ -391,8 +391,8 @@ Eldritch Invocations and their prerequisites, and all five Fiend Patron features
 source-linked representative spells and authoring IR for Magical Cunning’s limited Pact-slot
 recovery.
 
-Generate all four SRD backgrounds, Human, Dwarf, Dragonborn, Elf, Gnome, Goliath, Halfling, and the
-Origin feat slice from pages 83–87:
+Generate all four SRD backgrounds, Human, Dwarf, Dragonborn, Elf, Gnome, Goliath, Halfling, Orc, and
+the Origin feat slice from pages 83–87:
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
@@ -407,16 +407,17 @@ Origin feat slice from pages 83–87:
 ```
 
 This parser generates typed Acolyte, Criminal, Sage, Soldier, Human, Dwarf, Dragonborn, Elf, Gnome,
-Goliath, Halfling, Alert, Savage Attacker, Skilled, and Cleric/Druid/Wizard Magic Initiate entities.
-Dragonborn includes a data-driven Draconic Ancestry selection, its matching resistance and Breath
-Weapon, Darkvision, and level-5 Draconic Flight. Elf includes lineage and spellcasting-ability
-choices, Keen Senses, lineage movement and Darkvision, and level-gated innate spells with Long Rest
-free casts. Gnome includes Forest and Rock lineages, Gnomish Cunning, innate spells,
-proficiency-bonus free casts of Speak with Animals, and the Rock Gnome clockwork-device activity.
-Goliath includes all six Giant Ancestry boons and their shared uses, Powerful Build, and level-5
-Large Form. Halfling includes Brave, movement and hiding permissions, and automatic Luck rerolls
-with visible dice feedback. The parser also generates sheet-automated Alert Initiative and
-roll-assisted Savage Attacker authoring IR.
+Goliath, Halfling, Orc, Alert, Savage Attacker, Skilled, and Cleric/Druid/Wizard Magic Initiate
+entities. Dragonborn includes a data-driven Draconic Ancestry selection, its matching resistance
+and Breath Weapon, Darkvision, and level-5 Draconic Flight. Elf includes lineage and
+spellcasting-ability choices, Keen Senses, lineage movement and Darkvision, and level-gated innate
+spells with Long Rest free casts. Gnome includes Forest and Rock lineages, Gnomish Cunning, innate
+spells, proficiency-bonus free casts of Speak with Animals, and the Rock Gnome clockwork-device
+activity. Goliath includes all six Giant Ancestry boons and their shared uses, Powerful Build, and
+level-5 Large Form. Halfling includes Brave, movement and hiding permissions, and automatic Luck
+rerolls with visible dice feedback. Orc includes 120-foot Darkvision, proficiency-scaled Adrenaline
+Rush with Short or Long Rest recovery, and once-per-Long-Rest Relentless Endurance. The parser also
+generates sheet-automated Alert Initiative and roll-assisted Savage Attacker authoring IR.
 
 Generate structured weapon, armor, adventuring-gear, and ammunition entities from SRD pages 91–92
 and 95–96:

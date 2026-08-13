@@ -25076,6 +25076,97 @@
   },
   {
     "body": {
+      "actions": [
+        {
+          "actionEconomy": "bonus-action",
+          "effect": "Take the Dash action and gain Temporary Hit Points",
+          "id": "srd521.action.orc.adrenaline-rush",
+          "resourceId": "srd521.resource.orc.adrenaline-rush",
+          "spends": 1,
+          "temporaryHitPointsFact": "proficiencyBonus"
+        },
+        {
+          "actionEconomy": "no-action",
+          "effect": "Drop to 1 Hit Point instead",
+          "id": "srd521.action.orc.relentless-endurance",
+          "minimumCurrentHitPoints": 1,
+          "requiredCurrentHitPoints": 0,
+          "requirement": "Be reduced to 0 Hit Points without being killed outright",
+          "resourceId": "srd521.resource.orc.relentless-endurance",
+          "spends": 1
+        }
+      ],
+      "creatureType": "humanoid",
+      "darkvisionRange": 120,
+      "resources": [
+        {
+          "id": "srd521.resource.orc.adrenaline-rush",
+          "maximum": "proficiency-bonus",
+          "recharge": [
+            {
+              "amount": "all",
+              "event": "short-rest"
+            },
+            {
+              "amount": "all",
+              "event": "long-rest"
+            }
+          ]
+        },
+        {
+          "id": "srd521.resource.orc.relentless-endurance",
+          "maximum": 1,
+          "recharge": [
+            {
+              "amount": "all",
+              "event": "long-rest"
+            }
+          ]
+        }
+      ],
+      "sizeOptions": [
+        "medium"
+      ],
+      "traitNames": [
+        "Adrenaline Rush",
+        "Darkvision",
+        "Relentless Endurance"
+      ],
+      "traitsText": "Orc Creature Type: Humanoid Size: Medium (about 6–7 feet tall) Speed: 30 feet As an Orc, you have these special traits. Adrenaline Rush. You can take the Dash action as a Bonus Action. When you do so, you gain a number of Temporary Hit Points equal to your Proficiency Bonus. You can use this trait a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Short or Long Rest. Darkvision. You have Darkvision with a range of 120 feet. Relentless Endurance. When you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point instead. Once you use this trait, you can’t do so again until you finish a Long Rest.",
+      "walkingSpeed": 30
+    },
+    "id": "srd521.species.orc",
+    "kind": "species",
+    "name": {
+      "en": "Orc"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Orc extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0086-b010",
+          "p0086-b011"
+        ],
+        "page": 86,
+        "quoteHash": "0aaea438db4063b0d99724f4f1c4a839d0a58af606311c534d8d05ef1611eb5a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "species",
+      "humanoid",
+      "orc"
+    ]
+  },
+  {
+    "body": {
       "category": "origin",
       "chooseDamageRoll": "either",
       "description": "You’ve trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",

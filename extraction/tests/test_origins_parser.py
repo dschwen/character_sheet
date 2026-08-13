@@ -8,6 +8,7 @@ from srd_extract.origins import (
     parse_gnome,
     parse_goliath,
     parse_halfling,
+    parse_orc,
     parse_human,
     parse_origin_feat,
     parse_soldier,
@@ -236,6 +237,29 @@ def test_parse_halfling_species() -> None:
         "species.movement.canEnterLargerCreatureSpace": True,
         "species.hide.obscuredByLargerCreature": True,
     }
+
+
+def test_parse_orc_species() -> None:
+    body = parse_orc(
+        "Orc Creature Type: Humanoid Size: Medium (about 6–7 feet tall) Speed: 30 feet "
+        "Adrenaline Rush. You can take the Dash action as a Bonus Action and gain Temporary Hit "
+        "Points equal to your Proficiency Bonus. You can use this trait a number of times equal "
+        "to your Proficiency Bonus, and regain uses when you finish a Short or Long Rest. "
+        "Darkvision. You have Darkvision with a range of 120 feet. Relentless Endurance. When "
+        "you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point "
+        "instead."
+    )
+
+    assert body["sizeOptions"] == ["medium"]
+    assert body["darkvisionRange"] == 120
+    assert body["resources"][0]["maximum"] == "proficiency-bonus"
+    assert [rule["event"] for rule in body["resources"][0]["recharge"]] == [
+        "short-rest",
+        "long-rest",
+    ]
+    assert body["actions"][0]["temporaryHitPointsFact"] == "proficiencyBonus"
+    assert body["actions"][1]["requiredCurrentHitPoints"] == 0
+    assert body["actions"][1]["minimumCurrentHitPoints"] == 1
 
 
 def test_parse_origin_feats_rejects_incomplete_benefits() -> None:

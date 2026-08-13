@@ -703,6 +703,36 @@ describe("guided character level up", () => {
     expect(preview.evaluation?.facts["species.hide.obscuredByLargerCreature"]).toBe(true);
   });
 
+  it("preserves Orc traits and scales Adrenaline Rush with proficiency during level up", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const original = buildCharacter(
+      updateBuilderSpecies(
+        defaultBuilderDraft(fighterId, catalog, 4, "Orc Pathfinder"),
+        catalog,
+        "srd521.species.orc",
+      ),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-10T22:00:00.000Z"),
+    });
+
+    expect(draft.speciesId).toBe("srd521.species.orc");
+    expect(preview.issues).toEqual([]);
+    expect(preview.evaluation?.resources).toContainEqual(
+      expect.objectContaining({ id: "srd521.resource.orc.adrenaline-rush", maximum: 3 }),
+    );
+    expect(
+      preview.evaluation?.actions.find(
+        (action) => action.id === "srd521.action.orc.adrenaline-rush",
+      )?.parameters?.temporaryHitPoints,
+    ).toBe(3);
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

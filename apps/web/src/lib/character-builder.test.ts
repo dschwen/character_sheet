@@ -1745,6 +1745,102 @@ describe("guided character builder", () => {
     }
   });
 
+  it("builds Orcs with Adrenaline Rush, Darkvision, and Relentless Endurance", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const speciesId = "srd521.species.orc";
+    const adrenalineResourceId = "srd521.resource.orc.adrenaline-rush";
+    const enduranceResourceId = "srd521.resource.orc.relentless-endurance";
+    const draft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 1, "Orc Vanguard"),
+      catalog,
+      speciesId,
+    );
+    const orc = buildCharacter(draft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character: orc, packages: [rulesPackage] });
+    const adrenaline = evaluation.actions.find(
+      (action) => action.id === "srd521.action.orc.adrenaline-rush",
+    );
+    const endurance = evaluation.actions.find(
+      (action) => action.id === "srd521.action.orc.relentless-endurance",
+    );
+
+    expect(catalog.species[speciesId]).toMatchObject({
+      sizeOptions: ["medium"],
+      walkingSpeed: 30,
+      traitNames: ["Adrenaline Rush", "Darkvision", "Relentless Endurance"],
+    });
+    expect(evaluation.validations.filter((message) => message.severity === "error")).toEqual([]);
+    expect(evaluation.facts["sense.darkvision.range"]).toBe(120);
+    expect(evaluation.resources).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: adrenalineResourceId, maximum: 2, current: 2 }),
+        expect.objectContaining({ id: enduranceResourceId, maximum: 1, current: 1 }),
+      ]),
+    );
+    expect(adrenaline).toMatchObject({
+      available: true,
+      actionEconomy: "bonus-action",
+    });
+    expect(adrenaline?.parameters?.temporaryHitPoints).toBe(2);
+    expect(endurance).toMatchObject({
+      available: false,
+      reasons: ["Current Hit Points must be 0."],
+    });
+
+    const rush = proposeAction(
+      { character: orc, packages: [rulesPackage] },
+      { actionId: "srd521.action.orc.adrenaline-rush" },
+    );
+    expect(rush.applicable).toBe(true);
+    expect(rush.nextState.temporaryHitPoints).toBe(2);
+    expect(rush.nextState.expendedResources[adrenalineResourceId]).toBe(1);
+    expect(rush.changes).toContainEqual(
+      expect.objectContaining({ path: "state.temporaryHitPoints", before: 0, after: 2 }),
+    );
+
+    const reducedToZero = {
+      ...orc,
+      state: {
+        ...rush.nextState,
+        currentHitPoints: 0,
+        deathSaveSuccesses: 1,
+        deathSaveFailures: 2,
+      },
+    };
+    const zeroEvaluation = evaluateCharacter({
+      character: reducedToZero,
+      packages: [rulesPackage],
+    });
+    const readyEndurance = zeroEvaluation.actions.find(
+      (action) => action.id === "srd521.action.orc.relentless-endurance",
+    );
+    expect(readyEndurance).toMatchObject({ available: true });
+    expect(readyEndurance?.parameters?.minimumCurrentHitPoints).toBe(1);
+
+    const endure = proposeAction(
+      { character: reducedToZero, packages: [rulesPackage] },
+      { actionId: "srd521.action.orc.relentless-endurance" },
+    );
+    expect(endure.applicable).toBe(true);
+    expect(endure.nextState.currentHitPoints).toBe(1);
+    expect(endure.nextState.deathSaveSuccesses).toBe(0);
+    expect(endure.nextState.deathSaveFailures).toBe(0);
+    expect(endure.nextState.expendedResources[enduranceResourceId]).toBe(1);
+
+    const shortRest = proposeRest(
+      { character: { ...orc, state: endure.nextState }, packages: [rulesPackage] },
+      { event: "short-rest" },
+    );
+    expect(shortRest.nextState.expendedResources[adrenalineResourceId]).toBe(0);
+    expect(shortRest.nextState.expendedResources[enduranceResourceId]).toBe(1);
+    const longRest = proposeRest(
+      { character: { ...orc, state: shortRest.nextState }, packages: [rulesPackage] },
+      { event: "long-rest" },
+    );
+    expect(longRest.nextState.expendedResources[enduranceResourceId]).toBe(0);
+  });
+
   it("migrates Magic Initiate defaults into characters saved before spell choices", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

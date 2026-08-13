@@ -46,6 +46,8 @@ const stateActionParametersSchema = z
         z.object({ perResourcePoint: z.number().positive() }).strict(),
       ])
       .optional(),
+    temporaryHitPoints: z.number().int().nonnegative().optional(),
+    minimumCurrentHitPoints: z.number().int().positive().optional(),
   })
   .passthrough()
   .refine(
@@ -242,12 +244,15 @@ export function proposeAction(
       : undefined;
   const bonus = diceHealing === undefined ? undefined : evaluation.facts[diceHealing.bonusFact];
   const maximumHitPoints =
-    parameters.healing === undefined ? undefined : evaluation.values["hitPoints.maximum"]?.value;
+    parameters.healing === undefined && parameters.minimumCurrentHitPoints === undefined
+      ? undefined
+      : evaluation.values["hitPoints.maximum"]?.value;
   if (
     resource === undefined ||
     (parameters.spellId !== undefined && spell === undefined) ||
     (parameters.restoresResource !== undefined && restoredResource === undefined) ||
     (parameters.restoresSpellSlots !== undefined && restoredSpellSlot === undefined) ||
+    (parameters.minimumCurrentHitPoints !== undefined && typeof maximumHitPoints !== "number") ||
     (diceHealing !== undefined &&
       (typeof bonus !== "number" || typeof maximumHitPoints !== "number"))
   ) {
@@ -324,6 +329,25 @@ export function proposeAction(
       sourceTrace,
     );
   }
+  if (parameters.minimumCurrentHitPoints !== undefined && typeof maximumHitPoints === "number") {
+    const raisedHitPoints = Math.min(
+      maximumHitPoints,
+      Math.max(healedHitPoints, parameters.minimumCurrentHitPoints),
+    );
+    nextState.currentHitPoints = raisedHitPoints;
+    recordChange(
+      changes,
+      traces,
+      "state.currentHitPoints",
+      healedHitPoints,
+      raisedHitPoints,
+      `${request.actionId} raises current Hit Points to at least ${String(parameters.minimumCurrentHitPoints)}.`,
+      "apply-action-minimum-hit-points",
+      [healedHitPoints, parameters.minimumCurrentHitPoints, maximumHitPoints],
+      sourceTrace,
+    );
+    healedHitPoints = raisedHitPoints;
+  }
   const expendedBefore = character.state.expendedResources[parameters.resourceId] ?? 0;
   const expendedAfter = expendedBefore + spend;
   nextState.expendedResources[parameters.resourceId] = expendedAfter;
@@ -338,6 +362,24 @@ export function proposeAction(
     [expendedBefore, spend, resource.maximum],
     sourceTrace,
   );
+  if (parameters.temporaryHitPoints !== undefined) {
+    const temporaryHitPointsAfter = Math.max(
+      character.state.temporaryHitPoints,
+      parameters.temporaryHitPoints,
+    );
+    nextState.temporaryHitPoints = temporaryHitPointsAfter;
+    recordChange(
+      changes,
+      traces,
+      "state.temporaryHitPoints",
+      character.state.temporaryHitPoints,
+      temporaryHitPointsAfter,
+      `${request.actionId} grants Temporary Hit Points.`,
+      "apply-action-temporary-hit-points",
+      [character.state.temporaryHitPoints, parameters.temporaryHitPoints],
+      sourceTrace,
+    );
+  }
   if (spell?.concentration === true) {
     const concentrationBefore = character.state.concentrationSpellId ?? null;
     nextState.concentrationSpellId = spell.id;

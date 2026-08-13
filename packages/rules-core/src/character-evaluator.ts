@@ -355,6 +355,9 @@ const speciesBodySchema = z
             duration: z.string().min(1).optional(),
             requirement: z.string().min(1).optional(),
             effect: z.string().min(1).optional(),
+            requiredCurrentHitPoints: z.number().int().nonnegative().optional(),
+            temporaryHitPointsFact: z.string().min(1).optional(),
+            minimumCurrentHitPoints: z.number().int().positive().optional(),
             damage: z
               .union([
                 z
@@ -4059,15 +4062,22 @@ function evaluateSpeciesTraits(
       action.resourceId === undefined
         ? undefined
         : state.resources.find((candidate) => candidate.id === action.resourceId);
-    const available =
+    const resourceAvailable =
       action.resourceId === undefined ||
       (resource !== undefined && resource.current >= (action.spends ?? 0));
+    const stateAvailable =
+      action.requiredCurrentHitPoints === undefined ||
+      character.state.currentHitPoints === action.requiredCurrentHitPoints;
+    const available = resourceAvailable && stateAvailable;
     const traceId = `${action.id}.available`;
     const actionParameters: Record<string, JsonValue> = {
       ...(action.resourceId === undefined ? {} : { resourceId: action.resourceId }),
       ...(action.spends === undefined ? {} : { spends: action.spends }),
       ...(action.effect === undefined ? {} : { effect: action.effect }),
       ...(action.requirement === undefined ? {} : { requirement: action.requirement }),
+      ...(action.minimumCurrentHitPoints === undefined
+        ? {}
+        : { minimumCurrentHitPoints: action.minimumCurrentHitPoints }),
       ...(action.areaOptions === undefined ? {} : { areaOptions: action.areaOptions }),
       ...(action.halfDamageOnSave === undefined
         ? {}
@@ -4112,6 +4122,12 @@ function evaluateSpeciesTraits(
         modifier,
       };
     }
+    if (action.temporaryHitPointsFact !== undefined) {
+      actionParameters.temporaryHitPoints = requireNumber(
+        state.facts[action.temporaryHitPointsFact] ?? null,
+        `${action.id} Temporary Hit Points`,
+      );
+    }
     if (action.savingThrow !== undefined) {
       const abilityModifier = requireNumber(
         state.facts[`ability.${action.savingThrow.difficultyClassAbility}.modifier`] ?? null,
@@ -4143,10 +4159,16 @@ function evaluateSpeciesTraits(
     state.actions.push({
       id: action.id,
       available,
-      reasons:
-        available || action.resourceId === undefined
-          ? []
-          : [`${action.resourceId} has no uses remaining.`],
+      reasons: available
+        ? []
+        : [
+            ...(resourceAvailable || action.resourceId === undefined
+              ? []
+              : [`${action.resourceId} has no uses remaining.`]),
+            ...(stateAvailable
+              ? []
+              : [`Current Hit Points must be ${String(action.requiredCurrentHitPoints)}.`]),
+          ],
       actionEconomy: action.actionEconomy,
       parameters: actionParameters,
       traceId,
@@ -4159,10 +4181,14 @@ function evaluateSpeciesTraits(
           id: `${traceId}.${action.resourceId === undefined ? "grant" : "resource"}`,
           operation:
             action.resourceId === undefined ? "grant-species-action" : "resource-availability",
-          inputs:
-            action.resourceId === undefined
+          inputs: [
+            ...(action.resourceId === undefined
               ? [species.id]
-              : [resource?.current ?? 0, action.spends ?? 0],
+              : [resource?.current ?? 0, action.spends ?? 0]),
+            ...(action.requiredCurrentHitPoints === undefined
+              ? []
+              : [character.state.currentHitPoints, action.requiredCurrentHitPoints]),
+          ],
           output: available,
         },
       ],
