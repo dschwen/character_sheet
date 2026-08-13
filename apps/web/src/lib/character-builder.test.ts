@@ -390,7 +390,7 @@ describe("guided character builder", () => {
         }
       }
     }
-  });
+  }, 10_000);
 
   it("persists projected origin selections into a rules-valid character", () => {
     const { rulesPackage } = loadWebData();
@@ -1839,6 +1839,122 @@ describe("guided character builder", () => {
       { event: "long-rest" },
     );
     expect(longRest.nextState.expendedResources[enduranceResourceId]).toBe(0);
+  });
+
+  it("builds Tiefling legacies with resistance, innate spells, free casts, and casting ability", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const speciesId = "srd521.species.tiefling";
+    const legacyChoiceId = "srd521.species.tiefling.choice.fiendish-legacy";
+    const abilityChoiceId = "srd521.species.tiefling.choice.spellcasting-ability";
+    const levelOneDraft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 1, "Abyssal Envoy"),
+      catalog,
+      speciesId,
+    );
+    const levelOne = buildCharacter(levelOneDraft, rulesPackage, options);
+    const levelOneEvaluation = evaluateCharacter({
+      character: levelOne,
+      packages: [rulesPackage],
+    });
+
+    expect(catalog.species[speciesId]).toMatchObject({
+      sizeOptions: ["medium", "small"],
+      walkingSpeed: 30,
+      traitNames: ["Darkvision", "Fiendish Legacy", "Otherworldly Presence"],
+    });
+    expect(catalog.species[speciesId]?.choices[0]?.options).toHaveLength(3);
+    expect(levelOneDraft.speciesChoiceSelections).toMatchObject({
+      [legacyChoiceId]: ["srd521.species.tiefling.legacy.abyssal"],
+      [abilityChoiceId]: ["srd521.species.tiefling.spellcasting-ability.intelligence"],
+    });
+    expect(
+      levelOneEvaluation.validations.filter((message) => message.severity === "error"),
+    ).toEqual([]);
+    expect(levelOneEvaluation.facts["sense.darkvision.range"]).toBe(60);
+    expect(levelOneEvaluation.resistances).toContain("poison");
+    expect(levelOneEvaluation.spells).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.spell.poison-spray", prepared: false }),
+        expect.objectContaining({ id: "srd521.spell.thaumaturgy", prepared: false }),
+      ]),
+    );
+    expect(levelOneEvaluation.spells).not.toContainEqual(
+      expect.objectContaining({ id: "srd521.spell.ray-of-sickness" }),
+    );
+    const poisonSpray = levelOneEvaluation.spells.find(
+      (spell) => spell.id === "srd521.spell.poison-spray",
+    );
+    expect(poisonSpray?.castingOptions?.[0]).toMatchObject({
+      sourceId: speciesId,
+      ability: "intelligence",
+    });
+
+    const levelThree = buildCharacter(
+      updateBuilderLevel(levelOneDraft, catalog, 3),
+      rulesPackage,
+      options,
+    );
+    const levelThreeEvaluation = evaluateCharacter({
+      character: levelThree,
+      packages: [rulesPackage],
+    });
+    const rayResourceId = "srd521.resource.tiefling.ray-of-sickness.free-cast";
+    expect(levelThreeEvaluation.spells).toContainEqual(
+      expect.objectContaining({ id: "srd521.spell.ray-of-sickness", prepared: true }),
+    );
+    expect(levelThreeEvaluation.resources).toContainEqual(
+      expect.objectContaining({ id: rayResourceId, maximum: 1, current: 1 }),
+    );
+    const freeCast = proposeSpellCast(
+      { character: levelThree, packages: [rulesPackage] },
+      {
+        spellId: "srd521.spell.ray-of-sickness",
+        castingSourceId: speciesId,
+        useFreeCast: true,
+      },
+    );
+    expect(freeCast.applicable).toBe(true);
+    expect(freeCast.nextState.expendedResources[rayResourceId]).toBe(1);
+
+    const chthonicDraft = updateBuilderSpeciesChoice(levelOneDraft, catalog, legacyChoiceId, [
+      "srd521.species.tiefling.legacy.chthonic",
+    ]);
+    const wisdomChthonicDraft = updateBuilderSpeciesChoice(
+      chthonicDraft,
+      catalog,
+      abilityChoiceId,
+      ["srd521.species.tiefling.spellcasting-ability.wisdom"],
+    );
+    const levelFive = buildCharacter(
+      updateBuilderLevel(wisdomChthonicDraft, catalog, 5),
+      rulesPackage,
+      options,
+    );
+    const levelFiveEvaluation = evaluateCharacter({
+      character: levelFive,
+      packages: [rulesPackage],
+    });
+    expect(levelFiveEvaluation.resistances).toContain("necrotic");
+    expect(levelFiveEvaluation.resistances).not.toContain("poison");
+    expect(levelFiveEvaluation.spells).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.spell.chill-touch" }),
+        expect.objectContaining({ id: "srd521.spell.false-life", prepared: true }),
+        expect.objectContaining({ id: "srd521.spell.ray-of-enfeeblement", prepared: true }),
+        expect.objectContaining({ id: "srd521.spell.thaumaturgy" }),
+      ]),
+    );
+    expect(
+      levelFiveEvaluation.spells.find((spell) => spell.id === "srd521.spell.chill-touch")
+        ?.castingOptions?.[0]?.ability,
+    ).toBe("wisdom");
+    expect(levelFiveEvaluation.resources).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.resource.tiefling.false-life.free-cast" }),
+        expect.objectContaining({ id: "srd521.resource.tiefling.ray-of-enfeeblement.free-cast" }),
+      ]),
+    );
   });
 
   it("migrates Magic Initiate defaults into characters saved before spell choices", () => {

@@ -1514,6 +1514,70 @@
   },
   {
     "body": {
+      "attackType": "melee",
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 1,
+          "diceSize": 10,
+          "type": "necrotic"
+        }
+      ],
+      "description": "Channeling the chill of the grave, make a melee spell attack against a target within reach. On a hit, the target takes 1d10 Necrotic damage, and it can’t regain Hit Points until the end of your next turn. Cantrip Upgrade. The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "level": 0,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "necromancy",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.chill-touch",
+    "kind": "spell",
+    "name": {
+      "en": "Chill Touch"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0115-b006",
+          "p0115-b007",
+          "p0115-b008"
+        ],
+        "page": 115,
+        "quoteHash": "eefd2c015aa7a0ab515f362539a676203a1c0138a1d3b9eedcbe834b4aacbcf7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "necromancy",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
       "attackType": "ranged",
       "castingTime": "Action",
       "classes": [
@@ -1751,6 +1815,64 @@
       "spell",
       "level-1",
       "divination",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a drop of alcohol",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "",
+      "duration": "Instantaneous You gain 2d4 + 4 Temporary Hit Points. Using a Higher-Level Spell Slot. You gain 5 additional Temporary Hit Points for each spell slot level above 1.",
+      "hasHigherLevelEffect": false,
+      "level": 1,
+      "range": "Self",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "necromancy",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.false-life",
+    "kind": "spell",
+    "name": {
+      "en": "False Life"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0129-b018",
+          "p0129-b019",
+          "p0129-b020"
+        ],
+        "page": 129,
+        "quoteHash": "29f68b182b3f24d59ea30f4ce496726f3393d15ba0d8612764f8dda6741357b9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-1",
+      "necromancy",
       "wizard"
     ]
   },
@@ -2349,6 +2471,130 @@
       "spell",
       "level-2",
       "conjuration",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": "ranged",
+      "castingTime": "Action",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [
+        {
+          "diceCount": 1,
+          "diceSize": 12,
+          "type": "poison"
+        }
+      ],
+      "description": "You spray toxic mist at a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d12 Poison damage. Cantrip Upgrade. The damage increases by 1d12 when you reach levels 5 (2d12), 11 (3d12), and 17 (4d12).",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "level": 0,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "necromancy",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.poison-spray",
+    "kind": "spell",
+    "name": {
+      "en": "Poison Spray"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0153-b011",
+          "p0153-b012",
+          "p0153-b013"
+        ],
+        "page": 153,
+        "quoteHash": "8b4722f58b039f9e2fe3195ae952a632e5748572a19e22a3865e76ba02963595",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "necromancy",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": false,
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": true,
+      "damage": [],
+      "description": "A beam of enervating energy shoots from you toward a creature within range. The target must make a Constitution saving throw. On a successful save, the target has Disadvantage on the next attack roll it makes until the start of your next turn. On a failed save, the target has Disadvantage on Strength-based D20 Tests for the duration. During that time, it also subtracts 1d8 from all its damage rolls. The target repeats the save at the end of each of its turns, ending the spell on a success.",
+      "duration": "Concentration, up to 1 minute",
+      "hasHigherLevelEffect": false,
+      "level": 2,
+      "range": "60 feet",
+      "ritual": false,
+      "savingThrows": [
+        "constitution"
+      ],
+      "school": "necromancy",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.ray-of-enfeeblement",
+    "kind": "spell",
+    "name": {
+      "en": "Ray of Enfeeblement"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0157-b020",
+          "p0157-b021",
+          "p0157-b022"
+        ],
+        "page": 157,
+        "quoteHash": "20dbbd756b1578f940badc2ab0394ca46783ed064dc2006c09a8dd9c6135bf1c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-2",
+      "necromancy",
       "wizard"
     ]
   },

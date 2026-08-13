@@ -32,11 +32,13 @@ SCHOOLS = (
 REPRESENTATIVE_SPELLS = (
     "Acid Splash",
     "Burning Hands",
+    "Chill Touch",
     "Chromatic Orb",
     "Counterspell",
     "Darkness",
     "Detect Magic",
     "Feather Fall",
+    "False Life",
     "Fireball",
     "Fly",
     "Light",
@@ -46,6 +48,8 @@ REPRESENTATIVE_SPELLS = (
     "Mending",
     "Minor Illusion",
     "Misty Step",
+    "Poison Spray",
+    "Ray of Enfeeblement",
     "Ray of Frost",
     "Scorching Ray",
     "Shatter",
@@ -740,9 +744,7 @@ def generate_wizard_content(
         *spell_entities,
     ]
     current_entities = read_json(output / "entities.json")
-    representative_spell_ids = {
-        f"srd521.spell.{_slug(name)}" for name in REPRESENTATIVE_SPELLS
-    }
+    representative_spell_ids = {f"srd521.spell.{_slug(name)}" for name in REPRESENTATIVE_SPELLS}
     externally_owned_spell_ids = {
         str(entity["id"])
         for entity in current_entities
@@ -788,7 +790,7 @@ def generate_wizard_content(
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
         "Barbarian, Fighter through level 5, Wizard source content, Human, Soldier, "
-        "equipment, and 23 representative spells. Proposed executable rules remain under review."
+        "equipment, and 27 representative spells. Proposed executable rules remain under review."
     )
     write_json(output / "coverage.json", coverage)
     report = {

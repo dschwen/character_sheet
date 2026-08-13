@@ -27,6 +27,7 @@ GNOME_ID = "srd521.species.gnome"
 GOLIATH_ID = "srd521.species.goliath"
 HALFLING_ID = "srd521.species.halfling"
 ORC_ID = "srd521.species.orc"
+TIEFLING_ID = "srd521.species.tiefling"
 ALERT_ID = "srd521.feat.origin.alert"
 MAGIC_INITIATE_IDS = {
     "cleric": "srd521.feat.origin.magic-initiate.cleric",
@@ -45,6 +46,7 @@ ORIGIN_IDS = {
     GOLIATH_ID,
     HALFLING_ID,
     ORC_ID,
+    TIEFLING_ID,
     ALERT_ID,
     *MAGIC_INITIATE_IDS.values(),
     SAVAGE_ATTACKER_ID,
@@ -895,6 +897,127 @@ def parse_orc(text: str) -> dict[str, Any]:
     }
 
 
+def parse_tiefling(text: str) -> dict[str, Any]:
+    creature_type = re.search(r"Creature Type: (?P<value>\w+)", text)
+    size = re.search(r"Size: (?P<value>.+?), chosen when you select this species", text)
+    speed = re.search(r"Speed: (?P<value>\d+) feet", text)
+    required_phrases = (
+        "Darkvision with a range of 60 feet",
+        "Choose a legacy from the Fiendish Legacies table",
+        "character levels 3 and 5",
+        "You always have that spell prepared",
+        "cast it once without a spell slot",
+        "Intelligence, Wisdom, or Charisma is your spellcasting ability",
+        "Otherworldly Presence",
+        "Thaumaturgy cantrip",
+        "Poison Spray",
+        "Ray of Sickness",
+        "Hold Person",
+        "Chill Touch",
+        "False Life",
+        "Ray of Enfeeblement",
+        "Fire Bolt",
+        "Hellish Rebuke",
+        "Darkness",
+    )
+    if creature_type is None or size is None or speed is None:
+        raise ValueError("Tiefling species does not match the expected fields")
+    if not all(phrase in text for phrase in required_phrases):
+        raise ValueError("Tiefling trait text is incomplete")
+    size_options = [
+        value.casefold() for value in re.findall(r"\b(Medium|Small)\b", size.group("value"))
+    ]
+    legacy_choice_id = "srd521.species.tiefling.choice.fiendish-legacy"
+    ability_choice_id = "srd521.species.tiefling.choice.spellcasting-ability"
+
+    def spell_grant(
+        spell: str,
+        minimum_level: int,
+        *,
+        free_cast: bool = False,
+    ) -> dict[str, Any]:
+        spell_id = f"srd521.spell.{spell}"
+        return {
+            "spellId": spell_id,
+            "minimumLevel": minimum_level,
+            **(
+                {"freeCastResourceId": (f"srd521.resource.tiefling.{spell}.free-cast")}
+                if free_cast
+                else {}
+            ),
+        }
+
+    legacies = (
+        (
+            "abyssal",
+            "Abyssal",
+            "poison",
+            spell_grant("poison-spray", 1),
+            spell_grant("ray-of-sickness", 3, free_cast=True),
+            spell_grant("hold-person", 5, free_cast=True),
+        ),
+        (
+            "chthonic",
+            "Chthonic",
+            "necrotic",
+            spell_grant("chill-touch", 1),
+            spell_grant("false-life", 3, free_cast=True),
+            spell_grant("ray-of-enfeeblement", 5, free_cast=True),
+        ),
+        (
+            "infernal",
+            "Infernal",
+            "fire",
+            spell_grant("fire-bolt", 1),
+            spell_grant("hellish-rebuke", 3, free_cast=True),
+            spell_grant("darkness", 5, free_cast=True),
+        ),
+    )
+    thaumaturgy = spell_grant("thaumaturgy", 1)
+    return {
+        "creatureType": creature_type.group("value").casefold(),
+        "sizeOptions": size_options,
+        "walkingSpeed": int(speed.group("value")),
+        "darkvisionRange": 60,
+        "choices": [
+            {
+                "id": legacy_choice_id,
+                "prompt": "Choose a Fiendish Legacy",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": f"srd521.species.tiefling.legacy.{slug}",
+                        "name": name,
+                        "damageType": resistance,
+                        "summary": f"{resistance.title()} resistance; legacy spells at levels 1, 3, and 5",
+                        "spellGrants": [cantrip, level_three, level_five, thaumaturgy],
+                    }
+                    for slug, name, resistance, cantrip, level_three, level_five in legacies
+                ],
+            },
+            {
+                "id": ability_choice_id,
+                "prompt": "Choose a Fiendish Legacy spellcasting ability",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": f"srd521.species.tiefling.spellcasting-ability.{ability}",
+                        "name": ability.title(),
+                        "ability": ability,
+                    }
+                    for ability in ("intelligence", "wisdom", "charisma")
+                ],
+            },
+        ],
+        "spellcastingAbilityChoiceId": ability_choice_id,
+        "resistanceFromChoiceId": legacy_choice_id,
+        "traitNames": ["Darkvision", "Fiendish Legacy", "Otherworldly Presence"],
+        "traitsText": text,
+    }
+
+
 def parse_origin_feat(
     name: str,
     text: str,
@@ -1101,6 +1224,9 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     ]
     halfling_nodes = _section(nodes, "Halfling", "Human")
     orc_nodes = _section(nodes, "Orc", "Tiefling")
+    tiefling_nodes = [
+        node for node in _section(nodes, "Tiefling", "Feats") if node["kind"] != "MetadataNode"
+    ]
     alert_nodes = _section(nodes, "Alert", "Magic Initiate")
     magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
@@ -1181,6 +1307,14 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         _source_spans(orc_nodes),
         parse_orc(_text(orc_nodes)),
     )
+    tiefling = _entity(
+        TIEFLING_ID,
+        "species",
+        "Tiefling",
+        ["species", "humanoid", "tiefling", "fiendish-legacy"],
+        _source_spans(tiefling_nodes),
+        parse_tiefling(_text(tiefling_nodes)),
+    )
     alert_source = _source_spans(alert_nodes)
     alert = _entity(
         ALERT_ID,
@@ -1233,6 +1367,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         goliath,
         halfling,
         orc,
+        tiefling,
         savage_attacker,
         skilled,
         alert,
@@ -1264,7 +1399,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["note"] = (
         "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
         "Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, "
-        "Elf, Gnome, Goliath, Halfling, and Orc; equipment; "
+        "Elf, Gnome, Goliath, Halfling, Orc, and Tiefling; equipment; "
         "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
@@ -1279,6 +1414,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "goliath": goliath["body"],
         "halfling": halfling["body"],
         "orc": orc["body"],
+        "tiefling": tiefling["body"],
         "originFeats": {
             ALERT_ID: alert["body"],
             **{entity["id"]: entity["body"] for entity in magic_initiates},

@@ -733,6 +733,54 @@ describe("guided character level up", () => {
     ).toBe(3);
   });
 
+  it("preserves a Tiefling's legacy and casting ability while unlocking legacy spells", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const legacyChoiceId = "srd521.species.tiefling.choice.fiendish-legacy";
+    const abilityChoiceId = "srd521.species.tiefling.choice.spellcasting-ability";
+    const originalDraft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 2, "Infernal Wanderer"),
+      catalog,
+      "srd521.species.tiefling",
+    );
+    originalDraft.speciesChoiceSelections = {
+      [legacyChoiceId]: ["srd521.species.tiefling.legacy.infernal"],
+      [abilityChoiceId]: ["srd521.species.tiefling.spellcasting-ability.charisma"],
+    };
+    const original = buildCharacter(originalDraft, rulesPackage, initialOptions);
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-10T23:00:00.000Z"),
+    });
+
+    expect(draft.speciesChoiceSelections).toMatchObject({
+      [legacyChoiceId]: ["srd521.species.tiefling.legacy.infernal"],
+      [abilityChoiceId]: ["srd521.species.tiefling.spellcasting-ability.charisma"],
+    });
+    expect(preview.issues).toEqual([]);
+    expect(preview.evaluation?.spells).toContainEqual(
+      expect.objectContaining({ id: "srd521.spell.hellish-rebuke", prepared: true }),
+    );
+    expect(preview.evaluation?.resources).toContainEqual(
+      expect.objectContaining({
+        id: "srd521.resource.tiefling.hellish-rebuke.free-cast",
+        current: 1,
+      }),
+    );
+
+    draft.speciesChoiceSelections = {
+      ...draft.speciesChoiceSelections,
+      [legacyChoiceId]: ["srd521.species.tiefling.legacy.abyssal"],
+    };
+    expect(
+      previewLevelUp(original, draft, rulesPackage, {
+        id: original.id,
+        now: new Date("2026-08-11T00:00:00.000Z"),
+      }).issues,
+    ).toContain("Choose a Fiendish Legacy cannot change during level up.");
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

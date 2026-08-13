@@ -468,6 +468,7 @@
     "srd521.species.goliath",
     "srd521.species.halfling",
     "srd521.species.orc",
+    "srd521.species.tiefling",
     "srd521.feat.origin.savage-attacker",
     "srd521.feat.origin.skilled",
     "srd521.feat.origin.alert",
@@ -974,5 +975,133 @@
       },
       "repeatable": true
     }
+  },
+  "tiefling": {
+    "choices": [
+      {
+        "id": "srd521.species.tiefling.choice.fiendish-legacy",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "damageType": "poison",
+            "id": "srd521.species.tiefling.legacy.abyssal",
+            "name": "Abyssal",
+            "spellGrants": [
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.poison-spray"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.tiefling.ray-of-sickness.free-cast",
+                "minimumLevel": 3,
+                "spellId": "srd521.spell.ray-of-sickness"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.tiefling.hold-person.free-cast",
+                "minimumLevel": 5,
+                "spellId": "srd521.spell.hold-person"
+              },
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.thaumaturgy"
+              }
+            ],
+            "summary": "Poison resistance; legacy spells at levels 1, 3, and 5"
+          },
+          {
+            "damageType": "necrotic",
+            "id": "srd521.species.tiefling.legacy.chthonic",
+            "name": "Chthonic",
+            "spellGrants": [
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.chill-touch"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.tiefling.false-life.free-cast",
+                "minimumLevel": 3,
+                "spellId": "srd521.spell.false-life"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.tiefling.ray-of-enfeeblement.free-cast",
+                "minimumLevel": 5,
+                "spellId": "srd521.spell.ray-of-enfeeblement"
+              },
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.thaumaturgy"
+              }
+            ],
+            "summary": "Necrotic resistance; legacy spells at levels 1, 3, and 5"
+          },
+          {
+            "damageType": "fire",
+            "id": "srd521.species.tiefling.legacy.infernal",
+            "name": "Infernal",
+            "spellGrants": [
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.fire-bolt"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.tiefling.hellish-rebuke.free-cast",
+                "minimumLevel": 3,
+                "spellId": "srd521.spell.hellish-rebuke"
+              },
+              {
+                "freeCastResourceId": "srd521.resource.tiefling.darkness.free-cast",
+                "minimumLevel": 5,
+                "spellId": "srd521.spell.darkness"
+              },
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.thaumaturgy"
+              }
+            ],
+            "summary": "Fire resistance; legacy spells at levels 1, 3, and 5"
+          }
+        ],
+        "prompt": "Choose a Fiendish Legacy"
+      },
+      {
+        "id": "srd521.species.tiefling.choice.spellcasting-ability",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "ability": "intelligence",
+            "id": "srd521.species.tiefling.spellcasting-ability.intelligence",
+            "name": "Intelligence"
+          },
+          {
+            "ability": "wisdom",
+            "id": "srd521.species.tiefling.spellcasting-ability.wisdom",
+            "name": "Wisdom"
+          },
+          {
+            "ability": "charisma",
+            "id": "srd521.species.tiefling.spellcasting-ability.charisma",
+            "name": "Charisma"
+          }
+        ],
+        "prompt": "Choose a Fiendish Legacy spellcasting ability"
+      }
+    ],
+    "creatureType": "humanoid",
+    "darkvisionRange": 60,
+    "resistanceFromChoiceId": "srd521.species.tiefling.choice.fiendish-legacy",
+    "sizeOptions": [
+      "medium",
+      "small"
+    ],
+    "spellcastingAbilityChoiceId": "srd521.species.tiefling.choice.spellcasting-ability",
+    "traitNames": [
+      "Darkvision",
+      "Fiendish Legacy",
+      "Otherworldly Presence"
+    ],
+    "traitsText": "Tiefling Creature Type: Humanoid Size: Medium (about 4–7 feet tall) or Small (about 3–4 feet tall), chosen when you select this species Speed: 30 feet As a Tiefling, you have the following special traits. Darkvision. You have Darkvision with a range of 60 feet. Fiendish Legacy. You are the recipient of a legacy that grants you supernatural abilities. Choose a legacy from the Fiendish Legacies table. You gain the level 1 benefit of the chosen legacy. When you reach character levels 3 and 5, you learn a higher-level spell, as shown on the table. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the legacy). Otherworldly Presence. You know the Thaumaturgy cantrip. When you cast it with this trait, the spell uses the same spellcasting ability you use for your Fiendish Legacy trait. Fiendish Legacies Legacy Level 1 Level 3 Level 5 Abyssal You have Resistance to Poison damage. You also know the Poison Spray cantrip. Ray of Sickness Hold Person Chthonic You have Resistance to Necrotic damage. You also know the Chill Touch cantrip. False Life Ray of Enfeeblement Infernal You have Resistance to Fire damage. You also know the Fire Bolt cantrip. Hellish Rebuke Darkness",
+    "walkingSpeed": 30
   }
 }

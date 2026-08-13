@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(563);
+    expect(parsedEntities).toHaveLength(568);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -461,6 +461,7 @@ describe("bootstrap content package", () => {
       "srd521.species.goliath",
       "srd521.species.halfling",
       "srd521.species.orc",
+      "srd521.species.tiefling",
       "srd521.feat.origin.savage-attacker",
       "srd521.feat.origin.skilled",
       "srd521.feat.origin.alert",
@@ -469,7 +470,7 @@ describe("bootstrap content package", () => {
       "srd521.feat.origin.magic-initiate.wizard",
     ]);
     expect(entities.map((entity) => entity.source[0]?.page)).toEqual([
-      83, 83, 83, 83, 86, 84, 84, 84, 85, 85, 86, 86, 87, 87, 87, 87, 87, 87,
+      83, 83, 83, 83, 86, 84, 84, 84, 85, 85, 86, 86, 86, 87, 87, 87, 87, 87, 87,
     ]);
     expect(savageAttacker.proposedRules[0]).toMatchObject({
       type: "grant-action",
@@ -505,11 +506,16 @@ describe("bootstrap content package", () => {
       })
       .parse(wizard?.body);
 
-    expect(entities).toHaveLength(41);
-    expect(spells).toHaveLength(23);
+    expect(entities).toHaveLength(45);
+    expect(spells).toHaveLength(27);
+    expect(spells).toContainEqual(expect.objectContaining({ id: "srd521.spell.chill-touch" }));
     expect(spells).toContainEqual(expect.objectContaining({ id: "srd521.spell.darkness" }));
     expect(spells).toContainEqual(expect.objectContaining({ id: "srd521.spell.mending" }));
     expect(spells).toContainEqual(expect.objectContaining({ id: "srd521.spell.minor-illusion" }));
+    expect(spells).toContainEqual(expect.objectContaining({ id: "srd521.spell.poison-spray" }));
+    expect(spells).toContainEqual(
+      expect.objectContaining({ id: "srd521.spell.ray-of-enfeeblement" }),
+    );
     expect(wizardBody.spellList).toHaveLength(217);
     expect(wizardBody.progression[4]).toMatchObject({
       level: 5,

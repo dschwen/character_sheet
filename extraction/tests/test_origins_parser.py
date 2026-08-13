@@ -9,6 +9,7 @@ from srd_extract.origins import (
     parse_goliath,
     parse_halfling,
     parse_orc,
+    parse_tiefling,
     parse_human,
     parse_origin_feat,
     parse_soldier,
@@ -260,6 +261,45 @@ def test_parse_orc_species() -> None:
     assert body["actions"][0]["temporaryHitPointsFact"] == "proficiencyBonus"
     assert body["actions"][1]["requiredCurrentHitPoints"] == 0
     assert body["actions"][1]["minimumCurrentHitPoints"] == 1
+
+
+def test_parse_tiefling_species() -> None:
+    body = parse_tiefling(
+        "Tiefling Creature Type: Humanoid Size: Medium (about 4–7 feet tall) or Small (about "
+        "3–4 feet tall), chosen when you select this species Speed: 30 feet Darkvision. You have "
+        "Darkvision with a range of 60 feet. Fiendish Legacy. Choose a legacy from the Fiendish "
+        "Legacies table. At character levels 3 and 5, you learn a spell. You always have that "
+        "spell prepared and can cast it once without a spell slot. Intelligence, Wisdom, or "
+        "Charisma is your spellcasting ability. Otherworldly Presence grants the Thaumaturgy "
+        "cantrip. Abyssal grants Poison Spray, Ray of Sickness, and Hold Person. Chthonic grants "
+        "Chill Touch, False Life, and Ray of Enfeeblement. Infernal grants Fire Bolt, Hellish "
+        "Rebuke, and Darkness."
+    )
+
+    assert body["sizeOptions"] == ["medium", "small"]
+    assert body["darkvisionRange"] == 60
+    legacy = body["choices"][0]
+    assert [option["name"] for option in legacy["options"]] == [
+        "Abyssal",
+        "Chthonic",
+        "Infernal",
+    ]
+    assert [option["damageType"] for option in legacy["options"]] == [
+        "poison",
+        "necrotic",
+        "fire",
+    ]
+    assert [grant["minimumLevel"] for grant in legacy["options"][0]["spellGrants"]] == [
+        1,
+        3,
+        5,
+        1,
+    ]
+    assert legacy["options"][1]["spellGrants"][2]["spellId"].endswith("ray-of-enfeeblement")
+    assert legacy["options"][2]["spellGrants"][1]["freeCastResourceId"].endswith(
+        "hellish-rebuke.free-cast"
+    )
+    assert body["spellcastingAbilityChoiceId"].endswith("spellcasting-ability")
 
 
 def test_parse_origin_feats_rejects_incomplete_benefits() -> None:

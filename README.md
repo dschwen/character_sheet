@@ -236,7 +236,7 @@ Generate Wizard content from pages 77–82 and representative spell descriptions
 ```
 
 This parser validates all 20 Wizard progression rows, captures the 217-entry Wizard spell list,
-extracts the Evoker subclass, and generates 20 source-linked representative spell entities with
+extracts the Evoker subclass, and generates 27 source-linked representative spell entities with
 structured casting, component, duration, attack, save, damage, Concentration, and Ritual fields.
 
 Generate Cleric content from pages 36–40 using the already extracted spell descriptions:
@@ -391,8 +391,8 @@ Eldritch Invocations and their prerequisites, and all five Fiend Patron features
 source-linked representative spells and authoring IR for Magical Cunning’s limited Pact-slot
 recovery.
 
-Generate all four SRD backgrounds, Human, Dwarf, Dragonborn, Elf, Gnome, Goliath, Halfling, Orc, and
-the Origin feat slice from pages 83–87:
+Generate all four SRD backgrounds, Human, Dwarf, Dragonborn, Elf, Gnome, Goliath, Halfling, Orc,
+Tiefling, and the Origin feat slice from pages 83–87:
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
@@ -407,8 +407,8 @@ the Origin feat slice from pages 83–87:
 ```
 
 This parser generates typed Acolyte, Criminal, Sage, Soldier, Human, Dwarf, Dragonborn, Elf, Gnome,
-Goliath, Halfling, Orc, Alert, Savage Attacker, Skilled, and Cleric/Druid/Wizard Magic Initiate
-entities. Dragonborn includes a data-driven Draconic Ancestry selection, its matching resistance
+Goliath, Halfling, Orc, Tiefling, Alert, Savage Attacker, Skilled, and Cleric/Druid/Wizard Magic
+Initiate entities. Dragonborn includes a data-driven Draconic Ancestry selection, its matching resistance
 and Breath Weapon, Darkvision, and level-5 Draconic Flight. Elf includes lineage and
 spellcasting-ability choices, Keen Senses, lineage movement and Darkvision, and level-gated innate
 spells with Long Rest free casts. Gnome includes Forest and Rock lineages, Gnomish Cunning, innate
@@ -417,7 +417,9 @@ activity. Goliath includes all six Giant Ancestry boons and their shared uses, P
 level-5 Large Form. Halfling includes Brave, movement and hiding permissions, and automatic Luck
 rerolls with visible dice feedback. Orc includes 120-foot Darkvision, proficiency-scaled Adrenaline
 Rush with Short or Long Rest recovery, and once-per-Long-Rest Relentless Endurance. The parser also
-generates sheet-automated Alert Initiative and roll-assisted Savage Attacker authoring IR.
+generates all three Tiefling Fiendish Legacies with their resistance, innate spells, casting ability,
+and level-gated Long Rest free casts. It also generates sheet-automated Alert Initiative and
+roll-assisted Savage Attacker authoring IR.
 
 Generate structured weapon, armor, adventuring-gear, and ammunition entities from SRD pages 91–92
 and 95–96:
