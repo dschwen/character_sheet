@@ -1116,6 +1116,67 @@
   },
   {
     "body": {
+      "conditionalRollEffects": [
+        {
+          "kind": "advantage",
+          "situationalTag": "avoid-or-end-frightened",
+          "source": "Brave",
+          "testIds": "saving-throws"
+        }
+      ],
+      "creatureType": "humanoid",
+      "d20RerollSource": "Luck",
+      "d20RerollValues": [
+        1
+      ],
+      "factGrants": {
+        "species.hide.obscuredByLargerCreature": true,
+        "species.movement.canEnterLargerCreatureSpace": true
+      },
+      "sizeOptions": [
+        "small"
+      ],
+      "traitNames": [
+        "Brave",
+        "Halfling Nimbleness",
+        "Luck",
+        "Naturally Stealthy"
+      ],
+      "traitsText": "Halfling Creature Type: Humanoid Size: Small (about 2–3 feet tall) Speed: 30 feet As a Halfling, you have these special traits. Brave. You have Advantage on saving throws you make to avoid or end the Frightened condition. Halfling Nimbleness. You can move through the space of any creature that is a size larger than you, but you can’t stop in the same space. Luck. When you roll a 1 on the d20 of a D20 Test, you can reroll the die, and you must use the new roll. Naturally Stealthy. You can take the Hide action even when you are obscured only by a creature that is at least one size larger than you.",
+      "walkingSpeed": 30
+    },
+    "id": "srd521.species.halfling",
+    "kind": "species",
+    "name": {
+      "en": "Halfling"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Halfling extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0086-b005",
+          "p0086-b006"
+        ],
+        "page": 86,
+        "quoteHash": "bcd9ffec7d5abd5733539a92789e31bff81288981b4321a4f89126fe43271ea9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "species",
+      "humanoid",
+      "halfling"
+    ]
+  },
+  {
+    "body": {
       "category": "origin",
       "chooseDamageRoll": "either",
       "description": "You’ve trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",

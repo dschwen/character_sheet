@@ -241,6 +241,9 @@ const speciesBodySchema = z
     damageResistances: z.array(z.string().min(1)).default([]),
     hitPointMaximumPerCharacterLevel: z.number().int().nonnegative().default(0),
     carryingCapacitySizeCategoryBonus: z.number().int().nonnegative().default(0),
+    d20RerollValues: z.array(z.number().int().min(1).max(20)).default([]),
+    d20RerollSource: z.string().min(1).optional(),
+    factGrants: z.record(z.union([z.boolean(), z.number(), z.string()])).default({}),
     choices: z
       .array(
         z
@@ -2105,6 +2108,9 @@ function recordD20Test(
   context: EvaluateCharacterInput["context"],
   additionalRollEffects: readonly D20RollEffect[],
   ruleModifiers: readonly D20TestModifier[],
+  rerollValues: readonly number[],
+  rerollSources: readonly string[],
+  rerollSourceReferences: readonly SourceReference[],
   sourceReferencesForTest: SourceReference[],
   state: EngineState,
 ): void {
@@ -2167,10 +2173,21 @@ function recordD20Test(
         inputs: [advantageSources, disadvantageSources],
         output: rollMode,
       },
+      ...(rerollValues.length === 0
+        ? []
+        : [
+            {
+              id: `${traceId}.reroll-values`,
+              operation: "grant-d20-reroll-values",
+              inputs: [...rerollSources],
+              output: [...rerollValues],
+            },
+          ]),
     ],
     sourceReferences: [
       ...sourceReferencesForTest,
       ...applicableModifiers.flatMap((value) => value.sourceReferences),
+      ...rerollSourceReferences,
     ],
   };
   state.facts[testId] = modifier;
@@ -2183,6 +2200,8 @@ function recordD20Test(
     rollMode,
     advantageSources,
     disadvantageSources,
+    rerollValues: [...rerollValues],
+    rerollSources: [...rerollSources],
     traceId,
   };
 }
@@ -2197,6 +2216,15 @@ function evaluateD20Tests(
   ruleModifiers: readonly D20TestModifier[],
 ): void {
   const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
+  const rerollValues = origins.speciesBody?.d20RerollValues ?? [];
+  const rerollSources =
+    rerollValues.length === 0
+      ? []
+      : [origins.speciesBody?.d20RerollSource ?? origins.species?.name.en ?? "Species"];
+  const rerollSourceReferences =
+    rerollValues.length === 0 || origins.species === undefined
+      ? []
+      : entitySourceReferences(origins.species);
   const firstClassId = character.build.levels[0]?.classId;
   const firstClassEntity =
     firstClassId === undefined ? undefined : index.entities.get(firstClassId);
@@ -2403,6 +2431,9 @@ function evaluateD20Tests(
       context,
       additionalRollEffects,
       ruleModifiers,
+      rerollValues,
+      rerollSources,
+      rerollSourceReferences,
       testSourceReferences(`savingThrow.${ability}`, sources),
       state,
     );
@@ -2417,6 +2448,9 @@ function evaluateD20Tests(
       context,
       additionalRollEffects,
       ruleModifiers,
+      rerollValues,
+      rerollSources,
+      rerollSourceReferences,
       testSourceReferences(`abilityCheck.${ability}`, []),
       state,
     );
@@ -2448,6 +2482,9 @@ function evaluateD20Tests(
       context,
       additionalRollEffects,
       ruleModifiers,
+      rerollValues,
+      rerollSources,
+      rerollSourceReferences,
       testSourceReferences(`skill.${skill.id}`, sources),
       state,
     );
@@ -2461,6 +2498,9 @@ function evaluateD20Tests(
     context,
     additionalRollEffects,
     ruleModifiers,
+    rerollValues,
+    rerollSources,
+    rerollSourceReferences,
     testSourceReferences("initiative", []),
     state,
   );
@@ -3670,6 +3710,25 @@ function evaluateSpeciesTraits(
           operation: "increase-carrying-capacity-size-category",
           inputs: [species.id],
           output: body.carryingCapacitySizeCategoryBonus,
+        },
+      ],
+      sourceReferences: sources,
+    };
+  }
+  for (const [factId, value] of Object.entries(body.factGrants)) {
+    state.facts[factId] = value;
+    if (typeof value === "number") {
+      state.values[factId] = { value, traceId: factId };
+    }
+    state.traces[factId] = {
+      id: factId,
+      result: value,
+      nodes: [
+        {
+          id: `${factId}.species`,
+          operation: "grant-species-fact",
+          inputs: [species.id],
+          output: value,
         },
       ],
       sourceReferences: sources,

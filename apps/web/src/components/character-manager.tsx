@@ -13,6 +13,7 @@ import type {
   ActionUseRequest,
   AttackSummary,
   CharacterEvaluation,
+  D20TestSummary,
   LoadedRulesPackage,
   SpellCastRequest,
   SpellSummary,
@@ -174,9 +175,26 @@ function rollExpression(result: DiceRollResult): string {
 
 function rollDetail(result: DiceRollResult): string {
   if (result.kind === "d20") {
-    return result.dice.length === 1 ? "1d20" : `2d20 rolled: ${result.dice.map(String).join(", ")}`;
+    const dice =
+      result.dice.length === 1 ? "1d20" : `2d20 rolled: ${result.dice.map(String).join(", ")}`;
+    const rerolls = result.rerolls
+      ?.map((reroll) => `${String(reroll.original)} → ${String(reroll.replacement)}`)
+      .join(", ");
+    return rerolls === undefined
+      ? dice
+      : `${dice} · ${result.rerollSource ?? "Feature"} rerolled ${rerolls}`;
   }
   return `${String(result.diceCount)}d${String(result.diceSize)} rolled: ${result.dice.map(String).join(", ")}`;
+}
+
+function d20RerollRequest(
+  test: D20TestSummary | undefined,
+): Pick<D20RollRequest, "rerollValues" | "rerollSource"> {
+  if (test === undefined || test.rerollValues.length === 0) return {};
+  return {
+    rerollValues: test.rerollValues,
+    rerollSource: test.rerollSources.join(", ") || "Feature",
+  };
 }
 
 function spellDamageRolls(spell: SpellSummary): SpellSummary["damage"] {
@@ -321,6 +339,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     [builderCatalog, character],
   );
   const evaluation = result.evaluation;
+  const universalD20Test = evaluation?.d20Tests.initiative;
   const additionalSpellcastingOption = evaluation?.spells
     .flatMap((spell) => spell.castingOptions ?? [])
     .find((option) => evaluation.spellcasting?.classId !== option.sourceId);
@@ -384,6 +403,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   label: `${spell.name} spell attack`,
                   modifier: attackBonus,
                   mode: "normal",
+                  ...d20RerollRequest(universalD20Test),
                 });
               }
             }}
@@ -891,6 +911,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     label: "Initiative",
                     modifier: numericFact(evaluation, "initiative"),
                     mode: evaluation.d20Tests.initiative?.rollMode ?? "normal",
+                    ...d20RerollRequest(evaluation.d20Tests.initiative),
                   }}
                   onRoll={performRoll}
                 >
@@ -1384,6 +1405,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   <div className="abilities">
                     {abilities.map((ability) => {
                       const modifier = numericFact(evaluation, `ability.${ability}.modifier`);
+                      const check = evaluation.d20Tests[`abilityCheck.${ability}`];
                       const save = evaluation.d20Tests[`savingThrow.${ability}`];
                       return (
                         <TraceButton
@@ -1394,7 +1416,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           roll={{
                             label: `${titleCase(ability)} check`,
                             modifier,
-                            mode: "normal",
+                            mode: check?.rollMode ?? "normal",
+                            ...d20RerollRequest(check),
                           }}
                           onRoll={performRoll}
                         >
@@ -1425,6 +1448,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             label: titleCase(skill.id.replace("skill.", "")),
                             modifier: skill.modifier,
                             mode: skill.rollMode,
+                            ...d20RerollRequest(skill),
                           }}
                           onRoll={performRoll}
                         >
@@ -1516,6 +1540,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                     modifier: attack.attackBonus,
                                     mode: "normal",
                                     criticalThreshold: attack.criticalHitThreshold,
+                                    ...d20RerollRequest(universalD20Test),
                                   }}
                                   onRoll={performRoll}
                                 >
@@ -1743,6 +1768,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             label: "Innate spell attack",
                             modifier: additionalSpellcastingOption?.attackBonus ?? 0,
                             mode: "normal",
+                            ...d20RerollRequest(universalD20Test),
                           }}
                           onRoll={performRoll}
                         >
@@ -1782,6 +1808,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             label: "Spell attack",
                             modifier: evaluation.spellcasting.attackBonus,
                             mode: "normal",
+                            ...d20RerollRequest(universalD20Test),
                           }}
                           onRoll={performRoll}
                         >

@@ -34,6 +34,45 @@ describe("d20 rolls", () => {
     ).toMatchObject({ dice: [15, 3], kept: 3, total: 2 });
   });
 
+  it("rerolls configured d20 values once and exposes feedback", () => {
+    expect(
+      rollD20(
+        {
+          label: "Halfling Dexterity check",
+          modifier: 3,
+          mode: "normal",
+          rerollValues: [1],
+          rerollSource: "Luck",
+        },
+        sequence(0, 0.65),
+      ),
+    ).toEqual({
+      kind: "d20",
+      label: "Halfling Dexterity check",
+      modifier: 3,
+      mode: "normal",
+      rerollValues: [1],
+      rerollSource: "Luck",
+      dice: [14],
+      kept: 14,
+      total: 17,
+      rerolls: [{ dieIndex: 0, original: 1, replacement: 14 }],
+    });
+  });
+
+  it("does not recursively reroll a qualifying replacement", () => {
+    expect(
+      rollD20(
+        { label: "Halfling save", modifier: 0, mode: "normal", rerollValues: [1] },
+        sequence(0, 0),
+      ),
+    ).toMatchObject({
+      dice: [1],
+      kept: 1,
+      rerolls: [{ dieIndex: 0, original: 1, replacement: 1 }],
+    });
+  });
+
   it("rejects random values outside the supported range", () => {
     expect(() =>
       rollD20({ label: "Initiative", modifier: 0, mode: "normal" }, sequence(1)),

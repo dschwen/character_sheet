@@ -25,6 +25,7 @@ DRAGONBORN_ID = "srd521.species.dragonborn"
 ELF_ID = "srd521.species.elf"
 GNOME_ID = "srd521.species.gnome"
 GOLIATH_ID = "srd521.species.goliath"
+HALFLING_ID = "srd521.species.halfling"
 ALERT_ID = "srd521.feat.origin.alert"
 MAGIC_INITIATE_IDS = {
     "cleric": "srd521.feat.origin.magic-initiate.cleric",
@@ -41,6 +42,7 @@ ORIGIN_IDS = {
     ELF_ID,
     GNOME_ID,
     GOLIATH_ID,
+    HALFLING_ID,
     ALERT_ID,
     *MAGIC_INITIATE_IDS.values(),
     SAVAGE_ATTACKER_ID,
@@ -789,6 +791,44 @@ def parse_goliath(text: str) -> dict[str, Any]:
     }
 
 
+def parse_halfling(text: str) -> dict[str, Any]:
+    creature_type = re.search(r"Creature Type: (?P<value>\w+)", text)
+    size = re.search(r"Size: (?P<value>Medium|Small)", text)
+    speed = re.search(r"Speed: (?P<value>\d+) feet", text)
+    required_phrases = (
+        "Advantage on saving throws you make to avoid or end the Frightened condition",
+        "move through the space of any creature that is a size larger than you",
+        "When you roll a 1 on the d20 of a D20 Test",
+        "you must use the new roll",
+        "take the Hide action even when you are obscured only by a creature",
+    )
+    if creature_type is None or size is None or speed is None:
+        raise ValueError("Halfling species does not match the expected fields")
+    if not all(phrase in text for phrase in required_phrases):
+        raise ValueError("Halfling trait text is incomplete")
+    return {
+        "creatureType": creature_type.group("value").casefold(),
+        "sizeOptions": [size.group("value").casefold()],
+        "walkingSpeed": int(speed.group("value")),
+        "conditionalRollEffects": [
+            {
+                "testIds": "saving-throws",
+                "kind": "advantage",
+                "situationalTag": "avoid-or-end-frightened",
+                "source": "Brave",
+            }
+        ],
+        "d20RerollValues": [1],
+        "d20RerollSource": "Luck",
+        "factGrants": {
+            "species.movement.canEnterLargerCreatureSpace": True,
+            "species.hide.obscuredByLargerCreature": True,
+        },
+        "traitNames": ["Brave", "Halfling Nimbleness", "Luck", "Naturally Stealthy"],
+        "traitsText": text,
+    }
+
+
 def parse_origin_feat(
     name: str,
     text: str,
@@ -993,6 +1033,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     goliath_nodes = [
         node for node in _section(nodes, "Goliath", "Halfling") if node["kind"] != "MetadataNode"
     ]
+    halfling_nodes = _section(nodes, "Halfling", "Human")
     alert_nodes = _section(nodes, "Alert", "Magic Initiate")
     magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
@@ -1057,6 +1098,14 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         _source_spans(goliath_nodes),
         parse_goliath(_text(goliath_nodes)),
     )
+    halfling = _entity(
+        HALFLING_ID,
+        "species",
+        "Halfling",
+        ["species", "humanoid", "halfling"],
+        _source_spans(halfling_nodes),
+        parse_halfling(_text(halfling_nodes)),
+    )
     alert_source = _source_spans(alert_nodes)
     alert = _entity(
         ALERT_ID,
@@ -1107,6 +1156,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         elf,
         gnome,
         goliath,
+        halfling,
         savage_attacker,
         skilled,
         alert,
@@ -1138,7 +1188,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["note"] = (
         "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
         "Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, "
-        "Elf, Gnome, and Goliath; equipment; "
+        "Elf, Gnome, Goliath, and Halfling; equipment; "
         "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
@@ -1151,6 +1201,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "elf": elf["body"],
         "gnome": gnome["body"],
         "goliath": goliath["body"],
+        "halfling": halfling["body"],
         "originFeats": {
             ALERT_ID: alert["body"],
             **{entity["id"]: entity["body"] for entity in magic_initiates},

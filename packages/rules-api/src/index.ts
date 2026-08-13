@@ -50,6 +50,8 @@ export interface D20TestSummary {
   rollMode: RollMode;
   advantageSources: string[];
   disadvantageSources: string[];
+  rerollValues: number[];
+  rerollSources: string[];
   traceId: string;
 }
 

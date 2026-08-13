@@ -1700,6 +1700,51 @@ describe("guided character builder", () => {
     );
   });
 
+  it("builds Halflings with Brave, Nimbleness, Luck, and Naturally Stealthy", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const speciesId = "srd521.species.halfling";
+    const draft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 1, "Lucky Scout"),
+      catalog,
+      speciesId,
+    );
+    const halfling = buildCharacter(draft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character: halfling, packages: [rulesPackage] });
+    const frightenedEvaluation = evaluateCharacter({
+      character: halfling,
+      packages: [rulesPackage],
+      context: { situationalTags: ["avoid-or-end-frightened"] },
+    });
+
+    expect(catalog.species[speciesId]).toMatchObject({
+      sizeOptions: ["small"],
+      walkingSpeed: 30,
+      traitNames: ["Brave", "Halfling Nimbleness", "Luck", "Naturally Stealthy"],
+    });
+    expect(draft.speciesSize).toBe("small");
+    expect(draft.speciesChoiceSelections).toEqual({});
+    expect(evaluation.validations.filter((message) => message.severity === "error")).toEqual([]);
+    expect(evaluation.facts["species.movement.canEnterLargerCreatureSpace"]).toBe(true);
+    expect(evaluation.facts["species.hide.obscuredByLargerCreature"]).toBe(true);
+    expect(evaluation.d20Tests.initiative).toMatchObject({
+      rerollValues: [1],
+      rerollSources: ["Luck"],
+    });
+    expect(evaluation.d20Tests["skill.stealth"]?.rerollValues).toEqual([1]);
+    expect(evaluation.d20Tests["savingThrow.wisdom"]?.rollMode).toBe("normal");
+    for (const ability of [
+      "strength",
+      "dexterity",
+      "constitution",
+      "intelligence",
+      "wisdom",
+      "charisma",
+    ]) {
+      expect(frightenedEvaluation.d20Tests[`savingThrow.${ability}`]?.rollMode).toBe("advantage");
+    }
+  });
+
   it("migrates Magic Initiate defaults into characters saved before spell choices", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

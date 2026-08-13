@@ -7,6 +7,7 @@ from srd_extract.origins import (
     parse_elf,
     parse_gnome,
     parse_goliath,
+    parse_halfling,
     parse_human,
     parse_origin_feat,
     parse_soldier,
@@ -214,6 +215,27 @@ def test_parse_goliath_species() -> None:
     assert body["actions"][1]["damage"] == {"diceCount": 1, "diceSize": 10, "type": "fire"}
     assert body["actions"][4]["roll"]["bonusAbility"] == "constitution"
     assert body["actions"][-1]["minimumLevel"] == 5
+
+
+def test_parse_halfling_species() -> None:
+    body = parse_halfling(
+        "Halfling Creature Type: Humanoid Size: Small (about 2–3 feet tall) Speed: 30 feet "
+        "Brave. You have Advantage on saving throws you make to avoid or end the Frightened "
+        "condition. Halfling Nimbleness. You can move through the space of any creature that is "
+        "a size larger than you. Luck. When you roll a 1 on the d20 of a D20 Test, you can reroll "
+        "the die, and you must use the new roll. Naturally Stealthy. You can take the Hide action "
+        "even when you are obscured only by a creature that is at least one size larger than you."
+    )
+
+    assert body["sizeOptions"] == ["small"]
+    assert body["walkingSpeed"] == 30
+    assert body["d20RerollValues"] == [1]
+    assert body["d20RerollSource"] == "Luck"
+    assert body["conditionalRollEffects"][0]["situationalTag"] == "avoid-or-end-frightened"
+    assert body["factGrants"] == {
+        "species.movement.canEnterLargerCreatureSpace": True,
+        "species.hide.obscuredByLargerCreature": True,
+    }
 
 
 def test_parse_origin_feats_rejects_incomplete_benefits() -> None:

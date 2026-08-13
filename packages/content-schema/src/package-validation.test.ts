@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(561);
+    expect(parsedEntities).toHaveLength(562);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -459,6 +459,7 @@ describe("bootstrap content package", () => {
       "srd521.species.elf",
       "srd521.species.gnome",
       "srd521.species.goliath",
+      "srd521.species.halfling",
       "srd521.feat.origin.savage-attacker",
       "srd521.feat.origin.skilled",
       "srd521.feat.origin.alert",
@@ -467,7 +468,7 @@ describe("bootstrap content package", () => {
       "srd521.feat.origin.magic-initiate.wizard",
     ]);
     expect(entities.map((entity) => entity.source[0]?.page)).toEqual([
-      83, 83, 83, 83, 86, 84, 84, 84, 85, 85, 87, 87, 87, 87, 87, 87,
+      83, 83, 83, 83, 86, 84, 84, 84, 85, 85, 86, 87, 87, 87, 87, 87, 87,
     ]);
     expect(savageAttacker.proposedRules[0]).toMatchObject({
       type: "grant-action",

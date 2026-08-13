@@ -5,6 +5,8 @@ export interface D20RollRequest {
   modifier: number;
   mode: RollMode;
   criticalThreshold?: number;
+  rerollValues?: readonly number[];
+  rerollSource?: string;
 }
 
 export interface D20RollResult extends D20RollRequest {
@@ -12,6 +14,13 @@ export interface D20RollResult extends D20RollRequest {
   dice: readonly number[];
   kept: number;
   total: number;
+  rerolls?: readonly D20Reroll[];
+}
+
+export interface D20Reroll {
+  dieIndex: number;
+  original: number;
+  replacement: number;
 }
 
 export interface DicePoolRollRequest {
@@ -49,16 +58,29 @@ export function rollD20(
   request: D20RollRequest,
   random: RandomSource = Math.random,
 ): D20RollResult {
-  const dice =
+  const initialDice =
     request.mode === "normal"
       ? ([rollDie(20, random)] as const)
       : [rollDie(20, random), rollDie(20, random)];
+  const rerollValues = new Set(request.rerollValues ?? []);
+  if ([...rerollValues].some((value) => !Number.isInteger(value) || value < 1 || value > 20)) {
+    throw new RangeError("D20 reroll values must be whole numbers from 1 through 20.");
+  }
+  const rerolls: D20Reroll[] = [];
+  const dice = initialDice.map((die, dieIndex) => {
+    if (!rerollValues.has(die)) return die;
+    const replacement = rollDie(20, random);
+    rerolls.push({ dieIndex, original: die, replacement });
+    return replacement;
+  });
+  const firstDie = dice[0];
+  if (firstDie === undefined) throw new RangeError("A D20 roll must contain at least one die.");
   const kept =
     request.mode === "advantage"
       ? Math.max(...dice)
       : request.mode === "disadvantage"
         ? Math.min(...dice)
-        : dice[0];
+        : firstDie;
 
   return {
     ...request,
@@ -66,6 +88,7 @@ export function rollD20(
     dice,
     kept,
     total: kept + request.modifier,
+    ...(rerolls.length === 0 ? {} : { rerolls }),
   };
 }
 

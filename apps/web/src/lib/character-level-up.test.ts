@@ -678,6 +678,31 @@ describe("guided character level up", () => {
     ).toContain("Choose a Giant Ancestry cannot change during level up.");
   });
 
+  it("preserves Halfling species traits during level up", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const original = buildCharacter(
+      updateBuilderSpecies(
+        defaultBuilderDraft(fighterId, catalog, 1, "Lucky Veteran"),
+        catalog,
+        "srd521.species.halfling",
+      ),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-10T21:00:00.000Z"),
+    });
+
+    expect(draft.speciesId).toBe("srd521.species.halfling");
+    expect(draft.speciesSize).toBe("small");
+    expect(preview.issues).toEqual([]);
+    expect(preview.evaluation?.d20Tests.initiative?.rerollValues).toEqual([1]);
+    expect(preview.evaluation?.facts["species.hide.obscuredByLargerCreature"]).toBe(true);
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
