@@ -5704,6 +5704,127 @@
   {
     "body": {
       "attackType": null,
+      "castingTime": "1 minute",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "two lodestones",
+        "somatic": true,
+        "verbal": true
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "This spell repairs a single break or tear in an object you touch, such as a broken chain link, two halves of a broken key, a torn cloak, or a leaking wineskin. As long as the break or tear is no larger than 1 foot in any dimension, you mend it, leaving no trace of the former damage. This spell can physically repair a magic item, but it can’t restore magic to such an object.",
+      "duration": "Instantaneous",
+      "hasHigherLevelEffect": false,
+      "level": 0,
+      "range": "Touch",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "transmutation",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.mending",
+    "kind": "spell",
+    "name": {
+      "en": "Mending"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0148-b015",
+          "p0148-b016",
+          "p0148-b017"
+        ],
+        "page": 148,
+        "quoteHash": "6f82d50231f721fc6b88025d79a598cb8df1dafd8c33eed45f9d204b3b1ff0bf",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "transmutation",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
+      "castingTime": "Action",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "components": {
+        "material": true,
+        "materialText": "a bit of fleece",
+        "somatic": true,
+        "verbal": false
+      },
+      "concentration": false,
+      "damage": [],
+      "description": "You create a sound or an image of an object within range that lasts for the duration. See the descriptions below for the effects of each. The illusion ends if you cast this spell again. If a creature takes a Study action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature. Sound. If you create a sound, its volume can range from a whisper to a scream. It can be your voice, someone else’s voice, a lion’s roar, a beating of drums, or any other sound you choose. The sound continues unabated throughout the duration, or you can make discrete sounds at different times before the spell ends. Image. If you create an image of an object—such as a chair, muddy footprints, or a small chest—it must be no larger than a 5-foot Cube. The image can’t create sound, light, smell, or any other sensory effect. Physical interaction with the image reveals it to be an illusion, since things can pass through it.",
+      "duration": "1 minute",
+      "hasHigherLevelEffect": false,
+      "level": 0,
+      "range": "30 feet",
+      "ritual": false,
+      "savingThrows": [],
+      "school": "illusion",
+      "wizardSpell": true
+    },
+    "id": "srd521.spell.minor-illusion",
+    "kind": "spell",
+    "name": {
+      "en": "Minor Illusion"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Representative Wizard spell with structured casting and effect fields.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0149-b013",
+          "p0149-b014",
+          "p0149-b015"
+        ],
+        "page": 149,
+        "quoteHash": "f47169c1be65a3084536794cb15dfa410b0a604680e684569f08572dabcef5ed",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "spell",
+      "level-0",
+      "illusion",
+      "wizard"
+    ]
+  },
+  {
+    "body": {
+      "attackType": null,
       "castingTime": "Bonus Action",
       "classes": [
         "sorcerer",
@@ -24520,6 +24641,135 @@
       "species",
       "humanoid",
       "elf"
+    ]
+  },
+  {
+    "body": {
+      "actions": [
+        {
+          "actionEconomy": "10 minutes",
+          "effect": "Cast Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP) with one chosen effect; a creature activates it by touch as a Bonus Action; up to three devices can exist, and each lasts 8 hours",
+          "id": "srd521.action.gnome.rock.clockwork-device",
+          "requiredWhen": {
+            "choiceId": "srd521.species.gnome.choice.gnomish-lineage",
+            "optionId": "srd521.species.gnome.lineage.rock"
+          }
+        }
+      ],
+      "choices": [
+        {
+          "id": "srd521.species.gnome.choice.gnomish-lineage",
+          "maximum": 1,
+          "minimum": 1,
+          "options": [
+            {
+              "id": "srd521.species.gnome.lineage.forest",
+              "name": "Forest Gnome",
+              "spellGrants": [
+                {
+                  "minimumLevel": 1,
+                  "spellId": "srd521.spell.minor-illusion"
+                },
+                {
+                  "freeCastMaximum": "proficiency-bonus",
+                  "freeCastResourceId": "srd521.resource.gnome.forest.speak-with-animals",
+                  "minimumLevel": 1,
+                  "spellId": "srd521.spell.speak-with-animals"
+                }
+              ]
+            },
+            {
+              "id": "srd521.species.gnome.lineage.rock",
+              "name": "Rock Gnome",
+              "spellGrants": [
+                {
+                  "minimumLevel": 1,
+                  "spellId": "srd521.spell.mending"
+                },
+                {
+                  "minimumLevel": 1,
+                  "spellId": "srd521.spell.prestidigitation"
+                }
+              ]
+            }
+          ],
+          "prompt": "Choose a Gnomish Lineage"
+        },
+        {
+          "id": "srd521.species.gnome.choice.spellcasting-ability",
+          "maximum": 1,
+          "minimum": 1,
+          "options": [
+            {
+              "ability": "intelligence",
+              "id": "srd521.species.gnome.spellcasting-ability.intelligence",
+              "name": "Intelligence"
+            },
+            {
+              "ability": "wisdom",
+              "id": "srd521.species.gnome.spellcasting-ability.wisdom",
+              "name": "Wisdom"
+            },
+            {
+              "ability": "charisma",
+              "id": "srd521.species.gnome.spellcasting-ability.charisma",
+              "name": "Charisma"
+            }
+          ],
+          "prompt": "Choose a Gnomish Lineage spellcasting ability"
+        }
+      ],
+      "creatureType": "humanoid",
+      "darkvisionRange": 60,
+      "savingThrowAdvantages": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ],
+      "sizeOptions": [
+        "small"
+      ],
+      "spellcastingAbilityChoiceId": "srd521.species.gnome.choice.spellcasting-ability",
+      "traitNames": [
+        "Darkvision",
+        "Gnomish Cunning",
+        "Gnomish Lineage"
+      ],
+      "traitsText": "Gnome Creature Type: Humanoid Size: Small (about 3–4 feet tall) Speed: 30 feet As a Gnome, you have these special traits. Darkvision. You have Darkvision with a range of 60 feet. Gnomish Cunning. You have Advantage on Intelligence, Wisdom, and Charisma saving throws. Gnomish Lineage. You are part of a lineage that grants you supernatural abilities. Choose one of the following options; whichever one you choose, Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the lineage): Forest Gnome. You know the Minor Illusion cantrip. You also always have the Speak with Animals spell prepared. You can cast it without a spell slot a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. You can also use any spell slots you have to cast the spell. Rock Gnome. You know the Mending and Prestidigitation cantrips. In addition, you can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP), such as a toy, fire starter, or music box. When you create the device, you determine its function by choosing one effect from Prestidigitation; the device produces that effect whenever you or another creature takes a Bonus Action to activate it with a touch. If the chosen effect has options within it, you choose one of those options for the device when you create it. For example, if you choose the spell’s ignite-extinguish effect, you determine whether the device ignites or extinguishes fire; the device doesn’t do both. You can have three such devices in existence at a time, and each falls apart 8 hours after its creation or when you dismantle it with a touch as a Utilize action.",
+      "walkingSpeed": 30
+    },
+    "id": "srd521.species.gnome",
+    "kind": "species",
+    "name": {
+      "en": "Gnome"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Gnome extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0085-b003",
+          "p0085-b004",
+          "p0085-b005",
+          "p0085-b006",
+          "p0085-b007",
+          "p0085-b008"
+        ],
+        "page": 85,
+        "quoteHash": "687966b15243eed7f9dcc06c02dd0add20e21b9b960cd47d518af780ec003112",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "species",
+      "humanoid",
+      "gnome"
     ]
   },
   {

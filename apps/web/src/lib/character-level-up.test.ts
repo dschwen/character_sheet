@@ -601,6 +601,45 @@ describe("guided character level up", () => {
     ).toContain("Choose an Elven Lineage cannot change during level up.");
   });
 
+  it("preserves a Gnome's lineage and spellcasting ability during level up", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const lineageChoiceId = "srd521.species.gnome.choice.gnomish-lineage";
+    const abilityChoiceId = "srd521.species.gnome.choice.spellcasting-ability";
+    const original = buildCharacter(
+      updateBuilderSpecies(
+        defaultBuilderDraft(fighterId, catalog, 1, "Forest Scholar"),
+        catalog,
+        "srd521.species.gnome",
+      ),
+      rulesPackage,
+      initialOptions,
+    );
+    const draft = createLevelUpDraft(original, catalog);
+
+    expect(draft.speciesChoiceSelections).toMatchObject({
+      [lineageChoiceId]: ["srd521.species.gnome.lineage.forest"],
+      [abilityChoiceId]: ["srd521.species.gnome.spellcasting-ability.intelligence"],
+    });
+    expect(
+      previewLevelUp(original, draft, rulesPackage, {
+        id: original.id,
+        now: new Date("2026-08-10T17:00:00.000Z"),
+      }).issues,
+    ).toEqual([]);
+
+    draft.speciesChoiceSelections = {
+      ...draft.speciesChoiceSelections,
+      [lineageChoiceId]: ["srd521.species.gnome.lineage.rock"],
+    };
+    expect(
+      previewLevelUp(original, draft, rulesPackage, {
+        id: original.id,
+        now: new Date("2026-08-10T18:00:00.000Z"),
+      }).issues,
+    ).toContain("Choose a Gnomish Lineage cannot change during level up.");
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

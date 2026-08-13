@@ -5,6 +5,7 @@ from srd_extract.origins import (
     parse_dragonborn,
     parse_dwarf,
     parse_elf,
+    parse_gnome,
     parse_human,
     parse_origin_feat,
     parse_soldier,
@@ -161,6 +162,30 @@ def test_parse_elf_species() -> None:
         "srd521.skill.perception",
         "srd521.skill.survival",
     ]
+
+
+def test_parse_gnome_species() -> None:
+    body = parse_gnome(
+        "Gnome Creature Type: Humanoid Size: Small (about 3–4 feet tall) Speed: 30 feet "
+        "Darkvision. You have Darkvision with a range of 60 feet. Gnomish Cunning. You have "
+        "Advantage on Intelligence, Wisdom, and Charisma saving throws. Gnomish Lineage. "
+        "Whichever lineage you choose, Intelligence, Wisdom, or Charisma is your spellcasting "
+        "ability. Forest Gnome. You know Minor Illusion and always prepare Speak with Animals. "
+        "You can cast it a number of times equal to your Proficiency Bonus. Rock Gnome. You know "
+        "the Mending and Prestidigitation cantrips and can create a Tiny clockwork device. You "
+        "can have three such devices in existence."
+    )
+
+    lineage = body["choices"][0]
+    assert [option["name"] for option in lineage["options"]] == ["Forest Gnome", "Rock Gnome"]
+    forest_spells = lineage["options"][0]["spellGrants"]
+    assert forest_spells[1]["freeCastMaximum"] == "proficiency-bonus"
+    assert lineage["options"][1]["spellGrants"] == [
+        {"spellId": "srd521.spell.mending", "minimumLevel": 1},
+        {"spellId": "srd521.spell.prestidigitation", "minimumLevel": 1},
+    ]
+    assert body["savingThrowAdvantages"] == ["intelligence", "wisdom", "charisma"]
+    assert body["actions"][0]["requiredWhen"]["optionId"].endswith(".rock")
 
 
 def test_parse_origin_feats_rejects_incomplete_benefits() -> None:

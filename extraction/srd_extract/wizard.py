@@ -43,6 +43,8 @@ REPRESENTATIVE_SPELLS = (
     "Mage Armor",
     "Mage Hand",
     "Magic Missile",
+    "Mending",
+    "Minor Illusion",
     "Misty Step",
     "Ray of Frost",
     "Scorching Ray",
@@ -786,7 +788,7 @@ def generate_wizard_content(
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
         "Barbarian, Fighter through level 5, Wizard source content, Human, Soldier, "
-        "equipment, and 21 representative spells. Proposed executable rules remain under review."
+        "equipment, and 23 representative spells. Proposed executable rules remain under review."
     )
     write_json(output / "coverage.json", coverage)
     report = {

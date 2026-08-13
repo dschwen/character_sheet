@@ -686,6 +686,14 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
               const options = choice.options.flatMap((optionValue) => {
                 const option = objectValue(optionValue);
                 if (typeof option?.id !== "string" || typeof option.name !== "string") return [];
+                const grantedSpellNames = Array.isArray(option.spellGrants)
+                  ? option.spellGrants.flatMap((grantValue) => {
+                      const grant = objectValue(grantValue);
+                      const spell =
+                        typeof grant?.spellId === "string" ? entity(grant.spellId) : undefined;
+                      return spell?.kind === "spell" ? [localizedName(spell)] : [];
+                    })
+                  : [];
                 const details = [
                   typeof option.damageType === "string"
                     ? `${titleCase(option.damageType)} damage`
@@ -699,6 +707,9 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
                   typeof option.ability === "string"
                     ? `${titleCase(option.ability)} spellcasting`
                     : undefined,
+                  grantedSpellNames.length === 0
+                    ? undefined
+                    : `Magic: ${grantedSpellNames.join(", ")}`,
                 ].filter((detail): detail is string => detail !== undefined);
                 return [
                   {

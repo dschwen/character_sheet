@@ -1498,6 +1498,114 @@ describe("guided character builder", () => {
     );
   });
 
+  it("builds Forest and Rock Gnomes with cunning, innate magic, and clockwork devices", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const speciesId = "srd521.species.gnome";
+    const lineageChoiceId = "srd521.species.gnome.choice.gnomish-lineage";
+    const resourceId = "srd521.resource.gnome.forest.speak-with-animals";
+    const forestDraft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 1, "Forest Tinkerer"),
+      catalog,
+      speciesId,
+    );
+    const forest = buildCharacter(forestDraft, rulesPackage, options);
+    const forestEvaluation = evaluateCharacter({ character: forest, packages: [rulesPackage] });
+
+    expect(catalog.species[speciesId]).toMatchObject({
+      sizeOptions: ["small"],
+      walkingSpeed: 30,
+      traitNames: ["Darkvision", "Gnomish Cunning", "Gnomish Lineage"],
+    });
+    expect(forestDraft.speciesChoiceSelections[lineageChoiceId]).toEqual([
+      "srd521.species.gnome.lineage.forest",
+    ]);
+    expect(forestEvaluation.validations.filter((message) => message.severity === "error")).toEqual(
+      [],
+    );
+    expect(forestEvaluation.facts["sense.darkvision.range"]).toBe(60);
+    expect(forestEvaluation.d20Tests["savingThrow.intelligence"]?.rollMode).toBe("advantage");
+    expect(forestEvaluation.d20Tests["savingThrow.wisdom"]?.rollMode).toBe("advantage");
+    expect(forestEvaluation.d20Tests["savingThrow.charisma"]?.rollMode).toBe("advantage");
+    expect(forestEvaluation.d20Tests["savingThrow.strength"]?.rollMode).toBe("normal");
+    expect(forestEvaluation.spells).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.spell.minor-illusion", prepared: false }),
+        expect.objectContaining({ id: "srd521.spell.speak-with-animals", prepared: true }),
+      ]),
+    );
+    expect(forestEvaluation.resources).toContainEqual(
+      expect.objectContaining({ id: resourceId, maximum: 2, current: 2 }),
+    );
+    expect(forestEvaluation.actions).not.toContainEqual(
+      expect.objectContaining({ id: "srd521.action.gnome.rock.clockwork-device" }),
+    );
+
+    const firstCast = proposeSpellCast(
+      { character: forest, packages: [rulesPackage] },
+      {
+        spellId: "srd521.spell.speak-with-animals",
+        castingSourceId: speciesId,
+        useFreeCast: true,
+      },
+    );
+    const onceExpended = { ...forest, state: firstCast.nextState };
+    const secondCast = proposeSpellCast(
+      { character: onceExpended, packages: [rulesPackage] },
+      {
+        spellId: "srd521.spell.speak-with-animals",
+        castingSourceId: speciesId,
+        useFreeCast: true,
+      },
+    );
+    const twiceExpended = { ...forest, state: secondCast.nextState };
+    expect(firstCast.applicable).toBe(true);
+    expect(secondCast.applicable).toBe(true);
+    expect(secondCast.nextState.expendedResources[resourceId]).toBe(2);
+    expect(
+      proposeSpellCast(
+        { character: twiceExpended, packages: [rulesPackage] },
+        {
+          spellId: "srd521.spell.speak-with-animals",
+          castingSourceId: speciesId,
+          useFreeCast: true,
+        },
+      ).validations,
+    ).toContainEqual(expect.objectContaining({ code: "SPELL_FREE_CAST_EXPENDED" }));
+    const rested = proposeRest(
+      { character: twiceExpended, packages: [rulesPackage] },
+      { event: "long-rest" },
+    );
+    expect(rested.nextState.expendedResources[resourceId]).toBe(0);
+
+    const rockDraft = updateBuilderSpeciesChoice(forestDraft, catalog, lineageChoiceId, [
+      "srd521.species.gnome.lineage.rock",
+    ]);
+    const rockEvaluation = evaluateCharacter({
+      character: buildCharacter(rockDraft, rulesPackage, options),
+      packages: [rulesPackage],
+    });
+    expect(rockEvaluation.spells).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "srd521.spell.mending" }),
+        expect.objectContaining({ id: "srd521.spell.prestidigitation" }),
+      ]),
+    );
+    expect(rockEvaluation.spells).not.toContainEqual(
+      expect.objectContaining({ id: "srd521.spell.speak-with-animals" }),
+    );
+    expect(rockEvaluation.resources).not.toContainEqual(
+      expect.objectContaining({ id: resourceId }),
+    );
+    expect(rockEvaluation.actions).toContainEqual(
+      expect.objectContaining({
+        id: "srd521.action.gnome.rock.clockwork-device",
+        available: true,
+        actionEconomy: "10 minutes",
+      }),
+    );
+  });
+
   it("migrates Magic Initiate defaults into characters saved before spell choices", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

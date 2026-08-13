@@ -265,6 +265,9 @@ const speciesBodySchema = z
                           spellId: z.string().min(1),
                           minimumLevel: z.number().int().positive(),
                           freeCastResourceId: z.string().min(1).optional(),
+                          freeCastMaximum: z
+                            .union([z.number().int().positive(), z.literal("proficiency-bonus")])
+                            .optional(),
                         })
                         .strict(),
                     )
@@ -296,6 +299,7 @@ const speciesBodySchema = z
       )
       .default([]),
     spellcastingAbilityChoiceId: z.string().min(1).optional(),
+    savingThrowAdvantages: z.array(z.enum(abilities)).default([]),
     resistanceFromChoiceId: z.string().min(1).optional(),
     conditionalRollEffects: z
       .array(
@@ -334,9 +338,13 @@ const speciesBodySchema = z
           .object({
             id: z.string().min(1),
             actionEconomy: z.string().min(1),
-            resourceId: z.string().min(1),
-            spends: z.number().int().positive(),
+            resourceId: z.string().min(1).optional(),
+            spends: z.number().int().positive().optional(),
             minimumLevel: z.number().int().positive().default(1),
+            requiredWhen: z
+              .object({ choiceId: z.string().min(1), optionId: z.string().min(1) })
+              .strict()
+              .optional(),
             sense: z.string().min(1).optional(),
             range: z.number().int().positive().optional(),
             duration: z.string().min(1).optional(),
@@ -2455,18 +2463,25 @@ function speciesRollEffects(
   context: EvaluateCharacterInput["context"],
 ): D20RollEffect[] {
   const situationalTags = new Set(context?.situationalTags ?? []);
-  return (origins.speciesBody?.conditionalRollEffects ?? []).flatMap((effect) => {
-    if (!situationalTags.has(effect.situationalTag)) return [];
-    const testIds =
-      effect.testIds === "saving-throws"
-        ? abilities.map((ability) => `savingThrow.${ability}`)
-        : effect.testIds;
-    return testIds.map((testId) => ({
-      testId,
-      kind: effect.kind,
-      source: origins.species?.id ?? effect.source,
-    }));
-  });
+  return [
+    ...(origins.speciesBody?.savingThrowAdvantages ?? []).map((ability) => ({
+      testId: `savingThrow.${ability}`,
+      kind: "advantage" as const,
+      source: origins.species?.id ?? "Species",
+    })),
+    ...(origins.speciesBody?.conditionalRollEffects ?? []).flatMap((effect) => {
+      if (!situationalTags.has(effect.situationalTag)) return [];
+      const testIds =
+        effect.testIds === "saving-throws"
+          ? abilities.map((ability) => `savingThrow.${ability}`)
+          : effect.testIds;
+      return testIds.map((testId) => ({
+        testId,
+        kind: effect.kind,
+        source: origins.species?.id ?? effect.source,
+      }));
+    }),
+  ];
 }
 
 function hitPointBase(
@@ -3789,7 +3804,10 @@ function evaluateSpeciesTraits(
         let castingOption: NonNullable<SpellSummary["castingOptions"]>[number] = baseCastingOption;
         if (grant.freeCastResourceId !== undefined) {
           const resourceId = grant.freeCastResourceId;
-          const maximum = 1;
+          const maximum =
+            grant.freeCastMaximum === "proficiency-bonus"
+              ? proficiencyBonus
+              : (grant.freeCastMaximum ?? 1);
           const expended = character.state.expendedResources[resourceId] ?? 0;
           const current = Math.max(0, maximum - expended);
           const maximumTraceId = `${resourceId}.maximum`;
@@ -3919,12 +3937,23 @@ function evaluateSpeciesTraits(
   }
   for (const action of body.actions) {
     if (action.minimumLevel > characterLevel) continue;
-    const resource = state.resources.find((candidate) => candidate.id === action.resourceId);
-    const available = resource !== undefined && resource.current >= action.spends;
+    if (
+      action.requiredWhen !== undefined &&
+      selectedSpeciesOptions.get(action.requiredWhen.choiceId)?.id !== action.requiredWhen.optionId
+    ) {
+      continue;
+    }
+    const resource =
+      action.resourceId === undefined
+        ? undefined
+        : state.resources.find((candidate) => candidate.id === action.resourceId);
+    const available =
+      action.resourceId === undefined ||
+      (resource !== undefined && resource.current >= (action.spends ?? 0));
     const traceId = `${action.id}.available`;
     const actionParameters: Record<string, JsonValue> = {
-      resourceId: action.resourceId,
-      spends: action.spends,
+      ...(action.resourceId === undefined ? {} : { resourceId: action.resourceId }),
+      ...(action.spends === undefined ? {} : { spends: action.spends }),
       ...(action.effect === undefined ? {} : { effect: action.effect }),
       ...(action.requirement === undefined ? {} : { requirement: action.requirement }),
       ...(action.areaOptions === undefined ? {} : { areaOptions: action.areaOptions }),
@@ -3981,7 +4010,10 @@ function evaluateSpeciesTraits(
     state.actions.push({
       id: action.id,
       available,
-      reasons: available ? [] : [`${action.resourceId} has no uses remaining.`],
+      reasons:
+        available || action.resourceId === undefined
+          ? []
+          : [`${action.resourceId} has no uses remaining.`],
       actionEconomy: action.actionEconomy,
       parameters: actionParameters,
       traceId,
@@ -3991,9 +4023,13 @@ function evaluateSpeciesTraits(
       result: available,
       nodes: [
         {
-          id: `${traceId}.resource`,
-          operation: "resource-availability",
-          inputs: [resource?.current ?? 0, action.spends],
+          id: `${traceId}.${action.resourceId === undefined ? "grant" : "resource"}`,
+          operation:
+            action.resourceId === undefined ? "grant-species-action" : "resource-availability",
+          inputs:
+            action.resourceId === undefined
+              ? [species.id]
+              : [resource?.current ?? 0, action.spends ?? 0],
           output: available,
         },
       ],

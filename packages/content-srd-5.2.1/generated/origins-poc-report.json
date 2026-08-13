@@ -464,6 +464,7 @@
     "srd521.species.dwarf",
     "srd521.species.dragonborn",
     "srd521.species.elf",
+    "srd521.species.gnome",
     "srd521.feat.origin.savage-attacker",
     "srd521.feat.origin.skilled",
     "srd521.feat.origin.alert",
@@ -471,6 +472,100 @@
     "srd521.feat.origin.magic-initiate.druid",
     "srd521.feat.origin.magic-initiate.wizard"
   ],
+  "gnome": {
+    "actions": [
+      {
+        "actionEconomy": "10 minutes",
+        "effect": "Cast Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP) with one chosen effect; a creature activates it by touch as a Bonus Action; up to three devices can exist, and each lasts 8 hours",
+        "id": "srd521.action.gnome.rock.clockwork-device",
+        "requiredWhen": {
+          "choiceId": "srd521.species.gnome.choice.gnomish-lineage",
+          "optionId": "srd521.species.gnome.lineage.rock"
+        }
+      }
+    ],
+    "choices": [
+      {
+        "id": "srd521.species.gnome.choice.gnomish-lineage",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "id": "srd521.species.gnome.lineage.forest",
+            "name": "Forest Gnome",
+            "spellGrants": [
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.minor-illusion"
+              },
+              {
+                "freeCastMaximum": "proficiency-bonus",
+                "freeCastResourceId": "srd521.resource.gnome.forest.speak-with-animals",
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.speak-with-animals"
+              }
+            ]
+          },
+          {
+            "id": "srd521.species.gnome.lineage.rock",
+            "name": "Rock Gnome",
+            "spellGrants": [
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.mending"
+              },
+              {
+                "minimumLevel": 1,
+                "spellId": "srd521.spell.prestidigitation"
+              }
+            ]
+          }
+        ],
+        "prompt": "Choose a Gnomish Lineage"
+      },
+      {
+        "id": "srd521.species.gnome.choice.spellcasting-ability",
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          {
+            "ability": "intelligence",
+            "id": "srd521.species.gnome.spellcasting-ability.intelligence",
+            "name": "Intelligence"
+          },
+          {
+            "ability": "wisdom",
+            "id": "srd521.species.gnome.spellcasting-ability.wisdom",
+            "name": "Wisdom"
+          },
+          {
+            "ability": "charisma",
+            "id": "srd521.species.gnome.spellcasting-ability.charisma",
+            "name": "Charisma"
+          }
+        ],
+        "prompt": "Choose a Gnomish Lineage spellcasting ability"
+      }
+    ],
+    "creatureType": "humanoid",
+    "darkvisionRange": 60,
+    "savingThrowAdvantages": [
+      "intelligence",
+      "wisdom",
+      "charisma"
+    ],
+    "sizeOptions": [
+      "small"
+    ],
+    "spellcastingAbilityChoiceId": "srd521.species.gnome.choice.spellcasting-ability",
+    "traitNames": [
+      "Darkvision",
+      "Gnomish Cunning",
+      "Gnomish Lineage"
+    ],
+    "traitsText": "Gnome Creature Type: Humanoid Size: Small (about 3–4 feet tall) Speed: 30 feet As a Gnome, you have these special traits. Darkvision. You have Darkvision with a range of 60 feet. Gnomish Cunning. You have Advantage on Intelligence, Wisdom, and Charisma saving throws. Gnomish Lineage. You are part of a lineage that grants you supernatural abilities. Choose one of the following options; whichever one you choose, Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the lineage): Forest Gnome. You know the Minor Illusion cantrip. You also always have the Speak with Animals spell prepared. You can cast it without a spell slot a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. You can also use any spell slots you have to cast the spell. Rock Gnome. You know the Mending and Prestidigitation cantrips. In addition, you can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP), such as a toy, fire starter, or music box. When you create the device, you determine its function by choosing one effect from Prestidigitation; the device produces that effect whenever you or another creature takes a Bonus Action to activate it with a touch. If the chosen effect has options within it, you choose one of those options for the device when you create it. For example, if you choose the spell’s ignite-extinguish effect, you determine whether the device ignites or extinguishes fire; the device doesn’t do both. You can have three such devices in existence at a time, and each falls apart 8 hours after its creation or when you dismantle it with a touch as a Utilize action.",
+    "walkingSpeed": 30
+  },
   "human": {
     "creatureType": "humanoid",
     "longRestGrantsHeroicInspiration": true,

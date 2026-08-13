@@ -23,6 +23,7 @@ HUMAN_ID = "srd521.species.human"
 DWARF_ID = "srd521.species.dwarf"
 DRAGONBORN_ID = "srd521.species.dragonborn"
 ELF_ID = "srd521.species.elf"
+GNOME_ID = "srd521.species.gnome"
 ALERT_ID = "srd521.feat.origin.alert"
 MAGIC_INITIATE_IDS = {
     "cleric": "srd521.feat.origin.magic-initiate.cleric",
@@ -37,6 +38,7 @@ ORIGIN_IDS = {
     DWARF_ID,
     DRAGONBORN_ID,
     ELF_ID,
+    GNOME_ID,
     ALERT_ID,
     *MAGIC_INITIATE_IDS.values(),
     SAVAGE_ATTACKER_ID,
@@ -499,6 +501,103 @@ def parse_elf(text: str) -> dict[str, Any]:
     }
 
 
+def parse_gnome(text: str) -> dict[str, Any]:
+    creature_type = re.search(r"Creature Type: (?P<value>\w+)", text)
+    size = re.search(r"Size: (?P<value>Medium|Small)", text)
+    speed = re.search(r"Speed: (?P<value>\d+) feet", text)
+    required_phrases = (
+        "Darkvision with a range of 60 feet",
+        "Advantage on Intelligence, Wisdom, and Charisma saving throws",
+        "Intelligence, Wisdom, or Charisma is your spellcasting ability",
+        "Forest Gnome",
+        "Minor Illusion",
+        "Speak with Animals",
+        "number of times equal to your Proficiency Bonus",
+        "Rock Gnome",
+        "Mending and Prestidigitation cantrips",
+        "Tiny clockwork device",
+        "three such devices in existence",
+    )
+    if creature_type is None or size is None or speed is None:
+        raise ValueError("Gnome species does not match the expected fields")
+    if not all(phrase in text for phrase in required_phrases):
+        raise ValueError("Gnome trait text is incomplete")
+    lineage_choice_id = "srd521.species.gnome.choice.gnomish-lineage"
+    ability_choice_id = "srd521.species.gnome.choice.spellcasting-ability"
+    return {
+        "creatureType": creature_type.group("value").casefold(),
+        "sizeOptions": [size.group("value").casefold()],
+        "walkingSpeed": int(speed.group("value")),
+        "darkvisionRange": 60,
+        "savingThrowAdvantages": ["intelligence", "wisdom", "charisma"],
+        "choices": [
+            {
+                "id": lineage_choice_id,
+                "prompt": "Choose a Gnomish Lineage",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": "srd521.species.gnome.lineage.forest",
+                        "name": "Forest Gnome",
+                        "spellGrants": [
+                            {"spellId": "srd521.spell.minor-illusion", "minimumLevel": 1},
+                            {
+                                "spellId": "srd521.spell.speak-with-animals",
+                                "minimumLevel": 1,
+                                "freeCastResourceId": (
+                                    "srd521.resource.gnome.forest.speak-with-animals"
+                                ),
+                                "freeCastMaximum": "proficiency-bonus",
+                            },
+                        ],
+                    },
+                    {
+                        "id": "srd521.species.gnome.lineage.rock",
+                        "name": "Rock Gnome",
+                        "spellGrants": [
+                            {"spellId": "srd521.spell.mending", "minimumLevel": 1},
+                            {"spellId": "srd521.spell.prestidigitation", "minimumLevel": 1},
+                        ],
+                    },
+                ],
+            },
+            {
+                "id": ability_choice_id,
+                "prompt": "Choose a Gnomish Lineage spellcasting ability",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": f"srd521.species.gnome.spellcasting-ability.{ability}",
+                        "name": ability.title(),
+                        "ability": ability,
+                    }
+                    for ability in ("intelligence", "wisdom", "charisma")
+                ],
+            },
+        ],
+        "spellcastingAbilityChoiceId": ability_choice_id,
+        "actions": [
+            {
+                "id": "srd521.action.gnome.rock.clockwork-device",
+                "actionEconomy": "10 minutes",
+                "requiredWhen": {
+                    "choiceId": lineage_choice_id,
+                    "optionId": "srd521.species.gnome.lineage.rock",
+                },
+                "effect": (
+                    "Cast Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP) with "
+                    "one chosen effect; a creature activates it by touch as a Bonus Action; up "
+                    "to three devices can exist, and each lasts 8 hours"
+                ),
+            }
+        ],
+        "traitNames": ["Darkvision", "Gnomish Cunning", "Gnomish Lineage"],
+        "traitsText": text,
+    }
+
+
 def parse_origin_feat(
     name: str,
     text: str,
@@ -696,6 +795,10 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     elf_nodes = [node for node in _section(nodes, "Elf", "Gnome") if node["kind"] != "MetadataNode"]
     raw_page_85 = read_json(extraction_root / "raw" / "pages" / "0085.json")
     elf_nodes.append(_raw_continuation_node(raw_page_85, "p0085-b002"))
+    gnome_nodes = [
+        node for node in _section(nodes, "Gnome", "Goliath") if node["kind"] != "MetadataNode"
+    ]
+    gnome_nodes.append(_raw_continuation_node(raw_page_85, "p0085-b008"))
     alert_nodes = _section(nodes, "Alert", "Magic Initiate")
     magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
@@ -743,6 +846,14 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         ["species", "humanoid", "elf"],
         _source_spans(elf_nodes),
         parse_elf(_text(elf_nodes)),
+    )
+    gnome = _entity(
+        GNOME_ID,
+        "species",
+        "Gnome",
+        ["species", "humanoid", "gnome"],
+        _source_spans(gnome_nodes),
+        parse_gnome(_text(gnome_nodes).replace("Presti- digitation", "Prestidigitation")),
     )
     alert_source = _source_spans(alert_nodes)
     alert = _entity(
@@ -792,6 +903,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         dwarf,
         dragonborn,
         elf,
+        gnome,
         savage_attacker,
         skilled,
         alert,
@@ -823,7 +935,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["note"] = (
         "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
         "Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, "
-        "and Elf; equipment; "
+        "Elf, and Gnome; equipment; "
         "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
@@ -834,6 +946,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "dwarf": dwarf["body"],
         "dragonborn": dragonborn["body"],
         "elf": elf["body"],
+        "gnome": gnome["body"],
         "originFeats": {
             ALERT_ID: alert["body"],
             **{entity["id"]: entity["body"] for entity in magic_initiates},
