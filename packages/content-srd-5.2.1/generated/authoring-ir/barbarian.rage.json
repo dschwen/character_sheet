@@ -35,6 +35,8 @@
       "id": "enter-rage",
       "parameters": {
         "actionEconomy": "bonus-action",
+        "activatesEffectId": "srd521.effect.barbarian.rage",
+        "resourceId": "srd521.resource.barbarian.rage",
         "spends": 1
       },
       "target": "action.enter-rage",
@@ -55,6 +57,17 @@
           {
             "kind": "resourceAvailable",
             "resourceId": "srd521.resource.barbarian.rage"
+          },
+          {
+            "kind": "equals",
+            "left": {
+              "kind": "ref",
+              "path": "state.rage.active"
+            },
+            "right": {
+              "kind": "literal",
+              "value": false
+            }
           }
         ],
         "kind": "all"

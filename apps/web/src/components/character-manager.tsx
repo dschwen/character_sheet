@@ -24,6 +24,7 @@ import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from 
 
 import { levelUpEligibility } from "../lib/character-level-up";
 import { characterBuilderCatalog, migrateMagicInitiateChoices } from "../lib/character-builder";
+import { actionDiceRequest, rollActionDice } from "../lib/action-roll";
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
 import { CharacterLevelUp } from "./character-level-up";
@@ -53,6 +54,8 @@ import {
   applyHealing,
   clearConcentration,
   commitCharacterState,
+  setActiveEffectActive,
+  setConditionActive,
   setExhaustion,
   setHeroicInspiration,
   setCurrency,
@@ -80,13 +83,10 @@ interface TransitionResult {
 }
 
 interface ActionDraft {
-  rolls: string;
   amount: string;
 }
 
 interface ActionRequirements {
-  diceCount?: number;
-  diceSize?: number;
   minimumSpend?: number;
   damageDiceCount?: number;
   damageDiceSize?: number;
@@ -116,10 +116,7 @@ function objectValue(value: unknown): Readonly<Record<string, unknown>> | undefi
 }
 
 function actionRequirements(action: ActionSummary): ActionRequirements {
-  const healing = objectValue(action.parameters?.healing);
   const variableSpend = objectValue(action.parameters?.variableSpend);
-  const diceCount = healing?.diceCount;
-  const diceSize = healing?.diceSize;
   const minimumSpend = variableSpend?.minimum;
   const damage = objectValue(action.parameters?.damage);
   const roll = objectValue(action.parameters?.roll);
@@ -127,8 +124,6 @@ function actionRequirements(action: ActionSummary): ActionRequirements {
   const temporaryHitPoints = action.parameters?.temporaryHitPoints;
   const minimumCurrentHitPoints = action.parameters?.minimumCurrentHitPoints;
   return {
-    ...(typeof diceCount === "number" ? { diceCount } : {}),
-    ...(typeof diceSize === "number" ? { diceSize } : {}),
     ...(typeof minimumSpend === "number" ? { minimumSpend } : {}),
     ...(typeof damage?.diceCount === "number" ? { damageDiceCount: damage.diceCount } : {}),
     ...(typeof damage?.diceSize === "number" ? { damageDiceSize: damage.diceSize } : {}),
@@ -286,6 +281,23 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
   const [castFeedback, setCastFeedback] = useState<CastFeedback>();
   const equipmentCatalog = useMemo(() => inventoryCatalog(rulesPackage), [rulesPackage]);
+  const conditionOptions = useMemo(
+    () =>
+      rulesPackage.entities
+        .filter(
+          (entity) => entity.kind === "condition" && entity.id !== "srd521.condition.exhaustion",
+        )
+        .map((entity) => ({
+          id: entity.id,
+          name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
+          description:
+            typeof objectValue(entity.body)?.description === "string"
+              ? String(objectValue(entity.body)?.description)
+              : "",
+        }))
+        .sort((left, right) => left.name.localeCompare(right.name)),
+    [rulesPackage],
+  );
   const equipmentCatalogById = useMemo(
     () => new Map(equipmentCatalog.map((item) => [item.id, item])),
     [equipmentCatalog],
@@ -628,24 +640,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   function updateActionDraft(actionId: string, update: Partial<ActionDraft>): void {
     setActionDrafts((current) => ({
       ...current,
-      [actionId]: { rolls: "", amount: "", ...current[actionId], ...update },
+      [actionId]: { amount: "", ...current[actionId], ...update },
     }));
   }
 
   function useAction(action: ActionSummary): void {
-    const draft = actionDrafts[action.id] ?? { rolls: "", amount: "" };
+    if (evaluation === undefined) return;
+    const draft = actionDrafts[action.id] ?? { amount: "" };
     const request: ActionUseRequest = { actionId: action.id };
-    if (draft.rolls.trim().length > 0) {
-      const rolls = draft.rolls
-        .trim()
-        .split(/[\s,]+/u)
-        .map(Number);
-      if (rolls.some((roll) => !Number.isInteger(roll) || roll < 1)) {
-        setNotice("Action rolls must be positive whole numbers separated by spaces or commas.");
-        return;
-      }
-      request.rolls = rolls;
-    }
     if (draft.amount.trim().length > 0) {
       const amount = Number(draft.amount);
       if (!Number.isInteger(amount) || amount < 1) {
@@ -655,11 +657,15 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       request.amount = amount;
     }
     try {
+      const actionName = names.get(action.id) ?? shortEntityName(action.id);
+      const actionRoll = rollActionDice(action, evaluation, actionName);
+      if (actionRoll !== undefined) request.rolls = [...actionRoll.dice];
       const proposal = proposeAction({ character, packages: [rulesPackage] }, request);
       applyTransition(
         proposal,
-        `${names.get(action.id) ?? shortEntityName(action.id)} applied (${String(proposal.changes.length)} changes).`,
+        `${actionName} applied (${String(proposal.changes.length)} changes).`,
       );
+      if (proposal.applicable && actionRoll !== undefined) setLatestRoll(actionRoll);
     } catch (error) {
       setNotice(`Action failed: ${errorMessage(error)}`);
     }
@@ -1112,6 +1118,58 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       </button>
                     </div>
                   </div>
+                  <div className="condition-controls">
+                    <span>
+                      <strong>Conditions</strong>
+                      <small>Click to apply or remove</small>
+                    </span>
+                    <div className="condition-grid">
+                      {conditionOptions.map((condition) => {
+                        const active = character.state.conditionIds.includes(condition.id);
+                        return (
+                          <button
+                            key={condition.id}
+                            type="button"
+                            className={active ? "condition-toggle active" : "condition-toggle"}
+                            aria-pressed={active}
+                            title={condition.description}
+                            onClick={() => {
+                              savePlayState(
+                                setConditionActive(character, condition.id, !active),
+                                `${condition.name} ${active ? "removed" : "applied"}.`,
+                              );
+                            }}
+                          >
+                            {condition.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {character.state.activeEffectIds.length === 0 ? null : (
+                    <div className="active-effect-controls">
+                      <span>
+                        <strong>Active effects</strong>
+                        <small>Click an effect to end it</small>
+                      </span>
+                      <div className="tag-list">
+                        {character.state.activeEffectIds.map((effectId) => (
+                          <button
+                            key={effectId}
+                            type="button"
+                            onClick={() => {
+                              savePlayState(
+                                setActiveEffectActive(character, effectId, false),
+                                `${names.get(effectId) ?? shortEntityName(effectId)} ended.`,
+                              );
+                            }}
+                          >
+                            {names.get(effectId) ?? shortEntityName(effectId)} ×
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </Section>
 
                 <Section title="Rest" eyebrow="Atomic rules transitions">
@@ -1157,11 +1215,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     <div className="play-action-list">
                       {statefulActions.map((action) => {
                         const requirements = actionRequirements(action);
-                        const draft = actionDrafts[action.id] ?? { rolls: "", amount: "" };
+                        const draft = actionDrafts[action.id] ?? { amount: "" };
+                        const actionName = names.get(action.id) ?? shortEntityName(action.id);
+                        const transitionDice = actionDiceRequest(action, evaluation, actionName);
                         return (
                           <div key={action.id}>
                             <span>
-                              <strong>{names.get(action.id) ?? shortEntityName(action.id)}</strong>
+                              <strong>{actionName}</strong>
                               <small>
                                 {action.actionEconomy === undefined
                                   ? "Special action"
@@ -1234,19 +1294,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   Raise HP to {String(requirements.minimumCurrentHitPoints)}
                                 </span>
                               )}
-                              {requirements.diceCount === undefined ? null : (
-                                <label>
-                                  Rolls
-                                  <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    placeholder={`${String(requirements.diceCount)}d${String(requirements.diceSize ?? "?")}`}
-                                    value={draft.rolls}
-                                    onChange={(event) => {
-                                      updateActionDraft(action.id, { rolls: event.target.value });
-                                    }}
-                                  />
-                                </label>
+                              {transitionDice === undefined ? null : (
+                                <span className="action-roll-preview">
+                                  Heals {String(transitionDice.diceCount)}d
+                                  {String(transitionDice.diceSize)}
+                                  {(transitionDice.modifier ?? 0) === 0
+                                    ? ""
+                                    : ` ${(transitionDice.modifier ?? 0) > 0 ? "+" : "−"} ${String(Math.abs(transitionDice.modifier ?? 0))}`}
+                                </span>
                               )}
                               {requirements.minimumSpend === undefined ? null : (
                                 <label>
@@ -1271,7 +1326,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   useAction(action);
                                 }}
                               >
-                                Use
+                                {transitionDice === undefined ? "Use" : "Use & roll"}
                               </button>
                             </div>
                           </div>
@@ -1763,6 +1818,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           shortEntityName(character.state.concentrationSpellId)}
                       </span>
                     )}
+                    {character.state.activeEffectIds.map((id) => (
+                      <span key={id}>Active: {names.get(id) ?? shortEntityName(id)}</span>
+                    ))}
                   </div>
                 </Section>
               </div>

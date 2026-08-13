@@ -62,6 +62,14 @@ Dwarves gain their source-defined 120-foot Darkvision, Poison resistance, situat
 Advantage, one additional Hit Point per character level, and Proficiency Bonus uses of
 Stonecunning. Stonecunning is spent from the Play UI and recharges on a Long Rest.
 
+The Play tab also provides persistent toggles for the fourteen non-Exhaustion SRD conditions;
+Exhaustion retains its level control, and active effects such as Rage can be ended from the same
+Status panel. Condition names and descriptions come from source-linked Rules Glossary entities.
+Stateful feature actions roll their declared transition dice automatically: using Second Wind, for
+example, rolls its content-defined d10, adds Fighter level, shows the dice result, heals, and spends
+the resource as one interaction. The roll request and result are kept separate from presentation so
+the current feedback can later be replaced by animated dice without changing rules transitions.
+
 For a supported character below its class's reviewed maximum, choose **Level up** to add the next
 level in its existing class. The advancement flow presents only newly introduced decisions, including class skills,
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
@@ -437,6 +445,19 @@ and 95–96:
   --output packages/content-srd-5.2.1/generated
 ```
 
+Generate the fifteen source-linked standard conditions from Rules Glossary pages 176–191:
+
+```bash
+.venv/bin/python -m srd_extract.pipeline \
+  --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
+  --out generated/extraction/srd-5.2.1-conditions \
+  --pages 176-191
+
+.venv/bin/python -m srd_extract.conditions \
+  --extraction generated/extraction/srd-5.2.1-conditions \
+  --output packages/content-srd-5.2.1/generated
+```
+
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
 Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite; the
 web integration suite also covers Ranger creation and advancement through level 6. Results
@@ -450,7 +471,9 @@ thresholds, Hit Points, feature resources, variable resource spending and restor
 actions, resistances, validations, coverage warnings, and calculation traces.
 
 The rules kernel also exposes atomic Short Rest, Long Rest, action-use, and spell-cast proposals.
-Transition processing validates explicit dice results and available spell slots, previews
-field-level state changes and resource recharge or spending, restores Pact Magic on Short Rests,
-manages Concentration including resource-backed free spell actions, applies Human Resourceful, and
-preserves a trace without mutating the input character.
+Transition processing validates rules-driven or explicitly supplied dice results and available
+spell slots, previews field-level state changes and resource recharge or spending, restores Pact
+Magic on Short Rests,
+manages Concentration including resource-backed free spell actions, activates Rage through its
+resource-backed action, applies Human Resourceful, and preserves a trace without mutating the input
+character.

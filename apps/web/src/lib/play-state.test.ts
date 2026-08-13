@@ -6,6 +6,8 @@ import {
   applyDamage,
   applyHealing,
   clearConcentration,
+  setActiveEffectActive,
+  setConditionActive,
   setCurrency,
   setExhaustion,
   setHeroicInspiration,
@@ -58,5 +60,23 @@ describe("browser play-state edits", () => {
     expect(updated.loadout.currency.sp).toBe(source.loadout.currency.sp);
     expect(source.loadout.currency.gp).not.toBe(37);
     expect(updated.metadata.revision).toBe(source.metadata.revision + 1);
+  });
+
+  it("toggles conditions and active effects without duplicating state IDs", () => {
+    const source = character();
+    const blinded = setConditionActive(source, "srd521.condition.blinded", true, updatedAt);
+    const stillBlinded = setConditionActive(blinded, "srd521.condition.blinded", true, updatedAt);
+    const raging = setActiveEffectActive(
+      stillBlinded,
+      "srd521.effect.barbarian.rage",
+      true,
+      updatedAt,
+    );
+    const cleared = setConditionActive(raging, "srd521.condition.blinded", false, updatedAt);
+
+    expect(stillBlinded.state.conditionIds).toEqual(["srd521.condition.blinded"]);
+    expect(raging.state.activeEffectIds).toEqual(["srd521.effect.barbarian.rage"]);
+    expect(cleared.state.conditionIds).toEqual([]);
+    expect(source.state.conditionIds).toEqual([]);
   });
 });

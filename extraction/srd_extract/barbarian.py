@@ -674,9 +674,15 @@ def _rage_ir(feature: ExtractedFeature) -> dict[str, Any]:
                             "kind": "resourceAvailable",
                             "resourceId": "srd521.resource.barbarian.rage",
                         },
+                        _equals_fact("state.rage.active", False),
                     ],
                 },
-                "parameters": {"actionEconomy": "bonus-action", "spends": 1},
+                "parameters": {
+                    "actionEconomy": "bonus-action",
+                    "spends": 1,
+                    "resourceId": "srd521.resource.barbarian.rage",
+                    "activatesEffectId": "srd521.effect.barbarian.rage",
+                },
                 "automationLevel": "state-automated",
             },
             {

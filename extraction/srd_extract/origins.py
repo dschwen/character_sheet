@@ -1400,7 +1400,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "Ranger through level 6; Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Rogue, "
         "Sorcerer, Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, "
         "Elf, Gnome, Goliath, Halfling, Orc, and Tiefling; equipment; "
-        "and representative spells."
+        "representative spells; and all fifteen standard conditions."
     )
     write_json(output / "coverage.json", coverage)
     report = {

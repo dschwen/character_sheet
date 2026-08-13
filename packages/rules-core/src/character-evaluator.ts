@@ -552,6 +552,7 @@ const actionParametersSchema = z
     actionEconomy: z.string().optional(),
     spends: z.number().int().positive().optional(),
     resourceId: z.string().min(1).optional(),
+    activatesEffectId: z.string().min(1).optional(),
     spellId: z.string().min(1).optional(),
     extraDamage: z
       .object({
@@ -4831,6 +4832,9 @@ function evaluateConditionalRules(
       }
       if (parameters.resourceId !== undefined) {
         actionParameters.resourceId = parameters.resourceId;
+      }
+      if (parameters.activatesEffectId !== undefined) {
+        actionParameters.activatesEffectId = parameters.activatesEffectId;
       }
       if (parameters.spellId !== undefined) {
         actionParameters.spellId = parameters.spellId;

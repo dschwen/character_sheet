@@ -51,7 +51,7 @@
   },
   "action": {
     "id": "action.enter-rage",
-    "available": true,
+    "available": false,
     "actionEconomy": "bonus-action"
   },
   "attacks": [

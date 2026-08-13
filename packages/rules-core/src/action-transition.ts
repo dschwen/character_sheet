@@ -25,6 +25,7 @@ const stateActionParametersSchema = z
     spends: z.number().int().positive().optional(),
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     resourceId: z.string().min(1),
+    activatesEffectId: z.string().min(1).optional(),
     spellId: z.string().min(1).optional(),
     restoresResource: z
       .object({ resourceId: z.string().min(1), amount: z.number().int().positive() })
@@ -362,6 +363,25 @@ export function proposeAction(
     [expendedBefore, spend, resource.maximum],
     sourceTrace,
   );
+  if (
+    parameters.activatesEffectId !== undefined &&
+    !character.state.activeEffectIds.includes(parameters.activatesEffectId)
+  ) {
+    const activeEffectsBefore = [...character.state.activeEffectIds];
+    const activeEffectsAfter = [...new Set([...activeEffectsBefore, parameters.activatesEffectId])];
+    nextState.activeEffectIds = activeEffectsAfter;
+    recordChange(
+      changes,
+      traces,
+      "state.activeEffectIds",
+      activeEffectsBefore,
+      activeEffectsAfter,
+      `${request.actionId} activates ${parameters.activatesEffectId}.`,
+      "activate-action-effect",
+      [parameters.activatesEffectId],
+      sourceTrace,
+    );
+  }
   if (parameters.temporaryHitPoints !== undefined) {
     const temporaryHitPointsAfter = Math.max(
       character.state.temporaryHitPoints,

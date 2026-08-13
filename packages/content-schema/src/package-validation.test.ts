@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(568);
+    expect(parsedEntities).toHaveLength(583);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -93,6 +93,40 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.class.cleric");
     expect(entityIds).toContain("srd521.subclass.cleric.life-domain");
     expect(entityIds).toContain("srd521.spell.spirit-guardians");
+    expect(entityIds).toContain("srd521.condition.blinded");
+    expect(entityIds).toContain("srd521.condition.unconscious");
+  });
+
+  it("validates all standard source-linked conditions", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const conditions = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities/conditions.json", root), "utf8")));
+
+    expect(conditions).toHaveLength(15);
+    expect(conditions.every((condition) => condition.kind === "condition")).toBe(true);
+    expect(conditions.map((condition) => condition.name.en)).toEqual([
+      "Blinded",
+      "Charmed",
+      "Deafened",
+      "Exhaustion",
+      "Frightened",
+      "Grappled",
+      "Incapacitated",
+      "Invisible",
+      "Paralyzed",
+      "Petrified",
+      "Poisoned",
+      "Prone",
+      "Restrained",
+      "Stunned",
+      "Unconscious",
+    ]);
+    expect(conditions.every((condition) => condition.source.length === 1)).toBe(true);
+    const blinded = z.object({ description: z.string() }).parse(conditions[0]?.body);
+    expect(blinded.description).toContain(
+      "automatically fail any ability check that requires sight",
+    );
   });
 
   it("validates the acquired source manifest against the pinned artifact", () => {

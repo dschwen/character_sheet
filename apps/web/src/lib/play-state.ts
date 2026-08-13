@@ -100,6 +100,42 @@ export function clearConcentration(
   return commitCharacterState(character, state, updatedAt);
 }
 
+function setStateIdActive(values: readonly string[], id: string, active: boolean): string[] {
+  return active ? [...new Set([...values, id])] : values.filter((value) => value !== id);
+}
+
+export function setConditionActive(
+  character: CharacterDocument,
+  conditionId: string,
+  active: boolean,
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(
+    character,
+    {
+      ...character.state,
+      conditionIds: setStateIdActive(character.state.conditionIds, conditionId, active),
+    },
+    updatedAt,
+  );
+}
+
+export function setActiveEffectActive(
+  character: CharacterDocument,
+  effectId: string,
+  active: boolean,
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(
+    character,
+    {
+      ...character.state,
+      activeEffectIds: setStateIdActive(character.state.activeEffectIds, effectId, active),
+    },
+    updatedAt,
+  );
+}
+
 export function setCurrency(
   character: CharacterDocument,
   denomination: CurrencyDenomination,

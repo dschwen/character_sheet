@@ -91,19 +91,19 @@ describe("Barbarian draft authoring IR", () => {
 
     expect(
       new ExpressionEvaluator({
-        facts: { "equipment.wearingHeavyArmor": false },
+        facts: { "equipment.wearingHeavyArmor": false, "state.rage.active": false },
         resourceAmounts: { "srd521.resource.barbarian.rage": 1 },
       }).evaluatePredicate(predicate).value,
     ).toBe(true);
     expect(
       new ExpressionEvaluator({
-        facts: { "equipment.wearingHeavyArmor": true },
+        facts: { "equipment.wearingHeavyArmor": true, "state.rage.active": false },
         resourceAmounts: { "srd521.resource.barbarian.rage": 1 },
       }).evaluatePredicate(predicate).value,
     ).toBe(false);
     expect(
       new ExpressionEvaluator({
-        facts: { "equipment.wearingHeavyArmor": false },
+        facts: { "equipment.wearingHeavyArmor": false, "state.rage.active": false },
         resourceAmounts: { "srd521.resource.barbarian.rage": 0 },
       }).evaluatePredicate(predicate).value,
     ).toBe(false);

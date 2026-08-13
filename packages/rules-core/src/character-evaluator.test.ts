@@ -6,7 +6,7 @@ import { characterDocumentSchema, type CharacterDocument } from "@dnd/character-
 import { authoringIrSchema, contentEntitySchema, packageManifestSchema } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 
-import { evaluateCharacter } from "./index.js";
+import { evaluateCharacter, proposeAction } from "./index.js";
 
 const packageRoot = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
 const fixturesRoot = new URL("../../test-fixtures/", import.meta.url);
@@ -155,6 +155,27 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
     };
 
     expect(evaluateCharacter(input)).toEqual(evaluateCharacter(input));
+  });
+
+  it("spends a Rage use and activates Rage atomically", () => {
+    const character = loadCharacter();
+    character.state.activeEffectIds = [];
+    const proposal = proposeAction(
+      { character, packages: [loadRulesPackage()] },
+      { actionId: "action.enter-rage" },
+    );
+
+    expect(proposal.applicable).toBe(true);
+    expect(proposal.nextState.expendedResources["srd521.resource.barbarian.rage"]).toBe(2);
+    expect(proposal.nextState.activeEffectIds).toEqual(["srd521.effect.barbarian.rage"]);
+    expect(proposal.changes.map((change) => change.path)).toContain("state.activeEffectIds");
+    expect(character.state.activeEffectIds).toEqual([]);
+    expect(
+      evaluateCharacter({
+        character: { ...character, state: proposal.nextState },
+        packages: [loadRulesPackage()],
+      }).actions[0]?.available,
+    ).toBe(false);
   });
 
   it("rejects Unarmored Defense and entering Rage while Heavy armor is equipped", () => {

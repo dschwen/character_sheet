@@ -681,6 +681,56 @@ button.vital-card:hover {
   color: white;
   background: var(--green);
 }
+.condition-controls,
+.active-effect-controls {
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+}
+.condition-controls > span,
+.active-effect-controls > span {
+  display: grid;
+  gap: 3px;
+}
+.condition-controls small,
+.active-effect-controls small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.condition-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.condition-toggle {
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: #f8f7f2;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 750;
+}
+.condition-toggle:hover {
+  border-color: var(--green-bright);
+}
+.condition-toggle.active {
+  border-color: #9f4c42;
+  color: white;
+  background: #9f4c42;
+}
+.active-effect-controls .tag-list button {
+  padding: 7px 10px;
+  border: 1px solid var(--green);
+  border-radius: 99px;
+  color: white;
+  background: var(--green);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 750;
+}
 .stepper {
   display: grid;
   grid-template-columns: 32px 35px 32px;
@@ -780,6 +830,13 @@ button.vital-card:hover {
 .action-inputs input {
   width: 82px;
   height: 34px;
+}
+.action-roll-preview {
+  align-self: center;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
 }
 .play-spell-list select {
   height: 34px;
@@ -2465,6 +2522,9 @@ button.builder-choice:disabled {
   }
   .spell-metrics {
     grid-template-columns: 1fr;
+  }
+  .condition-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .preparation-summary,
   .preparation-editor-heading {
