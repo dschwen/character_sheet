@@ -92,6 +92,10 @@ interface ActionRequirements {
   damageType?: string;
   saveAbility?: string;
   saveDifficultyClass?: number;
+  rollDiceCount?: number;
+  rollDiceSize?: number;
+  rollLabel?: string;
+  rollModifier?: number;
 }
 
 interface CastFeedback {
@@ -115,6 +119,7 @@ function actionRequirements(action: ActionSummary): ActionRequirements {
   const diceSize = healing?.diceSize;
   const minimumSpend = variableSpend?.minimum;
   const damage = objectValue(action.parameters?.damage);
+  const roll = objectValue(action.parameters?.roll);
   const savingThrow = objectValue(action.parameters?.savingThrow);
   return {
     ...(typeof diceCount === "number" ? { diceCount } : {}),
@@ -127,6 +132,10 @@ function actionRequirements(action: ActionSummary): ActionRequirements {
     ...(typeof savingThrow?.difficultyClass === "number"
       ? { saveDifficultyClass: savingThrow.difficultyClass }
       : {}),
+    ...(typeof roll?.diceCount === "number" ? { rollDiceCount: roll.diceCount } : {}),
+    ...(typeof roll?.diceSize === "number" ? { rollDiceSize: roll.diceSize } : {}),
+    ...(typeof roll?.label === "string" ? { rollLabel: roll.label } : {}),
+    ...(typeof roll?.modifier === "number" ? { rollModifier: roll.modifier } : {}),
   };
 }
 
@@ -1140,6 +1149,29 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               </small>
                             </span>
                             <div className="action-inputs">
+                              {requirements.rollDiceCount === undefined ||
+                              requirements.rollDiceSize === undefined ? null : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setLatestRoll(
+                                      rollDice({
+                                        label: `${names.get(action.id) ?? shortEntityName(action.id)} · ${requirements.rollLabel ?? "Roll"}`,
+                                        diceCount: requirements.rollDiceCount ?? 1,
+                                        diceSize: requirements.rollDiceSize ?? 12,
+                                        modifier: requirements.rollModifier ?? 0,
+                                      }),
+                                    );
+                                  }}
+                                >
+                                  Roll {String(requirements.rollDiceCount)}d
+                                  {String(requirements.rollDiceSize)}
+                                  {(requirements.rollModifier ?? 0) === 0
+                                    ? ""
+                                    : ` ${(requirements.rollModifier ?? 0) > 0 ? "+" : "−"} ${String(Math.abs(requirements.rollModifier ?? 0))}`}{" "}
+                                  {requirements.rollLabel}
+                                </button>
+                              )}
                               {requirements.damageDiceCount === undefined ||
                               requirements.damageDiceSize === undefined ? null : (
                                 <button

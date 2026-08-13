@@ -695,6 +695,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
                     })
                   : [];
                 const details = [
+                  typeof option.summary === "string" ? option.summary : undefined,
                   typeof option.damageType === "string"
                     ? `${titleCase(option.damageType)} damage`
                     : undefined,

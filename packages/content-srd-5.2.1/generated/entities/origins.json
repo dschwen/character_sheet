@@ -875,6 +875,247 @@
   },
   {
     "body": {
+      "actions": [
+        {
+          "actionEconomy": "bonus-action",
+          "effect": "Teleport up to 30 feet to an unoccupied space you can see",
+          "id": "srd521.action.goliath.clouds-jaunt",
+          "requiredWhen": {
+            "choiceId": "srd521.species.goliath.choice.giant-ancestry",
+            "optionId": "srd521.species.goliath.ancestry.cloud"
+          },
+          "resourceId": "srd521.resource.goliath.giant-ancestry",
+          "spends": 1
+        },
+        {
+          "actionEconomy": "on-hit",
+          "damage": {
+            "diceCount": 1,
+            "diceSize": 10,
+            "type": "fire"
+          },
+          "id": "srd521.action.goliath.fires-burn",
+          "requiredWhen": {
+            "choiceId": "srd521.species.goliath.choice.giant-ancestry",
+            "optionId": "srd521.species.goliath.ancestry.fire"
+          },
+          "requirement": "Hit with an attack roll and deal damage",
+          "resourceId": "srd521.resource.goliath.giant-ancestry",
+          "spends": 1
+        },
+        {
+          "actionEconomy": "on-hit",
+          "damage": {
+            "diceCount": 1,
+            "diceSize": 6,
+            "type": "cold"
+          },
+          "effect": "Reduce the target’s Speed by 10 feet until the start of your next turn",
+          "id": "srd521.action.goliath.frosts-chill",
+          "requiredWhen": {
+            "choiceId": "srd521.species.goliath.choice.giant-ancestry",
+            "optionId": "srd521.species.goliath.ancestry.frost"
+          },
+          "requirement": "Hit with an attack roll and deal damage",
+          "resourceId": "srd521.resource.goliath.giant-ancestry",
+          "spends": 1
+        },
+        {
+          "actionEconomy": "on-hit",
+          "effect": "Give the target the Prone condition",
+          "id": "srd521.action.goliath.hills-tumble",
+          "requiredWhen": {
+            "choiceId": "srd521.species.goliath.choice.giant-ancestry",
+            "optionId": "srd521.species.goliath.ancestry.hill"
+          },
+          "requirement": "Hit a Large or smaller creature with an attack roll and deal damage",
+          "resourceId": "srd521.resource.goliath.giant-ancestry",
+          "spends": 1
+        },
+        {
+          "actionEconomy": "reaction",
+          "effect": "Reduce the triggering damage by the roll total",
+          "id": "srd521.action.goliath.stones-endurance",
+          "requiredWhen": {
+            "choiceId": "srd521.species.goliath.choice.giant-ancestry",
+            "optionId": "srd521.species.goliath.ancestry.stone"
+          },
+          "requirement": "Take damage",
+          "resourceId": "srd521.resource.goliath.giant-ancestry",
+          "roll": {
+            "bonusAbility": "constitution",
+            "diceCount": 1,
+            "diceSize": 12,
+            "label": "Damage reduction"
+          },
+          "spends": 1
+        },
+        {
+          "actionEconomy": "reaction",
+          "damage": {
+            "diceCount": 1,
+            "diceSize": 8,
+            "type": "thunder"
+          },
+          "id": "srd521.action.goliath.storms-thunder",
+          "requiredWhen": {
+            "choiceId": "srd521.species.goliath.choice.giant-ancestry",
+            "optionId": "srd521.species.goliath.ancestry.storm"
+          },
+          "requirement": "Take damage from a creature within 60 feet",
+          "resourceId": "srd521.resource.goliath.giant-ancestry",
+          "spends": 1
+        },
+        {
+          "actionEconomy": "bonus-action",
+          "effect": "Become Large for 10 minutes; gain Advantage on Strength checks and increase Speed by 10 feet; end the form with no action",
+          "id": "srd521.action.goliath.large-form",
+          "minimumLevel": 5,
+          "requirement": "Be in a space large enough for Large size",
+          "resourceId": "srd521.resource.goliath.large-form",
+          "spends": 1
+        }
+      ],
+      "carryingCapacitySizeCategoryBonus": 1,
+      "choices": [
+        {
+          "id": "srd521.species.goliath.choice.giant-ancestry",
+          "maximum": 1,
+          "minimum": 1,
+          "options": [
+            {
+              "id": "srd521.species.goliath.ancestry.cloud",
+              "name": "Cloud Giant",
+              "summary": "Bonus Action: teleport up to 30 feet to an unoccupied space you can see"
+            },
+            {
+              "id": "srd521.species.goliath.ancestry.fire",
+              "name": "Fire Giant",
+              "summary": "On a damaging attack-roll hit: deal 1d10 extra Fire damage"
+            },
+            {
+              "id": "srd521.species.goliath.ancestry.frost",
+              "name": "Frost Giant",
+              "summary": "On a damaging attack-roll hit: deal 1d6 extra Cold damage and reduce Speed by 10 feet"
+            },
+            {
+              "id": "srd521.species.goliath.ancestry.hill",
+              "name": "Hill Giant",
+              "summary": "On a damaging attack-roll hit: give a Large or smaller target the Prone condition"
+            },
+            {
+              "id": "srd521.species.goliath.ancestry.stone",
+              "name": "Stone Giant",
+              "summary": "Reaction when damaged: reduce the damage by 1d12 plus your Constitution modifier"
+            },
+            {
+              "id": "srd521.species.goliath.ancestry.storm",
+              "name": "Storm Giant",
+              "summary": "Reaction when damaged by a creature within 60 feet: deal 1d8 Thunder damage"
+            }
+          ],
+          "prompt": "Choose a Giant Ancestry"
+        }
+      ],
+      "conditionalRollEffects": [
+        {
+          "kind": "advantage",
+          "situationalTag": "end-grappled",
+          "source": "Powerful Build",
+          "testIds": [
+            "abilityCheck.strength",
+            "abilityCheck.dexterity",
+            "abilityCheck.constitution",
+            "abilityCheck.intelligence",
+            "abilityCheck.wisdom",
+            "abilityCheck.charisma"
+          ]
+        }
+      ],
+      "creatureType": "humanoid",
+      "resources": [
+        {
+          "id": "srd521.resource.goliath.giant-ancestry",
+          "maximum": "proficiency-bonus",
+          "recharge": [
+            {
+              "amount": "all",
+              "event": "long-rest"
+            }
+          ]
+        },
+        {
+          "id": "srd521.resource.goliath.large-form",
+          "maximum": 1,
+          "minimumLevel": 5,
+          "recharge": [
+            {
+              "amount": "all",
+              "event": "long-rest"
+            }
+          ]
+        }
+      ],
+      "sizeOptions": [
+        "medium"
+      ],
+      "traitNames": [
+        "Giant Ancestry",
+        "Large Form",
+        "Powerful Build"
+      ],
+      "traitsText": "Goliath Creature Type: Humanoid Size: Medium (about 7–8 feet tall) Speed: 35 feet As a Goliath, you have these special traits. Giant Ancestry. You are descended from Giants. Choose one of the following benefits—a supernatural boon from your ancestry; you can use the chosen benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest: Cloud’s Jaunt (Cloud Giant). As a Bonus Action, you magically teleport up to 30 feet to an unoccupied space you can see. Fire’s Burn (Fire Giant). When you hit a target with an attack roll and deal damage to it, you can also deal 1d10 Fire damage to that target. Frost’s Chill (Frost Giant). When you hit a target with an attack roll and deal damage to it, you can also deal 1d6 Cold damage to that target and reduce its Speed by 10 feet until the start of your next turn. Hill’s Tumble (Hill Giant). When you hit a Large or smaller creature with an attack roll and deal damage to it, you can give that target the Prone condition. Stone’s Endurance (Stone Giant). When you take damage, you can take a Reaction to roll 1d12. Add your Constitution modifier to the number rolled and reduce the damage by that total. Storm’s Thunder (Storm Giant). When you take damage from a creature within 60 feet of you, you can take a Reaction to deal 1d8 Thunder damage to that creature. Large Form. Starting at character level 5, you can change your size to Large as a Bonus Action if you’re in a big enough space. This transformation lasts for 10 minutes or until you end it (no action required). For that duration, you have Advantage on Strength checks, and your Speed increases by 10 feet. Once you use this trait, you can’t use it again until you finish a Long Rest. Powerful Build. You have Advantage on any ability check you make to end the Grappled condition. You also count as one size larger when determining your carrying capacity.",
+      "walkingSpeed": 35
+    },
+    "id": "srd521.species.goliath",
+    "kind": "species",
+    "name": {
+      "en": "Goliath"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Goliath extracted for the first character-origin vertical slice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0085-b009",
+          "p0085-b010",
+          "p0085-b011",
+          "p0085-b012",
+          "p0085-b013",
+          "p0085-b014",
+          "p0085-b015",
+          "p0085-b016"
+        ],
+        "page": 85,
+        "quoteHash": "f343caf534b36a858fa40df454a41470553570fcd647650b10e3c082f5191da3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0086-b002",
+          "p0086-b003",
+          "p0086-b004"
+        ],
+        "page": 86,
+        "quoteHash": "0aa2f1c2d55a07f2aadd223336d16cdb81f9ccca078fbf1dbc8463558c26b1cd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "species",
+      "humanoid",
+      "goliath",
+      "giant-ancestry"
+    ]
+  },
+  {
+    "body": {
       "category": "origin",
       "chooseDamageRoll": "either",
       "description": "You’ve trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",

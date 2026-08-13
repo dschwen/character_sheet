@@ -24,6 +24,7 @@ DWARF_ID = "srd521.species.dwarf"
 DRAGONBORN_ID = "srd521.species.dragonborn"
 ELF_ID = "srd521.species.elf"
 GNOME_ID = "srd521.species.gnome"
+GOLIATH_ID = "srd521.species.goliath"
 ALERT_ID = "srd521.feat.origin.alert"
 MAGIC_INITIATE_IDS = {
     "cleric": "srd521.feat.origin.magic-initiate.cleric",
@@ -39,6 +40,7 @@ ORIGIN_IDS = {
     DRAGONBORN_ID,
     ELF_ID,
     GNOME_ID,
+    GOLIATH_ID,
     ALERT_ID,
     *MAGIC_INITIATE_IDS.values(),
     SAVAGE_ATTACKER_ID,
@@ -598,6 +600,195 @@ def parse_gnome(text: str) -> dict[str, Any]:
     }
 
 
+def parse_goliath(text: str) -> dict[str, Any]:
+    creature_type = re.search(r"Creature Type: (?P<value>\w+)", text)
+    size = re.search(r"Size: (?P<value>Medium|Small)", text)
+    speed = re.search(r"Speed: (?P<value>\d+) feet", text)
+    required_phrases = (
+        "Cloud’s Jaunt",
+        "Fire’s Burn",
+        "Frost’s Chill",
+        "Hill’s Tumble",
+        "Stone’s Endurance",
+        "Storm’s Thunder",
+        "number of times equal to your Proficiency Bonus",
+        "Starting at character level 5",
+        "Advantage on Strength checks",
+        "count as one size larger when determining your carrying capacity",
+    )
+    if creature_type is None or size is None or speed is None:
+        raise ValueError("Goliath species does not match the expected fields")
+    if not all(phrase in text for phrase in required_phrases):
+        raise ValueError("Goliath trait text is incomplete")
+
+    ancestry_choice_id = "srd521.species.goliath.choice.giant-ancestry"
+    ancestry_resource_id = "srd521.resource.goliath.giant-ancestry"
+    ancestry_options = [
+        (
+            "cloud",
+            "Cloud Giant",
+            "Bonus Action: teleport up to 30 feet to an unoccupied space you can see",
+        ),
+        ("fire", "Fire Giant", "On a damaging attack-roll hit: deal 1d10 extra Fire damage"),
+        (
+            "frost",
+            "Frost Giant",
+            "On a damaging attack-roll hit: deal 1d6 extra Cold damage and reduce Speed by 10 feet",
+        ),
+        (
+            "hill",
+            "Hill Giant",
+            "On a damaging attack-roll hit: give a Large or smaller target the Prone condition",
+        ),
+        (
+            "stone",
+            "Stone Giant",
+            "Reaction when damaged: reduce the damage by 1d12 plus your Constitution modifier",
+        ),
+        (
+            "storm",
+            "Storm Giant",
+            "Reaction when damaged by a creature within 60 feet: deal 1d8 Thunder damage",
+        ),
+    ]
+
+    def ancestry_requirement(kind: str) -> dict[str, str]:
+        return {
+            "choiceId": ancestry_choice_id,
+            "optionId": f"srd521.species.goliath.ancestry.{kind}",
+        }
+
+    return {
+        "creatureType": creature_type.group("value").casefold(),
+        "sizeOptions": [size.group("value").casefold()],
+        "walkingSpeed": int(speed.group("value")),
+        "carryingCapacitySizeCategoryBonus": 1,
+        "choices": [
+            {
+                "id": ancestry_choice_id,
+                "prompt": "Choose a Giant Ancestry",
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    {
+                        "id": f"srd521.species.goliath.ancestry.{kind}",
+                        "name": name,
+                        "summary": summary,
+                    }
+                    for kind, name, summary in ancestry_options
+                ],
+            }
+        ],
+        "conditionalRollEffects": [
+            {
+                "testIds": [
+                    f"abilityCheck.{ability}"
+                    for ability in (
+                        "strength",
+                        "dexterity",
+                        "constitution",
+                        "intelligence",
+                        "wisdom",
+                        "charisma",
+                    )
+                ],
+                "kind": "advantage",
+                "situationalTag": "end-grappled",
+                "source": "Powerful Build",
+            }
+        ],
+        "resources": [
+            {
+                "id": ancestry_resource_id,
+                "maximum": "proficiency-bonus",
+                "recharge": [{"event": "long-rest", "amount": "all"}],
+            },
+            {
+                "id": "srd521.resource.goliath.large-form",
+                "maximum": 1,
+                "minimumLevel": 5,
+                "recharge": [{"event": "long-rest", "amount": "all"}],
+            },
+        ],
+        "actions": [
+            {
+                "id": "srd521.action.goliath.clouds-jaunt",
+                "actionEconomy": "bonus-action",
+                "resourceId": ancestry_resource_id,
+                "spends": 1,
+                "requiredWhen": ancestry_requirement("cloud"),
+                "effect": "Teleport up to 30 feet to an unoccupied space you can see",
+            },
+            {
+                "id": "srd521.action.goliath.fires-burn",
+                "actionEconomy": "on-hit",
+                "resourceId": ancestry_resource_id,
+                "spends": 1,
+                "requiredWhen": ancestry_requirement("fire"),
+                "requirement": "Hit with an attack roll and deal damage",
+                "damage": {"diceCount": 1, "diceSize": 10, "type": "fire"},
+            },
+            {
+                "id": "srd521.action.goliath.frosts-chill",
+                "actionEconomy": "on-hit",
+                "resourceId": ancestry_resource_id,
+                "spends": 1,
+                "requiredWhen": ancestry_requirement("frost"),
+                "requirement": "Hit with an attack roll and deal damage",
+                "effect": "Reduce the target’s Speed by 10 feet until the start of your next turn",
+                "damage": {"diceCount": 1, "diceSize": 6, "type": "cold"},
+            },
+            {
+                "id": "srd521.action.goliath.hills-tumble",
+                "actionEconomy": "on-hit",
+                "resourceId": ancestry_resource_id,
+                "spends": 1,
+                "requiredWhen": ancestry_requirement("hill"),
+                "requirement": "Hit a Large or smaller creature with an attack roll and deal damage",
+                "effect": "Give the target the Prone condition",
+            },
+            {
+                "id": "srd521.action.goliath.stones-endurance",
+                "actionEconomy": "reaction",
+                "resourceId": ancestry_resource_id,
+                "spends": 1,
+                "requiredWhen": ancestry_requirement("stone"),
+                "requirement": "Take damage",
+                "effect": "Reduce the triggering damage by the roll total",
+                "roll": {
+                    "diceCount": 1,
+                    "diceSize": 12,
+                    "label": "Damage reduction",
+                    "bonusAbility": "constitution",
+                },
+            },
+            {
+                "id": "srd521.action.goliath.storms-thunder",
+                "actionEconomy": "reaction",
+                "resourceId": ancestry_resource_id,
+                "spends": 1,
+                "requiredWhen": ancestry_requirement("storm"),
+                "requirement": "Take damage from a creature within 60 feet",
+                "damage": {"diceCount": 1, "diceSize": 8, "type": "thunder"},
+            },
+            {
+                "id": "srd521.action.goliath.large-form",
+                "actionEconomy": "bonus-action",
+                "resourceId": "srd521.resource.goliath.large-form",
+                "spends": 1,
+                "minimumLevel": 5,
+                "requirement": "Be in a space large enough for Large size",
+                "effect": (
+                    "Become Large for 10 minutes; gain Advantage on Strength checks and increase "
+                    "Speed by 10 feet; end the form with no action"
+                ),
+            },
+        ],
+        "traitNames": ["Giant Ancestry", "Large Form", "Powerful Build"],
+        "traitsText": text,
+    }
+
+
 def parse_origin_feat(
     name: str,
     text: str,
@@ -799,6 +990,9 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         node for node in _section(nodes, "Gnome", "Goliath") if node["kind"] != "MetadataNode"
     ]
     gnome_nodes.append(_raw_continuation_node(raw_page_85, "p0085-b008"))
+    goliath_nodes = [
+        node for node in _section(nodes, "Goliath", "Halfling") if node["kind"] != "MetadataNode"
+    ]
     alert_nodes = _section(nodes, "Alert", "Magic Initiate")
     magic_initiate_nodes = _section(nodes, "Magic Initiate", "Savage Attacker")
     savage_nodes = _section(nodes, "Savage Attacker", "Skilled")
@@ -855,6 +1049,14 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         _source_spans(gnome_nodes),
         parse_gnome(_text(gnome_nodes).replace("Presti- digitation", "Prestidigitation")),
     )
+    goliath = _entity(
+        GOLIATH_ID,
+        "species",
+        "Goliath",
+        ["species", "humanoid", "goliath", "giant-ancestry"],
+        _source_spans(goliath_nodes),
+        parse_goliath(_text(goliath_nodes)),
+    )
     alert_source = _source_spans(alert_nodes)
     alert = _entity(
         ALERT_ID,
@@ -904,6 +1106,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         dragonborn,
         elf,
         gnome,
+        goliath,
         savage_attacker,
         skilled,
         alert,
@@ -935,7 +1138,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["note"] = (
         "Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
         "Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, "
-        "Elf, and Gnome; equipment; "
+        "Elf, Gnome, and Goliath; equipment; "
         "and representative spells."
     )
     write_json(output / "coverage.json", coverage)
@@ -947,6 +1150,7 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
         "dragonborn": dragonborn["body"],
         "elf": elf["body"],
         "gnome": gnome["body"],
+        "goliath": goliath["body"],
         "originFeats": {
             ALERT_ID: alert["body"],
             **{entity["id"]: entity["body"] for entity in magic_initiates},

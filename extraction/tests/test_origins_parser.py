@@ -6,6 +6,7 @@ from srd_extract.origins import (
     parse_dwarf,
     parse_elf,
     parse_gnome,
+    parse_goliath,
     parse_human,
     parse_origin_feat,
     parse_soldier,
@@ -186,6 +187,33 @@ def test_parse_gnome_species() -> None:
     ]
     assert body["savingThrowAdvantages"] == ["intelligence", "wisdom", "charisma"]
     assert body["actions"][0]["requiredWhen"]["optionId"].endswith(".rock")
+
+
+def test_parse_goliath_species() -> None:
+    body = parse_goliath(
+        "Goliath Creature Type: Humanoid Size: Medium (about 7–8 feet tall) Speed: 35 feet "
+        "Giant Ancestry. Choose Cloud’s Jaunt, Fire’s Burn, Frost’s Chill, Hill’s Tumble, "
+        "Stone’s Endurance, or Storm’s Thunder. You can use the benefit a number of times "
+        "equal to your Proficiency Bonus. Starting at character level 5, Large Form grants "
+        "Advantage on Strength checks. Powerful Build lets you count as one size larger when "
+        "determining your carrying capacity."
+    )
+
+    ancestry = body["choices"][0]
+    assert [option["name"] for option in ancestry["options"]] == [
+        "Cloud Giant",
+        "Fire Giant",
+        "Frost Giant",
+        "Hill Giant",
+        "Stone Giant",
+        "Storm Giant",
+    ]
+    assert body["walkingSpeed"] == 35
+    assert body["carryingCapacitySizeCategoryBonus"] == 1
+    assert body["resources"][0]["maximum"] == "proficiency-bonus"
+    assert body["actions"][1]["damage"] == {"diceCount": 1, "diceSize": 10, "type": "fire"}
+    assert body["actions"][4]["roll"]["bonusAbility"] == "constitution"
+    assert body["actions"][-1]["minimumLevel"] == 5
 
 
 def test_parse_origin_feats_rejects_incomplete_benefits() -> None:

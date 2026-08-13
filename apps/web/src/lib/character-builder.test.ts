@@ -1606,6 +1606,100 @@ describe("guided character builder", () => {
     );
   });
 
+  it("builds data-driven Goliath ancestries, shared uses, Powerful Build, and Large Form", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const speciesId = "srd521.species.goliath";
+    const choiceId = "srd521.species.goliath.choice.giant-ancestry";
+    const resourceId = "srd521.resource.goliath.giant-ancestry";
+    const levelOneDraft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 1, "Stone Goliath"),
+      catalog,
+      speciesId,
+    );
+    const stoneDraft = updateBuilderSpeciesChoice(levelOneDraft, catalog, choiceId, [
+      "srd521.species.goliath.ancestry.stone",
+    ]);
+    const stone = buildCharacter(stoneDraft, rulesPackage, options);
+    const stoneEvaluation = evaluateCharacter({ character: stone, packages: [rulesPackage] });
+
+    expect(catalog.species[speciesId]).toMatchObject({
+      sizeOptions: ["medium"],
+      walkingSpeed: 35,
+      traitNames: ["Giant Ancestry", "Large Form", "Powerful Build"],
+    });
+    expect(catalog.species[speciesId]?.choices[0]?.options).toHaveLength(6);
+    expect(catalog.species[speciesId]?.choices[0]?.options[4]?.description).toContain("1d12");
+    expect(stoneEvaluation.validations.filter((message) => message.severity === "error")).toEqual(
+      [],
+    );
+    expect(stoneEvaluation.facts["speed.walking"]).toBe(35);
+    expect(stoneEvaluation.facts["species.carryingCapacitySizeCategoryBonus"]).toBe(1);
+    expect(stoneEvaluation.resources).toContainEqual(
+      expect.objectContaining({ id: resourceId, maximum: 2, current: 2 }),
+    );
+    expect(stoneEvaluation.resources).not.toContainEqual(
+      expect.objectContaining({ id: "srd521.resource.goliath.large-form" }),
+    );
+    const stoneAction = stoneEvaluation.actions.find(
+      (action) => action.id === "srd521.action.goliath.stones-endurance",
+    );
+    expect(stoneAction?.parameters?.roll).toEqual({
+      diceCount: 1,
+      diceSize: 12,
+      label: "Damage reduction",
+      modifier: 2,
+    });
+    expect(stoneEvaluation.actions).not.toContainEqual(
+      expect.objectContaining({ id: "srd521.action.goliath.fires-burn" }),
+    );
+    expect(
+      evaluateCharacter({
+        character: stone,
+        packages: [rulesPackage],
+        context: { situationalTags: ["end-grappled"] },
+      }).d20Tests["abilityCheck.strength"]?.rollMode,
+    ).toBe("advantage");
+
+    const use = proposeAction(
+      { character: stone, packages: [rulesPackage] },
+      { actionId: "srd521.action.goliath.stones-endurance" },
+    );
+    expect(use.applicable).toBe(true);
+    expect(use.nextState.expendedResources[resourceId]).toBe(1);
+
+    const fireDraft = updateBuilderSpeciesChoice(levelOneDraft, catalog, choiceId, [
+      "srd521.species.goliath.ancestry.fire",
+    ]);
+    const fireEvaluation = evaluateCharacter({
+      character: buildCharacter(fireDraft, rulesPackage, options),
+      packages: [rulesPackage],
+    });
+    expect(
+      fireEvaluation.actions.find((action) => action.id === "srd521.action.goliath.fires-burn")
+        ?.parameters?.damage,
+    ).toEqual({ diceCount: 1, diceSize: 10, type: "fire" });
+
+    const levelFive = buildCharacter(
+      updateBuilderLevel(stoneDraft, catalog, 5),
+      rulesPackage,
+      options,
+    );
+    const levelFiveEvaluation = evaluateCharacter({
+      character: levelFive,
+      packages: [rulesPackage],
+    });
+    expect(levelFiveEvaluation.resources).toContainEqual(
+      expect.objectContaining({ id: "srd521.resource.goliath.large-form", maximum: 1 }),
+    );
+    expect(levelFiveEvaluation.actions).toContainEqual(
+      expect.objectContaining({
+        id: "srd521.action.goliath.large-form",
+        actionEconomy: "bonus-action",
+      }),
+    );
+  });
+
   it("migrates Magic Initiate defaults into characters saved before spell choices", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

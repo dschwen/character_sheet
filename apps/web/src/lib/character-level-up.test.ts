@@ -640,6 +640,44 @@ describe("guided character level up", () => {
     ).toContain("Choose a Gnomish Lineage cannot change during level up.");
   });
 
+  it("preserves Giant Ancestry and unlocks a Goliath's Large Form at level 5", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const choiceId = "srd521.species.goliath.choice.giant-ancestry";
+    const originalDraft = updateBuilderSpecies(
+      defaultBuilderDraft(fighterId, catalog, 4, "Stone Guardian"),
+      catalog,
+      "srd521.species.goliath",
+    );
+    originalDraft.speciesChoiceSelections = {
+      [choiceId]: ["srd521.species.goliath.ancestry.stone"],
+    };
+    const original = buildCharacter(originalDraft, rulesPackage, initialOptions);
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-10T19:00:00.000Z"),
+    });
+
+    expect(draft.speciesChoiceSelections[choiceId]).toEqual([
+      "srd521.species.goliath.ancestry.stone",
+    ]);
+    expect(preview.issues).toEqual([]);
+    expect(preview.evaluation?.actions).toContainEqual(
+      expect.objectContaining({ id: "srd521.action.goliath.large-form" }),
+    );
+
+    draft.speciesChoiceSelections = {
+      [choiceId]: ["srd521.species.goliath.ancestry.cloud"],
+    };
+    expect(
+      previewLevelUp(original, draft, rulesPackage, {
+        id: original.id,
+        now: new Date("2026-08-10T20:00:00.000Z"),
+      }).issues,
+    ).toContain("Choose a Giant Ancestry cannot change during level up.");
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

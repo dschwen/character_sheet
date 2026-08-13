@@ -240,6 +240,7 @@ const speciesBodySchema = z
     darkvisionRange: z.number().int().positive().optional(),
     damageResistances: z.array(z.string().min(1)).default([]),
     hitPointMaximumPerCharacterLevel: z.number().int().nonnegative().default(0),
+    carryingCapacitySizeCategoryBonus: z.number().int().nonnegative().default(0),
     choices: z
       .array(
         z
@@ -253,6 +254,7 @@ const speciesBodySchema = z
                 .object({
                   id: z.string().min(1),
                   name: z.string().min(1),
+                  summary: z.string().min(1).optional(),
                   damageType: z.string().min(1).optional(),
                   ability: z.enum(abilities).optional(),
                   darkvisionRange: z.number().int().positive().optional(),
@@ -351,10 +353,29 @@ const speciesBodySchema = z
             requirement: z.string().min(1).optional(),
             effect: z.string().min(1).optional(),
             damage: z
+              .union([
+                z
+                  .object({
+                    diceCount: z.number().int().positive(),
+                    diceSize: z.number().int().positive(),
+                    type: z.string().min(1),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    diceSize: z.number().int().positive(),
+                    diceCountByLevel: z.record(z.string(), z.number().int().positive()),
+                    typeFromChoiceId: z.string().min(1),
+                  })
+                  .strict(),
+              ])
+              .optional(),
+            roll: z
               .object({
+                diceCount: z.number().int().positive(),
                 diceSize: z.number().int().positive(),
-                diceCountByLevel: z.record(z.string(), z.number().int().positive()),
-                typeFromChoiceId: z.string().min(1),
+                label: z.string().min(1),
+                bonusAbility: z.enum(abilities).optional(),
               })
               .strict()
               .optional(),
@@ -2387,6 +2408,20 @@ function evaluateD20Tests(
     );
   }
 
+  const noAbilityCheckProficiency = proficiencyEntry("none", proficiencyBonus, []);
+  for (const ability of abilities) {
+    recordD20Test(
+      `abilityCheck.${ability}`,
+      ability,
+      noAbilityCheckProficiency,
+      context,
+      additionalRollEffects,
+      ruleModifiers,
+      testSourceReferences(`abilityCheck.${ability}`, []),
+      state,
+    );
+  }
+
   for (const skill of skillDefinitions) {
     const entityId = `${skillEntityPrefix}${skill.id}`;
     const proficiencySources = skillChoices
@@ -3622,6 +3657,24 @@ function evaluateSpeciesTraits(
   body.damageResistances.forEach((damageType) => {
     state.resistances.add(damageType);
   });
+  if (body.carryingCapacitySizeCategoryBonus > 0) {
+    const traceId = "species.carryingCapacitySizeCategoryBonus";
+    state.facts[traceId] = body.carryingCapacitySizeCategoryBonus;
+    state.values[traceId] = { value: body.carryingCapacitySizeCategoryBonus, traceId };
+    state.traces[traceId] = {
+      id: traceId,
+      result: body.carryingCapacitySizeCategoryBonus,
+      nodes: [
+        {
+          id: `${traceId}.species`,
+          operation: "increase-carrying-capacity-size-category",
+          inputs: [species.id],
+          output: body.carryingCapacitySizeCategoryBonus,
+        },
+      ],
+      sourceReferences: sources,
+    };
+  }
   const selectedSpeciesOptions = new Map<
     string,
     z.infer<typeof speciesBodySchema>["choices"][number]["options"][number]
@@ -3967,10 +4020,16 @@ function evaluateSpeciesTraits(
       actionParameters.effect = `${action.effect} for ${action.duration}`;
     }
     if (action.damage !== undefined) {
-      const diceCount = Object.entries(action.damage.diceCountByLevel)
-        .filter(([level]) => Number(level) <= characterLevel)
-        .sort(([left], [right]) => Number(right) - Number(left))[0]?.[1];
-      const damageType = selectedSpeciesOptions.get(action.damage.typeFromChoiceId)?.damageType;
+      const diceCount =
+        "diceCount" in action.damage
+          ? action.damage.diceCount
+          : Object.entries(action.damage.diceCountByLevel)
+              .filter(([level]) => Number(level) <= characterLevel)
+              .sort(([left], [right]) => Number(right) - Number(left))[0]?.[1];
+      const damageType =
+        "type" in action.damage
+          ? action.damage.type
+          : selectedSpeciesOptions.get(action.damage.typeFromChoiceId)?.damageType;
       if (diceCount !== undefined && damageType !== undefined) {
         actionParameters.damage = {
           diceCount,
@@ -3978,6 +4037,21 @@ function evaluateSpeciesTraits(
           type: damageType,
         };
       }
+    }
+    if (action.roll !== undefined) {
+      const modifier =
+        action.roll.bonusAbility === undefined
+          ? 0
+          : requireNumber(
+              state.facts[`ability.${action.roll.bonusAbility}.modifier`] ?? null,
+              `${action.id} roll ability modifier`,
+            );
+      actionParameters.roll = {
+        diceCount: action.roll.diceCount,
+        diceSize: action.roll.diceSize,
+        label: action.roll.label,
+        modifier,
+      };
     }
     if (action.savingThrow !== undefined) {
       const abilityModifier = requireNumber(
