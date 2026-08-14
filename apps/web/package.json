@@ -12,6 +12,7 @@
     "@dnd/content-schema": "workspace:^",
     "@dnd/rules-api": "workspace:^",
     "@dnd/rules-core": "workspace:^",
+    "@dnd/webgl-dice": "workspace:^",
     "next": "^16.2.12",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

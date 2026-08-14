@@ -24,7 +24,7 @@ import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from 
 
 import { levelUpEligibility } from "../lib/character-level-up";
 import { characterBuilderCatalog, migrateMagicInitiateChoices } from "../lib/character-builder";
-import { actionDiceRequest, rollActionDice } from "../lib/action-roll";
+import { actionDiceRequest } from "../lib/action-roll";
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
 import { CharacterLevelUp } from "./character-level-up";
@@ -63,7 +63,15 @@ import {
 } from "../lib/play-state";
 import { proposePreparedSpellLoadout, spellPreparationEditor } from "../lib/spell-preparation";
 import { spellStatusInstructions, spellStatusMessage } from "../lib/spell-status";
-import { rollD20, rollDice, type D20RollRequest, type DiceRollResult } from "../lib/dice-roll";
+import {
+  rollD20,
+  rollDice,
+  type D20RollRequest,
+  type DicePoolRollRequest,
+  type DicePoolRollResult,
+  type DiceRollResult,
+} from "../lib/dice-roll";
+import { rollD20Fullscreen, rollDiceFullscreen } from "../lib/fullscreen-dice";
 
 const storageKey = "dnd-character-manager.document.v1";
 const tabs = ["overview", "play", "combat", "spells", "features", "diagnostics"] as const;
@@ -280,7 +288,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
   const [preparedSpellDraft, setPreparedSpellDraft] = useState<string[]>();
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
+  const [diceRolling, setDiceRolling] = useState(false);
   const [castFeedback, setCastFeedback] = useState<CastFeedback>();
+  const diceRollingRef = useRef(false);
   const equipmentCatalog = useMemo(() => inventoryCatalog(rulesPackage), [rulesPackage]);
   const conditionOptions = useMemo(() => {
     const conditionBodies = new Map(
@@ -399,8 +409,47 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const statefulActions = evaluation?.actions.filter(supportsStateTransition) ?? [];
   const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
 
+  function beginDiceRoll(): boolean {
+    if (diceRollingRef.current) {
+      setNotice("Wait for the current dice to settle.");
+      return false;
+    }
+    diceRollingRef.current = true;
+    setDiceRolling(true);
+    setLatestRoll(undefined);
+    return true;
+  }
+
+  function finishDiceRoll(): void {
+    diceRollingRef.current = false;
+    setDiceRolling(false);
+  }
+
   function performRoll(request: D20RollRequest): void {
-    setLatestRoll(rollD20(request));
+    if (!beginDiceRoll()) return;
+    void rollD20Fullscreen(request)
+      .catch((error: unknown) => {
+        setNotice(`3D dice were unavailable (${errorMessage(error)}); used the fallback roller.`);
+        return rollD20(request);
+      })
+      .then(setLatestRoll)
+      .finally(finishDiceRoll);
+  }
+
+  async function performDicePoolRoll(
+    request: DicePoolRollRequest,
+  ): Promise<DicePoolRollResult | undefined> {
+    if (!beginDiceRoll()) return undefined;
+    try {
+      const result = await rollDiceFullscreen(request).catch((error: unknown) => {
+        setNotice(`3D dice were unavailable (${errorMessage(error)}); used the fallback roller.`);
+        return rollDice(request);
+      });
+      setLatestRoll(result);
+      return result;
+    } finally {
+      finishDiceRoll();
+    }
   }
 
   function rollAttackDamage(attack: AttackSummary, critical = false): void {
@@ -409,24 +458,20 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setNotice(`${attack.name} has no structured damage dice to roll.`);
       return;
     }
-    setLatestRoll(
-      rollDice({
-        label: `${attack.name}${critical ? " critical" : ""} damage · ${titleCase(attack.damage.type)}`,
-        diceCount: critical ? diceCount * 2 : diceCount,
-        diceSize,
-        modifier: bonus + flat,
-      }),
-    );
+    void performDicePoolRoll({
+      label: `${attack.name}${critical ? " critical" : ""} damage · ${titleCase(attack.damage.type)}`,
+      diceCount: critical ? diceCount * 2 : diceCount,
+      diceSize,
+      modifier: bonus + flat,
+    });
   }
 
   function rollSpellDamage(spell: SpellSummary, damage: SpellSummary["damage"][number]): void {
-    setLatestRoll(
-      rollDice({
-        label: `${spell.name} · ${titleCase(damage.type)} damage`,
-        diceCount: damage.diceCount,
-        diceSize: damage.diceSize,
-      }),
-    );
+    void performDicePoolRoll({
+      label: `${spell.name} · ${titleCase(damage.type)} damage`,
+      diceCount: damage.diceCount,
+      diceSize: damage.diceSize,
+    });
   }
 
   function spellRollControls(spell: SpellSummary): React.ReactNode {
@@ -679,7 +724,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }));
   }
 
-  function useAction(action: ActionSummary): void {
+  async function useAction(action: ActionSummary): Promise<void> {
     if (evaluation === undefined) return;
     const draft = actionDrafts[action.id] ?? { amount: "" };
     const request: ActionUseRequest = { actionId: action.id };
@@ -693,14 +738,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
     try {
       const actionName = names.get(action.id) ?? shortEntityName(action.id);
-      const actionRoll = rollActionDice(action, evaluation, actionName);
+      const actionRollRequest = actionDiceRequest(action, evaluation, actionName);
+      const actionRoll =
+        actionRollRequest === undefined ? undefined : await performDicePoolRoll(actionRollRequest);
+      if (actionRollRequest !== undefined && actionRoll === undefined) return;
       if (actionRoll !== undefined) request.rolls = [...actionRoll.dice];
       const proposal = proposeAction({ character, packages: [rulesPackage] }, request);
       applyTransition(
         proposal,
         `${actionName} applied (${String(proposal.changes.length)} changes).`,
       );
-      if (proposal.applicable && actionRoll !== undefined) setLatestRoll(actionRoll);
     } catch (error) {
       setNotice(`Action failed: ${errorMessage(error)}`);
     }
@@ -852,6 +899,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       </header>
 
       <div id="top" className="workspace">
+        {diceRolling ? (
+          <div className="dice-rolling-guard" role="status" aria-live="polite" aria-busy="true">
+            <span>Rolling dice…</span>
+          </div>
+        ) : null}
         {notice === undefined ? null : (
           <div className="notice" role="status">
             <span>{notice}</span>
@@ -1312,14 +1364,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    setLatestRoll(
-                                      rollDice({
-                                        label: `${names.get(action.id) ?? shortEntityName(action.id)} · ${requirements.rollLabel ?? "Roll"}`,
-                                        diceCount: requirements.rollDiceCount ?? 1,
-                                        diceSize: requirements.rollDiceSize ?? 12,
-                                        modifier: requirements.rollModifier ?? 0,
-                                      }),
-                                    );
+                                    void performDicePoolRoll({
+                                      label: `${names.get(action.id) ?? shortEntityName(action.id)} · ${requirements.rollLabel ?? "Roll"}`,
+                                      diceCount: requirements.rollDiceCount ?? 1,
+                                      diceSize: requirements.rollDiceSize ?? 12,
+                                      modifier: requirements.rollModifier ?? 0,
+                                    });
                                   }}
                                 >
                                   Roll {String(requirements.rollDiceCount)}d
@@ -1335,13 +1385,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    setLatestRoll(
-                                      rollDice({
-                                        label: `${names.get(action.id) ?? shortEntityName(action.id)} · ${titleCase(requirements.damageType ?? "damage")}`,
-                                        diceCount: requirements.damageDiceCount ?? 1,
-                                        diceSize: requirements.damageDiceSize ?? 10,
-                                      }),
-                                    );
+                                    void performDicePoolRoll({
+                                      label: `${names.get(action.id) ?? shortEntityName(action.id)} · ${titleCase(requirements.damageType ?? "damage")}`,
+                                      diceCount: requirements.damageDiceCount ?? 1,
+                                      diceSize: requirements.damageDiceSize ?? 10,
+                                    });
                                   }}
                                 >
                                   Roll {String(requirements.damageDiceCount)}d
@@ -1394,7 +1442,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 type="button"
                                 disabled={!action.available}
                                 onClick={() => {
-                                  useAction(action);
+                                  void useAction(action);
                                 }}
                               >
                                 {transitionDice === undefined ? "Use" : "Use & roll"}

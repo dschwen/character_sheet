@@ -1,0 +1,19 @@
+{
+  "name": "@dnd/webgl-dice",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Vendored fullscreen WebGL polyhedral dice roller.",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "dependencies": {
+    "cannon-es": "^0.20.0",
+    "three": "^0.180.0"
+  }
+}

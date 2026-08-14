@@ -4,3 +4,5 @@ generated
 sources
 pnpm-lock.yaml
 dnd_srd_character_manager_implementation_plan.md
+packages/webgl-dice/README.md
+packages/webgl-dice/src/*.js

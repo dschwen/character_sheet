@@ -9,6 +9,7 @@ export default tseslint.config(
       "**/generated/**",
       "**/.next/**",
       "**/out/**",
+      "packages/webgl-dice/src/*.js",
       "eslint.config.js",
     ],
   },

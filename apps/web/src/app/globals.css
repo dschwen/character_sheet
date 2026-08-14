@@ -186,6 +186,29 @@ a:focus-visible {
   background: #173c32;
   box-shadow: 0 16px 42px rgb(15 30 24 / 28%);
 }
+.dice-rolling-guard {
+  position: fixed;
+  z-index: 9998;
+  inset: 0;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: 28px;
+  background: rgb(23 60 50 / 5%);
+  cursor: wait;
+}
+.dice-rolling-guard span {
+  padding: 9px 14px;
+  color: white;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 999px;
+  background: rgb(23 60 50 / 88%);
+  box-shadow: 0 8px 28px rgb(15 30 24 / 22%);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 .dice-result > div:nth-child(2) {
   display: grid;
   gap: 3px;

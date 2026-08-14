@@ -67,8 +67,10 @@ Exhaustion retains its level control, and active effects such as Rage can be end
 Status panel. Condition names and descriptions come from source-linked Rules Glossary entities.
 Stateful feature actions roll their declared transition dice automatically: using Second Wind, for
 example, rolls its content-defined d10, adds Fighter level, shows the dice result, heals, and spends
-the resource as one interaction. The roll request and result are kept separate from presentation so
-the current feedback can later be replaced by animated dice without changing rules transitions.
+the resource as one interaction. Every UI roll now uses the vendored WebGL Poly Dice fullscreen
+overlay. The settled physical dice supply the actual results for normal rolls, Advantage,
+Disadvantage, rerolls, damage pools, and state-changing feature rolls; an instant fallback remains
+available when WebGL cannot initialize.
 
 For a supported character below its class's reviewed maximum, choose **Level up** to add the next
 level in its existing class. The advancement flow presents only newly introduced decisions, including class skills,
