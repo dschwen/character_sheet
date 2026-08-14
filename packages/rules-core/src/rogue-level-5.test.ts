@@ -39,7 +39,7 @@ function loadCharacter(): CharacterDocument {
   return characterDocumentSchema.parse(readJson(new URL("characters/rogue-5.json", fixturesRoot)));
 }
 
-describe("evaluateCharacter Rogue level-5 vertical slice", () => {
+describe("evaluateCharacter Rogue level-5 and level-6 vertical slice", () => {
   it("evaluates Thief defenses, Expertise, climb speed, and weapon mastery", () => {
     const evaluation = evaluateCharacter({
       character: loadCharacter(),
@@ -184,5 +184,38 @@ describe("evaluateCharacter Rogue level-5 vertical slice", () => {
       "ACTION_TRANSITION_UNSUPPORTED",
     );
     expect(proposal.nextState).toEqual(character.state);
+  });
+
+  it("grants two additional Expertise selections at Rogue level 6", () => {
+    const character = loadCharacter();
+    character.build.levels.push({
+      characterLevel: 6,
+      classId: "srd521.class.rogue",
+      hitPointChoice: "fixed",
+      selectedFeatureChoices: [],
+    });
+    character.build.proficiencyChoices.expertise.push(
+      {
+        skillId: "srd521.skill.acrobatics",
+        sourceId: "srd521.class-feature.rogue.expertise",
+      },
+      {
+        skillId: "srd521.skill.investigation",
+        sourceId: "srd521.class-feature.rogue.expertise",
+      },
+    );
+
+    const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.values["hitPoints.maximum"]?.value).toBe(45);
+    expect(evaluation.d20Tests["skill.acrobatics"]?.proficiency).toMatchObject({
+      level: "expertise",
+      bonus: 6,
+    });
+    expect(evaluation.d20Tests["skill.investigation"]?.proficiency).toMatchObject({
+      level: "expertise",
+      bonus: 6,
+    });
   });
 });

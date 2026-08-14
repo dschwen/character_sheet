@@ -1,8 +1,12 @@
-# Rogue level 5 vertical slice
+# Rogue levels 5–6 vertical slice
 
 The reviewed `rogue-5.json` fixture is a Human Soldier Thief Rogue. It wears Studded Leather Armor,
 masters Daggers and Shortbows, has Expertise in Sleight of Hand and Stealth, and uses the full
 level-5 Cunning Strike option set.
+
+At level 6, the data-driven Expertise count increases from two to four. The level-up flow keeps the
+existing choices locked, asks for two new proficient skills, and the evaluator doubles proficiency
+for all four selections.
 
 The evaluator derives AC 16, two doubled-proficiency skills, a Cunning Strike save DC of 15,
 3d6 Sneak Attack, Weapon Mastery, Cunning Action, Steady Aim, Uncanny Dodge, Fast Hands, and the
@@ -10,7 +14,7 @@ Thief’s 30-foot Climb Speed. Withdraw calculates its maximum 15-foot movement 
 walking speed, and all calculated values retain source-linked traces.
 
 The generated content retains every Rogue and Thief feature through level 20 as source-linked
-structured text. Through level 5, these limits remain intentionally assisted:
+structured text. Through level 6, these limits remain intentionally assisted:
 
 - Sneak Attack reports its dice and eligibility requirements, but encounter state determines
   Advantage, adjacent allies, and the once-per-turn limit.

@@ -843,6 +843,51 @@ describe("guided character level up", () => {
     });
   });
 
+  it("advances a Rogue from level 5 to 6 with two additional Expertise selections", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const original = buildCharacter(
+      defaultBuilderDraft(rogueId, catalog, 5, "Expert Delver"),
+      rulesPackage,
+      initialOptions,
+    );
+
+    expect(original.build.proficiencyChoices.expertise).toHaveLength(2);
+    expect(levelUpEligibility(original, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 5,
+      targetLevel: 6,
+      classId: rogueId,
+    });
+
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-12T02:00:00.000Z"),
+    });
+
+    expect(draft.level).toBe(6);
+    expect(draft.expertiseSkillIds).toHaveLength(4);
+    expect(preview.issues).toEqual([]);
+    expect(
+      Object.values(preview.evaluation?.proficiencies.skills ?? {}).filter(
+        (proficiency) => proficiency.level === "expertise",
+      ),
+    ).toHaveLength(4);
+
+    const advanced = levelUpCharacter(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-12T02:00:00.000Z"),
+    });
+    expect(advanced.build.proficiencyChoices.expertise).toHaveLength(4);
+    expect(advanced.build.levels).toHaveLength(6);
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({
+      eligible: false,
+      currentLevel: 6,
+      reason: "Rogue advancement is currently reviewed through level 6.",
+    });
+  });
+
   it("explains unsupported and fully reviewed advancement limits", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

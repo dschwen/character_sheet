@@ -17648,7 +17648,8 @@
             "2": 2,
             "3": 2,
             "4": 2,
-            "5": 2
+            "5": 2,
+            "6": 4
           },
           "eligibleSkillIds": [
             "srd521.skill.acrobatics",
@@ -17674,7 +17675,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.rogue.expertise"
         },
-        "supportedLevelMaximum": 5,
+        "supportedLevelMaximum": 6,
         "supportedLevelMinimum": 1
       },
       "conditionalWeaponProficiencies": [
@@ -18034,7 +18035,8 @@
           "2": 4,
           "3": 4,
           "4": 4,
-          "5": 4
+          "5": 4,
+          "6": 4
         },
         "maximum": 4,
         "minimum": 4,

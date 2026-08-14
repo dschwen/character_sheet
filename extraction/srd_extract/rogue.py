@@ -360,7 +360,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 4 for level in range(1, 6)},
+                "countByLevel": {str(level): 4 for level in range(1, 7)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple"],
@@ -370,7 +370,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 15,
@@ -411,7 +411,10 @@ def _class_entity(
                         "srd521.skill.survival",
                     ],
                     "requireClassProficiency": False,
-                    "countByLevel": {str(level): 2 for level in range(1, 6)},
+                    "countByLevel": {
+                        **{str(level): 2 for level in range(1, 6)},
+                        "6": 4,
+                    },
                 },
             },
             "featureSaveAbility": "dexterity",
@@ -791,7 +794,19 @@ def generate_rogue_content(extraction_root: Path, output: Path) -> dict[str, Any
         for entity in read_json(output / "entities.json")
         if entity["id"] not in replacement_ids
     ]
-    all_entities = [*existing, *rogue_entities]
+    insertion_index = next(
+        (
+            index
+            for index, entity in enumerate(existing)
+            if entity["id"] == "srd521.class.sorcerer"
+        ),
+        len(existing),
+    )
+    all_entities = [
+        *existing[:insertion_index],
+        *rogue_entities,
+        *existing[insertion_index:],
+    ]
     write_json(output / "entities" / "rogue.json", rogue_entities)
     write_json(output / "entities.json", all_entities)
     by_name = {feature["name"]: feature for feature in features}
@@ -810,9 +825,10 @@ def generate_rogue_content(extraction_root: Path, output: Path) -> dict[str, Any
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Barbarian, Cleric through level 5, Druid through level 5, Fighter through level 5, "
-        "Monk through level 5, Paladin through level 5, Ranger through level 5, Rogue through "
-        "level 5, Wizard through level 5, Human, Soldier, equipment, and representative spells."
+        "Ranger and Rogue through level 6; Barbarian, Bard, Cleric, Druid, Fighter, Monk, "
+        "Paladin, Sorcerer, Warlock, and Wizard through level 5; all four SRD backgrounds; "
+        "Human, Dwarf, Dragonborn, Elf, Gnome, Goliath, Halfling, Orc, and Tiefling; equipment; "
+        "representative spells; all fifteen standard conditions; and beneficial spell statuses."
     )
     write_json(output / "coverage.json", coverage)
     report = {

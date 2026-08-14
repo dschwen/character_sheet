@@ -357,13 +357,13 @@ describe("bootstrap content package", () => {
       ]),
     );
     expect(metadata.find(({ id }) => id === "srd521.class.rogue")?.builder).toMatchObject({
-      supportedLevelMaximum: 5,
+      supportedLevelMaximum: 6,
       defaultAbilityScoreImprovementAbility: "dexterity",
       expertiseChoice: {
         sourceId: "srd521.class-feature.rogue.expertise",
         minimumLevel: 1,
         requireClassProficiency: false,
-        countByLevel: { 1: 2, 3: 2, 5: 2 },
+        countByLevel: { 1: 2, 3: 2, 5: 2, 6: 4 },
       },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.sorcerer")?.builder).toMatchObject({
