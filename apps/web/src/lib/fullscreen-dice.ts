@@ -48,11 +48,11 @@ function dieSpecs(diceSize: number, diceCount: number): DieSpec[] {
   }
   const type = dieType(diceSize);
   const radius = diceCount > 6 ? 0.55 : diceCount > 3 ? 0.68 : type === "d20" ? 0.82 : 0.88;
-  return Array.from({ length: diceCount }, (_, index) => ({
+  return Array.from({ length: diceCount }, () => ({
     type,
     radius,
-    color: index % 2 === 0 ? 0xf3dca7 : 0x347461,
-    labelColor: index % 2 === 0 ? "#173c32" : "#fffefa",
+    color: 0x214f42,
+    labelColor: "#fffefa",
     emboss: "recessed",
     embossStrength: 0.22,
   }));
