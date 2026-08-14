@@ -281,23 +281,37 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
   const [castFeedback, setCastFeedback] = useState<CastFeedback>();
   const equipmentCatalog = useMemo(() => inventoryCatalog(rulesPackage), [rulesPackage]);
-  const conditionOptions = useMemo(
-    () =>
+  const conditionOptions = useMemo(() => {
+    const conditionBodies = new Map(
       rulesPackage.entities
-        .filter(
-          (entity) => entity.kind === "condition" && entity.id !== "srd521.condition.exhaustion",
-        )
-        .map((entity) => ({
-          id: entity.id,
-          name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
-          description:
-            typeof objectValue(entity.body)?.description === "string"
-              ? String(objectValue(entity.body)?.description)
-              : "",
-        }))
-        .sort((left, right) => left.name.localeCompare(right.name)),
-    [rulesPackage],
-  );
+        .filter((entity) => entity.kind === "condition")
+        .map((entity) => [entity.id, objectValue(entity.body)]),
+    );
+    const breaksConcentration = (conditionId: string, visited = new Set<string>()): boolean => {
+      if (visited.has(conditionId)) return false;
+      visited.add(conditionId);
+      const body = conditionBodies.get(conditionId);
+      if (body?.breaksConcentration === true) return true;
+      const granted = Array.isArray(body?.grantsConditions) ? body.grantsConditions : [];
+      return granted.some(
+        (id) => typeof id === "string" && breaksConcentration(id, new Set(visited)),
+      );
+    };
+    return rulesPackage.entities
+      .filter(
+        (entity) => entity.kind === "condition" && entity.id !== "srd521.condition.exhaustion",
+      )
+      .map((entity) => ({
+        id: entity.id,
+        name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
+        description:
+          typeof objectValue(entity.body)?.description === "string"
+            ? String(objectValue(entity.body)?.description)
+            : "",
+        breaksConcentration: breaksConcentration(entity.id),
+      }))
+      .sort((left, right) => left.name.localeCompare(right.name));
+  }, [rulesPackage]);
   const equipmentCatalogById = useMemo(
     () => new Map(equipmentCatalog.map((item) => [item.id, item])),
     [equipmentCatalog],
@@ -357,6 +371,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     [builderCatalog, character],
   );
   const evaluation = result.evaluation;
+  const attackRollMode =
+    evaluation?.facts["attackRoll.mode"] === "advantage" ||
+    evaluation?.facts["attackRoll.mode"] === "disadvantage"
+      ? evaluation.facts["attackRoll.mode"]
+      : "normal";
   const universalD20Test = evaluation?.d20Tests.initiative;
   const additionalSpellcastingOption = evaluation?.spells
     .flatMap((spell) => spell.castingOptions ?? [])
@@ -420,7 +439,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 performRoll({
                   label: `${spell.name} spell attack`,
                   modifier: attackBonus,
-                  mode: "normal",
+                  mode: attackRollMode,
                   ...d20RerollRequest(universalD20Test),
                 });
               }
@@ -1135,7 +1154,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             title={condition.description}
                             onClick={() => {
                               savePlayState(
-                                setConditionActive(character, condition.id, !active),
+                                setConditionActive(
+                                  character,
+                                  condition.id,
+                                  !active,
+                                  undefined,
+                                  condition.breaksConcentration,
+                                ),
                                 `${condition.name} ${active ? "removed" : "applied"}.`,
                               );
                             }}
@@ -1609,7 +1634,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   roll={{
                                     label: `${attack.name} attack`,
                                     modifier: attack.attackBonus,
-                                    mode: "normal",
+                                    mode: attackRollMode,
                                     criticalThreshold: attack.criticalHitThreshold,
                                     ...d20RerollRequest(universalD20Test),
                                   }}
@@ -1841,7 +1866,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           roll={{
                             label: "Innate spell attack",
                             modifier: additionalSpellcastingOption?.attackBonus ?? 0,
-                            mode: "normal",
+                            mode: attackRollMode,
                             ...d20RerollRequest(universalD20Test),
                           }}
                           onRoll={performRoll}
@@ -1881,7 +1906,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           roll={{
                             label: "Spell attack",
                             modifier: evaluation.spellcasting.attackBonus,
-                            mode: "normal",
+                            mode: attackRollMode,
                             ...d20RerollRequest(universalD20Test),
                           }}
                           onRoll={performRoll}

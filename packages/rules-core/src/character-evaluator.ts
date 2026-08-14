@@ -69,6 +69,40 @@ const skillDefinitions = [
 
 const skillEntityPrefix = "srd521.skill.";
 
+const conditionBodySchema = z
+  .object({
+    description: z.string(),
+    grantsConditions: z.array(z.string()).default([]),
+    speedMaximum: z.number().nonnegative().optional(),
+    speedModifierPerLevel: z.number().int().optional(),
+    d20ModifierPerLevel: z.number().int().optional(),
+    d20RollEffects: z
+      .array(
+        z
+          .object({
+            scope: z.enum(["ability-checks", "attack-rolls", "initiative", "saving-throw"]),
+            ability: z.enum(abilities).optional(),
+            kind: z.enum(["advantage", "disadvantage"]),
+          })
+          .strict(),
+      )
+      .default([]),
+    disablesActions: z.boolean().default(false),
+    breaksConcentration: z.boolean().default(false),
+    automaticFailedSavingThrows: z.array(z.enum(abilities)).default([]),
+    damageResistances: z.array(z.string()).default([]),
+    conditionImmunities: z.array(z.string()).default([]),
+  })
+  .passthrough();
+
+type ConditionBody = z.infer<typeof conditionBodySchema>;
+
+interface ActiveCondition {
+  readonly entity: ContentEntity;
+  readonly body: ConditionBody;
+  readonly explicit: boolean;
+}
+
 const classBodySchema = z
   .object({
     hitPointDie: z.number().int().positive(),
@@ -697,6 +731,163 @@ interface OriginContext {
   readonly backgroundBody?: z.infer<typeof backgroundBodySchema>;
   readonly species?: ContentEntity;
   readonly speciesBody?: z.infer<typeof speciesBodySchema>;
+}
+
+function resolveActiveConditions(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): ActiveCondition[] {
+  const active = new Map<string, ActiveCondition>();
+  const pending = [...character.state.conditionIds];
+  if (character.state.exhaustion > 0) pending.push("srd521.condition.exhaustion");
+  while (pending.length > 0) {
+    const conditionId = pending.shift();
+    if (conditionId === undefined || active.has(conditionId)) continue;
+    const entity = index.entities.get(conditionId);
+    if (entity?.kind !== "condition") {
+      addValidation(
+        state,
+        "ACTIVE_CONDITION_INVALID",
+        `${conditionId} is not a loaded condition.`,
+        ["state.conditionIds"],
+      );
+      continue;
+    }
+    const body = conditionBodySchema.parse(entity.body);
+    active.set(conditionId, {
+      entity,
+      body,
+      explicit:
+        character.state.conditionIds.includes(conditionId) ||
+        (conditionId === "srd521.condition.exhaustion" && character.state.exhaustion > 0),
+    });
+    pending.push(...body.grantsConditions);
+  }
+  for (const [conditionId, condition] of active) {
+    state.facts[`condition.${conditionId.slice(conditionId.lastIndexOf(".") + 1)}.active`] = true;
+    for (const immunity of condition.body.conditionImmunities) {
+      if (active.get(immunity)?.explicit === true) {
+        addValidation(
+          state,
+          "CONDITION_BLOCKED_BY_IMMUNITY",
+          `${condition.entity.name.en ?? condition.entity.id} prevents ${immunity} from applying.`,
+          ["state.conditionIds"],
+          "warning",
+        );
+      }
+    }
+  }
+  return [...active.values()];
+}
+
+function conditionRollEffects(conditions: readonly ActiveCondition[]): D20RollEffect[] {
+  const testsByScope: Record<string, readonly string[]> = {
+    "ability-checks": [
+      ...abilities.map((ability) => `abilityCheck.${ability}`),
+      ...skillDefinitions.map((skill) => `skill.${skill.id}`),
+    ],
+    initiative: ["initiative"],
+  };
+  return conditions.flatMap(({ entity, body }) =>
+    body.d20RollEffects.flatMap((effect) => {
+      if (effect.scope === "attack-rolls") return [];
+      const testIds =
+        effect.scope === "saving-throw" && effect.ability !== undefined
+          ? [`savingThrow.${effect.ability}`]
+          : (testsByScope[effect.scope] ?? []);
+      return testIds.map((testId) => ({
+        testId,
+        kind: effect.kind,
+        source: entity.id,
+      }));
+    }),
+  );
+}
+
+function conditionD20Modifiers(
+  character: CharacterDocument,
+  conditions: readonly ActiveCondition[],
+): D20TestModifier[] {
+  return conditions.flatMap(({ entity, body }) => {
+    if (body.d20ModifierPerLevel === undefined) return [];
+    return [
+      {
+        target: "all-d20-tests",
+        bonus: body.d20ModifierPerLevel * character.state.exhaustion,
+        sourceId: entity.id,
+        sourceReferences: entitySourceReferences(entity),
+      },
+    ];
+  });
+}
+
+function evaluateConditionMechanics(
+  character: CharacterDocument,
+  conditions: readonly ActiveCondition[],
+  state: EngineState,
+): void {
+  const speedMaximum = Math.min(
+    ...conditions.map(({ body }) => body.speedMaximum ?? Number.POSITIVE_INFINITY),
+  );
+  const speedModifier = conditions.reduce(
+    (total, { body }) => total + (body.speedModifierPerLevel ?? 0) * character.state.exhaustion,
+    0,
+  );
+  const movementSpeedIds = new Set(["speed.walking", "speed.climb", "speed.swim", "speed.fly"]);
+  for (const speedId of Object.keys(state.values).filter((id) => movementSpeedIds.has(id))) {
+    const before = state.values[speedId]?.value;
+    if (typeof before !== "number") continue;
+    const value = Math.max(0, Math.min(speedMaximum, before + speedModifier));
+    const sources = conditions
+      .filter(
+        ({ body }) => body.speedMaximum !== undefined || body.speedModifierPerLevel !== undefined,
+      )
+      .flatMap(({ entity }) => entitySourceReferences(entity));
+    state.facts[speedId] = value;
+    state.values[speedId] = { value, traceId: speedId };
+    state.traces[speedId] = {
+      id: speedId,
+      result: value,
+      nodes: [
+        ...(state.traces[speedId]?.nodes ?? []),
+        {
+          id: `${speedId}.conditions`,
+          operation: "apply-condition-speed-modifiers",
+          inputs: [before, speedModifier, Number.isFinite(speedMaximum) ? speedMaximum : null],
+          output: value,
+        },
+      ],
+      sourceReferences: [...(state.traces[speedId]?.sourceReferences ?? []), ...sources],
+    };
+  }
+
+  const attackEffects = conditions.flatMap(({ entity, body }) =>
+    body.d20RollEffects
+      .filter((effect) => effect.scope === "attack-rolls")
+      .map((effect) => ({ ...effect, source: entity.id })),
+  );
+  const advantageSources = attackEffects
+    .filter((effect) => effect.kind === "advantage")
+    .map((effect) => effect.source);
+  const disadvantageSources = attackEffects
+    .filter((effect) => effect.kind === "disadvantage")
+    .map((effect) => effect.source);
+  state.facts["attackRoll.mode"] = resolveRollMode(advantageSources, disadvantageSources);
+
+  for (const { entity, body } of conditions) {
+    body.damageResistances.forEach((damageType) => state.resistances.add(damageType));
+    for (const ability of body.automaticFailedSavingThrows) {
+      state.facts[`savingThrow.${ability}.automaticFailure`] = true;
+    }
+    if (body.disablesActions) {
+      state.facts["actions.disabled"] = true;
+      for (const action of state.actions) {
+        action.available = false;
+        action.reasons = [...action.reasons, `${entity.name.en ?? entity.id} prevents actions.`];
+      }
+    }
+  }
 }
 
 function addValidation(
@@ -2125,6 +2316,7 @@ function recordD20Test(
   const applicableModifiers = ruleModifiers.filter(
     (modifier) =>
       modifier.target === testId ||
+      modifier.target === "all-d20-tests" ||
       (modifier.target === "unproficient-skill-checks" &&
         testId.startsWith("skill.") &&
         proficiency.level === "none"),
@@ -3423,6 +3615,14 @@ function validateConcentration(
   state: EngineState,
 ): void {
   if (character.state.concentrationSpellId === undefined) return;
+  if (state.facts["actions.disabled"] === true) {
+    addValidation(
+      state,
+      "CONDITION_BREAKS_CONCENTRATION",
+      "The active condition prevents maintaining Concentration.",
+      ["state.concentrationSpellId", "state.conditionIds"],
+    );
+  }
   const spellId = character.state.concentrationSpellId;
   const concentration = index.entities.get(spellId);
   if (concentration?.kind !== "spell" || !spellBodySchema.parse(concentration.body).concentration) {
@@ -5130,6 +5330,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const origins = resolveOrigins(character, index, state);
   validateProgressionSelections(character, index, state);
   const classLevels = materializeFacts(character, state);
+  const conditions = resolveActiveConditions(character, index, state);
   const granted = grantedFeatureIds(classLevels, index);
   grantSubclassFeatures(character, classLevels, index, granted);
   if (character.build.speciesId !== undefined) {
@@ -5160,19 +5361,24 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
       ...equipment.rollEffects,
       ...speciesRollEffects(origins, input.context),
       ...ruleRollEffects(rules, state, index, granted),
+      ...conditionRollEffects(conditions),
     ],
-    ruleD20TestModifiers(rules, state, index, granted),
+    [
+      ...ruleD20TestModifiers(rules, state, index, granted),
+      ...conditionD20Modifiers(character, conditions),
+    ],
   );
   evaluateHitPoints(character, rules, granted, index, state);
   evaluateSpellcasting(character, classLevels, index, state);
   evaluateMagicInitiate(character, index, state);
   evaluateSpeciesTraits(character, origins, index, state);
-  validateConcentration(character, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
   const attackRules = evaluateAttackRules(rules, granted, index, state);
   evaluateAttacks(character, equipment, attackRules, index, state);
+  evaluateConditionMechanics(character, conditions, state);
+  validateConcentration(character, index, state);
   validateActiveState(character, state);
   const coverageWarnings = index.authoringIr
     .filter((ir) => granted.has(ir.id) && ir.review.semantics !== "approved")

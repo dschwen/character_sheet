@@ -29,6 +29,67 @@ EXPECTED_CONDITIONS = (
     "Unconscious",
 )
 
+# Mechanical annotations are deliberately separate from the extracted prose.  The
+# evaluator consumes these fields generically, so adding another condition does
+# not require a condition-name switch in either rules-core or the web app.
+CONDITION_MECHANICS: dict[str, dict[str, Any]] = {
+    "Blinded": {"d20RollEffects": [{"scope": "attack-rolls", "kind": "disadvantage"}]},
+    "Exhaustion": {"d20ModifierPerLevel": -2, "speedModifierPerLevel": -5},
+    "Frightened": {
+        "d20RollEffects": [
+            {"scope": "ability-checks", "kind": "disadvantage"},
+            {"scope": "attack-rolls", "kind": "disadvantage"},
+        ]
+    },
+    "Grappled": {"speedMaximum": 0},
+    "Incapacitated": {
+        "disablesActions": True,
+        "breaksConcentration": True,
+        "d20RollEffects": [{"scope": "initiative", "kind": "disadvantage"}],
+    },
+    "Invisible": {
+        "d20RollEffects": [
+            {"scope": "initiative", "kind": "advantage"},
+            {"scope": "attack-rolls", "kind": "advantage"},
+        ]
+    },
+    "Paralyzed": {
+        "grantsConditions": ["srd521.condition.incapacitated"],
+        "speedMaximum": 0,
+        "automaticFailedSavingThrows": ["strength", "dexterity"],
+    },
+    "Petrified": {
+        "grantsConditions": ["srd521.condition.incapacitated"],
+        "speedMaximum": 0,
+        "automaticFailedSavingThrows": ["strength", "dexterity"],
+        "damageResistances": ["all"],
+        "conditionImmunities": ["srd521.condition.poisoned"],
+    },
+    "Poisoned": {
+        "d20RollEffects": [
+            {"scope": "ability-checks", "kind": "disadvantage"},
+            {"scope": "attack-rolls", "kind": "disadvantage"},
+        ]
+    },
+    "Prone": {"d20RollEffects": [{"scope": "attack-rolls", "kind": "disadvantage"}]},
+    "Restrained": {
+        "speedMaximum": 0,
+        "d20RollEffects": [
+            {"scope": "attack-rolls", "kind": "disadvantage"},
+            {"scope": "saving-throw", "ability": "dexterity", "kind": "disadvantage"},
+        ],
+    },
+    "Stunned": {
+        "grantsConditions": ["srd521.condition.incapacitated"],
+        "automaticFailedSavingThrows": ["strength", "dexterity"],
+    },
+    "Unconscious": {
+        "grantsConditions": ["srd521.condition.incapacitated", "srd521.condition.prone"],
+        "speedMaximum": 0,
+        "automaticFailedSavingThrows": ["strength", "dexterity"],
+    },
+}
+
 
 def parse_conditions(document: dict[str, Any]) -> list[dict[str, Any]]:
     nodes = list(document["nodes"])
@@ -57,7 +118,10 @@ def parse_conditions(document: dict[str, Any]) -> list[dict[str, Any]]:
                 "name": {"en": name},
                 "tags": ["condition"],
                 "source": _source_spans([heading, description]),
-                "body": {"description": description["normalizedText"]},
+                "body": {
+                    "description": description["normalizedText"],
+                    **CONDITION_MECHANICS.get(name, {}),
+                },
                 "rules": [],
                 "review": {
                     "status": "STRUCTURED",

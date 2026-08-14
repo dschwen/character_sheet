@@ -109,15 +109,14 @@ export function setConditionActive(
   conditionId: string,
   active: boolean,
   updatedAt?: Date,
+  breaksConcentration = false,
 ): CharacterDocument {
-  return commitCharacterState(
-    character,
-    {
-      ...character.state,
-      conditionIds: setStateIdActive(character.state.conditionIds, conditionId, active),
-    },
-    updatedAt,
-  );
+  const state = {
+    ...character.state,
+    conditionIds: setStateIdActive(character.state.conditionIds, conditionId, active),
+  };
+  if (active && breaksConcentration) delete state.concentrationSpellId;
+  return commitCharacterState(character, state, updatedAt);
 }
 
 export function setActiveEffectActive(

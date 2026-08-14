@@ -520,4 +520,43 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       "HIT_DICE_EXPENDED_ABOVE_MAXIMUM",
     );
   });
+
+  it("applies condition mechanics from condition entity data", () => {
+    const source = loadCharacter();
+    const character: CharacterDocument = {
+      ...source,
+      state: {
+        ...source.state,
+        conditionIds: ["srd521.condition.unconscious"],
+        exhaustion: 2,
+      },
+    };
+
+    const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+
+    expect(evaluation.values["speed.walking"]?.value).toBe(0);
+    expect(evaluation.d20Tests["skill.athletics"]?.modifier).toBe(1);
+    expect(evaluation.facts["savingThrow.strength.automaticFailure"]).toBe(true);
+    expect(evaluation.facts["condition.incapacitated.active"]).toBe(true);
+    expect(evaluation.facts["condition.prone.active"]).toBe(true);
+    expect(evaluation.facts["attackRoll.mode"]).toBe("disadvantage");
+    expect(evaluation.actions.every((action) => !action.available)).toBe(true);
+  });
+
+  it("cancels condition-granted attack advantage and disadvantage", () => {
+    const source = loadCharacter();
+    const character: CharacterDocument = {
+      ...source,
+      state: {
+        ...source.state,
+        conditionIds: ["srd521.condition.invisible", "srd521.condition.poisoned"],
+      },
+    };
+
+    const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+
+    expect(evaluation.facts["attackRoll.mode"]).toBe("normal");
+    expect(evaluation.d20Tests.initiative?.rollMode).toBe("advantage");
+    expect(evaluation.d20Tests["abilityCheck.strength"]?.rollMode).toBe("disadvantage");
+  });
 });

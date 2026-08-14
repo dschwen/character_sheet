@@ -79,4 +79,23 @@ describe("browser play-state edits", () => {
     expect(cleared.state.conditionIds).toEqual([]);
     expect(source.state.conditionIds).toEqual([]);
   });
+
+  it("ends concentration when condition data says the condition breaks it", () => {
+    const source = character();
+    const concentrating = {
+      ...source,
+      state: { ...source.state, concentrationSpellId: "srd521.spell.bless" },
+    };
+
+    const updated = setConditionActive(
+      concentrating,
+      "srd521.condition.incapacitated",
+      true,
+      updatedAt,
+      true,
+    );
+
+    expect(updated.state.concentrationSpellId).toBeUndefined();
+    expect(updated.state.conditionIds).toContain("srd521.condition.incapacitated");
+  });
 });

@@ -98,6 +98,14 @@ export function proposeSpellCast(
           ? spell.castingOptions?.find((option) => option.freeCastResourceId !== undefined)
           : spell.castingOptions?.[0]
         : spell.castingOptions?.find((option) => option.sourceId === request.castingSourceId);
+  if (evaluation.facts["actions.disabled"] === true) {
+    addValidation(
+      validations,
+      "SPELL_CAST_PREVENTED_BY_CONDITION",
+      "An active condition prevents the character from casting spells.",
+      ["character.state.conditionIds"],
+    );
+  }
   if (spell === undefined) {
     addValidation(
       validations,
