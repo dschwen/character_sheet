@@ -456,6 +456,9 @@ Generate the fifteen source-linked standard conditions from Rules Glossary pages
 .venv/bin/python -m srd_extract.conditions \
   --extraction generated/extraction/srd-5.2.1-conditions \
   --output packages/content-srd-5.2.1/generated
+
+.venv/bin/python -m srd_extract.spell_statuses \
+  --output packages/content-srd-5.2.1/generated
 ```
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,

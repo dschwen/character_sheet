@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(583);
+    expect(parsedEntities).toHaveLength(597);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -31,6 +31,8 @@ describe("bootstrap content package", () => {
         "srd521.spell.lightning-bolt",
         "srd521.spell.ray-of-sickness",
         "srd521.spell.shocking-grasp",
+        "srd521.status.spell.bless",
+        "srd521.status.spell.haste",
       ]),
     );
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");

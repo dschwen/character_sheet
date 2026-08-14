@@ -62,6 +62,7 @@ import {
   setTemporaryHitPoints,
 } from "../lib/play-state";
 import { proposePreparedSpellLoadout, spellPreparationEditor } from "../lib/spell-preparation";
+import { spellStatusInstructions, spellStatusMessage } from "../lib/spell-status";
 import { rollD20, rollDice, type D20RollRequest, type DiceRollResult } from "../lib/dice-roll";
 
 const storageKey = "dnd-character-manager.document.v1";
@@ -312,6 +313,21 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       }))
       .sort((left, right) => left.name.localeCompare(right.name));
   }, [rulesPackage]);
+  const statusOptions = useMemo(
+    () =>
+      rulesPackage.entities
+        .filter((entity) => entity.kind === "status")
+        .map((entity) => ({
+          id: entity.id,
+          name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
+          description:
+            typeof objectValue(entity.body)?.description === "string"
+              ? String(objectValue(entity.body)?.description)
+              : "",
+        }))
+        .sort((left, right) => left.name.localeCompare(right.name)),
+    [rulesPackage],
+  );
   const equipmentCatalogById = useMemo(
     () => new Map(equipmentCatalog.map((item) => [item.id, item])),
     [equipmentCatalog],
@@ -730,7 +746,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       }
       applyTransition(
         proposal,
-        `${spell.name}${asRitual ? " was cast as a ritual" : useFreeCast ? " used its free casting" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.`,
+        `${spell.name}${asRitual ? " was cast as a ritual" : useFreeCast ? " used its free casting" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.${spellStatusMessage(spell) === "" ? "" : ` ${spellStatusMessage(spell)}`}`,
       );
     } catch (error) {
       setNotice(`Spell cast failed: ${errorMessage(error)}`);
@@ -1171,6 +1187,36 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       })}
                     </div>
                   </div>
+                  {statusOptions.length === 0 ? null : (
+                    <div className="condition-controls">
+                      <span>
+                        <strong>Beneficial statuses</strong>
+                        <small>Set spell effects on this sheet</small>
+                      </span>
+                      <div className="condition-grid">
+                        {statusOptions.map((status) => {
+                          const active = character.state.activeEffectIds.includes(status.id);
+                          return (
+                            <button
+                              key={status.id}
+                              type="button"
+                              className={active ? "condition-toggle active" : "condition-toggle"}
+                              aria-pressed={active}
+                              title={status.description}
+                              onClick={() => {
+                                savePlayState(
+                                  setActiveEffectActive(character, status.id, !active),
+                                  `${status.name} ${active ? "removed" : "set"}.`,
+                                );
+                              }}
+                            >
+                              {status.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                   {character.state.activeEffectIds.length === 0 ? null : (
                     <div className="active-effect-controls">
                       <span>
@@ -1387,6 +1433,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               structured.
                             </em>
                           ) : null}
+                          {spellStatusInstructions(castFeedback.spell).map((instruction) => (
+                            <em key={instruction}>{instruction}</em>
+                          ))}
                           {spellRollControls(castFeedback.spell)}
                         </div>
                         <button

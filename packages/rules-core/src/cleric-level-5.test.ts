@@ -74,6 +74,15 @@ describe("evaluateCharacter Cleric level-5 vertical slice", () => {
     expect(
       evaluation.spells.find((spell) => spell.id === "srd521.spell.spirit-guardians"),
     ).toMatchObject({ prepared: true, concentration: true });
+    expect(evaluation.spells.find((spell) => spell.id === "srd521.spell.bless")).toMatchObject({
+      appliedStatuses: [
+        {
+          statusId: "srd521.status.spell.bless",
+          statusName: "Blessed",
+          target: "target",
+        },
+      ],
+    });
     expect(evaluation.resources).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

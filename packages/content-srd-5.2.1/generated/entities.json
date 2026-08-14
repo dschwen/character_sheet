@@ -5406,6 +5406,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.feather-fall",
+          "statusName": "Feather Falling",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Reaction, which you take when you or a creature you can see within 60 feet of you falls",
       "classes": [
@@ -5532,6 +5539,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.fly",
+          "statusName": "Flying",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -5651,6 +5665,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.mage-armor",
+          "statusName": "Mage Armor",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -7979,6 +8000,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.aid",
+          "statusName": "Aided",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -8103,6 +8131,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.bless",
+          "statusName": "Blessed",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -8224,6 +8259,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.guidance",
+          "statusName": "Guided",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -8658,6 +8700,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.shield-of-faith",
+          "statusName": "Shield of Faith",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Bonus Action",
       "classes": [
@@ -11325,6 +11374,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.pass-without-trace",
+          "statusName": "Pass without Trace",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -11757,6 +11813,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.water-breathing",
+          "statusName": "Water Breathing",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action or Ritual",
       "classes": [
@@ -15352,6 +15415,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.heroism",
+          "statusName": "Heroism",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -15411,6 +15481,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.protection-from-evil-and-good",
+          "statusName": "Protection from Evil and Good",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -17412,6 +17489,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.longstrider",
+          "statusName": "Longstrider",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -21102,6 +21186,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.dragon-s-breath",
+          "statusName": "Dragon’s Breath",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Bonus Action",
       "classes": [
@@ -21285,6 +21376,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.haste",
+          "statusName": "Hasted",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [
@@ -34262,6 +34360,543 @@
     ],
     "tags": [
       "condition"
+    ]
+  },
+  {
+    "body": {
+      "concentration": false,
+      "description": "Choose up to three creatures within range. Each target’s Hit Point maximum and current Hit Points increase by 5 for the duration. Using a Higher-Level Spell Slot. Each target’s Hit Points increase by 5 for each spell slot level above 2.",
+      "duration": "8 hours",
+      "sourceSpellId": "srd521.spell.aid"
+    },
+    "id": "srd521.status.spell.aid",
+    "kind": "status",
+    "name": {
+      "en": "Aided"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Aid.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0107-b008",
+          "p0107-b009",
+          "p0107-b010"
+        ],
+        "page": 107,
+        "quoteHash": "09f36abcd0a2933809c408d7f89556c9a21ef54b661e126cfb2f7d2372f63cc6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "You bless up to three creatures within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target adds 1d4 to the attack roll or save. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 1.",
+      "duration": "Concentration, up to 1 minute",
+      "sourceSpellId": "srd521.spell.bless"
+    },
+    "id": "srd521.status.spell.bless",
+    "kind": "status",
+    "name": {
+      "en": "Blessed"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Bless.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0113-b010",
+          "p0113-b011",
+          "p0113-b012",
+          "p0113-b013"
+        ],
+        "page": 113,
+        "quoteHash": "19fecfe1b3a354fe50bc92c09185744fec1cf7df7b7784da61c3f2a226078ba5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "You touch one willing creature, and choose Acid, Cold, Fire, Lightning, or Poison. Until the spell ends, the target can take a Magic action to exhale a 15-foot Cone. Each creature in that area makes a Dexterity saving throw, taking 3d6 damage of the chosen type on a failed save or half as much damage on a successful one. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell slot level above 2.",
+      "duration": "Concentration, up to 1 minute",
+      "sourceSpellId": "srd521.spell.dragon-s-breath"
+    },
+    "id": "srd521.status.spell.dragon-s-breath",
+    "kind": "status",
+    "name": {
+      "en": "Dragon’s Breath"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Dragon’s Breath.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0126-b006",
+          "p0126-b007",
+          "p0126-b008",
+          "p0126-b009"
+        ],
+        "page": 126,
+        "quoteHash": "9bf9862dbd49af3932c58949f823123e26be4034d1ed89dfc97d849bfcff34c3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": false,
+      "description": "Choose up to five falling creatures within range. A falling creature’s rate of descent slows to 60 feet per round until the spell ends. If a creature lands before the spell ends, the creature takes no damage from the fall, and the spell ends for that creature.",
+      "duration": "1 minute",
+      "sourceSpellId": "srd521.spell.feather-fall"
+    },
+    "id": "srd521.status.spell.feather-fall",
+    "kind": "status",
+    "name": {
+      "en": "Feather Falling"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Feather Fall.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0130-b005",
+          "p0130-b006",
+          "p0130-b007",
+          "p0130-b008"
+        ],
+        "page": 130,
+        "quoteHash": "d112fd9e651fe7b5fb08752c175fe596948fd2edcc3c99645bbbc42eb71bf0d9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "You touch a willing creature. For the duration, the target gains a Fly Speed of 60 feet and can hover. When the spell ends, the target falls if it is still aloft unless it can stop the fall. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 3.",
+      "duration": "Concentration, up to 10 minutes",
+      "sourceSpellId": "srd521.spell.fly"
+    },
+    "id": "srd521.status.spell.fly",
+    "kind": "status",
+    "name": {
+      "en": "Flying"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Fly.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0133-b008",
+          "p0133-b009",
+          "p0133-b010"
+        ],
+        "page": 133,
+        "quoteHash": "8301f0a22d4989718b8668cfbc19eef68de81b084711a1f1d8d80f99c8917c70",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "You touch a willing creature and choose a skill. Until the spell ends, the creature adds 1d4 to any ability check using the chosen skill.",
+      "duration": "Concentration, up to 1 minute",
+      "sourceSpellId": "srd521.spell.guidance"
+    },
+    "id": "srd521.status.spell.guidance",
+    "kind": "status",
+    "name": {
+      "en": "Guided"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Guidance.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0138-b004",
+          "p0138-b005",
+          "p0138-b006"
+        ],
+        "page": 138,
+        "quoteHash": "2024839d625db5725d3a480e6ab25c845bba4ef281e133f1400b7f25c743d4b6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "Choose a willing creature that you can see within range. Until the spell ends, the target’s Speed is doubled, it gains a +2 bonus to Armor Class, it has Advantage on Dexterity saving throws, and it gains an additional action on each of its turns. That action can be used to take only the Attack (one attack only), Dash, Disengage, Hide, or Utilize action. When the spell ends, the target is Incapacitated and has a Speed of 0 until the end of its next turn, as a wave of lethargy washes over it.",
+      "duration": "Concentration, up to 1 minute",
+      "sourceSpellId": "srd521.spell.haste"
+    },
+    "id": "srd521.status.spell.haste",
+    "kind": "status",
+    "name": {
+      "en": "Hasted"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Haste.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0139-b018",
+          "p0139-b019",
+          "p0139-b020"
+        ],
+        "page": 139,
+        "quoteHash": "28f885bb6698a71a2e21d387889642a37edae1e7a6fb181eecb27abf9bab3384",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "A willing creature you touch is imbued with bravery. Until the spell ends, the creature is immune to the Frightened condition and gains Temporary Hit Points equal to your spellcasting ability modifier at the start of each of its turns. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 1.",
+      "duration": "Concentration, up to 1 minute",
+      "sourceSpellId": "srd521.spell.heroism"
+    },
+    "id": "srd521.status.spell.heroism",
+    "kind": "status",
+    "name": {
+      "en": "Heroism"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Heroism.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0140-b011",
+          "p0140-b012",
+          "p0140-b013",
+          "p0140-b014"
+        ],
+        "page": 140,
+        "quoteHash": "102b3cc648762ba8eff372637ce66ea293e9ba086703d6486754c4d186aab6e8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": false,
+      "description": "You touch a creature. The target’s Speed increases by 10 feet until the spell ends. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 1.",
+      "duration": "1 hour",
+      "sourceSpellId": "srd521.spell.longstrider"
+    },
+    "id": "srd521.status.spell.longstrider",
+    "kind": "status",
+    "name": {
+      "en": "Longstrider"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Longstrider.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0145-b008",
+          "p0145-b009",
+          "p0145-b010"
+        ],
+        "page": 145,
+        "quoteHash": "dc314fccf7a8901feb54d7824ea982eb17874baf23a6e1a964a4277d866025d2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": false,
+      "description": "You touch a willing creature who isn’t wearing armor. Until the spell ends, the target’s base AC becomes 13 plus its Dexterity modifier. The spell ends early if the target dons armor.",
+      "duration": "8 hours",
+      "sourceSpellId": "srd521.spell.mage-armor"
+    },
+    "id": "srd521.status.spell.mage-armor",
+    "kind": "status",
+    "name": {
+      "en": "Mage Armor"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Mage Armor.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0145-b011",
+          "p0145-b012",
+          "p0145-b013"
+        ],
+        "page": 145,
+        "quoteHash": "43243a009ce59e6e0c2de40bc39e94f35c6aa41eda97eba54c1b6a2425511283",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "You radiate a concealing aura in a 30-foot Emanation for the duration. While in the aura, you and each creature you choose have a +10 bonus to Dexterity (Stealth) checks and leave no tracks.",
+      "duration": "Concentration, up to 1 hour",
+      "sourceSpellId": "srd521.spell.pass-without-trace"
+    },
+    "id": "srd521.status.spell.pass-without-trace",
+    "kind": "status",
+    "name": {
+      "en": "Pass without Trace"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Pass without Trace.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0151-b014",
+          "p0151-b015",
+          "p0151-b016"
+        ],
+        "page": 151,
+        "quoteHash": "d8444565ce47c48c0a72ca81f09370cce2a472a6c591ce1a7a398a047482fc78",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "Until the spell ends, one willing creature you touch is protected against creatures that are Aberrations, Celestials, Elementals, Fey, Fiends, or Undead. The protection grants several benefits. Creatures of those types have Disadvantage on attack rolls against the target. The target also can’t be possessed by or gain the Charmed or Frightened conditions from them. If the target is already possessed, Charmed, or Frightened by such a creature, the target has Advantage on any new saving throw against the relevant effect.",
+      "duration": "Concentration up to 10 minutes",
+      "sourceSpellId": "srd521.spell.protection-from-evil-and-good"
+    },
+    "id": "srd521.status.spell.protection-from-evil-and-good",
+    "kind": "status",
+    "name": {
+      "en": "Protection from Evil and Good"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Protection from Evil and Good.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0157-b006",
+          "p0157-b007",
+          "p0157-b008",
+          "p0157-b009"
+        ],
+        "page": 157,
+        "quoteHash": "994fa01734a9df426f7f08f92b4ca844277e90a604d2210390957de643a6581d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
+      "description": "A shimmering field surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.",
+      "duration": "Concentration, up to 10 minutes",
+      "sourceSpellId": "srd521.spell.shield-of-faith"
+    },
+    "id": "srd521.status.spell.shield-of-faith",
+    "kind": "status",
+    "name": {
+      "en": "Shield of Faith"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Shield of Faith.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0162-b003",
+          "p0162-b004",
+          "p0162-b005"
+        ],
+        "page": 162,
+        "quoteHash": "57a1b0cf332727684446497505f82af3c19558d838e894eaea7cd630e03f82a6",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": false,
+      "description": "This spell grants up to ten willing creatures of your choice within range the ability to breathe underwater until the spell ends. Affected creatures also retain their normal mode of respiration.",
+      "duration": "24 hours",
+      "sourceSpellId": "srd521.spell.water-breathing"
+    },
+    "id": "srd521.status.spell.water-breathing",
+    "kind": "status",
+    "name": {
+      "en": "Water Breathing"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Water Breathing.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0173-b014",
+          "p0173-b015",
+          "p0173-b016"
+        ],
+        "page": 173,
+        "quoteHash": "73ba10705005821fc60449736169022e4ea2a71367fb80cafdc95687abd579e1",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
     ]
   }
 ]

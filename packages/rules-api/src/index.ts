@@ -205,8 +205,15 @@ export interface SpellSummary {
   savingThrows: string[];
   damage: SpellDamageSummary[];
   hasHigherLevelEffect: boolean;
+  appliedStatuses: SpellAppliedStatusSummary[];
   sources: SourceReference[];
   castingOptions?: SpellCastingOptionSummary[];
+}
+
+export interface SpellAppliedStatusSummary {
+  statusId: string;
+  statusName: string;
+  target: "target";
 }
 
 export type RestEvent = "short-rest" | "long-rest";

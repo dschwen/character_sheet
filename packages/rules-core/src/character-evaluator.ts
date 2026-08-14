@@ -565,6 +565,17 @@ const spellBodySchema = z
       .nullish()
       .transform((damage) => damage ?? []),
     hasHigherLevelEffect: z.boolean().default(false),
+    appliedStatuses: z
+      .array(
+        z
+          .object({
+            statusId: z.string().min(1),
+            statusName: z.string().min(1),
+            target: z.literal("target"),
+          })
+          .strict(),
+      )
+      .default([]),
   })
   .passthrough();
 const tableBodySchema = z.object({ entries: z.record(z.number()) });
@@ -3260,6 +3271,7 @@ function evaluateSpellcasting(
         diceCount: damage.diceCount * cantripDamageMultiplier,
       })),
       hasHigherLevelEffect: body.hasHigherLevelEffect,
+      appliedStatuses: body.appliedStatuses,
       sources: entitySourceReferences(entity),
       castingOptions: [
         {
@@ -3372,6 +3384,7 @@ function addMagicInitiateSpell(
       diceCount: damage.diceCount * cantripDamageMultiplier,
     })),
     hasHigherLevelEffect: body.hasHigherLevelEffect,
+    appliedStatuses: body.appliedStatuses,
     sources: entitySourceReferences(entity),
     castingOptions: [castingOption],
   });
