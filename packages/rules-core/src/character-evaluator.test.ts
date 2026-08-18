@@ -619,4 +619,29 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       ]),
     );
   });
+
+  it("attaches Bless and selected-skill Guidance dice to d20 rolls", () => {
+    const source = loadCharacter();
+    source.state.activeEffectIds.push("srd521.status.spell.bless", "srd521.status.spell.guidance");
+    source.state.activeEffectSelections["srd521.status.spell.guidance"] = "skill.stealth";
+
+    const evaluation = evaluateCharacter({ character: source, packages: [loadRulesPackage()] });
+
+    expect(evaluation.attackRollBonusDice).toEqual([
+      { diceCount: 1, diceSize: 4, source: "Blessed" },
+    ]);
+    expect(evaluation.d20Tests["savingThrow.strength"]?.bonusDice).toEqual([
+      { diceCount: 1, diceSize: 4, source: "Blessed" },
+    ]);
+    expect(evaluation.d20Tests["skill.stealth"]?.bonusDice).toEqual([
+      { diceCount: 1, diceSize: 4, source: "Guided" },
+    ]);
+    expect(evaluation.d20Tests["skill.arcana"]?.bonusDice).toEqual([]);
+    expect(evaluation.d20Tests["abilityCheck.dexterity"]?.bonusDice).toEqual([]);
+    expect(evaluation.traces["skill.stealth"]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ entityId: "srd521.status.spell.guidance" }),
+      ]),
+    );
+  });
 });

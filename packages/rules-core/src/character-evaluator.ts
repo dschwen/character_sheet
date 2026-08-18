@@ -18,6 +18,7 @@ import type {
   ActionSummary,
   AttackSummary,
   CharacterEvaluation,
+  D20BonusDice,
   D20RollEffect,
   D20TestSummary,
   DerivedValue,
@@ -77,6 +78,16 @@ const d20RollEffectBodySchema = z
   })
   .strict();
 
+const d20BonusDiceBodySchema = z
+  .object({
+    scope: z.enum(["ability-checks", "attack-rolls", "initiative", "saving-throw"]),
+    ability: z.enum(abilities).optional(),
+    diceCount: z.number().int().positive(),
+    diceSize: z.number().int().min(2),
+    selection: z.literal("skill").optional(),
+  })
+  .strict();
+
 const conditionBodySchema = z
   .object({
     description: z.string(),
@@ -120,6 +131,7 @@ const statusBodySchema = z
       .strict()
       .optional(),
     d20RollEffects: z.array(d20RollEffectBodySchema).default([]),
+    d20BonusDice: z.array(d20BonusDiceBodySchema).default([]),
   })
   .passthrough();
 
@@ -879,6 +891,58 @@ function statusRollEffects(statuses: readonly ActiveStatus[]): D20RollEffect[] {
       }));
     }),
   );
+}
+
+interface D20TestBonusDice extends D20BonusDice {
+  readonly testId: string;
+  readonly sourceReferences: SourceReference[];
+}
+
+function statusBonusDice(
+  character: CharacterDocument,
+  statuses: readonly ActiveStatus[],
+): { tests: D20TestBonusDice[]; attacks: D20BonusDice[] } {
+  const tests: D20TestBonusDice[] = [];
+  const attacks: D20BonusDice[] = [];
+  const abilityCheckIds = [
+    ...abilities.map((ability) => `abilityCheck.${ability}`),
+    ...skillDefinitions.map((skill) => `skill.${skill.id}`),
+  ];
+  for (const { entity, body } of statuses) {
+    for (const bonus of body.d20BonusDice) {
+      const dice = {
+        diceCount: bonus.diceCount,
+        diceSize: bonus.diceSize,
+        source: entity.name.en ?? entity.id,
+      };
+      if (bonus.scope === "attack-rolls") {
+        attacks.push(dice);
+        continue;
+      }
+      let testIds: readonly string[];
+      if (bonus.selection === "skill") {
+        const selected = character.state.activeEffectSelections[entity.id];
+        testIds = selected?.startsWith("skill.") === true ? [selected] : [];
+      } else if (bonus.scope === "ability-checks") {
+        testIds = abilityCheckIds;
+      } else if (bonus.scope === "saving-throw") {
+        testIds =
+          bonus.ability === undefined
+            ? abilities.map((ability) => `savingThrow.${ability}`)
+            : [`savingThrow.${bonus.ability}`];
+      } else {
+        testIds = ["initiative"];
+      }
+      tests.push(
+        ...testIds.map((testId) => ({
+          ...dice,
+          testId,
+          sourceReferences: entitySourceReferences(entity),
+        })),
+      );
+    }
+  }
+  return { tests, attacks };
 }
 
 function evaluateStatusMovement(statuses: readonly ActiveStatus[], state: EngineState): void {
@@ -2426,6 +2490,7 @@ function recordD20Test(
   context: EvaluateCharacterInput["context"],
   additionalRollEffects: readonly D20RollEffect[],
   ruleModifiers: readonly D20TestModifier[],
+  bonusDice: readonly D20TestBonusDice[],
   rerollValues: readonly number[],
   rerollSources: readonly string[],
   rerollSourceReferences: readonly SourceReference[],
@@ -2457,6 +2522,7 @@ function recordD20Test(
     .filter((effect) => effect.kind === "disadvantage")
     .map((effect) => effect.source);
   const rollMode = resolveRollMode(advantageSources, disadvantageSources);
+  const applicableBonusDice = bonusDice.filter((bonus) => bonus.testId === testId);
   const traceId = testId;
   state.traces[traceId] = {
     id: traceId,
@@ -2502,11 +2568,18 @@ function recordD20Test(
               output: [...rerollValues],
             },
           ]),
+      ...applicableBonusDice.map((bonus, index) => ({
+        id: `${traceId}.bonus-dice-${String(index + 1)}`,
+        operation: "grant-d20-bonus-dice",
+        inputs: [bonus.source],
+        output: `${String(bonus.diceCount)}d${String(bonus.diceSize)}`,
+      })),
     ],
     sourceReferences: [
       ...sourceReferencesForTest,
       ...applicableModifiers.flatMap((value) => value.sourceReferences),
       ...rerollSourceReferences,
+      ...applicableBonusDice.flatMap((bonus) => bonus.sourceReferences),
     ],
   };
   state.facts[testId] = modifier;
@@ -2521,6 +2594,11 @@ function recordD20Test(
     disadvantageSources,
     rerollValues: [...rerollValues],
     rerollSources: [...rerollSources],
+    bonusDice: applicableBonusDice.map(({ diceCount, diceSize, source }) => ({
+      diceCount,
+      diceSize,
+      source,
+    })),
     traceId,
   };
 }
@@ -2533,6 +2611,7 @@ function evaluateD20Tests(
   context: EvaluateCharacterInput["context"],
   additionalRollEffects: readonly D20RollEffect[],
   ruleModifiers: readonly D20TestModifier[],
+  bonusDice: readonly D20TestBonusDice[],
 ): void {
   const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
   const rerollValues = origins.speciesBody?.d20RerollValues ?? [];
@@ -2750,6 +2829,7 @@ function evaluateD20Tests(
       context,
       additionalRollEffects,
       ruleModifiers,
+      bonusDice,
       rerollValues,
       rerollSources,
       rerollSourceReferences,
@@ -2767,6 +2847,7 @@ function evaluateD20Tests(
       context,
       additionalRollEffects,
       ruleModifiers,
+      bonusDice,
       rerollValues,
       rerollSources,
       rerollSourceReferences,
@@ -2801,6 +2882,7 @@ function evaluateD20Tests(
       context,
       additionalRollEffects,
       ruleModifiers,
+      bonusDice,
       rerollValues,
       rerollSources,
       rerollSourceReferences,
@@ -2817,6 +2899,7 @@ function evaluateD20Tests(
     context,
     additionalRollEffects,
     ruleModifiers,
+    bonusDice,
     rerollValues,
     rerollSources,
     rerollSourceReferences,
@@ -5549,6 +5632,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateWalkingSpeed(character, index, state);
   evaluateMovementRules(rules, granted, index, state);
   evaluateStatusMovement(statuses, state);
+  const d20BonusDice = statusBonusDice(character, statuses);
   evaluateD20Tests(
     character,
     origins,
@@ -5566,6 +5650,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
       ...ruleD20TestModifiers(rules, state, index, granted),
       ...conditionD20Modifiers(character, conditions),
     ],
+    d20BonusDice.tests,
   );
   evaluateHitPoints(character, rules, granted, index, state);
   evaluateSpellcasting(character, classLevels, index, state);
@@ -5591,6 +5676,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     values: state.values,
     proficiencies: state.proficiencies,
     d20Tests: state.d20Tests,
+    attackRollBonusDice: d20BonusDice.attacks,
     inventory: state.inventory,
     attacks: state.attacks,
     ...(state.spellcasting === undefined ? {} : { spellcasting: state.spellcasting }),

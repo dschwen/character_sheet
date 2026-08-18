@@ -55,6 +55,7 @@ import {
   clearConcentration,
   commitCharacterState,
   setActiveEffectActive,
+  setActiveEffectSelection,
   setConditionActive,
   setExhaustion,
   setHeroicInspiration,
@@ -176,7 +177,10 @@ function traceLabel(traceId: string): string {
 
 function rollExpression(result: DiceRollResult): string {
   if (result.kind === "d20") {
-    return `${String(result.kept)} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))} = ${String(result.total)}`;
+    const bonusTotal = (result.bonusDiceRolls ?? [])
+      .flatMap((bonus) => bonus.dice)
+      .reduce((total, die) => total + die, 0);
+    return `${String(result.kept)}${bonusTotal === 0 ? "" : ` + ${String(bonusTotal)}`} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))} = ${String(result.total)}`;
   }
   if (result.modifier === 0) return `Total ${String(result.total)}`;
   const diceTotal = result.dice.reduce((total, die) => total + die, 0);
@@ -190,20 +194,35 @@ function rollDetail(result: DiceRollResult): string {
     const rerolls = result.rerolls
       ?.map((reroll) => `${String(reroll.original)} → ${String(reroll.replacement)}`)
       .join(", ");
-    return rerolls === undefined
-      ? dice
-      : `${dice} · ${result.rerollSource ?? "Feature"} rerolled ${rerolls}`;
+    const bonusDice = result.bonusDiceRolls
+      ?.map(
+        (bonus) =>
+          `${bonus.source} ${String(bonus.diceCount)}d${String(bonus.diceSize)}: ${bonus.dice.map(String).join(", ")}`,
+      )
+      .join(" · ");
+    return [
+      dice,
+      ...(rerolls === undefined ? [] : [`${result.rerollSource ?? "Feature"} rerolled ${rerolls}`]),
+      ...(bonusDice === undefined ? [] : [bonusDice]),
+    ].join(" · ");
   }
   return `${String(result.diceCount)}d${String(result.diceSize)} rolled: ${result.dice.map(String).join(", ")}`;
 }
 
 function d20RerollRequest(
   test: D20TestSummary | undefined,
-): Pick<D20RollRequest, "rerollValues" | "rerollSource"> {
-  if (test === undefined || test.rerollValues.length === 0) return {};
+  bonusDice = test?.bonusDice ?? [],
+): Pick<D20RollRequest, "rerollValues" | "rerollSource" | "bonusDice"> {
+  const rerolls =
+    test === undefined || test.rerollValues.length === 0
+      ? {}
+      : {
+          rerollValues: test.rerollValues,
+          rerollSource: test.rerollSources.join(", ") || "Feature",
+        };
   return {
-    rerollValues: test.rerollValues,
-    rerollSource: test.rerollSources.join(", ") || "Feature",
+    ...rerolls,
+    ...(bonusDice.length === 0 ? {} : { bonusDice }),
   };
 }
 
@@ -327,14 +346,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     () =>
       rulesPackage.entities
         .filter((entity) => entity.kind === "status")
-        .map((entity) => ({
-          id: entity.id,
-          name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
-          description:
-            typeof objectValue(entity.body)?.description === "string"
-              ? String(objectValue(entity.body)?.description)
-              : "",
-        }))
+        .map((entity) => {
+          const body = objectValue(entity.body);
+          const bonusDice = Array.isArray(body?.d20BonusDice) ? body.d20BonusDice : [];
+          return {
+            id: entity.id,
+            name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
+            description: typeof body?.description === "string" ? body.description : "",
+            requiresSkillSelection: bonusDice.some(
+              (bonus) => objectValue(bonus)?.selection === "skill",
+            ),
+          };
+        })
         .sort((left, right) => left.name.localeCompare(right.name)),
     [rulesPackage],
   );
@@ -501,7 +524,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   label: `${spell.name} spell attack`,
                   modifier: attackBonus,
                   mode: attackRollMode,
-                  ...d20RerollRequest(universalD20Test),
+                  ...d20RerollRequest(universalD20Test, evaluation?.attackRollBonusDice ?? []),
                 });
               }
             }}
@@ -1267,6 +1290,43 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           );
                         })}
                       </div>
+                      {statusOptions
+                        .filter(
+                          (status) =>
+                            status.requiresSkillSelection &&
+                            character.state.activeEffectIds.includes(status.id),
+                        )
+                        .map((status) => (
+                          <label className="effect-selection" key={`${status.id}-selection`}>
+                            <span>{status.name} skill</span>
+                            <select
+                              value={character.state.activeEffectSelections[status.id] ?? ""}
+                              onChange={(event) => {
+                                if (event.target.value === "") return;
+                                savePlayState(
+                                  setActiveEffectSelection(
+                                    character,
+                                    status.id,
+                                    event.target.value,
+                                  ),
+                                  `${status.name} now applies to ${titleCase(event.target.value.replace("skill.", ""))}.`,
+                                );
+                              }}
+                            >
+                              <option value="" disabled>
+                                Choose a skill
+                              </option>
+                              {Object.values(evaluation.d20Tests)
+                                .filter((test) => test.id.startsWith("skill."))
+                                .sort((left, right) => left.id.localeCompare(right.id))
+                                .map((skill) => (
+                                  <option key={skill.id} value={skill.id}>
+                                    {titleCase(skill.id.replace("skill.", ""))}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                        ))}
                     </div>
                   )}
                   {character.state.activeEffectIds.length === 0 ? null : (
@@ -1733,7 +1793,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                     modifier: attack.attackBonus,
                                     mode: attackRollMode,
                                     criticalThreshold: attack.criticalHitThreshold,
-                                    ...d20RerollRequest(universalD20Test),
+                                    ...d20RerollRequest(
+                                      universalD20Test,
+                                      evaluation.attackRollBonusDice,
+                                    ),
                                   }}
                                   onRoll={performRoll}
                                 >
@@ -1964,7 +2027,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             label: "Innate spell attack",
                             modifier: additionalSpellcastingOption?.attackBonus ?? 0,
                             mode: attackRollMode,
-                            ...d20RerollRequest(universalD20Test),
+                            ...d20RerollRequest(universalD20Test, evaluation.attackRollBonusDice),
                           }}
                           onRoll={performRoll}
                         >
@@ -2004,7 +2067,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             label: "Spell attack",
                             modifier: evaluation.spellcasting.attackBonus,
                             mode: attackRollMode,
-                            ...d20RerollRequest(universalD20Test),
+                            ...d20RerollRequest(universalD20Test, evaluation.attackRollBonusDice),
                           }}
                           onRoll={performRoll}
                         >

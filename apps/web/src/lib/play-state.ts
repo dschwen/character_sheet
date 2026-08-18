@@ -125,11 +125,36 @@ export function setActiveEffectActive(
   active: boolean,
   updatedAt?: Date,
 ): CharacterDocument {
+  const activeEffectSelections = active
+    ? { ...character.state.activeEffectSelections }
+    : Object.fromEntries(
+        Object.entries(character.state.activeEffectSelections).filter(([id]) => id !== effectId),
+      );
   return commitCharacterState(
     character,
     {
       ...character.state,
       activeEffectIds: setStateIdActive(character.state.activeEffectIds, effectId, active),
+      activeEffectSelections,
+    },
+    updatedAt,
+  );
+}
+
+export function setActiveEffectSelection(
+  character: CharacterDocument,
+  effectId: string,
+  selection: string,
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(
+    character,
+    {
+      ...character.state,
+      activeEffectSelections: {
+        ...character.state.activeEffectSelections,
+        [effectId]: selection,
+      },
     },
     updatedAt,
   );

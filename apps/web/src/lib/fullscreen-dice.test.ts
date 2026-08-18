@@ -53,4 +53,25 @@ describe("fullscreen physical dice result mapping", () => {
 
     expect(result).toMatchObject({ dice: [3, 6], modifier: 4, total: 13 });
   });
+
+  it("includes physically rolled bonus dice in a d20 result", async () => {
+    const throwDice = physicalThrows([13], [3]);
+    const result = await rollD20Fullscreen(
+      {
+        label: "Blessed attack",
+        modifier: 5,
+        mode: "normal",
+        bonusDice: [{ diceCount: 1, diceSize: 4, source: "Blessed" }],
+      },
+      throwDice,
+    );
+
+    expect(throwDice).toHaveBeenNthCalledWith(1, 20, 1);
+    expect(throwDice).toHaveBeenNthCalledWith(2, 4, 1);
+    expect(result).toMatchObject({
+      kept: 13,
+      bonusDiceRolls: [{ source: "Blessed", dice: [3] }],
+      total: 21,
+    });
+  });
 });

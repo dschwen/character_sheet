@@ -7,6 +7,7 @@ import {
   applyHealing,
   clearConcentration,
   setActiveEffectActive,
+  setActiveEffectSelection,
   setConditionActive,
   setCurrency,
   setExhaustion,
@@ -78,6 +79,16 @@ describe("browser play-state edits", () => {
     expect(raging.state.activeEffectIds).toEqual(["srd521.effect.barbarian.rage"]);
     expect(cleared.state.conditionIds).toEqual([]);
     expect(source.state.conditionIds).toEqual([]);
+  });
+
+  it("stores an active effect choice and clears it when the effect ends", () => {
+    const effectId = "srd521.status.spell.guidance";
+    const active = setActiveEffectActive(character(), effectId, true, updatedAt);
+    const selected = setActiveEffectSelection(active, effectId, "skill.stealth", updatedAt);
+    const ended = setActiveEffectActive(selected, effectId, false, updatedAt);
+
+    expect(selected.state.activeEffectSelections[effectId]).toBe("skill.stealth");
+    expect(ended.state.activeEffectSelections[effectId]).toBeUndefined();
   });
 
   it("ends concentration when condition data says the condition breaks it", () => {

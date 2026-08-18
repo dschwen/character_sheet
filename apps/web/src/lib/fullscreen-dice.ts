@@ -59,13 +59,21 @@ function dieSpecs(diceSize: number, diceCount: number): DieSpec[] {
 }
 
 async function throwPhysicalDice(diceSize: number, diceCount: number): Promise<readonly number[]> {
+  const results = await throwPhysicalDiceGroups([{ diceSize, diceCount }]);
+  return results[0] ?? [];
+}
+
+async function throwPhysicalDiceGroups(
+  groups: readonly { diceSize: number; diceCount: number }[],
+): Promise<readonly (readonly number[])[]> {
   const roller = await fullscreenRoller();
   if (clearTimer !== undefined) clearTimeout(clearTimer);
   roller.clear();
   const from = origins[throwIndex % origins.length] ?? "bottom-left";
   throwIndex += 1;
   const toward: ThrowOptions["toward"] = from.includes("left") ? "top-right" : "top-left";
-  const labels = await roller.throwAndWait(dieSpecs(diceSize, diceCount), {
+  const groupSpecs = groups.map(({ diceSize, diceCount }) => dieSpecs(diceSize, diceCount));
+  const labels = await roller.throwAndWait(groupSpecs.flat(), {
     from,
     toward,
     velocity: 10,
@@ -74,10 +82,16 @@ async function throwPhysicalDice(diceSize: number, diceCount: number): Promise<r
     spread: 0.75,
     timeout: 7000,
   });
-  return labels.map((label) => {
+  const values = labels.map((label) => {
     const value = Number(label);
     if (!Number.isInteger(value)) throw new Error(`The physical die returned ${label}.`);
     return value;
+  });
+  let offset = 0;
+  return groupSpecs.map((specs) => {
+    const result = values.slice(offset, offset + specs.length);
+    offset += specs.length;
+    return result;
   });
 }
 
@@ -107,7 +121,23 @@ async function resolvePhysicalD20(
   const rerollValues = new Set(request.rerollValues ?? []);
   const replacementCount = initialDice.filter((value) => rerollValues.has(value)).length;
   const replacements = replacementCount === 0 ? [] : await throwDice(20, replacementCount);
-  return resolveD20Roll(request, initialDice, replacements);
+  const bonusDiceResults = [];
+  for (const bonus of request.bonusDice ?? []) {
+    bonusDiceResults.push(await throwDice(bonus.diceSize, bonus.diceCount));
+  }
+  return resolveD20Roll(request, initialDice, replacements, bonusDiceResults);
+}
+
+async function resolveFullscreenD20(request: D20RollRequest): Promise<D20RollResult> {
+  const groups = [
+    { diceSize: 20, diceCount: request.mode === "normal" ? 1 : 2 },
+    ...(request.bonusDice ?? []).map(({ diceSize, diceCount }) => ({ diceSize, diceCount })),
+  ];
+  const [initialDice = [], ...bonusDiceResults] = await throwPhysicalDiceGroups(groups);
+  const rerollValues = new Set(request.rerollValues ?? []);
+  const replacementCount = initialDice.filter((value) => rerollValues.has(value)).length;
+  const replacements = replacementCount === 0 ? [] : await throwPhysicalDice(20, replacementCount);
+  return resolveD20Roll(request, initialDice, replacements, bonusDiceResults);
 }
 
 export function rollD20Fullscreen(
@@ -115,7 +145,7 @@ export function rollD20Fullscreen(
   throwDice?: PhysicalDiceThrow,
 ): Promise<D20RollResult> {
   return throwDice === undefined
-    ? enqueueRoll(() => resolvePhysicalD20(request, throwPhysicalDice))
+    ? enqueueRoll(() => resolveFullscreenD20(request))
     : resolvePhysicalD20(request, throwDice);
 }
 

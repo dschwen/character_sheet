@@ -1,4 +1,4 @@
-import type { RollMode } from "@dnd/rules-api";
+import type { D20BonusDice, RollMode } from "@dnd/rules-api";
 
 export interface D20RollRequest {
   label: string;
@@ -7,6 +7,7 @@ export interface D20RollRequest {
   criticalThreshold?: number;
   rerollValues?: readonly number[];
   rerollSource?: string;
+  bonusDice?: readonly D20BonusDice[];
 }
 
 export interface D20RollResult extends D20RollRequest {
@@ -15,6 +16,11 @@ export interface D20RollResult extends D20RollRequest {
   kept: number;
   total: number;
   rerolls?: readonly D20Reroll[];
+  bonusDiceRolls?: readonly D20BonusDiceRoll[];
+}
+
+export interface D20BonusDiceRoll extends D20BonusDice {
+  dice: readonly number[];
 }
 
 export interface D20Reroll {
@@ -66,6 +72,7 @@ export function resolveD20Roll(
   request: D20RollRequest,
   initialDice: readonly number[],
   replacementDice: readonly number[] = [],
+  bonusDiceResults: readonly (readonly number[])[] = [],
 ): D20RollResult {
   const expectedDice = request.mode === "normal" ? 1 : 2;
   if (initialDice.length !== expectedDice) {
@@ -107,14 +114,34 @@ export function resolveD20Roll(
       : request.mode === "disadvantage"
         ? Math.min(...dice)
         : firstDie;
+  const bonusDice = request.bonusDice ?? [];
+  if (bonusDiceResults.length !== bonusDice.length) {
+    throw new RangeError(`This d20 roll requires ${String(bonusDice.length)} bonus dice pools.`);
+  }
+  const bonusDiceRolls = bonusDice.map((bonus, index) => {
+    const dice = bonusDiceResults[index];
+    if (dice?.length !== bonus.diceCount) {
+      throw new RangeError(
+        `${bonus.source} requires ${String(bonus.diceCount)}d${String(bonus.diceSize)}.`,
+      );
+    }
+    dice.forEach((value) => {
+      validateDieValue(value, bonus.diceSize);
+    });
+    return { ...bonus, dice: [...dice] };
+  });
+  const bonusTotal = bonusDiceRolls
+    .flatMap((bonus) => bonus.dice)
+    .reduce((sum, die) => sum + die, 0);
 
   return {
     ...request,
     kind: "d20",
     dice,
     kept,
-    total: kept + request.modifier,
+    total: kept + request.modifier + bonusTotal,
     ...(rerolls.length === 0 ? {} : { rerolls }),
+    ...(bonusDiceRolls.length === 0 ? {} : { bonusDiceRolls }),
   };
 }
 
@@ -163,7 +190,10 @@ export function rollD20(
   const replacementDice = initialDice
     .filter((die) => rerollValues.has(die))
     .map(() => rollDie(20, random));
-  return resolveD20Roll(request, initialDice, replacementDice);
+  const bonusDiceResults = (request.bonusDice ?? []).map((bonus) =>
+    Array.from({ length: bonus.diceCount }, () => rollDie(bonus.diceSize, random)),
+  );
+  return resolveD20Roll(request, initialDice, replacementDice, bonusDiceResults);
 }
 
 export function rollDice(

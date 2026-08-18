@@ -28,6 +28,10 @@ def test_annotate_spell_statuses_links_spells_and_status_entities() -> None:
     bless = next(entity for entity in entities if entity["id"] == "srd521.spell.bless")
     assert blessed["id"] == "srd521.status.spell.bless"
     assert blessed["body"]["sourceSpellId"] == "srd521.spell.bless"
+    assert blessed["body"]["d20BonusDice"] == [
+        {"scope": "attack-rolls", "diceCount": 1, "diceSize": 4},
+        {"scope": "saving-throw", "diceCount": 1, "diceSize": 4},
+    ]
     assert bless["body"]["appliedStatuses"] == [
         {
             "statusId": "srd521.status.spell.bless",

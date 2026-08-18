@@ -73,6 +73,25 @@ describe("d20 rolls", () => {
     });
   });
 
+  it("rolls and adds structured bonus dice to the d20 total", () => {
+    expect(
+      rollD20(
+        {
+          label: "Blessed save",
+          modifier: 2,
+          mode: "normal",
+          bonusDice: [{ diceCount: 1, diceSize: 4, source: "Blessed" }],
+        },
+        sequence(0.45, 0.99),
+      ),
+    ).toMatchObject({
+      dice: [10],
+      kept: 10,
+      bonusDiceRolls: [{ diceCount: 1, diceSize: 4, source: "Blessed", dice: [4] }],
+      total: 16,
+    });
+  });
+
   it("rejects random values outside the supported range", () => {
     expect(() =>
       rollD20({ label: "Initiative", modifier: 0, mode: "normal" }, sequence(1)),

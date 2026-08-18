@@ -31,6 +31,12 @@ export interface D20RollEffect {
   source: string;
 }
 
+export interface D20BonusDice {
+  diceCount: number;
+  diceSize: number;
+  source: string;
+}
+
 export interface ProficiencyEntry {
   level: ProficiencyLevel;
   bonus: number;
@@ -52,6 +58,7 @@ export interface D20TestSummary {
   disadvantageSources: string[];
   rerollValues: number[];
   rerollSources: string[];
+  bonusDice: D20BonusDice[];
   traceId: string;
 }
 
@@ -285,6 +292,7 @@ export interface CharacterEvaluation {
   values: Readonly<Record<StatId, DerivedValue>>;
   proficiencies: ProficiencySummary;
   d20Tests: Readonly<Record<string, D20TestSummary>>;
+  attackRollBonusDice: D20BonusDice[];
   inventory: InventoryItemSummary[];
   attacks: AttackSummary[];
   spellcasting?: SpellcastingSummary;

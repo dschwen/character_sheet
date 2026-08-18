@@ -725,6 +725,23 @@ button.vital-card:hover {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
+.effect-selection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 1fr);
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.effect-selection select {
+  min-height: 36px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  background: white;
+}
 .condition-toggle {
   min-height: 34px;
   padding: 6px 8px;

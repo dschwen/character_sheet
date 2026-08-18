@@ -200,6 +200,7 @@ const characterStateSchema = z
     expendedSpellSlots: z.record(z.string(), z.number().int().min(0)).default({}),
     conditionIds: z.array(entityIdSchema).default([]),
     activeEffectIds: z.array(entityIdSchema).default([]),
+    activeEffectSelections: z.record(entityIdSchema, z.string().min(1)).default({}),
     concentrationSpellId: entityIdSchema.optional(),
     heroicInspiration: z.boolean().default(false),
     deathSaveSuccesses: z.number().int().min(0).max(3).default(0),

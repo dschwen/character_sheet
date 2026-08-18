@@ -27,6 +27,12 @@ SPELL_STATUS_NAMES = {
 }
 
 SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
+    "srd521.spell.bless": {
+        "d20BonusDice": [
+            {"scope": "attack-rolls", "diceCount": 1, "diceSize": 4},
+            {"scope": "saving-throw", "diceCount": 1, "diceSize": 4},
+        ]
+    },
     "srd521.spell.fly": {"speedOverrides": {"speed.fly": 60}},
     "srd521.spell.haste": {
         "speedMultiplier": 2,
@@ -34,6 +40,16 @@ SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
         "d20RollEffects": [
             {"scope": "saving-throw", "ability": "dexterity", "kind": "advantage"}
         ],
+    },
+    "srd521.spell.guidance": {
+        "d20BonusDice": [
+            {
+                "scope": "ability-checks",
+                "diceCount": 1,
+                "diceSize": 4,
+                "selection": "skill",
+            }
+        ]
     },
     "srd521.spell.longstrider": {"speedBonus": 10},
     "srd521.spell.mage-armor": {
