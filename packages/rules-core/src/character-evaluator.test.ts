@@ -644,4 +644,23 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       ]),
     );
   });
+
+  it("applies Aid slot scaling and Pass without Trace from status data", () => {
+    const source = loadCharacter();
+    source.state.activeEffectIds.push(
+      "srd521.status.spell.aid",
+      "srd521.status.spell.pass-without-trace",
+    );
+    source.state.activeEffectSelections["srd521.status.spell.aid"] = "3";
+
+    const evaluation = evaluateCharacter({ character: source, packages: [loadRulesPackage()] });
+
+    expect(evaluation.values["hitPoints.maximum"]?.value).toBe(25);
+    expect(evaluation.facts["status.aid.hitPointBonus"]).toBe(10);
+    expect(evaluation.d20Tests["skill.stealth"]?.modifier).toBe(14);
+    expect(evaluation.facts["stealth.leavesNoTracks"]).toBe(true);
+    expect(evaluation.traces["hitPoints.maximum"]?.sourceReferences).toEqual(
+      expect.arrayContaining([expect.objectContaining({ entityId: "srd521.status.spell.aid" })]),
+    );
+  });
 });

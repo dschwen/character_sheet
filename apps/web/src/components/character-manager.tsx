@@ -56,6 +56,8 @@ import {
   commitCharacterState,
   setActiveEffectActive,
   setActiveEffectSelection,
+  setActiveEffectSelectionWithHitPointAdjustment,
+  setActiveEffectWithHitPointBonus,
   setConditionActive,
   setExhaustion,
   setHeroicInspiration,
@@ -79,6 +81,24 @@ const tabs = ["overview", "play", "combat", "spells", "features", "diagnostics"]
 const currencyDenominations = ["pp", "gp", "ep", "sp", "cp"] as const;
 type Tab = (typeof tabs)[number];
 type Trace = CharacterEvaluation["traces"][string];
+
+interface StatusHitPointBonus {
+  base: number;
+  minimumSelection: number;
+  maximumSelection: number;
+  perSelectedLevel: number;
+}
+
+function selectedStatusHitPointBonus(
+  definition: StatusHitPointBonus,
+  selection: string | undefined,
+): number {
+  const parsed = Number(selection);
+  const selected = Number.isInteger(parsed)
+    ? Math.max(definition.minimumSelection, Math.min(definition.maximumSelection, parsed))
+    : definition.minimumSelection;
+  return definition.base + (selected - definition.minimumSelection) * definition.perSelectedLevel;
+}
 
 interface CharacterManagerProps {
   rulesPackage: LoadedRulesPackage;
@@ -349,6 +369,19 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         .map((entity) => {
           const body = objectValue(entity.body);
           const bonusDice = Array.isArray(body?.d20BonusDice) ? body.d20BonusDice : [];
+          const hitPointBonusBody = objectValue(body?.hitPointBonus);
+          const hitPointBonus =
+            typeof hitPointBonusBody?.base === "number" &&
+            typeof hitPointBonusBody.minimumSelection === "number" &&
+            typeof hitPointBonusBody.maximumSelection === "number" &&
+            typeof hitPointBonusBody.perSelectedLevel === "number"
+              ? {
+                  base: hitPointBonusBody.base,
+                  minimumSelection: hitPointBonusBody.minimumSelection,
+                  maximumSelection: hitPointBonusBody.maximumSelection,
+                  perSelectedLevel: hitPointBonusBody.perSelectedLevel,
+                }
+              : undefined;
           return {
             id: entity.id,
             name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
@@ -356,6 +389,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             requiresSkillSelection: bonusDice.some(
               (bonus) => objectValue(bonus)?.selection === "skill",
             ),
+            hitPointBonus,
           };
         })
         .sort((left, right) => left.name.localeCompare(right.name)),
@@ -1279,8 +1313,23 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               aria-pressed={active}
                               title={status.description}
                               onClick={() => {
+                                const selection =
+                                  character.state.activeEffectSelections[status.id] ??
+                                  String(status.hitPointBonus?.minimumSelection ?? "");
+                                const hitPointBonus =
+                                  status.hitPointBonus === undefined
+                                    ? undefined
+                                    : selectedStatusHitPointBonus(status.hitPointBonus, selection);
                                 savePlayState(
-                                  setActiveEffectActive(character, status.id, !active),
+                                  hitPointBonus === undefined
+                                    ? setActiveEffectActive(character, status.id, !active)
+                                    : setActiveEffectWithHitPointBonus(
+                                        character,
+                                        status.id,
+                                        !active,
+                                        hitPointBonus,
+                                        selection,
+                                      ),
                                   `${status.name} ${active ? "removed" : "set"}.`,
                                 );
                               }}
@@ -1327,6 +1376,62 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             </select>
                           </label>
                         ))}
+                      {statusOptions
+                        .filter(
+                          (status) =>
+                            status.hitPointBonus !== undefined &&
+                            character.state.activeEffectIds.includes(status.id),
+                        )
+                        .map((status) => {
+                          const definition = status.hitPointBonus;
+                          if (definition === undefined) return null;
+                          const currentSelection =
+                            character.state.activeEffectSelections[status.id] ??
+                            String(definition.minimumSelection);
+                          const currentBonus = selectedStatusHitPointBonus(
+                            definition,
+                            currentSelection,
+                          );
+                          return (
+                            <label className="effect-selection" key={`${status.id}-hp-selection`}>
+                              <span>{status.name} slot level</span>
+                              <select
+                                value={currentSelection}
+                                onChange={(event) => {
+                                  const nextBonus = selectedStatusHitPointBonus(
+                                    definition,
+                                    event.target.value,
+                                  );
+                                  savePlayState(
+                                    setActiveEffectSelectionWithHitPointAdjustment(
+                                      character,
+                                      status.id,
+                                      event.target.value,
+                                      nextBonus - currentBonus,
+                                    ),
+                                    `${status.name} now grants ${String(nextBonus)} current and maximum HP.`,
+                                  );
+                                }}
+                              >
+                                {Array.from(
+                                  {
+                                    length:
+                                      definition.maximumSelection - definition.minimumSelection + 1,
+                                  },
+                                  (_, index) => definition.minimumSelection + index,
+                                ).map((level) => (
+                                  <option key={level} value={String(level)}>
+                                    Level {String(level)} (+
+                                    {String(
+                                      selectedStatusHitPointBonus(definition, String(level)),
+                                    )}{" "}
+                                    HP)
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          );
+                        })}
                     </div>
                   )}
                   {character.state.activeEffectIds.length === 0 ? null : (
@@ -1341,8 +1446,25 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             key={effectId}
                             type="button"
                             onClick={() => {
+                              const status = statusOptions.find(({ id }) => id === effectId);
+                              const hitPointBonus =
+                                status?.hitPointBonus === undefined
+                                  ? undefined
+                                  : selectedStatusHitPointBonus(
+                                      status.hitPointBonus,
+                                      character.state.activeEffectSelections[effectId],
+                                    );
                               savePlayState(
-                                setActiveEffectActive(character, effectId, false),
+                                hitPointBonus === undefined
+                                  ? setActiveEffectActive(character, effectId, false)
+                                  : setActiveEffectWithHitPointBonus(
+                                      character,
+                                      effectId,
+                                      false,
+                                      hitPointBonus,
+                                      character.state.activeEffectSelections[effectId] ??
+                                        String(status?.hitPointBonus?.minimumSelection ?? ""),
+                                    ),
                                 `${names.get(effectId) ?? shortEntityName(effectId)} ended.`,
                               );
                             }}

@@ -48,6 +48,10 @@ def test_annotate_spell_statuses_links_spells_and_status_entities() -> None:
         "ability": "dexterity",
         "requiresUnarmored": True,
     }
+    aided = next(entity for entity in statuses if entity["name"]["en"] == "Aided")
+    assert aided["body"]["hitPointBonus"]["base"] == 5
+    hidden = next(entity for entity in statuses if entity["name"]["en"] == "Pass without Trace")
+    assert hidden["body"]["d20Modifiers"] == [{"target": "skill.stealth", "bonus": 10}]
 
 
 def test_annotate_spell_statuses_is_idempotent() -> None:

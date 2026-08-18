@@ -27,6 +27,14 @@ SPELL_STATUS_NAMES = {
 }
 
 SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
+    "srd521.spell.aid": {
+        "hitPointBonus": {
+            "base": 5,
+            "minimumSelection": 2,
+            "maximumSelection": 9,
+            "perSelectedLevel": 5,
+        }
+    },
     "srd521.spell.bless": {
         "d20BonusDice": [
             {"scope": "attack-rolls", "diceCount": 1, "diceSize": 4},
@@ -58,6 +66,10 @@ SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
             "ability": "dexterity",
             "requiresUnarmored": True,
         }
+    },
+    "srd521.spell.pass-without-trace": {
+        "d20Modifiers": [{"target": "skill.stealth", "bonus": 10}],
+        "factGrants": {"stealth.leavesNoTracks": True},
     },
     "srd521.spell.shield-of-faith": {"armorClassBonus": 2},
 }

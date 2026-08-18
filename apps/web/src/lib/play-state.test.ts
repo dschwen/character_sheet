@@ -8,6 +8,8 @@ import {
   clearConcentration,
   setActiveEffectActive,
   setActiveEffectSelection,
+  setActiveEffectSelectionWithHitPointAdjustment,
+  setActiveEffectWithHitPointBonus,
   setConditionActive,
   setCurrency,
   setExhaustion,
@@ -88,6 +90,25 @@ describe("browser play-state edits", () => {
     const ended = setActiveEffectActive(selected, effectId, false, updatedAt);
 
     expect(selected.state.activeEffectSelections[effectId]).toBe("skill.stealth");
+    expect(ended.state.activeEffectSelections[effectId]).toBeUndefined();
+  });
+
+  it("adjusts current HP as a selected Aid bonus changes and ends", () => {
+    const effectId = "srd521.status.spell.aid";
+    const source = character();
+    const aided = setActiveEffectWithHitPointBonus(source, effectId, true, 5, "2", updatedAt);
+    const heightened = setActiveEffectSelectionWithHitPointAdjustment(
+      aided,
+      effectId,
+      "3",
+      5,
+      updatedAt,
+    );
+    const ended = setActiveEffectWithHitPointBonus(heightened, effectId, false, 10, "3", updatedAt);
+
+    expect(aided.state.currentHitPoints).toBe(source.state.currentHitPoints + 5);
+    expect(heightened.state.currentHitPoints).toBe(source.state.currentHitPoints + 10);
+    expect(ended.state.currentHitPoints).toBe(source.state.currentHitPoints);
     expect(ended.state.activeEffectSelections[effectId]).toBeUndefined();
   });
 

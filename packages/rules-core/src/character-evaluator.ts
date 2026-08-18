@@ -132,6 +132,26 @@ const statusBodySchema = z
       .optional(),
     d20RollEffects: z.array(d20RollEffectBodySchema).default([]),
     d20BonusDice: z.array(d20BonusDiceBodySchema).default([]),
+    d20Modifiers: z
+      .array(
+        z
+          .object({
+            target: z.string().min(1),
+            bonus: z.number(),
+          })
+          .strict(),
+      )
+      .default([]),
+    factGrants: z.record(z.union([z.boolean(), z.number(), z.string()])).default({}),
+    hitPointBonus: z
+      .object({
+        base: z.number().int(),
+        minimumSelection: z.number().int(),
+        maximumSelection: z.number().int(),
+        perSelectedLevel: z.number().int(),
+      })
+      .strict()
+      .optional(),
   })
   .passthrough();
 
@@ -841,6 +861,7 @@ function resolveActiveStatuses(
     if (entity?.kind !== "status") return [];
     const body = statusBodySchema.parse(entity.body);
     state.facts[`status.${entity.id.slice(entity.id.lastIndexOf(".") + 1)}.active`] = true;
+    Object.assign(state.facts, body.factGrants);
     return [{ entity, body }];
   });
 }
@@ -1007,6 +1028,17 @@ function conditionD20Modifiers(
       },
     ];
   });
+}
+
+function statusD20Modifiers(statuses: readonly ActiveStatus[]): D20TestModifier[] {
+  return statuses.flatMap(({ entity, body }) =>
+    body.d20Modifiers.map((modifier) => ({
+      target: modifier.target,
+      bonus: modifier.bonus,
+      sourceId: entity.id,
+      sourceReferences: entitySourceReferences(entity),
+    })),
+  );
 }
 
 function evaluateConditionMechanics(
@@ -2985,12 +3017,25 @@ function hitPointBase(
   return level.hitPointRoll;
 }
 
+function statusHitPointBonus(character: CharacterDocument, status: ActiveStatus): number {
+  const definition = status.body.hitPointBonus;
+  if (definition === undefined) return 0;
+  const selected = Number(character.state.activeEffectSelections[status.entity.id]);
+  const selectedLevel = Number.isInteger(selected)
+    ? Math.max(definition.minimumSelection, Math.min(definition.maximumSelection, selected))
+    : definition.minimumSelection;
+  return (
+    definition.base + (selectedLevel - definition.minimumSelection) * definition.perSelectedLevel
+  );
+}
+
 function evaluateHitPoints(
   character: CharacterDocument,
   rules: { ir: AuthoringIr; rule: DraftRule }[],
   granted: ReadonlySet<string>,
   index: PackageIndex,
   state: EngineState,
+  statuses: readonly ActiveStatus[],
 ): void {
   const constitutionModifier = requireNumber(
     state.facts["ability.constitution.modifier"] ?? null,
@@ -3079,6 +3124,22 @@ function evaluateHitPoints(
       label: speciesEntity.name.en ?? speciesEntity.id,
     });
     sources.push(...entitySourceReferences(speciesEntity));
+  }
+  for (const status of statuses) {
+    const bonus = statusHitPointBonus(character, status);
+    if (bonus === 0) continue;
+    maximum += bonus;
+    state.facts[
+      `status.${status.entity.id.slice(status.entity.id.lastIndexOf(".") + 1)}.hitPointBonus`
+    ] = bonus;
+    nodes.push({
+      id: `hitPoints.maximum.${status.entity.id}`,
+      operation: "apply-status-hit-point-bonus",
+      inputs: [bonus],
+      output: bonus,
+      label: status.entity.name.en ?? status.entity.id,
+    });
+    sources.push(...entitySourceReferences(status.entity));
   }
   const traceId = "hitPoints.maximum";
   nodes.push({
@@ -5649,10 +5710,11 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     [
       ...ruleD20TestModifiers(rules, state, index, granted),
       ...conditionD20Modifiers(character, conditions),
+      ...statusD20Modifiers(statuses),
     ],
     d20BonusDice.tests,
   );
-  evaluateHitPoints(character, rules, granted, index, state);
+  evaluateHitPoints(character, rules, granted, index, state, statuses);
   evaluateSpellcasting(character, classLevels, index, state);
   evaluateMagicInitiate(character, index, state);
   evaluateSpeciesTraits(character, origins, index, state);

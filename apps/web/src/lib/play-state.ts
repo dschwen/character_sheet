@@ -160,6 +160,54 @@ export function setActiveEffectSelection(
   );
 }
 
+export function setActiveEffectWithHitPointBonus(
+  character: CharacterDocument,
+  effectId: string,
+  active: boolean,
+  hitPointBonus: number,
+  selection: string,
+  updatedAt?: Date,
+): CharacterDocument {
+  const selections = Object.fromEntries(
+    Object.entries(character.state.activeEffectSelections).filter(([id]) => id !== effectId),
+  );
+  if (active) selections[effectId] = selection;
+  return commitCharacterState(
+    character,
+    {
+      ...character.state,
+      currentHitPoints: Math.max(
+        0,
+        character.state.currentHitPoints + (active ? hitPointBonus : -hitPointBonus),
+      ),
+      activeEffectIds: setStateIdActive(character.state.activeEffectIds, effectId, active),
+      activeEffectSelections: selections,
+    },
+    updatedAt,
+  );
+}
+
+export function setActiveEffectSelectionWithHitPointAdjustment(
+  character: CharacterDocument,
+  effectId: string,
+  selection: string,
+  hitPointAdjustment: number,
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(
+    character,
+    {
+      ...character.state,
+      currentHitPoints: Math.max(0, character.state.currentHitPoints + hitPointAdjustment),
+      activeEffectSelections: {
+        ...character.state.activeEffectSelections,
+        [effectId]: selection,
+      },
+    },
+    updatedAt,
+  );
+}
+
 export function setCurrency(
   character: CharacterDocument,
   denomination: CurrencyDenomination,

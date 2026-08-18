@@ -34369,6 +34369,12 @@
       "concentration": false,
       "description": "Choose up to three creatures within range. Each target’s Hit Point maximum and current Hit Points increase by 5 for the duration. Using a Higher-Level Spell Slot. Each target’s Hit Points increase by 5 for each spell slot level above 2.",
       "duration": "8 hours",
+      "hitPointBonus": {
+        "base": 5,
+        "maximumSelection": 9,
+        "minimumSelection": 2,
+        "perSelectedLevel": 5
+      },
       "sourceSpellId": "srd521.spell.aid"
     },
     "id": "srd521.status.spell.aid",
@@ -34789,8 +34795,17 @@
   {
     "body": {
       "concentration": true,
+      "d20Modifiers": [
+        {
+          "bonus": 10,
+          "target": "skill.stealth"
+        }
+      ],
       "description": "You radiate a concealing aura in a 30-foot Emanation for the duration. While in the aura, you and each creature you choose have a +10 bonus to Dexterity (Stealth) checks and leave no tracks.",
       "duration": "Concentration, up to 1 hour",
+      "factGrants": {
+        "stealth.leavesNoTracks": true
+      },
       "sourceSpellId": "srd521.spell.pass-without-trace"
     },
     "id": "srd521.status.spell.pass-without-trace",
