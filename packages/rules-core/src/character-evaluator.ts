@@ -152,6 +152,15 @@ const statusBodySchema = z
       })
       .strict()
       .optional(),
+    conditionImmunities: z.array(z.string()).default([]),
+    turnStartTemporaryHitPoints: z
+      .object({
+        selectionLabel: z.string().min(1),
+        minimum: z.number().int().nonnegative(),
+        maximum: z.number().int().nonnegative(),
+      })
+      .strict()
+      .optional(),
   })
   .passthrough();
 
@@ -807,6 +816,7 @@ function resolveActiveConditions(
   character: CharacterDocument,
   index: PackageIndex,
   state: EngineState,
+  statuses: readonly ActiveStatus[],
 ): ActiveCondition[] {
   const active = new Map<string, ActiveCondition>();
   const pending = [...character.state.conditionIds];
@@ -834,19 +844,37 @@ function resolveActiveConditions(
     });
     pending.push(...body.grantsConditions);
   }
-  for (const [conditionId, condition] of active) {
-    state.facts[`condition.${conditionId.slice(conditionId.lastIndexOf(".") + 1)}.active`] = true;
-    for (const immunity of condition.body.conditionImmunities) {
-      if (active.get(immunity)?.explicit === true) {
+  const immunitySources = [
+    ...[...active.values()].flatMap((condition) =>
+      condition.body.conditionImmunities.map((conditionId) => ({
+        conditionId,
+        source: condition.entity,
+      })),
+    ),
+    ...statuses.flatMap((status) =>
+      status.body.conditionImmunities.map((conditionId) => ({
+        conditionId,
+        source: status.entity,
+      })),
+    ),
+  ];
+  for (const { conditionId, source } of immunitySources) {
+    const blocked = active.get(conditionId);
+    if (blocked !== undefined) {
+      if (blocked.explicit) {
         addValidation(
           state,
           "CONDITION_BLOCKED_BY_IMMUNITY",
-          `${condition.entity.name.en ?? condition.entity.id} prevents ${immunity} from applying.`,
+          `${source.name.en ?? source.id} prevents ${conditionId} from applying.`,
           ["state.conditionIds"],
           "warning",
         );
       }
+      active.delete(conditionId);
     }
+  }
+  for (const conditionId of active.keys()) {
+    state.facts[`condition.${conditionId.slice(conditionId.lastIndexOf(".") + 1)}.active`] = true;
   }
   return [...active.values()];
 }
@@ -5670,8 +5698,8 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const origins = resolveOrigins(character, index, state);
   validateProgressionSelections(character, index, state);
   const classLevels = materializeFacts(character, state);
-  const conditions = resolveActiveConditions(character, index, state);
   const statuses = resolveActiveStatuses(character, index, state);
+  const conditions = resolveActiveConditions(character, index, state, statuses);
   const granted = grantedFeatureIds(classLevels, index);
   grantSubclassFeatures(character, classLevels, index, granted);
   if (character.build.speciesId !== undefined) {

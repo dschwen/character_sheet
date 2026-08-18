@@ -742,6 +742,24 @@ button.vital-card:hover {
   color: var(--ink);
   background: white;
 }
+.effect-selection-action {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.45fr) minmax(120px, 1fr);
+  gap: 6px;
+}
+.effect-instructions {
+  padding: 11px 13px;
+  border: 1px solid #d8e5dc;
+  border-radius: 8px;
+  color: var(--ink);
+  background: #f2f8f4;
+  font-size: 12px;
+}
+.effect-instructions ul {
+  margin: 7px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
 .condition-toggle {
   min-height: 34px;
   padding: 6px 8px;

@@ -34674,9 +34674,17 @@
   {
     "body": {
       "concentration": true,
+      "conditionImmunities": [
+        "srd521.condition.frightened"
+      ],
       "description": "A willing creature you touch is imbued with bravery. Until the spell ends, the creature is immune to the Frightened condition and gains Temporary Hit Points equal to your spellcasting ability modifier at the start of each of its turns. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 1.",
       "duration": "Concentration, up to 1 minute",
-      "sourceSpellId": "srd521.spell.heroism"
+      "sourceSpellId": "srd521.spell.heroism",
+      "turnStartTemporaryHitPoints": {
+        "maximum": 10,
+        "minimum": 0,
+        "selectionLabel": "Caster spellcasting modifier"
+      }
     },
     "id": "srd521.status.spell.heroism",
     "kind": "status",
@@ -34844,6 +34852,23 @@
       "concentration": true,
       "description": "Until the spell ends, one willing creature you touch is protected against creatures that are Aberrations, Celestials, Elementals, Fey, Fiends, or Undead. The protection grants several benefits. Creatures of those types have Disadvantage on attack rolls against the target. The target also can’t be possessed by or gain the Charmed or Frightened conditions from them. If the target is already possessed, Charmed, or Frightened by such a creature, the target has Advantage on any new saving throw against the relevant effect.",
       "duration": "Concentration up to 10 minutes",
+      "situationalProtection": {
+        "blockedConditions": [
+          "charmed",
+          "frightened",
+          "possessed"
+        ],
+        "creatureTypes": [
+          "aberration",
+          "celestial",
+          "elemental",
+          "fey",
+          "fiend",
+          "undead"
+        ],
+        "existingEffectSavingThrowRollEffect": "advantage",
+        "incomingAttackRollEffect": "disadvantage"
+      },
       "sourceSpellId": "srd521.spell.protection-from-evil-and-good"
     },
     "id": "srd521.status.spell.protection-from-evil-and-good",

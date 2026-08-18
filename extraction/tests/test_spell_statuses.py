@@ -52,6 +52,12 @@ def test_annotate_spell_statuses_links_spells_and_status_entities() -> None:
     assert aided["body"]["hitPointBonus"]["base"] == 5
     hidden = next(entity for entity in statuses if entity["name"]["en"] == "Pass without Trace")
     assert hidden["body"]["d20Modifiers"] == [{"target": "skill.stealth", "bonus": 10}]
+    heroic = next(entity for entity in statuses if entity["name"]["en"] == "Heroism")
+    assert heroic["body"]["conditionImmunities"] == ["srd521.condition.frightened"]
+    protected = next(
+        entity for entity in statuses if entity["name"]["en"] == "Protection from Evil and Good"
+    )
+    assert "fiend" in protected["body"]["situationalProtection"]["creatureTypes"]
 
 
 def test_annotate_spell_statuses_is_idempotent() -> None:

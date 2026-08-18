@@ -59,6 +59,14 @@ SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
             }
         ]
     },
+    "srd521.spell.heroism": {
+        "conditionImmunities": ["srd521.condition.frightened"],
+        "turnStartTemporaryHitPoints": {
+            "selectionLabel": "Caster spellcasting modifier",
+            "minimum": 0,
+            "maximum": 10,
+        },
+    },
     "srd521.spell.longstrider": {"speedBonus": 10},
     "srd521.spell.mage-armor": {
         "armorClassCandidate": {
@@ -70,6 +78,21 @@ SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
     "srd521.spell.pass-without-trace": {
         "d20Modifiers": [{"target": "skill.stealth", "bonus": 10}],
         "factGrants": {"stealth.leavesNoTracks": True},
+    },
+    "srd521.spell.protection-from-evil-and-good": {
+        "situationalProtection": {
+            "creatureTypes": [
+                "aberration",
+                "celestial",
+                "elemental",
+                "fey",
+                "fiend",
+                "undead",
+            ],
+            "incomingAttackRollEffect": "disadvantage",
+            "blockedConditions": ["charmed", "frightened", "possessed"],
+            "existingEffectSavingThrowRollEffect": "advantage",
+        }
     },
     "srd521.spell.shield-of-faith": {"armorClassBonus": 2},
 }

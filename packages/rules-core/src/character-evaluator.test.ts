@@ -663,4 +663,19 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       expect.arrayContaining([expect.objectContaining({ entityId: "srd521.status.spell.aid" })]),
     );
   });
+
+  it("blocks Frightened mechanics while Heroism is active", () => {
+    const source = loadCharacter();
+    source.state.activeEffectIds.push("srd521.status.spell.heroism");
+    source.state.conditionIds.push("srd521.condition.frightened");
+
+    const evaluation = evaluateCharacter({ character: source, packages: [loadRulesPackage()] });
+
+    expect(evaluation.facts["condition.frightened.active"]).toBeUndefined();
+    expect(evaluation.facts["attackRoll.mode"]).toBe("normal");
+    expect(evaluation.d20Tests["skill.athletics"]?.rollMode).toBe("normal");
+    expect(evaluation.validations).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: "CONDITION_BLOCKED_BY_IMMUNITY" })]),
+    );
+  });
 });

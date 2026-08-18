@@ -370,6 +370,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           const body = objectValue(entity.body);
           const bonusDice = Array.isArray(body?.d20BonusDice) ? body.d20BonusDice : [];
           const hitPointBonusBody = objectValue(body?.hitPointBonus);
+          const temporaryHitPointsBody = objectValue(body?.turnStartTemporaryHitPoints);
+          const protectionBody = objectValue(body?.situationalProtection);
           const hitPointBonus =
             typeof hitPointBonusBody?.base === "number" &&
             typeof hitPointBonusBody.minimumSelection === "number" &&
@@ -382,6 +384,38 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   perSelectedLevel: hitPointBonusBody.perSelectedLevel,
                 }
               : undefined;
+          const turnStartTemporaryHitPoints =
+            typeof temporaryHitPointsBody?.selectionLabel === "string" &&
+            typeof temporaryHitPointsBody.minimum === "number" &&
+            typeof temporaryHitPointsBody.maximum === "number"
+              ? {
+                  selectionLabel: temporaryHitPointsBody.selectionLabel,
+                  minimum: temporaryHitPointsBody.minimum,
+                  maximum: temporaryHitPointsBody.maximum,
+                }
+              : undefined;
+          const creatureTypes = Array.isArray(protectionBody?.creatureTypes)
+            ? protectionBody.creatureTypes.filter(
+                (creatureType): creatureType is string => typeof creatureType === "string",
+              )
+            : [];
+          const blockedConditions = Array.isArray(protectionBody?.blockedConditions)
+            ? protectionBody.blockedConditions.filter(
+                (condition): condition is string => typeof condition === "string",
+              )
+            : [];
+          const situationalProtection =
+            creatureTypes.length > 0 &&
+            protectionBody?.incomingAttackRollEffect === "disadvantage" &&
+            protectionBody.existingEffectSavingThrowRollEffect === "advantage"
+              ? {
+                  creatureTypes,
+                  blockedConditions,
+                  incomingAttackRollEffect: protectionBody.incomingAttackRollEffect,
+                  existingEffectSavingThrowRollEffect:
+                    protectionBody.existingEffectSavingThrowRollEffect,
+                }
+              : undefined;
           return {
             id: entity.id,
             name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
@@ -390,6 +424,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
               (bonus) => objectValue(bonus)?.selection === "skill",
             ),
             hitPointBonus,
+            turnStartTemporaryHitPoints,
+            situationalProtection,
           };
         })
         .sort((left, right) => left.name.localeCompare(right.name)),
@@ -1430,6 +1466,90 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 ))}
                               </select>
                             </label>
+                          );
+                        })}
+                      {statusOptions
+                        .filter(
+                          (status) =>
+                            status.turnStartTemporaryHitPoints !== undefined &&
+                            character.state.activeEffectIds.includes(status.id),
+                        )
+                        .map((status) => {
+                          const definition = status.turnStartTemporaryHitPoints;
+                          if (definition === undefined) return null;
+                          const selection =
+                            character.state.activeEffectSelections[status.id] ??
+                            String(definition.minimum);
+                          const amount = Number(selection);
+                          return (
+                            <div className="effect-selection" key={`${status.id}-temporary-hp`}>
+                              <span>{definition.selectionLabel}</span>
+                              <div className="effect-selection-action">
+                                <select
+                                  aria-label={`${status.name} ${definition.selectionLabel}`}
+                                  value={selection}
+                                  onChange={(event) => {
+                                    savePlayState(
+                                      setActiveEffectSelection(
+                                        character,
+                                        status.id,
+                                        event.target.value,
+                                      ),
+                                      `${status.name} caster modifier set to ${event.target.value}.`,
+                                    );
+                                  }}
+                                >
+                                  {Array.from(
+                                    { length: definition.maximum - definition.minimum + 1 },
+                                    (_, index) => definition.minimum + index,
+                                  ).map((modifier) => (
+                                    <option key={modifier} value={String(modifier)}>
+                                      {signed(modifier)}
+                                    </option>
+                                  ))}
+                                </select>
+                                <button
+                                  className="button secondary compact"
+                                  type="button"
+                                  onClick={() => {
+                                    savePlayState(
+                                      setTemporaryHitPoints(
+                                        character,
+                                        Math.max(character.state.temporaryHitPoints, amount),
+                                      ),
+                                      `${status.name} turn-start Temporary HP applied.`,
+                                    );
+                                  }}
+                                >
+                                  Apply turn start
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      {statusOptions
+                        .filter(
+                          (status) =>
+                            status.situationalProtection !== undefined &&
+                            character.state.activeEffectIds.includes(status.id),
+                        )
+                        .map((status) => {
+                          const protection = status.situationalProtection;
+                          if (protection === undefined) return null;
+                          const creatureTypes = protection.creatureTypes.map(titleCase).join(", ");
+                          return (
+                            <div className="effect-instructions" key={`${status.id}-instructions`}>
+                              <strong>Against {creatureTypes}</strong>
+                              <ul>
+                                <li>Incoming attacks have Disadvantage.</li>
+                                <li>
+                                  Block {protection.blockedConditions.map(titleCase).join(", ")}.
+                                </li>
+                                <li>
+                                  Existing relevant effects grant Advantage on new saving throws.
+                                </li>
+                              </ul>
+                            </div>
                           );
                         })}
                     </div>
