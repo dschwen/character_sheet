@@ -35,6 +35,15 @@ def test_annotate_spell_statuses_links_spells_and_status_entities() -> None:
             "target": "target",
         }
     ]
+    hasted = next(entity for entity in statuses if entity["name"]["en"] == "Hasted")
+    assert hasted["body"]["speedMultiplier"] == 2
+    assert hasted["body"]["armorClassBonus"] == 2
+    mage_armor = next(entity for entity in statuses if entity["name"]["en"] == "Mage Armor")
+    assert mage_armor["body"]["armorClassCandidate"] == {
+        "base": 13,
+        "ability": "dexterity",
+        "requiresUnarmored": True,
+    }
 
 
 def test_annotate_spell_statuses_is_idempotent() -> None:

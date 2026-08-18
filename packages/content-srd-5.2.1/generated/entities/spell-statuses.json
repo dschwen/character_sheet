@@ -159,7 +159,10 @@
       "concentration": true,
       "description": "You touch a willing creature. For the duration, the target gains a Fly Speed of 60 feet and can hover. When the spell ends, the target falls if it is still aloft unless it can stop the fall. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 3.",
       "duration": "Concentration, up to 10 minutes",
-      "sourceSpellId": "srd521.spell.fly"
+      "sourceSpellId": "srd521.spell.fly",
+      "speedOverrides": {
+        "speed.fly": 60
+      }
     },
     "id": "srd521.status.spell.fly",
     "kind": "status",
@@ -232,10 +235,19 @@
   },
   {
     "body": {
+      "armorClassBonus": 2,
       "concentration": true,
+      "d20RollEffects": [
+        {
+          "ability": "dexterity",
+          "kind": "advantage",
+          "scope": "saving-throw"
+        }
+      ],
       "description": "Choose a willing creature that you can see within range. Until the spell ends, the target’s Speed is doubled, it gains a +2 bonus to Armor Class, it has Advantage on Dexterity saving throws, and it gains an additional action on each of its turns. That action can be used to take only the Attack (one attack only), Dash, Disengage, Hide, or Utilize action. When the spell ends, the target is Incapacitated and has a Speed of 0 until the end of its next turn, as a wave of lethargy washes over it.",
       "duration": "Concentration, up to 1 minute",
-      "sourceSpellId": "srd521.spell.haste"
+      "sourceSpellId": "srd521.spell.haste",
+      "speedMultiplier": 2
     },
     "id": "srd521.status.spell.haste",
     "kind": "status",
@@ -312,7 +324,8 @@
       "concentration": false,
       "description": "You touch a creature. The target’s Speed increases by 10 feet until the spell ends. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 1.",
       "duration": "1 hour",
-      "sourceSpellId": "srd521.spell.longstrider"
+      "sourceSpellId": "srd521.spell.longstrider",
+      "speedBonus": 10
     },
     "id": "srd521.status.spell.longstrider",
     "kind": "status",
@@ -347,6 +360,11 @@
   },
   {
     "body": {
+      "armorClassCandidate": {
+        "ability": "dexterity",
+        "base": 13,
+        "requiresUnarmored": true
+      },
       "concentration": false,
       "description": "You touch a willing creature who isn’t wearing armor. Until the spell ends, the target’s base AC becomes 13 plus its Dexterity modifier. The spell ends early if the target dons armor.",
       "duration": "8 hours",
@@ -462,6 +480,7 @@
   },
   {
     "body": {
+      "armorClassBonus": 2,
       "concentration": true,
       "description": "A shimmering field surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.",
       "duration": "Concentration, up to 10 minutes",

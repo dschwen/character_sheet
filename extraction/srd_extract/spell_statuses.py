@@ -26,6 +26,26 @@ SPELL_STATUS_NAMES = {
     "srd521.spell.water-breathing": "Water Breathing",
 }
 
+SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
+    "srd521.spell.fly": {"speedOverrides": {"speed.fly": 60}},
+    "srd521.spell.haste": {
+        "speedMultiplier": 2,
+        "armorClassBonus": 2,
+        "d20RollEffects": [
+            {"scope": "saving-throw", "ability": "dexterity", "kind": "advantage"}
+        ],
+    },
+    "srd521.spell.longstrider": {"speedBonus": 10},
+    "srd521.spell.mage-armor": {
+        "armorClassCandidate": {
+            "base": 13,
+            "ability": "dexterity",
+            "requiresUnarmored": True,
+        }
+    },
+    "srd521.spell.shield-of-faith": {"armorClassBonus": 2},
+}
+
 
 def _status_id(spell_id: str) -> str:
     return f"srd521.status.spell.{spell_id.removeprefix('srd521.spell.')}"
@@ -62,6 +82,7 @@ def annotate_spell_statuses(
                     "duration": spell["body"]["duration"],
                     "concentration": spell["body"]["concentration"],
                     "sourceSpellId": spell_id,
+                    **deepcopy(SPELL_STATUS_MECHANICS.get(spell_id, {})),
                 },
                 "rules": [],
                 "review": {

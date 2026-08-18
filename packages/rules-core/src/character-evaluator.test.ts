@@ -559,4 +559,64 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
     expect(evaluation.d20Tests.initiative?.rollMode).toBe("advantage");
     expect(evaluation.d20Tests["abilityCheck.strength"]?.rollMode).toBe("disadvantage");
   });
+
+  it("applies data-driven beneficial spell status mechanics", () => {
+    const source = loadCharacter();
+    const character: CharacterDocument = {
+      ...source,
+      state: {
+        ...source.state,
+        activeEffectIds: [
+          ...source.state.activeEffectIds,
+          "srd521.status.spell.fly",
+          "srd521.status.spell.haste",
+          "srd521.status.spell.longstrider",
+          "srd521.status.spell.shield-of-faith",
+        ],
+      },
+    };
+
+    const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+
+    expect(evaluation.values["speed.walking"]?.value).toBe(80);
+    expect(evaluation.values["speed.fly"]?.value).toBe(140);
+    expect(evaluation.values.armorClass?.value).toBe(19);
+    expect(evaluation.d20Tests["savingThrow.dexterity"]?.rollMode).toBe("advantage");
+    expect(evaluation.facts["status.haste.active"]).toBe(true);
+    expect(evaluation.traces["speed.fly"]?.sourceReferences).toEqual(
+      expect.arrayContaining([expect.objectContaining({ entityId: "srd521.status.spell.fly" })]),
+    );
+  });
+
+  it("offers Mage Armor only while unarmored", () => {
+    const source = loadCharacter();
+    source.state.activeEffectIds.push("srd521.status.spell.mage-armor");
+    const unarmored = evaluateCharacter({ character: source, packages: [loadRulesPackage()] });
+
+    expect(unarmored.values.armorClass?.candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "srd521.status.spell.mage-armor",
+          applicable: true,
+          value: 15,
+        }),
+      ]),
+    );
+
+    source.loadout.inventory.push({
+      id: "chain-mail-1",
+      entityId: "srd521.equipment.armor.heavy.chain-mail",
+      quantity: 1,
+    });
+    source.loadout.equippedItemIds = ["chain-mail-1"];
+    const armored = evaluateCharacter({ character: source, packages: [loadRulesPackage()] });
+    expect(armored.values.armorClass?.candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "srd521.status.spell.mage-armor",
+          applicable: false,
+        }),
+      ]),
+    );
+  });
 });

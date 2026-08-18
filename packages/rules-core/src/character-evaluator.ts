@@ -69,6 +69,14 @@ const skillDefinitions = [
 
 const skillEntityPrefix = "srd521.skill.";
 
+const d20RollEffectBodySchema = z
+  .object({
+    scope: z.enum(["ability-checks", "attack-rolls", "initiative", "saving-throw"]),
+    ability: z.enum(abilities).optional(),
+    kind: z.enum(["advantage", "disadvantage"]),
+  })
+  .strict();
+
 const conditionBodySchema = z
   .object({
     description: z.string(),
@@ -76,17 +84,7 @@ const conditionBodySchema = z
     speedMaximum: z.number().nonnegative().optional(),
     speedModifierPerLevel: z.number().int().optional(),
     d20ModifierPerLevel: z.number().int().optional(),
-    d20RollEffects: z
-      .array(
-        z
-          .object({
-            scope: z.enum(["ability-checks", "attack-rolls", "initiative", "saving-throw"]),
-            ability: z.enum(abilities).optional(),
-            kind: z.enum(["advantage", "disadvantage"]),
-          })
-          .strict(),
-      )
-      .default([]),
+    d20RollEffects: z.array(d20RollEffectBodySchema).default([]),
     disablesActions: z.boolean().default(false),
     breaksConcentration: z.boolean().default(false),
     automaticFailedSavingThrows: z.array(z.enum(abilities)).default([]),
@@ -101,6 +99,35 @@ interface ActiveCondition {
   readonly entity: ContentEntity;
   readonly body: ConditionBody;
   readonly explicit: boolean;
+}
+
+const statusBodySchema = z
+  .object({
+    description: z.string(),
+    sourceSpellId: z.string(),
+    duration: z.string(),
+    concentration: z.boolean(),
+    speedBonus: z.number().optional(),
+    speedMultiplier: z.number().positive().optional(),
+    speedOverrides: z.record(z.string(), z.number().nonnegative()).default({}),
+    armorClassBonus: z.number().int().optional(),
+    armorClassCandidate: z
+      .object({
+        base: z.number().int(),
+        ability: z.enum(abilities),
+        requiresUnarmored: z.boolean().default(false),
+      })
+      .strict()
+      .optional(),
+    d20RollEffects: z.array(d20RollEffectBodySchema).default([]),
+  })
+  .passthrough();
+
+type StatusBody = z.infer<typeof statusBodySchema>;
+
+interface ActiveStatus {
+  readonly entity: ContentEntity;
+  readonly body: StatusBody;
 }
 
 const classBodySchema = z
@@ -792,6 +819,20 @@ function resolveActiveConditions(
   return [...active.values()];
 }
 
+function resolveActiveStatuses(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): ActiveStatus[] {
+  return character.state.activeEffectIds.flatMap((effectId) => {
+    const entity = index.entities.get(effectId);
+    if (entity?.kind !== "status") return [];
+    const body = statusBodySchema.parse(entity.body);
+    state.facts[`status.${entity.id.slice(entity.id.lastIndexOf(".") + 1)}.active`] = true;
+    return [{ entity, body }];
+  });
+}
+
 function conditionRollEffects(conditions: readonly ActiveCondition[]): D20RollEffect[] {
   const testsByScope: Record<string, readonly string[]> = {
     "ability-checks": [
@@ -814,6 +855,77 @@ function conditionRollEffects(conditions: readonly ActiveCondition[]): D20RollEf
       }));
     }),
   );
+}
+
+function statusRollEffects(statuses: readonly ActiveStatus[]): D20RollEffect[] {
+  const testsByScope: Record<string, readonly string[]> = {
+    "ability-checks": [
+      ...abilities.map((ability) => `abilityCheck.${ability}`),
+      ...skillDefinitions.map((skill) => `skill.${skill.id}`),
+    ],
+    initiative: ["initiative"],
+  };
+  return statuses.flatMap(({ entity, body }) =>
+    body.d20RollEffects.flatMap((effect) => {
+      if (effect.scope === "attack-rolls") return [];
+      const testIds =
+        effect.scope === "saving-throw" && effect.ability !== undefined
+          ? [`savingThrow.${effect.ability}`]
+          : (testsByScope[effect.scope] ?? []);
+      return testIds.map((testId) => ({
+        testId,
+        kind: effect.kind,
+        source: entity.id,
+      }));
+    }),
+  );
+}
+
+function evaluateStatusMovement(statuses: readonly ActiveStatus[], state: EngineState): void {
+  const movementStatuses = statuses.filter(
+    ({ body }) =>
+      body.speedBonus !== undefined ||
+      body.speedMultiplier !== undefined ||
+      Object.keys(body.speedOverrides).length > 0,
+  );
+  if (movementStatuses.length === 0) return;
+  const movementSpeedIds = new Set([
+    ...Object.keys(state.values).filter((id) => id.startsWith("speed.")),
+    ...movementStatuses.flatMap(({ body }) => Object.keys(body.speedOverrides)),
+  ]);
+  const bonus = movementStatuses.reduce((total, { body }) => total + (body.speedBonus ?? 0), 0);
+  const multiplier = movementStatuses.reduce(
+    (total, { body }) => total * (body.speedMultiplier ?? 1),
+    1,
+  );
+  const sources = movementStatuses.flatMap(({ entity }) => entitySourceReferences(entity));
+  for (const speedId of movementSpeedIds) {
+    const before = state.values[speedId]?.value;
+    const override = Math.max(
+      ...movementStatuses.map(
+        ({ body }) => body.speedOverrides[speedId] ?? Number.NEGATIVE_INFINITY,
+      ),
+    );
+    const base = Number.isFinite(override) ? override : before;
+    if (typeof base !== "number") continue;
+    const value = Math.max(0, (base + bonus) * multiplier);
+    state.facts[speedId] = value;
+    state.values[speedId] = { value, traceId: speedId };
+    state.traces[speedId] = {
+      id: speedId,
+      result: value,
+      nodes: [
+        ...(state.traces[speedId]?.nodes ?? []),
+        {
+          id: `${speedId}.statuses`,
+          operation: "apply-status-speed-modifiers",
+          inputs: [before ?? null, Number.isFinite(override) ? override : null, bonus, multiplier],
+          output: value,
+        },
+      ],
+      sourceReferences: [...(state.traces[speedId]?.sourceReferences ?? []), ...sources],
+    };
+  }
 }
 
 function conditionD20Modifiers(
@@ -4418,6 +4530,7 @@ function evaluateArmorClass(
   index: PackageIndex,
   state: EngineState,
   equipment: EquipmentContext,
+  statuses: readonly ActiveStatus[],
 ): void {
   const candidates: {
     id: string;
@@ -4614,6 +4727,76 @@ function evaluateArmorClass(
       trace,
       sourceReferences: [...sourceReferences(ir), ...shieldSources, ...ruleModifierSources],
     });
+  }
+  for (const { entity, body } of statuses) {
+    const formula = body.armorClassCandidate;
+    if (formula === undefined) continue;
+    const applicable = !formula.requiresUnarmored || equippedArmor.length === 0;
+    const abilityModifier = requireNumber(
+      state.facts[`ability.${formula.ability}.modifier`] ?? null,
+      `${formula.ability} modifier`,
+    );
+    const value = formula.base + abilityModifier + shieldBonus + ruleModifierBonus;
+    const traceId = `armorClass.${entity.id}.value`;
+    candidates.push({
+      id: entity.id,
+      applicable,
+      ...(applicable ? { value } : {}),
+      rejectionReasons: applicable ? [] : ["This formula requires the character to wear no armor."],
+      trace: {
+        id: traceId,
+        result: applicable ? value : false,
+        nodes: [
+          ...ruleModifierNodes,
+          {
+            id: `${traceId}.formula`,
+            operation: "status-armor-class-formula",
+            inputs: [formula.base, abilityModifier, shieldBonus, ruleModifierBonus],
+            output: applicable ? value : false,
+            label: entity.name.en ?? entity.id,
+          },
+        ],
+        sourceReferences: [
+          ...entitySourceReferences(entity),
+          ...shieldSources,
+          ...ruleModifierSources,
+        ],
+      },
+      sourceReferences: [
+        ...entitySourceReferences(entity),
+        ...shieldSources,
+        ...ruleModifierSources,
+      ],
+    });
+  }
+  const statusArmorClassBonus = statuses.reduce(
+    (total, { body }) => total + (body.armorClassBonus ?? 0),
+    0,
+  );
+  const statusArmorClassSources = statuses
+    .filter(({ body }) => body.armorClassBonus !== undefined)
+    .flatMap(({ entity }) => entitySourceReferences(entity));
+  if (statusArmorClassBonus !== 0) {
+    for (const candidate of candidates) {
+      if (!candidate.applicable || candidate.value === undefined) continue;
+      const before = candidate.value;
+      candidate.value += statusArmorClassBonus;
+      candidate.trace = {
+        ...candidate.trace,
+        result: candidate.value,
+        nodes: [
+          ...candidate.trace.nodes,
+          {
+            id: `${candidate.trace.id}.statuses`,
+            operation: "add-status-armor-class-bonuses",
+            inputs: [before, statusArmorClassBonus],
+            output: candidate.value,
+          },
+        ],
+        sourceReferences: [...candidate.trace.sourceReferences, ...statusArmorClassSources],
+      };
+      candidate.sourceReferences.push(...statusArmorClassSources);
+    }
   }
   const applicableCandidates = candidates.filter(
     (candidate): candidate is typeof candidate & { value: number } =>
@@ -5344,6 +5527,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   validateProgressionSelections(character, index, state);
   const classLevels = materializeFacts(character, state);
   const conditions = resolveActiveConditions(character, index, state);
+  const statuses = resolveActiveStatuses(character, index, state);
   const granted = grantedFeatureIds(classLevels, index);
   grantSubclassFeatures(character, classLevels, index, granted);
   if (character.build.speciesId !== undefined) {
@@ -5364,6 +5548,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const equipment = resolveEquipment(character, index, state);
   evaluateWalkingSpeed(character, index, state);
   evaluateMovementRules(rules, granted, index, state);
+  evaluateStatusMovement(statuses, state);
   evaluateD20Tests(
     character,
     origins,
@@ -5375,6 +5560,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
       ...speciesRollEffects(origins, input.context),
       ...ruleRollEffects(rules, state, index, granted),
       ...conditionRollEffects(conditions),
+      ...statusRollEffects(statuses),
     ],
     [
       ...ruleD20TestModifiers(rules, state, index, granted),
@@ -5386,7 +5572,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateMagicInitiate(character, index, state);
   evaluateSpeciesTraits(character, origins, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
-  evaluateArmorClass(rules, granted, index, state, equipment);
+  evaluateArmorClass(rules, granted, index, state, equipment, statuses);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
   const attackRules = evaluateAttackRules(rules, granted, index, state);
   evaluateAttacks(character, equipment, attackRules, index, state);
