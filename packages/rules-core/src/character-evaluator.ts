@@ -161,6 +161,27 @@ const statusBodySchema = z
       })
       .strict()
       .optional(),
+    grantedAction: z
+      .object({
+        id: z.string().min(1),
+        name: z.string().min(1),
+        actionEconomy: z.string().min(1),
+        area: z.string().min(1),
+        savingThrowAbility: z.enum(abilities),
+        difficultyClassParameter: z.string().min(1),
+        damage: z
+          .object({
+            diceCount: z.number().int().positive(),
+            diceSize: z.number().int().min(2),
+            minimumSlotLevel: z.number().int().positive(),
+            maximumSlotLevel: z.number().int().positive(),
+            dicePerSlotLevel: z.number().int().nonnegative(),
+            types: z.array(z.string().min(1)).min(1),
+          })
+          .strict(),
+      })
+      .strict()
+      .optional(),
   })
   .passthrough();
 
@@ -1037,6 +1058,70 @@ function evaluateStatusMovement(statuses: readonly ActiveStatus[], state: Engine
         },
       ],
       sourceReferences: [...(state.traces[speedId]?.sourceReferences ?? []), ...sources],
+    };
+  }
+}
+
+function evaluateStatusActions(
+  character: CharacterDocument,
+  statuses: readonly ActiveStatus[],
+  state: EngineState,
+): void {
+  for (const { entity, body } of statuses) {
+    const action = body.grantedAction;
+    if (action === undefined) continue;
+    const selections = character.state.activeEffectParameters[entity.id] ?? {};
+    const selectedDamageType = selections.damageType;
+    const defaultDamageType = action.damage.types[0] ?? "damage";
+    const damageType = action.damage.types.includes(selectedDamageType ?? "")
+      ? (selectedDamageType ?? defaultDamageType)
+      : defaultDamageType;
+    const selectedSlotLevel = Number(selections.spellSlotLevel);
+    const slotLevel = Number.isInteger(selectedSlotLevel)
+      ? Math.max(
+          action.damage.minimumSlotLevel,
+          Math.min(action.damage.maximumSlotLevel, selectedSlotLevel),
+        )
+      : action.damage.minimumSlotLevel;
+    const diceCount =
+      action.damage.diceCount +
+      (slotLevel - action.damage.minimumSlotLevel) * action.damage.dicePerSlotLevel;
+    const difficultyClass = Number(selections[action.difficultyClassParameter]);
+    const hasDifficultyClass = Number.isInteger(difficultyClass) && difficultyClass > 0;
+    const traceId = `action.${action.id}`;
+    state.actions.push({
+      id: action.id,
+      available: hasDifficultyClass,
+      reasons: hasDifficultyClass ? [] : ["Enter the caster's spell save DC on the active status."],
+      actionEconomy: action.actionEconomy,
+      parameters: {
+        label: action.name,
+        area: action.area,
+        damage: {
+          diceCount,
+          diceSize: action.damage.diceSize,
+          type: damageType,
+        },
+        savingThrow: {
+          ability: action.savingThrowAbility,
+          ...(hasDifficultyClass ? { difficultyClass } : {}),
+        },
+      },
+      traceId,
+    });
+    state.traces[traceId] = {
+      id: traceId,
+      result: hasDifficultyClass,
+      nodes: [
+        {
+          id: `${traceId}.grant`,
+          operation: "grant-status-action",
+          inputs: [entity.id, damageType, slotLevel, hasDifficultyClass ? difficultyClass : null],
+          output: hasDifficultyClass,
+          label: action.name,
+        },
+      ],
+      sourceReferences: entitySourceReferences(entity),
     };
   }
 }
@@ -5721,6 +5806,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateWalkingSpeed(character, index, state);
   evaluateMovementRules(rules, granted, index, state);
   evaluateStatusMovement(statuses, state);
+  evaluateStatusActions(character, statuses, state);
   const d20BonusDice = statusBonusDice(character, statuses);
   evaluateD20Tests(
     character,

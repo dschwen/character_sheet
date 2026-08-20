@@ -201,6 +201,9 @@ const characterStateSchema = z
     conditionIds: z.array(entityIdSchema).default([]),
     activeEffectIds: z.array(entityIdSchema).default([]),
     activeEffectSelections: z.record(entityIdSchema, z.string().min(1)).default({}),
+    activeEffectParameters: z
+      .record(entityIdSchema, z.record(z.string().min(1), z.string().min(1)))
+      .default({}),
     concentrationSpellId: entityIdSchema.optional(),
     heroicInspiration: z.boolean().default(false),
     deathSaveSuccesses: z.number().int().min(0).max(3).default(0),

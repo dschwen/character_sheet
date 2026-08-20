@@ -41,6 +41,24 @@ SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
             {"scope": "saving-throw", "diceCount": 1, "diceSize": 4},
         ]
     },
+    "srd521.spell.dragon-s-breath": {
+        "grantedAction": {
+            "id": "srd521.action.status.dragon-s-breath",
+            "name": "Dragon’s Breath",
+            "actionEconomy": "magic-action",
+            "area": "15-foot Cone",
+            "savingThrowAbility": "dexterity",
+            "difficultyClassParameter": "saveDifficultyClass",
+            "damage": {
+                "diceCount": 3,
+                "diceSize": 6,
+                "minimumSlotLevel": 2,
+                "maximumSlotLevel": 9,
+                "dicePerSlotLevel": 1,
+                "types": ["acid", "cold", "fire", "lightning", "poison"],
+            },
+        }
+    },
     "srd521.spell.fly": {"speedOverrides": {"speed.fly": 60}},
     "srd521.spell.haste": {
         "speedMultiplier": 2,

@@ -130,12 +130,18 @@ export function setActiveEffectActive(
     : Object.fromEntries(
         Object.entries(character.state.activeEffectSelections).filter(([id]) => id !== effectId),
       );
+  const activeEffectParameters = active
+    ? { ...character.state.activeEffectParameters }
+    : Object.fromEntries(
+        Object.entries(character.state.activeEffectParameters).filter(([id]) => id !== effectId),
+      );
   return commitCharacterState(
     character,
     {
       ...character.state,
       activeEffectIds: setStateIdActive(character.state.activeEffectIds, effectId, active),
       activeEffectSelections,
+      activeEffectParameters,
     },
     updatedAt,
   );
@@ -160,6 +166,29 @@ export function setActiveEffectSelection(
   );
 }
 
+export function setActiveEffectParameter(
+  character: CharacterDocument,
+  effectId: string,
+  parameter: string,
+  value: string,
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(
+    character,
+    {
+      ...character.state,
+      activeEffectParameters: {
+        ...character.state.activeEffectParameters,
+        [effectId]: {
+          ...character.state.activeEffectParameters[effectId],
+          [parameter]: value,
+        },
+      },
+    },
+    updatedAt,
+  );
+}
+
 export function setActiveEffectWithHitPointBonus(
   character: CharacterDocument,
   effectId: string,
@@ -171,6 +200,11 @@ export function setActiveEffectWithHitPointBonus(
   const selections = Object.fromEntries(
     Object.entries(character.state.activeEffectSelections).filter(([id]) => id !== effectId),
   );
+  const parameters = active
+    ? { ...character.state.activeEffectParameters }
+    : Object.fromEntries(
+        Object.entries(character.state.activeEffectParameters).filter(([id]) => id !== effectId),
+      );
   if (active) selections[effectId] = selection;
   return commitCharacterState(
     character,
@@ -182,6 +216,7 @@ export function setActiveEffectWithHitPointBonus(
       ),
       activeEffectIds: setStateIdActive(character.state.activeEffectIds, effectId, active),
       activeEffectSelections: selections,
+      activeEffectParameters: parameters,
     },
     updatedAt,
   );

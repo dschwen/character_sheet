@@ -55,6 +55,7 @@ import {
   clearConcentration,
   commitCharacterState,
   setActiveEffectActive,
+  setActiveEffectParameter,
   setActiveEffectSelection,
   setActiveEffectSelectionWithHitPointAdjustment,
   setActiveEffectWithHitPointBonus,
@@ -177,6 +178,12 @@ function actionDamageLabel(action: ActionSummary): string {
     return "";
   }
   return ` · ${String(requirements.damageDiceCount)}d${String(requirements.damageDiceSize)} ${requirements.damageType ?? "damage"}`;
+}
+
+function actionDisplayName(action: ActionSummary, names: ReadonlyMap<string, string>): string {
+  return typeof action.parameters?.label === "string"
+    ? action.parameters.label
+    : (names.get(action.id) ?? shortEntityName(action.id));
 }
 
 function supportsStateTransition(action: ActionSummary): boolean {
@@ -372,6 +379,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           const hitPointBonusBody = objectValue(body?.hitPointBonus);
           const temporaryHitPointsBody = objectValue(body?.turnStartTemporaryHitPoints);
           const protectionBody = objectValue(body?.situationalProtection);
+          const grantedActionBody = objectValue(body?.grantedAction);
+          const grantedActionDamageBody = objectValue(grantedActionBody?.damage);
           const hitPointBonus =
             typeof hitPointBonusBody?.base === "number" &&
             typeof hitPointBonusBody.minimumSelection === "number" &&
@@ -416,6 +425,25 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     protectionBody.existingEffectSavingThrowRollEffect,
                 }
               : undefined;
+          const actionDamageTypes = Array.isArray(grantedActionDamageBody?.types)
+            ? grantedActionDamageBody.types.filter(
+                (damageType): damageType is string => typeof damageType === "string",
+              )
+            : [];
+          const grantedAction =
+            typeof grantedActionBody?.name === "string" &&
+            typeof grantedActionBody.difficultyClassParameter === "string" &&
+            typeof grantedActionDamageBody?.minimumSlotLevel === "number" &&
+            typeof grantedActionDamageBody.maximumSlotLevel === "number" &&
+            actionDamageTypes.length > 0
+              ? {
+                  name: grantedActionBody.name,
+                  difficultyClassParameter: grantedActionBody.difficultyClassParameter,
+                  minimumSlotLevel: grantedActionDamageBody.minimumSlotLevel,
+                  maximumSlotLevel: grantedActionDamageBody.maximumSlotLevel,
+                  damageTypes: actionDamageTypes,
+                }
+              : undefined;
           return {
             id: entity.id,
             name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
@@ -426,6 +454,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             hitPointBonus,
             turnStartTemporaryHitPoints,
             situationalProtection,
+            grantedAction,
           };
         })
         .sort((left, right) => left.name.localeCompare(right.name)),
@@ -499,7 +528,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const additionalSpellcastingOption = evaluation?.spells
     .flatMap((spell) => spell.castingOptions ?? [])
     .find((option) => evaluation.spellcasting?.classId !== option.sourceId);
-  const statefulActions = evaluation?.actions.filter(supportsStateTransition) ?? [];
+  const playActions =
+    evaluation?.actions.filter(
+      (action) =>
+        supportsStateTransition(action) || actionRequirements(action).damageDiceCount !== undefined,
+    ) ?? [];
   const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
 
   function beginDiceRoll(): boolean {
@@ -830,7 +863,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       request.amount = amount;
     }
     try {
-      const actionName = names.get(action.id) ?? shortEntityName(action.id);
+      const actionName = actionDisplayName(action, names);
       const actionRollRequest = actionDiceRequest(action, evaluation, actionName);
       const actionRoll =
         actionRollRequest === undefined ? undefined : await performDicePoolRoll(actionRollRequest);
@@ -1471,6 +1504,108 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       {statusOptions
                         .filter(
                           (status) =>
+                            status.grantedAction !== undefined &&
+                            character.state.activeEffectIds.includes(status.id),
+                        )
+                        .map((status) => {
+                          const action = status.grantedAction;
+                          if (action === undefined) return null;
+                          const parameters =
+                            character.state.activeEffectParameters[status.id] ?? {};
+                          const damageType = parameters.damageType ?? action.damageTypes[0] ?? "";
+                          const slotLevel =
+                            parameters.spellSlotLevel ?? String(action.minimumSlotLevel);
+                          const saveDifficultyClass =
+                            parameters[action.difficultyClassParameter] ?? "";
+                          return (
+                            <div className="effect-action-setup" key={`${status.id}-action`}>
+                              <strong>{action.name} setup</strong>
+                              <div>
+                                <label>
+                                  Damage type
+                                  <select
+                                    value={damageType}
+                                    onChange={(event) => {
+                                      savePlayState(
+                                        setActiveEffectParameter(
+                                          character,
+                                          status.id,
+                                          "damageType",
+                                          event.target.value,
+                                        ),
+                                        `${action.name} damage changed to ${event.target.value}.`,
+                                      );
+                                    }}
+                                  >
+                                    {action.damageTypes.map((type) => (
+                                      <option key={type} value={type}>
+                                        {titleCase(type)}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </label>
+                                <label>
+                                  Slot level
+                                  <select
+                                    value={slotLevel}
+                                    onChange={(event) => {
+                                      savePlayState(
+                                        setActiveEffectParameter(
+                                          character,
+                                          status.id,
+                                          "spellSlotLevel",
+                                          event.target.value,
+                                        ),
+                                        `${action.name} slot level set to ${event.target.value}.`,
+                                      );
+                                    }}
+                                  >
+                                    {Array.from(
+                                      {
+                                        length:
+                                          action.maximumSlotLevel - action.minimumSlotLevel + 1,
+                                      },
+                                      (_, index) => action.minimumSlotLevel + index,
+                                    ).map((level) => (
+                                      <option key={level} value={String(level)}>
+                                        {String(level)}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </label>
+                                <label>
+                                  Caster save DC
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    max="30"
+                                    step="1"
+                                    value={saveDifficultyClass}
+                                    placeholder="Required"
+                                    onChange={(event) => {
+                                      const value = Number(event.target.value);
+                                      if (!Number.isInteger(value) || value < 1 || value > 30)
+                                        return;
+                                      savePlayState(
+                                        setActiveEffectParameter(
+                                          character,
+                                          status.id,
+                                          action.difficultyClassParameter,
+                                          event.target.value,
+                                        ),
+                                        `${action.name} save DC set to ${event.target.value}.`,
+                                      );
+                                    }}
+                                  />
+                                </label>
+                              </div>
+                              <small>The roll control appears under Play → Use a feature.</small>
+                            </div>
+                          );
+                        })}
+                      {statusOptions
+                        .filter(
+                          (status) =>
                             status.turnStartTemporaryHitPoints !== undefined &&
                             character.state.activeEffectIds.includes(status.id),
                         )
@@ -1630,18 +1765,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
                 <Section
                   title="Use a feature"
-                  eyebrow={`${String(statefulActions.length)} state transitions`}
+                  eyebrow={`${String(playActions.length)} active actions`}
                 >
-                  {statefulActions.length === 0 ? (
+                  {playActions.length === 0 ? (
                     <p className="empty">
-                      No feature actions with complete state-transition automation are available.
+                      No feature actions or active-status rolls are available.
                     </p>
                   ) : (
                     <div className="play-action-list">
-                      {statefulActions.map((action) => {
+                      {playActions.map((action) => {
                         const requirements = actionRequirements(action);
                         const draft = actionDrafts[action.id] ?? { amount: "" };
-                        const actionName = names.get(action.id) ?? shortEntityName(action.id);
+                        const actionName = actionDisplayName(action, names);
                         const transitionDice = actionDiceRequest(action, evaluation, actionName);
                         return (
                           <div key={action.id}>
@@ -1667,7 +1802,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   type="button"
                                   onClick={() => {
                                     void performDicePoolRoll({
-                                      label: `${names.get(action.id) ?? shortEntityName(action.id)} · ${requirements.rollLabel ?? "Roll"}`,
+                                      label: `${actionName} · ${requirements.rollLabel ?? "Roll"}`,
                                       diceCount: requirements.rollDiceCount ?? 1,
                                       diceSize: requirements.rollDiceSize ?? 12,
                                       modifier: requirements.rollModifier ?? 0,
@@ -1686,9 +1821,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               requirements.damageDiceSize === undefined ? null : (
                                 <button
                                   type="button"
+                                  disabled={!action.available}
                                   onClick={() => {
                                     void performDicePoolRoll({
-                                      label: `${names.get(action.id) ?? shortEntityName(action.id)} · ${titleCase(requirements.damageType ?? "damage")}`,
+                                      label: `${actionName} · ${titleCase(requirements.damageType ?? "damage")}`,
                                       diceCount: requirements.damageDiceCount ?? 1,
                                       diceSize: requirements.damageDiceSize ?? 10,
                                     });
@@ -1739,16 +1875,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   />
                                 </label>
                               )}
-                              <button
-                                className="button primary compact"
-                                type="button"
-                                disabled={!action.available}
-                                onClick={() => {
-                                  void useAction(action);
-                                }}
-                              >
-                                {transitionDice === undefined ? "Use" : "Use & roll"}
-                              </button>
+                              {supportsStateTransition(action) ? (
+                                <button
+                                  className="button primary compact"
+                                  type="button"
+                                  disabled={!action.available}
+                                  onClick={() => {
+                                    void useAction(action);
+                                  }}
+                                >
+                                  {transitionDice === undefined ? "Use" : "Use & roll"}
+                                </button>
+                              ) : null}
                             </div>
                           </div>
                         );
@@ -2545,7 +2683,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         onSelect={setSelectedTraceId}
                       >
                         <span>
-                          <strong>{names.get(action.id) ?? shortEntityName(action.id)}</strong>
+                          <strong>{actionDisplayName(action, names)}</strong>
                           <small>
                             {action.actionEconomy === undefined
                               ? "Special action"

@@ -32,6 +32,16 @@ def test_annotate_spell_statuses_links_spells_and_status_entities() -> None:
         {"scope": "attack-rolls", "diceCount": 1, "diceSize": 4},
         {"scope": "saving-throw", "diceCount": 1, "diceSize": 4},
     ]
+    dragon_breath = next(
+        entity for entity in statuses if entity["name"]["en"] == "Dragon’s Breath"
+    )
+    assert dragon_breath["body"]["grantedAction"]["damage"]["types"] == [
+        "acid",
+        "cold",
+        "fire",
+        "lightning",
+        "poison",
+    ]
     assert bless["body"]["appliedStatuses"] == [
         {
             "statusId": "srd521.status.spell.bless",

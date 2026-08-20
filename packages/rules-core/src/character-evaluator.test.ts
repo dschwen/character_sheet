@@ -678,4 +678,44 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       expect.arrayContaining([expect.objectContaining({ code: "CONDITION_BLOCKED_BY_IMMUNITY" })]),
     );
   });
+
+  it("grants a configured Dragon's Breath action from active status data", () => {
+    const source = loadCharacter();
+    source.state.activeEffectIds.push("srd521.status.spell.dragon-s-breath");
+
+    const incomplete = evaluateCharacter({ character: source, packages: [loadRulesPackage()] });
+    expect(incomplete.actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "srd521.action.status.dragon-s-breath",
+          available: false,
+        }),
+      ]),
+    );
+
+    source.state.activeEffectParameters["srd521.status.spell.dragon-s-breath"] = {
+      damageType: "fire",
+      spellSlotLevel: "5",
+      saveDifficultyClass: "15",
+    };
+    const evaluation = evaluateCharacter({ character: source, packages: [loadRulesPackage()] });
+    const action = evaluation.actions.find(
+      ({ id }) => id === "srd521.action.status.dragon-s-breath",
+    );
+
+    expect(action).toMatchObject({
+      available: true,
+      actionEconomy: "magic-action",
+      parameters: {
+        area: "15-foot Cone",
+        damage: { diceCount: 6, diceSize: 6, type: "fire" },
+        savingThrow: { ability: "dexterity", difficultyClass: 15 },
+      },
+    });
+    expect(evaluation.traces[action?.traceId ?? ""]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ entityId: "srd521.status.spell.dragon-s-breath" }),
+      ]),
+    );
+  });
 });

@@ -8,6 +8,7 @@ import {
   clearConcentration,
   setActiveEffectActive,
   setActiveEffectSelection,
+  setActiveEffectParameter,
   setActiveEffectSelectionWithHitPointAdjustment,
   setActiveEffectWithHitPointBonus,
   setConditionActive,
@@ -87,10 +88,18 @@ describe("browser play-state edits", () => {
     const effectId = "srd521.status.spell.guidance";
     const active = setActiveEffectActive(character(), effectId, true, updatedAt);
     const selected = setActiveEffectSelection(active, effectId, "skill.stealth", updatedAt);
-    const ended = setActiveEffectActive(selected, effectId, false, updatedAt);
+    const parameterized = setActiveEffectParameter(
+      selected,
+      effectId,
+      "damageType",
+      "fire",
+      updatedAt,
+    );
+    const ended = setActiveEffectActive(parameterized, effectId, false, updatedAt);
 
     expect(selected.state.activeEffectSelections[effectId]).toBe("skill.stealth");
     expect(ended.state.activeEffectSelections[effectId]).toBeUndefined();
+    expect(ended.state.activeEffectParameters[effectId]).toBeUndefined();
   });
 
   it("adjusts current HP as a selected Aid bonus changes and ends", () => {
