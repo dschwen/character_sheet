@@ -61,6 +61,18 @@ describe("characterDocumentSchema", () => {
     expect(character.overrides).toEqual([]);
   });
 
+  it("allows accumulated increases from repeatable feats", () => {
+    const character = characterDocumentSchema.parse({
+      ...baseCharacter,
+      build: {
+        ...baseCharacter.build,
+        featAbilityScoreIncreases: { strength: 4 },
+      },
+    });
+
+    expect(character.build.featAbilityScoreIncreases).toEqual({ strength: 4 });
+  });
+
   it("rejects non-contiguous leveling history", () => {
     expect(() =>
       characterDocumentSchema.parse({

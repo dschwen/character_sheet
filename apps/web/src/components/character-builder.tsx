@@ -723,7 +723,8 @@ export function CharacterBuilder({
               <div className="ability-editor">
                 {abilities.map((ability) => {
                   const backgroundIncrease = draft.backgroundAbilityScoreIncreases[ability] ?? 0;
-                  const featIncrease = draft.level >= 4 && draft.asiAbility === ability ? 2 : 0;
+                  const featIncrease =
+                    draft.asiAbilities.filter((selected) => selected === ability).length * 2;
                   const finalScore =
                     draft.abilityScores[ability] + backgroundIncrease + featIncrease;
                   return (
@@ -747,15 +748,21 @@ export function CharacterBuilder({
                   );
                 })}
               </div>
-              {draft.level >= 4 ? (
-                <label className="builder-field compact-field">
-                  Level 4 Ability Score Improvement
+              {draft.asiAbilities.map((selectedAbility, index) => (
+                <label
+                  key={selectedClass.abilityScoreImprovementLevels[index]}
+                  className="builder-field compact-field"
+                >
+                  Level {String(selectedClass.abilityScoreImprovementLevels[index])} Ability Score
+                  Improvement
                   <select
-                    value={draft.asiAbility}
+                    value={selectedAbility}
                     onChange={(event) => {
                       setDraft((value) => ({
                         ...value,
-                        asiAbility: event.target.value as Ability,
+                        asiAbilities: value.asiAbilities.map((ability, abilityIndex) =>
+                          abilityIndex === index ? (event.target.value as Ability) : ability,
+                        ),
                       }));
                     }}
                   >
@@ -766,7 +773,7 @@ export function CharacterBuilder({
                     ))}
                   </select>
                 </label>
-              ) : null}
+              ))}
             </div>
           ) : null}
 

@@ -48,6 +48,18 @@ const backgroundAbilityScoreIncreasesSchema = z
   .strict()
   .default({});
 
+const featAbilityScoreIncreasesSchema = z
+  .object({
+    strength: z.number().int().min(1).max(30).optional(),
+    dexterity: z.number().int().min(1).max(30).optional(),
+    constitution: z.number().int().min(1).max(30).optional(),
+    intelligence: z.number().int().min(1).max(30).optional(),
+    wisdom: z.number().int().min(1).max(30).optional(),
+    charisma: z.number().int().min(1).max(30).optional(),
+  })
+  .strict()
+  .default({});
+
 const characterLevelSchema = z
   .object({
     characterLevel: z.number().int().min(1).max(20),
@@ -103,7 +115,7 @@ const characterBuildSchema = z
     backgroundId: entityIdSchema.optional(),
     backgroundAbilityScoreIncreases: backgroundAbilityScoreIncreasesSchema,
     subclassId: entityIdSchema.optional(),
-    featAbilityScoreIncreases: backgroundAbilityScoreIncreasesSchema,
+    featAbilityScoreIncreases: featAbilityScoreIncreasesSchema,
     featIds: z.array(entityIdSchema).default([]),
     learnedSpellIds: z.array(entityIdSchema).default([]),
     choices: z.array(choiceSelectionSchema).default([]),

@@ -2112,13 +2112,14 @@ function validateProgressionSelections(
     Ability,
     number,
   ][];
-  const abilityIncreaseFeat = character.build.featIds
+  const abilityIncreaseFeats = character.build.featIds
     .map((featId) => index.entities.get(featId))
-    .find(
+    .filter(
       (feat): feat is ContentEntity =>
         feat?.kind === "feat" &&
         featBodySchema.parse(feat.body).abilityScoreIncreasePatterns !== undefined,
     );
+  const abilityIncreaseFeat = abilityIncreaseFeats[0];
   if (abilityIncreaseFeat === undefined && increases.length > 0) {
     addValidation(
       state,
@@ -2129,19 +2130,64 @@ function validateProgressionSelections(
   }
   if (abilityIncreaseFeat !== undefined) {
     const body = featBodySchema.parse(abilityIncreaseFeat.body);
-    const selectedPattern = increases
-      .map(([, amount]) => amount)
-      .sort((left, right) => right - left);
-    const patternIsAllowed = body.abilityScoreIncreasePatterns?.some(
-      (pattern) =>
-        JSON.stringify([...pattern].sort((left, right) => right - left)) ===
-        JSON.stringify(selectedPattern),
+    const allocationsForPattern = (pattern: readonly number[]): number[][] => {
+      const allocations: number[][] = [];
+      const visit = (indexInPattern: number, used: Set<number>, allocation: number[]): void => {
+        if (indexInPattern === pattern.length) {
+          allocations.push(allocation);
+          return;
+        }
+        for (let abilityIndex = 0; abilityIndex < abilities.length; abilityIndex += 1) {
+          if (used.has(abilityIndex)) continue;
+          const next = [...allocation];
+          next[abilityIndex] = (next[abilityIndex] ?? 0) + (pattern[indexInPattern] ?? 0);
+          visit(indexInPattern + 1, new Set([...used, abilityIndex]), next);
+        }
+      };
+      visit(
+        0,
+        new Set(),
+        Array.from({ length: abilities.length }, () => 0),
+      );
+      return allocations.filter(
+        (allocation, allocationIndex, all) =>
+          all.findIndex((candidate) => candidate.join(",") === allocation.join(",")) ===
+          allocationIndex,
+      );
+    };
+    const allocationsByFeat = abilityIncreaseFeats.map((feat) =>
+      (featBodySchema.parse(feat.body).abilityScoreIncreasePatterns ?? []).flatMap(
+        allocationsForPattern,
+      ),
     );
-    if (patternIsAllowed !== true) {
+    const selected = abilities.map(
+      (ability) => character.build.featAbilityScoreIncreases[ability] ?? 0,
+    );
+    const allocationMemo = new Map<string, boolean>();
+    const matchesAllocations = (featIndex: number, remaining: number[]): boolean => {
+      const memoKey = `${String(featIndex)}:${remaining.join(",")}`;
+      const memoized = allocationMemo.get(memoKey);
+      if (memoized !== undefined) return memoized;
+      if (featIndex === allocationsByFeat.length) {
+        const matches = remaining.every((amount) => amount === 0);
+        allocationMemo.set(memoKey, matches);
+        return matches;
+      }
+      const matches = (allocationsByFeat[featIndex] ?? []).some((allocation) => {
+        const next = remaining.map(
+          (amount, abilityIndex) => amount - (allocation[abilityIndex] ?? 0),
+        );
+        return next.every((amount) => amount >= 0) && matchesAllocations(featIndex + 1, next);
+      });
+      allocationMemo.set(memoKey, matches);
+      return matches;
+    };
+    const patternIsAllowed = matchesAllocations(0, selected);
+    if (!patternIsAllowed) {
       addValidation(
         state,
         "FEAT_ABILITY_INCREASE_PATTERN",
-        `${abilityIncreaseFeat.id} requires either one +2 or two +1 increases.`,
+        "Feat ability increases must match every selected feat's allowed pattern.",
         ["build.featAbilityScoreIncreases"],
       );
     }

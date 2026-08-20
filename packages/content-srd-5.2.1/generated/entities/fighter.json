@@ -24,7 +24,7 @@
         "defaultGrantedFeatIds": [
           "srd521.feat.fighting-style.defense"
         ],
-        "supportedLevelMaximum": 5,
+        "supportedLevelMaximum": 6,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 10,

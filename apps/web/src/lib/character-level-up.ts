@@ -66,11 +66,21 @@ function choiceSelections(character: CharacterDocument): Readonly<Record<string,
   return selections;
 }
 
-function chosenAsiAbility(character: CharacterDocument, fallback: Ability): Ability {
-  return (
-    abilities.find((ability) => character.build.featAbilityScoreIncreases[ability] === 2) ??
-    fallback
+function chosenAsiAbilities(
+  character: CharacterDocument,
+  selectedClass: BuilderCatalog["classes"][BuilderClassId],
+  fallback: Ability,
+): Ability[] {
+  const required = selectedClass.abilityScoreImprovementLevels.filter(
+    (level) => level <= character.build.levels.length,
+  ).length;
+  const selected = abilities.flatMap((ability) =>
+    Array.from(
+      { length: Math.floor((character.build.featAbilityScoreIncreases[ability] ?? 0) / 2) },
+      () => ability,
+    ),
   );
+  return Array.from({ length: required }, (_, index) => selected[index] ?? fallback);
 }
 
 export function magicInitiateSelections(
@@ -231,8 +241,9 @@ export function createLevelUpDraft(
     ),
     originFeatId: originFeatId ?? "",
     abilityScores: { ...character.build.abilityScores },
-    asiAbility: chosenAsiAbility(
+    asiAbilities: chosenAsiAbilities(
       character,
+      selectedClass,
       selectedClass.builder.defaultAbilityScoreImprovementAbility,
     ),
     classSkillIds: skills
@@ -390,6 +401,15 @@ function mergeAdvancement(
       ) ?? []),
     ],
   }));
+  const featIds = [...target.build.featIds];
+  const targetCounts = new Map<string, number>();
+  for (const featId of featIds) targetCounts.set(featId, (targetCounts.get(featId) ?? 0) + 1);
+  const retainedCounts = new Map<string, number>();
+  for (const featId of character.build.featIds) {
+    const retained = retainedCounts.get(featId) ?? 0;
+    if (retained >= (targetCounts.get(featId) ?? 0)) featIds.push(featId);
+    retainedCounts.set(featId, retained + 1);
+  }
   return characterDocumentSchema.parse({
     ...character,
     build: {
@@ -397,7 +417,7 @@ function mergeAdvancement(
       levels: [...existingLevels, newLevel],
       subclassId: target.build.subclassId,
       featAbilityScoreIncreases: target.build.featAbilityScoreIncreases,
-      featIds: [...new Set([...character.build.featIds, ...target.build.featIds])],
+      featIds,
       choices: [
         ...character.build.choices.filter(
           (choice) =>

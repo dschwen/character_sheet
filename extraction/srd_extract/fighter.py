@@ -601,7 +601,7 @@ def _class_entity(
         },
         "builder": {
             "supportedLevelMinimum": 1,
-            "supportedLevelMaximum": 5,
+            "supportedLevelMaximum": 6,
             "defaultAbilityScores": {
                 "strength": 15,
                 "dexterity": 13,
@@ -1071,7 +1071,7 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Barbarian, Fighter through level 5, Human, Soldier, and equipment content. "
+        "Barbarian, Fighter through level 6, Human, Soldier, and equipment content. "
         "Proposed executable rules remain under review."
     )
     write_json(output / "coverage.json", coverage)

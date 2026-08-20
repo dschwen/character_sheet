@@ -164,7 +164,8 @@ export function CharacterLevelUp({
   const newExpertiseCount = Math.max(0, requiredExpertise - currentExpertiseSkillIds.length);
   const introducesExpertise = newExpertiseCount > 0;
   const introducesSubclass = selectedClass.subclassLevel === targetLevel;
-  const introducesAsi = targetLevel === 4;
+  const asiIndex = selectedClass.abilityScoreImprovementLevels.indexOf(targetLevel);
+  const introducesAsi = asiIndex >= 0;
   const magicInitiateIds = magicInitiateFeatIds(draft, catalog);
   const hasChoiceSections =
     newClassSkillCount > 0 ||
@@ -530,14 +531,21 @@ export function CharacterLevelUp({
 
               {introducesAsi ? (
                 <label className="builder-field compact-field">
-                  Level 4 Ability Score Improvement
+                  Level {String(targetLevel)} Ability Score Improvement
                   <select
-                    value={draft.asiAbility}
+                    value={draft.asiAbilities[asiIndex]}
                     onChange={(event) => {
                       setDraft((value) =>
                         value === undefined
                           ? value
-                          : { ...value, asiAbility: event.target.value as typeof value.asiAbility },
+                          : {
+                              ...value,
+                              asiAbilities: value.asiAbilities.map((ability, index) =>
+                                index === asiIndex
+                                  ? (event.target.value as typeof ability)
+                                  : ability,
+                              ),
+                            },
                       );
                     }}
                   >
@@ -900,7 +908,9 @@ export function CharacterLevelUp({
                   <span>Advancement</span>
                   <p>One class level using the fixed Hit Point value</p>
                   {introducesSubclass ? <small>{selectedClass.subclassName} added</small> : null}
-                  {introducesAsi ? <small>+2 {titleCase(draft.asiAbility)}</small> : null}
+                  {introducesAsi ? (
+                    <small>+2 {titleCase(draft.asiAbilities[asiIndex] ?? "strength")}</small>
+                  ) : null}
                 </article>
                 <article>
                   <span>Preserved</span>

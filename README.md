@@ -77,15 +77,15 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Ranger and Rogue advancement through level 6 and Barbarian, Bard, Cleric, Druid,
-Fighter, Monk, Paladin, Sorcerer, Warlock, and Wizard advancement through level 5. At Ranger level 6,
+same-class Fighter, Ranger, and Rogue advancement through level 6 and Barbarian, Bard, Cleric,
+Druid, Monk, Paladin, Sorcerer, Warlock, and Wizard advancement through level 5. At Ranger level 6,
 Roving automatically increases walking Speed when eligible and grants matching Climb and Swim
 Speeds. Bard advancement permits one cantrip and one prepared-spell
 replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
 one prepared-spell and cantrip replacement when gaining a level. Magic Initiate permits one
 same-level feat spell replacement while preserving its original casting ability. Multiclassing,
-Ranger and Rogue levels 7–20, and levels 6–20 for the other classes remain future work.
+Fighter, Ranger, and Rogue levels 7–20, and levels 6–20 for the other classes remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -208,7 +208,7 @@ College of Lore feature, and the level-5 Inspiration die and recharge changes. I
 source-linked representative spells plus authoring IR for Bardic Inspiration, Jack of All Trades,
 and Cutting Words.
 
-Generate the typed Fighter-through-level-5 content from class pages 47–49, Ability Score
+Generate the typed Fighter-through-level-6 content from class pages 47–49, Ability Score
 Improvement on page 87, and the Defense Fighting Style on page 88:
 
 ```bash
@@ -224,7 +224,7 @@ Improvement on page 87, and the Defense Fighting Style on page 88:
 ```
 
 This parser validates all 20 progression rows, reconciles every feature reference, extracts the
-Champion subclass, and generates draft authoring IR for the supported Fighter level 1–5 features.
+Champion subclass, and generates draft authoring IR for the supported Fighter level 1–6 features.
 
 Generate Wizard content from pages 77–82 and representative spell descriptions from pages
 107–175:

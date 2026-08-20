@@ -1,7 +1,9 @@
-# Fighter levels 2–5 engine vertical slice
+# Fighter levels 2–6 engine vertical slice
 
 The reviewed `fixture-fighter-5` advances the Human Soldier Fighter through five contiguous Fighter
-levels and selects Champion at level 3 and Ability Score Improvement at level 4.
+levels and selects Champion at level 3 and Ability Score Improvement at level 4. The guided builder
+can continue that character to level 6 and records Fighter's second Ability Score Improvement as a
+second repeatable feat selection.
 
 ## Golden outputs
 
@@ -54,4 +56,4 @@ Focused tests reject:
 The engine does not resolve Tactical Mind's final check success, roll weapon damage, apply Savage
 Attacker, model Unarmed Strikes, or move a combat token. Improved Critical is therefore attached to
 modeled weapon attacks; the source text for Unarmed Strikes is retained but awaits that attack
-model. Features above Fighter or Champion level 5 remain structured rather than executable.
+model. Features above Fighter level 6 or Champion level 5 remain structured rather than executable.

@@ -81,7 +81,7 @@ describe("guided character level up", () => {
         const previousState = character.state;
         const previousLearnedSpells = character.build.learnedSpellIds;
         const draft = createLevelUpDraft(character, catalog);
-        if (targetLevel === 4) draft.asiAbility = "dexterity";
+        if (targetLevel === 4) draft.asiAbilities[0] = "dexterity";
         const options = {
           id: character.id,
           now: new Date(`2026-08-0${String(targetLevel + 3)}T12:00:00.000Z`),
@@ -888,15 +888,45 @@ describe("guided character level up", () => {
     });
   });
 
-  it("explains unsupported and fully reviewed advancement limits", () => {
+  it("adds Fighter's second Ability Score Improvement at level 6", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
     const levelFive = buildCharacter(
-      defaultBuilderDraft(fighterId, catalog, 5, "Max Fighter"),
+      defaultBuilderDraft(fighterId, catalog, 5, "Improving Fighter"),
       rulesPackage,
       initialOptions,
     );
-    const unsupported = structuredClone(levelFive);
+    const draft = createLevelUpDraft(levelFive, catalog);
+
+    expect(draft.level).toBe(6);
+    expect(draft.asiAbilities).toEqual(["strength", "strength"]);
+    draft.asiAbilities[1] = "dexterity";
+    const preview = previewLevelUp(levelFive, draft, rulesPackage, {
+      id: levelFive.id,
+      now: new Date("2026-08-12T03:00:00.000Z"),
+    });
+
+    expect(preview.issues).toEqual([]);
+    expect(preview.character?.build.featAbilityScoreIncreases).toEqual({
+      strength: 2,
+      dexterity: 2,
+    });
+    expect(
+      preview.character?.build.featIds.filter(
+        (featId) => featId === "srd521.feat.general.ability-score-improvement",
+      ),
+    ).toHaveLength(2);
+  });
+
+  it("explains unsupported and fully reviewed advancement limits", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const levelSix = buildCharacter(
+      defaultBuilderDraft(fighterId, catalog, 6, "Max Fighter"),
+      rulesPackage,
+      initialOptions,
+    );
+    const unsupported = structuredClone(levelSix);
     unsupported.build.levels = unsupported.build.levels.slice(0, 1);
     const firstLevel = unsupported.build.levels[0];
     if (firstLevel === undefined) throw new Error("Expected a first character level.");
@@ -905,18 +935,18 @@ describe("guided character level up", () => {
       classId: "srd521.class.artificer",
     };
 
-    expect(levelUpEligibility(levelFive, catalog)).toMatchObject({
+    expect(levelUpEligibility(levelSix, catalog)).toMatchObject({
       eligible: false,
-      currentLevel: 5,
-      reason: "Fighter advancement is currently reviewed through level 5.",
+      currentLevel: 6,
+      reason: "Fighter advancement is currently reviewed through level 6.",
     });
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
       reason:
         "Level-up support currently covers Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
     });
-    expect(() => createLevelUpDraft(levelFive, catalog)).toThrow(
-      "Fighter advancement is currently reviewed through level 5.",
+    expect(() => createLevelUpDraft(levelSix, catalog)).toThrow(
+      "Fighter advancement is currently reviewed through level 6.",
     );
   });
 
