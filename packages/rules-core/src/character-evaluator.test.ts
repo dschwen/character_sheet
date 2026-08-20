@@ -718,4 +718,19 @@ describe("evaluateCharacter Barbarian vertical slice", () => {
       ]),
     );
   });
+
+  it("publishes Feather Fall and Water Breathing capability facts", () => {
+    const source = loadCharacter();
+    source.state.activeEffectIds.push(
+      "srd521.status.spell.feather-fall",
+      "srd521.status.spell.water-breathing",
+    );
+
+    const evaluation = evaluateCharacter({ character: source, packages: [loadRulesPackage()] });
+
+    expect(evaluation.facts["fall.descentRateFeetPerRound"]).toBe(60);
+    expect(evaluation.facts["fall.damagePreventedOnLanding"]).toBe(true);
+    expect(evaluation.facts["respiration.underwater"]).toBe(true);
+    expect(evaluation.facts["respiration.normalRetained"]).toBe(true);
+  });
 });

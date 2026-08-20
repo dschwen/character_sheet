@@ -100,6 +100,42 @@ export function clearConcentration(
   return commitCharacterState(character, state, updatedAt);
 }
 
+function withoutActiveEffects(state: CharacterState, effectIds: readonly string[]): CharacterState {
+  const ending = new Set(effectIds);
+  return {
+    ...state,
+    activeEffectIds: state.activeEffectIds.filter((id) => !ending.has(id)),
+    activeEffectSelections: Object.fromEntries(
+      Object.entries(state.activeEffectSelections).filter(([id]) => !ending.has(id)),
+    ),
+    activeEffectParameters: Object.fromEntries(
+      Object.entries(state.activeEffectParameters).filter(([id]) => !ending.has(id)),
+    ),
+  };
+}
+
+export function endActiveEffects(
+  character: CharacterDocument,
+  effectIds: readonly string[],
+  updatedAt?: Date,
+): CharacterDocument {
+  return commitCharacterState(
+    character,
+    withoutActiveEffects(character.state, effectIds),
+    updatedAt,
+  );
+}
+
+export function clearConcentrationAndEffects(
+  character: CharacterDocument,
+  effectIds: readonly string[],
+  updatedAt?: Date,
+): CharacterDocument {
+  const state = withoutActiveEffects(character.state, effectIds);
+  delete state.concentrationSpellId;
+  return commitCharacterState(character, state, updatedAt);
+}
+
 function setStateIdActive(values: readonly string[], id: string, active: boolean): string[] {
   return active ? [...new Set([...values, id])] : values.filter((value) => value !== id);
 }

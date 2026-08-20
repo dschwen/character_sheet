@@ -68,6 +68,12 @@ def test_annotate_spell_statuses_links_spells_and_status_entities() -> None:
         entity for entity in statuses if entity["name"]["en"] == "Protection from Evil and Good"
     )
     assert "fiend" in protected["body"]["situationalProtection"]["creatureTypes"]
+    feather_fall = next(entity for entity in statuses if entity["name"]["en"] == "Feather Falling")
+    assert feather_fall["body"]["factGrants"]["fall.descentRateFeetPerRound"] == 60
+    water_breathing = next(
+        entity for entity in statuses if entity["name"]["en"] == "Water Breathing"
+    )
+    assert water_breathing["body"]["factGrants"]["respiration.underwater"] is True
 
 
 def test_annotate_spell_statuses_is_idempotent() -> None:

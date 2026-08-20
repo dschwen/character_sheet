@@ -6,6 +6,8 @@ import {
   applyDamage,
   applyHealing,
   clearConcentration,
+  clearConcentrationAndEffects,
+  endActiveEffects,
   setActiveEffectActive,
   setActiveEffectSelection,
   setActiveEffectParameter,
@@ -100,6 +102,31 @@ describe("browser play-state edits", () => {
     expect(selected.state.activeEffectSelections[effectId]).toBe("skill.stealth");
     expect(ended.state.activeEffectSelections[effectId]).toBeUndefined();
     expect(ended.state.activeEffectParameters[effectId]).toBeUndefined();
+  });
+
+  it("clears linked effects and their choices when concentration ends", () => {
+    const effectId = "srd521.status.spell.dragon-s-breath";
+    const source = character();
+    const active = {
+      ...source,
+      state: {
+        ...source.state,
+        concentrationSpellId: "srd521.spell.dragon-s-breath",
+        activeEffectIds: [effectId],
+        activeEffectSelections: { [effectId]: "fire" },
+        activeEffectParameters: { [effectId]: { damageType: "fire" } },
+      },
+    };
+
+    const ended = clearConcentrationAndEffects(active, [effectId], updatedAt);
+    expect(ended.state.concentrationSpellId).toBeUndefined();
+    expect(ended.state.activeEffectIds).toEqual([]);
+    expect(ended.state.activeEffectSelections).toEqual({});
+    expect(ended.state.activeEffectParameters).toEqual({});
+
+    const replaced = endActiveEffects(active, [effectId], updatedAt);
+    expect(replaced.state.concentrationSpellId).toBe("srd521.spell.dragon-s-breath");
+    expect(replaced.state.activeEffectIds).toEqual([]);
   });
 
   it("adjusts current HP as a selected Aid bonus changes and ends", () => {

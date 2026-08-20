@@ -34522,9 +34522,18 @@
   },
   {
     "body": {
+      "assistedInstructions": [
+        "Descent is limited to 60 feet per round.",
+        "Take no falling damage when landing.",
+        "End this status when the creature lands."
+      ],
       "concentration": false,
       "description": "Choose up to five falling creatures within range. A falling creature’s rate of descent slows to 60 feet per round until the spell ends. If a creature lands before the spell ends, the creature takes no damage from the fall, and the spell ends for that creature.",
       "duration": "1 minute",
+      "factGrants": {
+        "fall.damagePreventedOnLanding": true,
+        "fall.descentRateFeetPerRound": 60
+      },
       "sourceSpellId": "srd521.spell.feather-fall"
     },
     "id": "srd521.status.spell.feather-fall",
@@ -34966,9 +34975,17 @@
   },
   {
     "body": {
+      "assistedInstructions": [
+        "The creature can breathe underwater and retains its normal respiration.",
+        "End this status after 24 hours."
+      ],
       "concentration": false,
       "description": "This spell grants up to ten willing creatures of your choice within range the ability to breathe underwater until the spell ends. Affected creatures also retain their normal mode of respiration.",
       "duration": "24 hours",
+      "factGrants": {
+        "respiration.normalRetained": true,
+        "respiration.underwater": true
+      },
       "sourceSpellId": "srd521.spell.water-breathing"
     },
     "id": "srd521.status.spell.water-breathing",

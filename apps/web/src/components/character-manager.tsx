@@ -52,8 +52,9 @@ import {
 import {
   applyDamage,
   applyHealing,
-  clearConcentration,
+  clearConcentrationAndEffects,
   commitCharacterState,
+  endActiveEffects,
   setActiveEffectActive,
   setActiveEffectParameter,
   setActiveEffectSelection,
@@ -444,6 +445,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   damageTypes: actionDamageTypes,
                 }
               : undefined;
+          const assistedInstructions = Array.isArray(body?.assistedInstructions)
+            ? body.assistedInstructions.filter(
+                (instruction): instruction is string => typeof instruction === "string",
+              )
+            : [];
           return {
             id: entity.id,
             name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
@@ -455,6 +461,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             turnStartTemporaryHitPoints,
             situationalProtection,
             grantedAction,
+            sourceSpellId: typeof body?.sourceSpellId === "string" ? body.sourceSpellId : undefined,
+            assistedInstructions,
           };
         })
         .sort((left, right) => left.name.localeCompare(right.name)),
@@ -534,6 +542,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         supportsStateTransition(action) || actionRequirements(action).damageDiceCount !== undefined,
     ) ?? [];
   const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
+
+  function linkedStatusIds(spellId: string | undefined): string[] {
+    if (spellId === undefined) return [];
+    return statusOptions
+      .filter((status) => status.sourceSpellId === spellId)
+      .map((status) => status.id);
+  }
 
   function beginDiceRoll(): boolean {
     if (diceRollingRef.current) {
@@ -904,7 +919,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       spell.level > 0 && !asRitual && !useFreeCast ? selectedSlotLevel(spell) : undefined;
     if (slotLevel !== undefined) request.slotLevel = slotLevel;
     try {
-      const proposal = proposeSpellCast({ character, packages: [rulesPackage] }, request);
+      const supersededStatusIds = spell.concentration
+        ? linkedStatusIds(character.state.concentrationSpellId)
+        : [];
+      const castingCharacter =
+        supersededStatusIds.length === 0
+          ? character
+          : endActiveEffects(character, supersededStatusIds);
+      const proposal = proposeSpellCast(
+        { character: castingCharacter, packages: [rulesPackage] },
+        request,
+      );
       if (proposal.applicable) {
         const slot = evaluation?.spellcasting?.slots.find(
           (candidate) => candidate.level === slotLevel,
@@ -1324,7 +1349,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         type="button"
                         disabled={character.state.concentrationSpellId === undefined}
                         onClick={() => {
-                          savePlayState(clearConcentration(character), "Concentration ended.");
+                          savePlayState(
+                            clearConcentrationAndEffects(
+                              character,
+                              linkedStatusIds(character.state.concentrationSpellId),
+                            ),
+                            "Concentration and its linked status ended.",
+                          );
                         }}
                       >
                         End
@@ -1347,14 +1378,20 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             aria-pressed={active}
                             title={condition.description}
                             onClick={() => {
+                              const updated = setConditionActive(
+                                character,
+                                condition.id,
+                                !active,
+                                undefined,
+                                condition.breaksConcentration,
+                              );
                               savePlayState(
-                                setConditionActive(
-                                  character,
-                                  condition.id,
-                                  !active,
-                                  undefined,
-                                  condition.breaksConcentration,
-                                ),
+                                !active && condition.breaksConcentration
+                                  ? endActiveEffects(
+                                      updated,
+                                      linkedStatusIds(character.state.concentrationSpellId),
+                                    )
+                                  : updated,
                                 `${condition.name} ${active ? "removed" : "applied"}.`,
                               );
                             }}
@@ -1687,6 +1724,22 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             </div>
                           );
                         })}
+                      {statusOptions
+                        .filter(
+                          (status) =>
+                            status.assistedInstructions.length > 0 &&
+                            character.state.activeEffectIds.includes(status.id),
+                        )
+                        .map((status) => (
+                          <div className="effect-instructions" key={`${status.id}-assistance`}>
+                            <strong>{status.name}</strong>
+                            <ul>
+                              {status.assistedInstructions.map((instruction) => (
+                                <li key={instruction}>{instruction}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
                     </div>
                   )}
                   {character.state.activeEffectIds.length === 0 ? null : (

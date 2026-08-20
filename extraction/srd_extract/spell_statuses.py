@@ -59,6 +59,17 @@ SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
             },
         }
     },
+    "srd521.spell.feather-fall": {
+        "factGrants": {
+            "fall.descentRateFeetPerRound": 60,
+            "fall.damagePreventedOnLanding": True,
+        },
+        "assistedInstructions": [
+            "Descent is limited to 60 feet per round.",
+            "Take no falling damage when landing.",
+            "End this status when the creature lands.",
+        ],
+    },
     "srd521.spell.fly": {"speedOverrides": {"speed.fly": 60}},
     "srd521.spell.haste": {
         "speedMultiplier": 2,
@@ -113,6 +124,16 @@ SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
         }
     },
     "srd521.spell.shield-of-faith": {"armorClassBonus": 2},
+    "srd521.spell.water-breathing": {
+        "factGrants": {
+            "respiration.underwater": True,
+            "respiration.normalRetained": True,
+        },
+        "assistedInstructions": [
+            "The creature can breathe underwater and retains its normal respiration.",
+            "End this status after 24 hours.",
+        ],
+    },
 }
 
 
