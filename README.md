@@ -31,7 +31,7 @@ is emitted as a static site in `apps/web/out` by `corepack pnpm build`.
 
 Choose **New character** to open the guided Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin,
 Ranger, Rogue, Sorcerer, Warlock, and Wizard builder. It
-creates rules-valid characters from levels 1–5 with Human or Dwarf and all four SRD backgrounds,
+creates rules-valid characters through each class's reviewed limit with Human or Dwarf and all four SRD backgrounds,
 class-specific abilities and skills, reviewed subclasses, and complete choice validation.
 Barbarians gain Primal
 Knowledge, choose only eligible melee Weapon Masteries, and follow the Path of the Berserker.
@@ -77,15 +77,15 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Fighter, Ranger, and Rogue advancement through level 6 and Barbarian, Bard, Cleric,
-Druid, Monk, Paladin, Sorcerer, Warlock, and Wizard advancement through level 5. At Ranger level 6,
+same-class Fighter, Ranger, Rogue, and Sorcerer advancement through level 6 and Barbarian, Bard,
+Cleric, Druid, Monk, Paladin, Warlock, and Wizard advancement through level 5. At Ranger level 6,
 Roving automatically increases walking Speed when eligible and grants matching Climb and Swim
 Speeds. Bard advancement permits one cantrip and one prepared-spell
 replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
 one prepared-spell and cantrip replacement when gaining a level. Magic Initiate permits one
 same-level feat spell replacement while preserving its original casting ability. Multiclassing,
-Fighter, Ranger, and Rogue levels 7–20, and levels 6–20 for the other classes remain future work.
+Fighter, Ranger, Rogue, and Sorcerer levels 7–20, and levels 6–20 for the other classes remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -381,7 +381,8 @@ Generate Sorcerer content from pages 64–70 using the shared spell-description 
 The Sorcerer parser validates all 20 progression rows, the 138-entry class spell list, all ten
 Metamagic options, and all five Draconic Sorcery features. It generates seven source-linked
 representative spells plus authoring IR for Sorcery Points, Innate Sorcery, Sorcerous Restoration,
-Quickened Spell, Subtle Spell, and Draconic Resilience.
+Quickened Spell, Subtle Spell, and Draconic Resilience. Elemental Affinity's level-6 damage-type
+choice drives its resistance and one-roll spell-damage bonus.
 
 Generate Warlock content from pages 70–76 using the shared spell-description extraction:
 

@@ -543,6 +543,12 @@ const featBodySchema = z
       .optional(),
   })
   .passthrough();
+const elementalAffinityOptionBodySchema = z
+  .object({
+    choiceId: z.literal("srd521.choice.sorcerer.draconic.elemental-affinity"),
+    damageType: z.enum(["acid", "cold", "fire", "lightning", "poison"]),
+  })
+  .passthrough();
 const magicInitiateFeatBodySchema = z
   .object({
     category: z.literal("origin"),
@@ -1967,6 +1973,46 @@ function validateProgressionSelections(
       state,
       "SORCERER_METAMAGIC_OPTION_INVALID",
       "The selected Metamagic option is not supported by the loaded Sorcerer content.",
+      ["build.levels"],
+    );
+  }
+  const elementalAffinitySelections = character.build.levels
+    .flatMap((level) => level.selectedFeatureChoices)
+    .filter((choice) => choice.choiceId === "srd521.choice.sorcerer.draconic.elemental-affinity")
+    .flatMap((choice) => choice.optionIds);
+  if (sorcererLevel < 6 && elementalAffinitySelections.length > 0) {
+    addValidation(
+      state,
+      "SORCERER_ELEMENTAL_AFFINITY_LEVEL_REQUIRED",
+      "Elemental Affinity requires Sorcerer level 6.",
+      ["build.levels"],
+    );
+  }
+  if (
+    sorcererLevel >= 6 &&
+    character.build.subclassId === "srd521.subclass.sorcerer.draconic-sorcery" &&
+    elementalAffinitySelections.length !== 1
+  ) {
+    addValidation(
+      state,
+      "SORCERER_ELEMENTAL_AFFINITY_CHOICE_COUNT",
+      "A level 6 Draconic Sorcerer selects exactly one Elemental Affinity damage type.",
+      ["build.levels"],
+    );
+  }
+  if (
+    elementalAffinitySelections.some((optionId) => {
+      const option = index.entities.get(optionId);
+      return (
+        option?.kind !== "class-option" ||
+        !elementalAffinityOptionBodySchema.safeParse(option.body).success
+      );
+    })
+  ) {
+    addValidation(
+      state,
+      "SORCERER_ELEMENTAL_AFFINITY_OPTION_INVALID",
+      "The selected Elemental Affinity damage type is not supported by the loaded content.",
       ["build.levels"],
     );
   }
@@ -3728,6 +3774,65 @@ function evaluateSpellcasting(
     attackTraceId,
     saveTraceId,
   };
+}
+
+function evaluateElementalAffinity(
+  character: CharacterDocument,
+  classLevels: ReadonlyMap<string, number>,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  if (
+    (classLevels.get("srd521.class.sorcerer") ?? 0) < 6 ||
+    character.build.subclassId !== "srd521.subclass.sorcerer.draconic-sorcery"
+  ) {
+    return;
+  }
+  const optionId = character.build.levels
+    .flatMap((level) => level.selectedFeatureChoices)
+    .find((choice) => choice.choiceId === "srd521.choice.sorcerer.draconic.elemental-affinity")
+    ?.optionIds[0];
+  const option = optionId === undefined ? undefined : index.entities.get(optionId);
+  const parsed =
+    option?.kind === "class-option"
+      ? elementalAffinityOptionBodySchema.safeParse(option.body)
+      : undefined;
+  if (option === undefined || parsed?.success !== true) return;
+
+  const { damageType } = parsed.data;
+  const bonus = requireNumber(
+    state.facts["ability.charisma.modifier"] ?? null,
+    "Elemental Affinity Charisma modifier",
+  );
+  const traceId = "sorcerer.elementalAffinity.spellDamageBonus";
+  state.resistances.add(damageType);
+  state.facts[traceId] = bonus;
+  state.values[traceId] = { value: bonus, traceId };
+  state.traces[traceId] = {
+    id: traceId,
+    result: bonus,
+    nodes: [
+      {
+        id: `${traceId}.choice`,
+        operation: "apply-elemental-affinity",
+        inputs: [option.id, damageType, state.facts["ability.charisma.modifier"] ?? null],
+        output: bonus,
+      },
+    ],
+    sourceReferences: entitySourceReferences(option),
+  };
+  for (const spell of state.spells) {
+    spell.damage = spell.damage.map((damage) =>
+      damage.type === damageType
+        ? {
+            ...damage,
+            bonus,
+            bonusAppliesToOneRoll: true,
+            bonusTraceId: traceId,
+          }
+        : damage,
+    );
+  }
 }
 
 function magicInitiateChoice(
@@ -5876,6 +5981,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   );
   evaluateHitPoints(character, rules, granted, index, state, statuses);
   evaluateSpellcasting(character, classLevels, index, state);
+  evaluateElementalAffinity(character, classLevels, index, state);
   evaluateMagicInitiate(character, index, state);
   evaluateSpeciesTraits(character, origins, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);

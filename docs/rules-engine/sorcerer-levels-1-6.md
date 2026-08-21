@@ -1,6 +1,8 @@
-# Sorcerer level 5 vertical slice
+# Sorcerer levels 1–6 vertical slice
 
-The reviewed `sorcerer-5.json` fixture is Ember, a Human Soldier Draconic Sorcerer. Ember has
+The reviewed `sorcerer-5.json` fixture is Ember, a Human Soldier Draconic Sorcerer. The guided
+level-up flow advances Ember to level 6 and records a source-defined Elemental Affinity choice.
+Ember has
 Quickened Spell and Subtle Spell, prepares nine Sorcerer spells, knows five cantrips, and always has
 the six level-3 and level-5 Draconic Spells prepared.
 
@@ -10,6 +12,11 @@ DC 14, the level-5 spell-slot progression, five Sorcery Points, two Innate Sorce
 Sorcerous Restoration use. Long Rests restore those resources and spell slots. Quickened Spell and
 Subtle Spell spend their configured Sorcery Point costs atomically; Sorcerous Restoration spends
 its own use and restores half the Sorcerer level in Sorcery Points, rounded down.
+
+At level 6, Elemental Affinity grants the selected Acid, Cold, Fire, Lightning, or Poison
+resistance. Matching Sorcerer spell damage rolls expose the Charisma modifier as an explicit bonus
+that applies to one damage roll of the spell. The level-up also raises the prepared-spell limit to
+ten, Sorcery Points to six, and level-3 spell slots to three without resetting play state.
 
 The generated content retains all 20 Sorcerer progression rows, the complete 138-spell Sorcerer
 list, all ten Metamagic options, and every Draconic Sorcery feature as source-linked structured
@@ -25,4 +32,5 @@ content. Through level 5, these limits remain intentionally assisted:
   transition does not invoke optional features automatically or remember that prerequisite, so its
   caller must offer the action only immediately after the rest.
 - Draconic Resilience automates maximum Hit Points and its unarmored AC candidate. Elemental
-  Affinity is retained as structured text because it first applies at Sorcerer level 6.
+  Affinity automates its persistent resistance and annotates eligible spell-damage rolls; the user
+  still chooses which one damage roll receives the bonus when a spell has multiple damage rolls.

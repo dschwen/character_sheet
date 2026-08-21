@@ -184,6 +184,9 @@ export interface SpellDamageSummary {
   diceCount: number;
   diceSize: number;
   type: string;
+  bonus?: number;
+  bonusAppliesToOneRoll?: boolean;
+  bonusTraceId?: string;
 }
 
 export interface SpellCastingOptionSummary {

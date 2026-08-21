@@ -134,7 +134,7 @@ describe("guided character builder", () => {
         preparationChange: { event: "level-up", replacementMaximum: 1 },
         ability: "charisma",
       },
-      skillCountByLevel: { 1: 2, 3: 2, 5: 2 },
+      skillCountByLevel: { 1: 2, 3: 2, 5: 2, 6: 2 },
     });
     expect(catalog.classes[sorcererId].featureChoices).toEqual([
       expect.objectContaining({
@@ -146,6 +146,13 @@ describe("guided character builder", () => {
           "srd521.option.sorcerer.metamagic.quickened",
           "srd521.option.sorcerer.metamagic.subtle",
         ],
+      }),
+      expect.objectContaining({
+        id: "srd521.choice.sorcerer.draconic.elemental-affinity",
+        level: 6,
+        minimum: 1,
+        maximum: 1,
+        defaultOptionIds: ["srd521.option.sorcerer.draconic.elemental-affinity.fire"],
       }),
     ]);
     expect(
@@ -891,16 +898,16 @@ describe("guided character builder", () => {
     ]);
   });
 
-  it("builds Draconic Sorcerers with Metamagic and prepared spells through level 5", () => {
+  it("builds Draconic Sorcerers with Metamagic and prepared spells through level 6", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [8, 14, 23, 30, 37];
-    const expectedArmorClass = [12, 12, 14, 15, 15];
-    const expectedCantrips = [4, 4, 4, 5, 5];
-    const expectedPrepared = [2, 4, 6, 7, 9];
-    const expectedAlwaysPrepared = [0, 0, 4, 4, 6];
+    const expectedHitPoints = [8, 14, 23, 30, 37, 44];
+    const expectedArmorClass = [12, 12, 14, 15, 15, 15];
+    const expectedCantrips = [4, 4, 4, 5, 5, 5];
+    const expectedPrepared = [2, 4, 6, 7, 9, 10];
+    const expectedAlwaysPrepared = [0, 0, 4, 4, 6, 6];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(
         sorcererId,
         catalog,
@@ -941,6 +948,15 @@ describe("guided character builder", () => {
             ],
           },
         ]);
+      }
+      if (level >= 6) {
+        expect(character.build.levels[5]?.selectedFeatureChoices).toEqual([
+          {
+            choiceId: "srd521.choice.sorcerer.draconic.elemental-affinity",
+            optionIds: ["srd521.option.sorcerer.draconic.elemental-affinity.fire"],
+          },
+        ]);
+        expect(evaluation.resistances).toContain("fire");
       }
       if (level === 1) {
         expect(character.loadout.inventory).toHaveLength(5);

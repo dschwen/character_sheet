@@ -22,7 +22,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(597);
+    expect(parsedEntities).toHaveLength(602);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -367,7 +367,7 @@ describe("bootstrap content package", () => {
       },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.sorcerer")?.builder).toMatchObject({
-      supportedLevelMaximum: 5,
+      supportedLevelMaximum: 6,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: ["srd521.skill.arcana", "srd521.skill.persuasion"],
     });
@@ -376,6 +376,30 @@ describe("bootstrap content package", () => {
     expect(sorcererBody.spellPreparationChange).toEqual({
       event: "level-up",
       replacementMaximum: 1,
+    });
+    const sorcererProgression = z.array(z.record(z.unknown())).parse(sorcererBody.progression);
+    expect(sorcererProgression.find((row) => row.level === 6)).toMatchObject({
+      level: 6,
+      sorceryPoints: 6,
+      preparedSpells: 10,
+      spellSlots: { 1: 4, 2: 3, 3: 3 },
+    });
+    const draconicSorcery = entities.find(
+      (entity) => entity.id === "srd521.subclass.sorcerer.draconic-sorcery",
+    );
+    const draconicBody = z.record(z.unknown()).parse(draconicSorcery?.body);
+    expect(classFeatureChoiceSchema.parse(draconicBody.elementalAffinityChoice)).toMatchObject({
+      level: 6,
+      minimum: 1,
+      maximum: 1,
+      defaultOptionIds: ["srd521.option.sorcerer.draconic.elemental-affinity.fire"],
+      options: [
+        "srd521.option.sorcerer.draconic.elemental-affinity.acid",
+        "srd521.option.sorcerer.draconic.elemental-affinity.cold",
+        "srd521.option.sorcerer.draconic.elemental-affinity.fire",
+        "srd521.option.sorcerer.draconic.elemental-affinity.lightning",
+        "srd521.option.sorcerer.draconic.elemental-affinity.poison",
+      ],
     });
     expect(classFeatureChoiceSchema.parse(sorcererBody.metamagicChoice)).toMatchObject({
       level: 2,

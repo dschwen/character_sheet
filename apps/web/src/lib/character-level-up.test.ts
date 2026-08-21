@@ -888,6 +888,69 @@ describe("guided character level up", () => {
     });
   });
 
+  it("advances a Draconic Sorcerer to level 6 with Elemental Affinity", () => {
+    const { fixtures, rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const fixture = fixtures.find((candidate) => candidate.filename === "sorcerer-5.json");
+    if (fixture === undefined) throw new Error("Missing sorcerer-5.json.");
+    const original = fixture.character;
+    let draft = createLevelUpDraft(original, catalog);
+
+    expect(draft.level).toBe(6);
+    expect(
+      draft.featureChoiceSelections["srd521.choice.sorcerer.draconic.elemental-affinity"],
+    ).toEqual(["srd521.option.sorcerer.draconic.elemental-affinity.fire"]);
+    draft = updateBuilderFeatureChoice(
+      draft,
+      catalog,
+      "srd521.choice.sorcerer.draconic.elemental-affinity",
+      "srd521.option.sorcerer.draconic.elemental-affinity.cold",
+    );
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-12T02:30:00.000Z"),
+    });
+
+    expect(preview.issues).toEqual([]);
+    expect(preview.evaluation?.spellcasting).toMatchObject({
+      preparedSpellLimit: 10,
+      abilityModifier: 3,
+    });
+    expect(preview.evaluation?.spellcasting?.slots).toContainEqual(
+      expect.objectContaining({ level: 3, maximum: 3, current: 2 }),
+    );
+    expect(preview.evaluation?.resources).toContainEqual(
+      expect.objectContaining({
+        id: "srd521.resource.sorcerer.sorcery-points",
+        maximum: 6,
+        current: 4,
+      }),
+    );
+    expect(preview.evaluation?.resistances).toContain("cold");
+    expect(
+      preview.evaluation?.spells
+        .find((spell) => spell.id === "srd521.spell.ray-of-frost")
+        ?.damage.find((damage) => damage.type === "cold"),
+    ).toMatchObject({ bonus: 3, bonusAppliesToOneRoll: true });
+
+    const advanced = levelUpCharacter(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-12T02:30:00.000Z"),
+    });
+    expect(advanced.state).toEqual(original.state);
+    expect(advanced.build.levels[5]?.selectedFeatureChoices).toEqual([
+      {
+        choiceId: "srd521.choice.sorcerer.draconic.elemental-affinity",
+        optionIds: ["srd521.option.sorcerer.draconic.elemental-affinity.cold"],
+      },
+    ]);
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({
+      eligible: false,
+      currentLevel: 6,
+      reason: "Sorcerer advancement is currently reviewed through level 6.",
+    });
+  });
+
   it("adds Fighter's second Ability Score Improvement at level 6", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

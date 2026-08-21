@@ -41,7 +41,7 @@ function loadCharacter(): CharacterDocument {
   );
 }
 
-describe("evaluateCharacter Sorcerer level-5 vertical slice", () => {
+describe("evaluateCharacter Sorcerer levels 1–6 vertical slice", () => {
   it("evaluates Draconic defenses, spellcasting, Metamagic, and resources", () => {
     const evaluation = evaluateCharacter({
       character: loadCharacter(),
@@ -214,5 +214,57 @@ describe("evaluateCharacter Sorcerer level-5 vertical slice", () => {
     expect(proposal.nextState.expendedResources["srd521.resource.sorcerer.sorcery-points"]).toBe(0);
     expect(proposal.nextState.expendedResources["srd521.resource.sorcerer.innate-sorcery"]).toBe(0);
     expect(proposal.nextState.expendedSpellSlots).toEqual({ "1": 0, "2": 0, "3": 0 });
+  });
+
+  it("applies a level-6 Draconic Sorcerer's Elemental Affinity", () => {
+    const character = loadCharacter();
+    character.build.levels.push({
+      characterLevel: 6,
+      classId: "srd521.class.sorcerer",
+      hitPointChoice: "fixed",
+      selectedFeatureChoices: [
+        {
+          choiceId: "srd521.choice.sorcerer.draconic.elemental-affinity",
+          optionIds: ["srd521.option.sorcerer.draconic.elemental-affinity.cold"],
+        },
+      ],
+    });
+    character.loadout.preparedSpellIds.push("srd521.spell.counterspell");
+
+    const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.resistances).toContain("cold");
+    expect(evaluation.values["sorcerer.elementalAffinity.spellDamageBonus"]?.value).toBe(3);
+    expect(
+      evaluation.spells
+        .find((spell) => spell.id === "srd521.spell.ray-of-frost")
+        ?.damage.find((damage) => damage.type === "cold"),
+    ).toMatchObject({ bonus: 3, bonusAppliesToOneRoll: true });
+  });
+
+  it("requires a valid Elemental Affinity choice at Sorcerer level 6", () => {
+    const character = loadCharacter();
+    character.build.levels.push({
+      characterLevel: 6,
+      classId: "srd521.class.sorcerer",
+      hitPointChoice: "fixed",
+      selectedFeatureChoices: [],
+    });
+    character.loadout.preparedSpellIds.push("srd521.spell.counterspell");
+
+    const missing = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+    expect(missing.validations.map((message) => message.code)).toContain(
+      "SORCERER_ELEMENTAL_AFFINITY_CHOICE_COUNT",
+    );
+
+    character.build.levels[5]?.selectedFeatureChoices.push({
+      choiceId: "srd521.choice.sorcerer.draconic.elemental-affinity",
+      optionIds: ["srd521.option.sorcerer.draconic.elemental-affinity.force"],
+    });
+    const invalid = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+    expect(invalid.validations.map((message) => message.code)).toContain(
+      "SORCERER_ELEMENTAL_AFFINITY_OPTION_INVALID",
+    );
   });
 });

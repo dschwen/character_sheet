@@ -18,7 +18,7 @@
           "srd521.skill.persuasion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 5,
+        "supportedLevelMaximum": 6,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 6,
@@ -459,7 +459,8 @@
           "2": 2,
           "3": 2,
           "4": 2,
-          "5": 2
+          "5": 2,
+          "6": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -1587,6 +1588,22 @@
         ]
       },
       "description": "Your innate magic comes from the gift of a dragon. Perhaps an ancient dragon facing death bequeathed some of its magical power to you or your ancestor. You might have absorbed magic from a site infused with dragons’ power. Or perhaps you handled a treasure taken from a dragon’s hoard that was steeped in draconic power. Or you might have a dragon for an ancestor.",
+      "elementalAffinityChoice": {
+        "defaultOptionIds": [
+          "srd521.option.sorcerer.draconic.elemental-affinity.fire"
+        ],
+        "id": "srd521.choice.sorcerer.draconic.elemental-affinity",
+        "level": 6,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.option.sorcerer.draconic.elemental-affinity.acid",
+          "srd521.option.sorcerer.draconic.elemental-affinity.cold",
+          "srd521.option.sorcerer.draconic.elemental-affinity.fire",
+          "srd521.option.sorcerer.draconic.elemental-affinity.lightning",
+          "srd521.option.sorcerer.draconic.elemental-affinity.poison"
+        ]
+      },
       "parentClassId": "srd521.class.sorcerer",
       "progression": [
         {
@@ -1816,6 +1833,181 @@
     "tags": [
       "subclass-feature",
       "sorcerer"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.draconic.elemental-affinity",
+      "damageType": "acid",
+      "text": "Resistance to acid damage; add Charisma to one damage roll of a spell that deals acid damage."
+    },
+    "id": "srd521.option.sorcerer.draconic.elemental-affinity.acid",
+    "kind": "class-option",
+    "name": {
+      "en": "Acid Affinity"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Elemental Affinity acid damage choice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b010"
+        ],
+        "page": 70,
+        "quoteHash": "8b71a061acd8971c074f45cefcc74cd676923d40e022843906653d4c35ef5efd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "draconic-sorcery"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.draconic.elemental-affinity",
+      "damageType": "cold",
+      "text": "Resistance to cold damage; add Charisma to one damage roll of a spell that deals cold damage."
+    },
+    "id": "srd521.option.sorcerer.draconic.elemental-affinity.cold",
+    "kind": "class-option",
+    "name": {
+      "en": "Cold Affinity"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Elemental Affinity cold damage choice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b010"
+        ],
+        "page": 70,
+        "quoteHash": "8b71a061acd8971c074f45cefcc74cd676923d40e022843906653d4c35ef5efd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "draconic-sorcery"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.draconic.elemental-affinity",
+      "damageType": "fire",
+      "text": "Resistance to fire damage; add Charisma to one damage roll of a spell that deals fire damage."
+    },
+    "id": "srd521.option.sorcerer.draconic.elemental-affinity.fire",
+    "kind": "class-option",
+    "name": {
+      "en": "Fire Affinity"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Elemental Affinity fire damage choice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b010"
+        ],
+        "page": 70,
+        "quoteHash": "8b71a061acd8971c074f45cefcc74cd676923d40e022843906653d4c35ef5efd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "draconic-sorcery"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.draconic.elemental-affinity",
+      "damageType": "lightning",
+      "text": "Resistance to lightning damage; add Charisma to one damage roll of a spell that deals lightning damage."
+    },
+    "id": "srd521.option.sorcerer.draconic.elemental-affinity.lightning",
+    "kind": "class-option",
+    "name": {
+      "en": "Lightning Affinity"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Elemental Affinity lightning damage choice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b010"
+        ],
+        "page": 70,
+        "quoteHash": "8b71a061acd8971c074f45cefcc74cd676923d40e022843906653d4c35ef5efd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "draconic-sorcery"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.sorcerer.draconic.elemental-affinity",
+      "damageType": "poison",
+      "text": "Resistance to poison damage; add Charisma to one damage roll of a spell that deals poison damage."
+    },
+    "id": "srd521.option.sorcerer.draconic.elemental-affinity.poison",
+    "kind": "class-option",
+    "name": {
+      "en": "Poison Affinity"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Elemental Affinity poison damage choice.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0070-b010"
+        ],
+        "page": 70,
+        "quoteHash": "8b71a061acd8971c074f45cefcc74cd676923d40e022843906653d4c35ef5efd",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "sorcerer",
+      "draconic-sorcery"
     ]
   },
   {

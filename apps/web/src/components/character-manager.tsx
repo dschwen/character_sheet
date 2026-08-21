@@ -612,6 +612,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       label: `${spell.name} · ${titleCase(damage.type)} damage`,
       diceCount: damage.diceCount,
       diceSize: damage.diceSize,
+      modifier: damage.bonus ?? 0,
     });
   }
 
@@ -659,12 +660,15 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
               rollSpellDamage(spell, damage);
             }}
             title={
-              spell.hasHigherLevelEffect
-                ? "Roll listed base damage; higher-level scaling is not included"
-                : "Roll listed spell damage"
+              damage.bonusAppliesToOneRoll
+                ? `Roll damage with ${signed(damage.bonus ?? 0)} Elemental Affinity bonus; apply it to only one damage roll of this spell`
+                : spell.hasHigherLevelEffect
+                  ? "Roll listed base damage; higher-level scaling is not included"
+                  : "Roll listed spell damage"
             }
           >
-            {String(damage.diceCount)}d{String(damage.diceSize)} {titleCase(damage.type)}
+            {String(damage.diceCount)}d{String(damage.diceSize)}
+            {damage.bonus === undefined ? "" : signed(damage.bonus)} {titleCase(damage.type)}
           </button>
         ))}
         {saveDifficultyClass === undefined

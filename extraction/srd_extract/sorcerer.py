@@ -27,6 +27,8 @@ SORCERY_POINTS_ID = "srd521.resource.sorcerer.sorcery-points"
 INNATE_SORCERY_ID = "srd521.resource.sorcerer.innate-sorcery"
 RESTORATION_ID = "srd521.resource.sorcerer.sorcerous-restoration"
 METAMAGIC_CHOICE_ID = "srd521.choice.sorcerer.metamagic"
+ELEMENTAL_AFFINITY_CHOICE_ID = "srd521.choice.sorcerer.draconic.elemental-affinity"
+ELEMENTAL_AFFINITY_DAMAGE_TYPES = ("acid", "cold", "fire", "lightning", "poison")
 METAMAGIC_NAMES = (
     "Careful Spell",
     "Distant Spell",
@@ -442,12 +444,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 6)},
+                "countByLevel": {str(level): 2 for level in range(1, 7)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -546,6 +548,9 @@ def _draconic_entities(
     )
     intro = nodes[nodes.index(heading) + 2]
     spells_feature = next(feature for feature in features if feature["name"] == "Draconic Spells")
+    affinity_feature = next(
+        feature for feature in features if feature["name"] == "Elemental Affinity"
+    )
     table = next(node for node in spells_feature["bodyNodes"] if node["kind"] == "TableNode")
     always: dict[str, list[str]] = {}
     for match in re.finditer(r"(?P<level>\d+) (?P<spells>.+?)(?= \d+ |$)", table["normalizedText"]):
@@ -568,12 +573,49 @@ def _draconic_entities(
                 {"level": level, "features": ids} for level, ids in sorted(by_level.items())
             ],
             "alwaysPreparedSpells": always,
+            "elementalAffinityChoice": {
+                "id": ELEMENTAL_AFFINITY_CHOICE_ID,
+                "level": 6,
+                "minimum": 1,
+                "maximum": 1,
+                "options": [
+                    f"srd521.option.sorcerer.draconic.elemental-affinity.{damage_type}"
+                    for damage_type in ELEMENTAL_AFFINITY_DAMAGE_TYPES
+                ],
+                "defaultOptionIds": [
+                    "srd521.option.sorcerer.draconic.elemental-affinity.fire"
+                ],
+            },
             "description": intro["normalizedText"],
         },
         "rules": [],
         "review": _review("Draconic Sorcery subclass extracted from pages 69–70."),
     }
-    return [subclass, *[_feature_entity(feature, "subclass-feature") for feature in features]]
+    affinity_options = [
+        {
+            "id": f"srd521.option.sorcerer.draconic.elemental-affinity.{damage_type}",
+            "kind": "class-option",
+            "name": {"en": f"{damage_type.title()} Affinity"},
+            "tags": ["class-option", "sorcerer", "draconic-sorcery"],
+            "source": affinity_feature["source"],
+            "body": {
+                "choiceId": ELEMENTAL_AFFINITY_CHOICE_ID,
+                "damageType": damage_type,
+                "text": (
+                    f"Resistance to {damage_type} damage; add Charisma to one damage roll of "
+                    f"a spell that deals {damage_type} damage."
+                ),
+            },
+            "rules": [],
+            "review": _review(f"Elemental Affinity {damage_type} damage choice."),
+        }
+        for damage_type in ELEMENTAL_AFFINITY_DAMAGE_TYPES
+    ]
+    return [
+        subclass,
+        *[_feature_entity(feature, "subclass-feature") for feature in features],
+        *affinity_options,
+    ]
 
 
 def _table(
@@ -818,8 +860,8 @@ def generate_sorcerer_content(class_root: Path, spell_root: Path, output: Path) 
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, and "
-        "Wizard through level 5, Human, Soldier, equipment, and representative spells."
+        "Sorcerer through level 6; other reviewed classes through their documented limits; "
+        "Human, Soldier, equipment, and representative spells."
     )
     write_json(output / "coverage.json", coverage)
     report = {
