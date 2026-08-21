@@ -452,7 +452,7 @@ def _class_entity(
                 "minimum": traits.skill_choice_count,
                 "maximum": traits.skill_choice_count,
                 "options": list(traits.skill_options),
-                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 6)},
+                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 7)},
             },
             "weaponProficiencies": list(traits.weapon_proficiencies),
             "weaponMasteryChoice": {
@@ -464,7 +464,7 @@ def _class_entity(
             "startingEquipmentText": traits.starting_equipment_text,
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 15,
                     "dexterity": 13,
@@ -590,6 +590,30 @@ def _berserker_entities(
             f"level-{feature.level}",
         ]
         entity["body"]["parentId"] = BERSERKER_ID
+        if feature.name == "Mindless Rage":
+            entity["body"].update(
+                {
+                    "automationLevel": "state-automated",
+                    "activeEffectConditionImmunities": [
+                        {
+                            "activeEffectId": "srd521.effect.barbarian.rage",
+                            "conditionIds": [
+                                "srd521.condition.charmed",
+                                "srd521.condition.frightened",
+                            ],
+                        }
+                    ],
+                    "actionEnhancements": [
+                        {
+                            "actionId": "action.enter-rage",
+                            "endsConditionIds": [
+                                "srd521.condition.charmed",
+                                "srd521.condition.frightened",
+                            ],
+                        }
+                    ],
+                }
+            )
         feature_entities.append(entity)
     return [subclass, *feature_entities]
 
@@ -895,8 +919,8 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
                 "VERIFIED": 0,
             },
             "note": (
-                "Barbarian pages 28–30 proof of concept. Proposed executable "
-                "rules remain in needs-review authoring IR."
+                "Barbarian through level 6 from pages 28–30. Proposed executable rules remain "
+                "in needs-review authoring IR."
             ),
         },
     )

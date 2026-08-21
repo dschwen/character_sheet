@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateCharacter } from "@dnd/rules-core";
+import { evaluateCharacter, proposeAction } from "@dnd/rules-core";
 
 import {
   createLevelUpDraft,
@@ -948,6 +948,76 @@ describe("guided character level up", () => {
       eligible: false,
       currentLevel: 6,
       reason: "Sorcerer advancement is currently reviewed through level 6.",
+    });
+  });
+
+  it("advances a Berserker to level 6 and applies Mindless Rage", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const levelFive = buildCharacter(
+      defaultBuilderDraft(barbarianId, catalog, 5, "Fearless Barbarian"),
+      rulesPackage,
+      initialOptions,
+    );
+    const original = {
+      ...levelFive,
+      state: {
+        ...levelFive.state,
+        conditionIds: ["srd521.condition.charmed", "srd521.condition.frightened"],
+      },
+    };
+    const draft = createLevelUpDraft(original, catalog);
+    const preview = previewLevelUp(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-12T02:45:00.000Z"),
+    });
+
+    expect(draft.level).toBe(6);
+    expect(preview.issues).toEqual([]);
+    expect(preview.evaluation?.facts["condition.charmed.active"]).toBe(true);
+    expect(preview.evaluation?.facts["condition.frightened.active"]).toBe(true);
+
+    const advanced = levelUpCharacter(original, draft, rulesPackage, {
+      id: original.id,
+      now: new Date("2026-08-12T02:45:00.000Z"),
+    });
+    expect(advanced.state).toEqual(original.state);
+    const rage = proposeAction(
+      { character: advanced, packages: [rulesPackage] },
+      { actionId: "action.enter-rage" },
+    );
+
+    expect(rage.applicable).toBe(true);
+    expect(rage.nextState.activeEffectIds).toContain("srd521.effect.barbarian.rage");
+    expect(rage.nextState.conditionIds).toEqual([]);
+    expect(rage.changes.map((change) => change.path)).toContain("state.conditionIds");
+    const ragingEvaluation = evaluateCharacter({
+      character: { ...advanced, state: rage.nextState },
+      packages: [rulesPackage],
+    });
+    expect(ragingEvaluation.facts["condition.charmed.active"]).toBeUndefined();
+    expect(ragingEvaluation.facts["condition.frightened.active"]).toBeUndefined();
+    const lingeringConditions = evaluateCharacter({
+      character: {
+        ...advanced,
+        state: {
+          ...advanced.state,
+          activeEffectIds: ["srd521.effect.barbarian.rage"],
+        },
+      },
+      packages: [rulesPackage],
+    });
+    expect(lingeringConditions.facts["condition.charmed.active"]).toBeUndefined();
+    expect(lingeringConditions.facts["condition.frightened.active"]).toBeUndefined();
+    expect(
+      lingeringConditions.validations.filter(
+        (validation) => validation.code === "CONDITION_BLOCKED_BY_IMMUNITY",
+      ),
+    ).toHaveLength(2);
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({
+      eligible: false,
+      currentLevel: 6,
+      reason: "Barbarian advancement is currently reviewed through level 6.",
     });
   });
 

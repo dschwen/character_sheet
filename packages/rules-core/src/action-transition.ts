@@ -26,6 +26,7 @@ const stateActionParametersSchema = z
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     resourceId: z.string().min(1),
     activatesEffectId: z.string().min(1).optional(),
+    endsConditionIds: z.array(z.string().min(1)).default([]),
     spellId: z.string().min(1).optional(),
     restoresResource: z
       .object({ resourceId: z.string().min(1), amount: z.number().int().positive() })
@@ -381,6 +382,25 @@ export function proposeAction(
       [parameters.activatesEffectId],
       sourceTrace,
     );
+  }
+  if (parameters.endsConditionIds.length > 0) {
+    const conditionIdsBefore = [...character.state.conditionIds];
+    const ended = new Set(parameters.endsConditionIds);
+    const conditionIdsAfter = conditionIdsBefore.filter((conditionId) => !ended.has(conditionId));
+    if (conditionIdsAfter.length !== conditionIdsBefore.length) {
+      nextState.conditionIds = conditionIdsAfter;
+      recordChange(
+        changes,
+        traces,
+        "state.conditionIds",
+        conditionIdsBefore,
+        conditionIdsAfter,
+        `${request.actionId} ends ${parameters.endsConditionIds.join(", ")}.`,
+        "end-conditions-on-action",
+        parameters.endsConditionIds,
+        sourceTrace,
+      );
+    }
   }
   if (parameters.temporaryHitPoints !== undefined) {
     const temporaryHitPointsAfter = Math.max(

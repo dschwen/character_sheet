@@ -77,7 +77,7 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Fighter, Ranger, Rogue, and Sorcerer advancement through level 6 and Barbarian, Bard,
+same-class Barbarian, Fighter, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
 Cleric, Druid, Monk, Paladin, Warlock, and Wizard advancement through level 5. At Ranger level 6,
 Roving automatically increases walking Speed when eligible and grants matching Climb and Swim
 Speeds. Bard advancement permits one cantrip and one prepared-spell
@@ -85,7 +85,7 @@ replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
 one prepared-spell and cantrip replacement when gaining a level. Magic Initiate permits one
 same-level feat spell replacement while preserving its original casting ability. Multiclassing,
-Fighter, Ranger, Rogue, and Sorcerer levels 7–20, and levels 6–20 for the other classes remain future work.
+Barbarian, Fighter, Ranger, Rogue, and Sorcerer levels 7–20, and levels 6–20 for the other classes remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -186,7 +186,8 @@ Generate the typed Barbarian proof-of-concept content and draft authoring IR:
 
 This command parses both class tables, reconciles the progression against feature headings,
 extracts Path of the Berserker, and generates source-linked draft mechanics for Rage, Unarmored
-Defense, and Extra Attack.
+Defense, and Extra Attack. The reviewed level-6 Mindless Rage data ends Charmed and Frightened
+when Rage begins and prevents those conditions while Rage remains active.
 
 Generate Bard content from pages 31–35 using the shared spell-description extraction:
 
@@ -466,7 +467,8 @@ Generate the fifteen source-linked standard conditions from Rules Glossary pages
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
 Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite; the
-web integration suite also covers Ranger and Rogue creation and advancement through level 6. Results
+web integration suite also covers Barbarian, Fighter, Ranger, Rogue, and Sorcerer creation and
+advancement through level 6. Results
 include origin and feat ability increases, subclass features, species size, speed, senses, traits,
 typed skill and saving-throw proficiencies, d20-test roll states, Initiative, Passive Perception,
 inventory, armor and Shield

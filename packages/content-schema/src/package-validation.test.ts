@@ -8,6 +8,7 @@ import {
   classBuilderMetadataSchema,
   classFeatureChoiceSchema,
   contentEntitySchema,
+  featureAutomationBodySchema,
   packageManifestSchema,
   sourceManifestSchema,
   startingEquipmentChoiceSchema,
@@ -293,8 +294,26 @@ describe("bootstrap content package", () => {
 
     expect(metadata).toHaveLength(12);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
-      supportedLevelMaximum: 5,
+      supportedLevelMaximum: 6,
       defaultAbilityScoreImprovementAbility: "strength",
+    });
+    const mindlessRage = entities.find(
+      (entity) =>
+        entity.id === "srd521.subclass-feature.barbarian.path-of-the-berserker.mindless-rage",
+    );
+    expect(featureAutomationBodySchema.parse(mindlessRage?.body)).toMatchObject({
+      activeEffectConditionImmunities: [
+        {
+          activeEffectId: "srd521.effect.barbarian.rage",
+          conditionIds: ["srd521.condition.charmed", "srd521.condition.frightened"],
+        },
+      ],
+      actionEnhancements: [
+        {
+          actionId: "action.enter-rage",
+          endsConditionIds: ["srd521.condition.charmed", "srd521.condition.frightened"],
+        },
+      ],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.bard")?.builder).toMatchObject({
       supportedLevelMaximum: 5,

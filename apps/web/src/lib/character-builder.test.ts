@@ -547,9 +547,9 @@ describe("guided character builder", () => {
   it("builds Path of the Berserker Barbarians at every supported level", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [14, 23, 32, 41, 50];
+    const expectedHitPoints = [14, 23, 32, 41, 50, 59];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(
         barbarianId,
         catalog,

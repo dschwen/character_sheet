@@ -22,7 +22,7 @@
           "srd521.skill.animal-handling"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 5,
+        "supportedLevelMaximum": 6,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 12,
@@ -345,7 +345,8 @@
           "2": 2,
           "3": 3,
           "4": 3,
-          "5": 3
+          "5": 3,
+          "6": 3
         },
         "maximum": 2,
         "minimum": 2,
@@ -1526,7 +1527,25 @@
   },
   {
     "body": {
-      "automationLevel": "structured",
+      "actionEnhancements": [
+        {
+          "actionId": "action.enter-rage",
+          "endsConditionIds": [
+            "srd521.condition.charmed",
+            "srd521.condition.frightened"
+          ]
+        }
+      ],
+      "activeEffectConditionImmunities": [
+        {
+          "activeEffectId": "srd521.effect.barbarian.rage",
+          "conditionIds": [
+            "srd521.condition.charmed",
+            "srd521.condition.frightened"
+          ]
+        }
+      ],
+      "automationLevel": "state-automated",
       "level": 6,
       "parentId": "srd521.subclass.barbarian.path-of-the-berserker",
       "text": {

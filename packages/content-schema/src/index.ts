@@ -379,6 +379,31 @@ export const classFeatureChoiceSchema = z
     }
   });
 
+export const featureAutomationBodySchema = z
+  .object({
+    activeEffectConditionImmunities: z
+      .array(
+        z
+          .object({
+            activeEffectId: entityIdSchema,
+            conditionIds: z.array(entityIdSchema).min(1),
+          })
+          .strict(),
+      )
+      .default([]),
+    actionEnhancements: z
+      .array(
+        z
+          .object({
+            actionId: z.string().min(1),
+            endsConditionIds: z.array(entityIdSchema).min(1),
+          })
+          .strict(),
+      )
+      .default([]),
+  })
+  .passthrough();
+
 export type PackageManifest = z.infer<typeof packageManifestSchema>;
 export type SourceManifest = z.infer<typeof sourceManifestSchema>;
 export type SourceSpan = z.infer<typeof sourceSpanSchema>;
@@ -388,5 +413,6 @@ export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSche
 export type StartingEquipmentChoice = z.infer<typeof startingEquipmentChoiceSchema>;
 export type ClassBuilderMetadata = z.infer<typeof classBuilderMetadataSchema>;
 export type ClassFeatureChoice = z.infer<typeof classFeatureChoiceSchema>;
+export type FeatureAutomationBody = z.infer<typeof featureAutomationBodySchema>;
 export type DraftRule = z.infer<typeof draftRuleSchema>;
 export type AuthoringIr = z.infer<typeof authoringIrSchema>;

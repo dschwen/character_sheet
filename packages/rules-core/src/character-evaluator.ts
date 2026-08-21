@@ -13,7 +13,14 @@ import {
   type CharacterLevel,
   type InventoryItem,
 } from "@dnd/character-model";
-import type { AuthoringIr, ContentEntity, DraftRule, Expr, Predicate } from "@dnd/content-schema";
+import {
+  featureAutomationBodySchema,
+  type AuthoringIr,
+  type ContentEntity,
+  type DraftRule,
+  type Expr,
+  type Predicate,
+} from "@dnd/content-schema";
 import type {
   ActionSummary,
   AttackSummary,
@@ -844,6 +851,7 @@ function resolveActiveConditions(
   index: PackageIndex,
   state: EngineState,
   statuses: readonly ActiveStatus[],
+  granted: ReadonlySet<string>,
 ): ActiveCondition[] {
   const active = new Map<string, ActiveCondition>();
   const pending = [...character.state.conditionIds];
@@ -884,6 +892,17 @@ function resolveActiveConditions(
         source: status.entity,
       })),
     ),
+    ...[...granted].flatMap((entityId) => {
+      const entity = index.entities.get(entityId);
+      if (entity === undefined) return [];
+      const body = featureAutomationBodySchema.safeParse(entity.body);
+      if (!body.success) return [];
+      return body.data.activeEffectConditionImmunities.flatMap((immunity) =>
+        character.state.activeEffectIds.includes(immunity.activeEffectId)
+          ? immunity.conditionIds.map((conditionId) => ({ conditionId, source: entity }))
+          : [],
+      );
+    }),
   ];
   for (const { conditionId, source } of immunitySources) {
     const blocked = active.get(conditionId);
@@ -904,6 +923,27 @@ function resolveActiveConditions(
     state.facts[`condition.${conditionId.slice(conditionId.lastIndexOf(".") + 1)}.active`] = true;
   }
   return [...active.values()];
+}
+
+function evaluateGrantedActionEnhancements(
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  for (const entityId of granted) {
+    const entity = index.entities.get(entityId);
+    if (entity === undefined) continue;
+    const body = featureAutomationBodySchema.safeParse(entity.body);
+    if (!body.success) continue;
+    for (const enhancement of body.data.actionEnhancements) {
+      const action = state.actions.find((candidate) => candidate.id === enhancement.actionId);
+      if (action === undefined) continue;
+      action.parameters = {
+        ...(action.parameters ?? {}),
+        endsConditionIds: enhancement.endsConditionIds,
+      };
+    }
+  }
 }
 
 function resolveActiveStatuses(
@@ -5935,7 +5975,6 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   validateProgressionSelections(character, index, state);
   const classLevels = materializeFacts(character, state);
   const statuses = resolveActiveStatuses(character, index, state);
-  const conditions = resolveActiveConditions(character, index, state, statuses);
   const granted = grantedFeatureIds(classLevels, index);
   grantSubclassFeatures(character, classLevels, index, granted);
   if (character.build.speciesId !== undefined) {
@@ -5949,6 +5988,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     .flatMap((level) => level.selectedFeatureChoices)
     .flatMap((choice) => choice.optionIds)
     .forEach((optionId) => granted.add(optionId));
+  const conditions = resolveActiveConditions(character, index, state, statuses, granted);
   const rules = applicableRules(index, granted);
   evaluateAbilities(state);
   evaluateProficiency(state);
@@ -5987,6 +6027,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment, statuses);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
+  evaluateGrantedActionEnhancements(granted, index, state);
   const attackRules = evaluateAttackRules(rules, granted, index, state);
   evaluateAttacks(character, equipment, attackRules, index, state);
   evaluateConditionMechanics(character, conditions, state);
