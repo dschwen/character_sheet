@@ -870,6 +870,25 @@ interface OriginContext {
   readonly speciesBody?: z.infer<typeof speciesBodySchema>;
 }
 
+function grantedAuraConditionImmunities(granted: ReadonlySet<string>, index: PackageIndex) {
+  const features = [...granted].flatMap((id) => {
+    const entity = index.entities.get(id);
+    const body = featureAutomationBodySchema.safeParse(entity?.body);
+    return entity !== undefined && body.success ? [{ entity, body: body.data }] : [];
+  });
+  return features.flatMap(({ entity, body }) =>
+    body.auraConditionImmunities.flatMap((enhancement) => {
+      const source = features.find(
+        (feature) => feature.body.savingThrowAura?.auraId === enhancement.auraId,
+      );
+      const aura = source?.body.savingThrowAura;
+      return source === undefined || aura === undefined
+        ? []
+        : [{ entity, enhancement, aura, auraSource: source.entity }];
+    }),
+  );
+}
+
 function resolveActiveConditions(
   character: CharacterDocument,
   index: PackageIndex,
@@ -928,7 +947,11 @@ function resolveActiveConditions(
       );
     }),
   ];
-  for (const { conditionId, source } of immunitySources) {
+  function suppressCondition(
+    conditionId: string,
+    source: ContentEntity,
+    otherSources: ContentEntity[] = [],
+  ): void {
     const blocked = active.get(conditionId);
     if (blocked !== undefined) {
       if (blocked.explicit) {
@@ -941,7 +964,30 @@ function resolveActiveConditions(
         );
       }
       active.delete(conditionId);
+      const traceId = `condition.${conditionId.slice(conditionId.lastIndexOf(".") + 1)}.suppressed`;
+      state.traces[traceId] = {
+        id: traceId,
+        result: false,
+        nodes: [
+          {
+            id: `${traceId}.immunity`,
+            operation: "suppress-condition-without-removing-state",
+            inputs: [conditionId, source.id],
+            output: false,
+          },
+        ],
+        sourceReferences: [source, ...otherSources, blocked.entity].flatMap(entitySourceReferences),
+      };
     }
+  }
+  for (const { conditionId, source } of immunitySources) suppressCondition(conditionId, source);
+  for (const { entity, enhancement, aura, auraSource } of grantedAuraConditionImmunities(
+    granted,
+    index,
+  )) {
+    if (aura.inactiveConditionIds.some((id) => active.has(id))) continue;
+    for (const conditionId of enhancement.conditionIds)
+      suppressCondition(conditionId, entity, [auraSource]);
   }
   for (const conditionId of active.keys()) {
     state.facts[`condition.${conditionId.slice(conditionId.lastIndexOf(".") + 1)}.active`] = true;
@@ -1326,6 +1372,31 @@ function evaluateSavingThrowAuras(
         true,
     );
     const traceId = `${aura.auraId}.bonus`;
+    const immunities = grantedAuraConditionImmunities(granted, index)
+      .filter(({ enhancement }) => enhancement.auraId === aura.auraId)
+      .map(({ entity: enhancementSource, enhancement }) => {
+        const immunityTraceId = `${enhancementSource.id}.aura-immunities`;
+        state.traces[immunityTraceId] = {
+          id: immunityTraceId,
+          result: active ? enhancement.conditionIds : [],
+          nodes: [
+            {
+              id: `${immunityTraceId}.grant`,
+              operation: "grant-condition-immunities-in-active-aura",
+              inputs: [active, ...enhancement.conditionIds],
+              output: active ? enhancement.conditionIds : [],
+            },
+          ],
+          sourceReferences: [entity, enhancementSource].flatMap(entitySourceReferences),
+        };
+        return {
+          sourceId: enhancementSource.id,
+          name: enhancementSource.name.en ?? enhancementSource.id,
+          conditionIds: enhancement.conditionIds,
+          recipientStatusId: enhancement.recipientStatusId,
+          traceId: immunityTraceId,
+        };
+      });
     state.traces[traceId] = {
       id: traceId,
       result: bonus,
@@ -1346,6 +1417,7 @@ function evaluateSavingThrowAuras(
       active,
       radiusFeet: aura.radiusFeet,
       recipientStatusId: aura.recipientStatusId,
+      ...(immunities.length > 0 ? { conditionImmunities: immunities } : {}),
       traceId,
     });
     if (active) chosen.set(aura.auraId, { bonus, entity });

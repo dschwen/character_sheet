@@ -477,7 +477,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 7)},
+                "countByLevel": {str(level): 2 for level in range(1, 8)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple", "martial"],
@@ -486,7 +486,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 15,
                     "dexterity": 8,
@@ -839,6 +839,52 @@ def generate_paladin_content(
         "inactiveConditionIds": ["srd521.condition.incapacitated"],
     }
     aura["body"]["automationLevel"] = "sheet-automated"
+    devotion = next(
+        entity
+        for entity in paladin_entities
+        if entity["id"] == "srd521.subclass-feature.paladin.oath-of-devotion.aura-of-devotion"
+    )
+    devotion_status_id = "srd521.status.feature.aura-of-devotion"
+    devotion["body"]["auraConditionImmunities"] = [
+        {
+            "auraId": aura_id,
+            "conditionIds": ["srd521.condition.charmed"],
+            "recipientStatusId": devotion_status_id,
+        }
+    ]
+    devotion["body"]["automationLevel"] = "sheet-automated"
+    paladin_entities.append(
+        {
+            "id": devotion_status_id,
+            "kind": "status",
+            "name": {"en": "Aura of Devotion (other Paladin)"},
+            "tags": ["status", "aura", "paladin"],
+            "source": devotion["source"],
+            "body": {
+                "sourceFeatureId": devotion["id"],
+                "description": devotion["body"]["text"],
+                "duration": "While inside an active Devotion Paladin's Aura of Protection",
+                "concentration": False,
+                "conditionImmunities": ["srd521.condition.charmed"],
+                "assistedInstructions": [
+                    "Set this status on allies inside a level-7 or higher Devotion Paladin's "
+                    "active Aura of Protection.",
+                    "Remove it when leaving the aura or when its Paladin is Incapacitated. "
+                    "Recipient Incapacitation does not end this protection.",
+                    "Charmed is suppressed, not removed. Leave the condition recorded if its "
+                    "duration has not ended.",
+                    "Set Aura of Protection separately with the chosen Paladin's saving-throw "
+                    "bonus; this toggle grants no save bonus.",
+                ],
+                "automationLevel": "sheet-automated",
+            },
+            "rules": [],
+            "review": _review(
+                "Source-linked Aura of Devotion recipient toggle; range and source status "
+                "are declared manually."
+            ),
+        }
+    )
     paladin_entities.append(
         {
             "id": status_id,

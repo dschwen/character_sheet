@@ -61,7 +61,7 @@ describe("guided character level up", () => {
     expect(evaluation.d20Tests["savingThrow.dexterity"]?.modifier).toBe(
       (original.d20Tests["savingThrow.dexterity"]?.modifier ?? 0) + 3,
     );
-    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: false });
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: true });
   });
   it("advances an Open Hand Monk to level 6 and rolls Wholeness of Body", () => {
     const { rulesPackage } = loadWebData();

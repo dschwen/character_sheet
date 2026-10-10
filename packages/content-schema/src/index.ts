@@ -539,6 +539,17 @@ export const featureAutomationBodySchema = z
       .strict()
       .optional(),
     savingThrowAura: savingThrowAuraSchema.optional(),
+    auraConditionImmunities: z
+      .array(
+        z
+          .object({
+            auraId: entityIdSchema,
+            conditionIds: z.array(entityIdSchema).min(1),
+            recipientStatusId: entityIdSchema,
+          })
+          .strict(),
+      )
+      .default([]),
     unarmedStrikeDamageTypes: z.array(z.string().min(1)).default([]),
     spellHealingEffects: z
       .array(

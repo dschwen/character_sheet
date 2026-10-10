@@ -14152,7 +14152,7 @@
           "srd521.skill.persuasion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -14572,7 +14572,8 @@
           "3": 2,
           "4": 2,
           "5": 2,
-          "6": 2
+          "6": 2,
+          "7": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -15683,6 +15684,16 @@
   },
   {
     "body": {
+      "auraConditionImmunities": [
+        {
+          "auraId": "srd521.aura.protection",
+          "conditionIds": [
+            "srd521.condition.charmed"
+          ],
+          "recipientStatusId": "srd521.status.feature.aura-of-devotion"
+        }
+      ],
+      "automationLevel": "sheet-automated",
       "level": 7,
       "text": "You and your allies have Immunity to the Charmed condition while in your Aura of Protection. If a Charmed ally enters the aura, that condition has no effect on that ally while there."
     },
@@ -52734,6 +52745,52 @@
     ],
     "tags": [
       "weapon-property"
+    ]
+  },
+  {
+    "body": {
+      "assistedInstructions": [
+        "Set this status on allies inside a level-7 or higher Devotion Paladin's active Aura of Protection.",
+        "Remove it when leaving the aura or when its Paladin is Incapacitated. Recipient Incapacitation does not end this protection.",
+        "Charmed is suppressed, not removed. Leave the condition recorded if its duration has not ended.",
+        "Set Aura of Protection separately with the chosen Paladin's saving-throw bonus; this toggle grants no save bonus."
+      ],
+      "automationLevel": "sheet-automated",
+      "concentration": false,
+      "conditionImmunities": [
+        "srd521.condition.charmed"
+      ],
+      "description": "You and your allies have Immunity to the Charmed condition while in your Aura of Protection. If a Charmed ally enters the aura, that condition has no effect on that ally while there.",
+      "duration": "While inside an active Devotion Paladin's Aura of Protection",
+      "sourceFeatureId": "srd521.subclass-feature.paladin.oath-of-devotion.aura-of-devotion"
+    },
+    "id": "srd521.status.feature.aura-of-devotion",
+    "kind": "status",
+    "name": {
+      "en": "Aura of Devotion (other Paladin)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Source-linked Aura of Devotion recipient toggle; range and source status are declared manually.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0056-b056"
+        ],
+        "page": 56,
+        "quoteHash": "4f1904fb60c3b7935a628e7c2c7ec53511abb596e8bc0187140c0e3f2ee55e74",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "aura",
+      "paladin"
     ]
   }
 ]

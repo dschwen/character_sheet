@@ -1705,6 +1705,27 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             shortEntityName(aura.recipientStatusId)}
                           ” on their sheets with bonus {signed(aura.bonus)}. Only one aura applies.
                         </small>
+                        {(aura.conditionImmunities ?? []).map((immunity) => (
+                          <div key={immunity.sourceId}>
+                            <TraceButton
+                              traceId={immunity.traceId}
+                              onSelect={setSelectedTraceId}
+                              inspectOnClick
+                            >
+                              {immunity.name} · {aura.active ? "Immune to" : "Inactive:"}{" "}
+                              {immunity.conditionIds
+                                .map((id) => names.get(id) ?? shortEntityName(id))
+                                .join(", ")}
+                            </TraceButton>
+                            <small>
+                              {aura.active ? "Allies in range: set" : "Aura inactive: remove"} “
+                              {names.get(immunity.recipientStatusId) ??
+                                shortEntityName(immunity.recipientStatusId)}
+                              ” on their sheets. Existing conditions are suppressed, not removed;
+                              range and the source Paladin’s condition are tracked manually.
+                            </small>
+                          </div>
+                        ))}
                       </div>
                     ))}
                     <span>
@@ -1714,14 +1735,21 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     <div className="condition-grid">
                       {conditionOptions.map((condition) => {
                         const active = character.state.conditionIds.includes(condition.id);
+                        const suppressionTraceId = `condition.${condition.id.slice(condition.id.lastIndexOf(".") + 1)}.suppressed`;
+                        const suppressed =
+                          active && evaluation.traces[suppressionTraceId] !== undefined;
                         return (
                           <button
                             key={condition.id}
                             type="button"
                             className={active ? "condition-toggle active" : "condition-toggle"}
                             aria-pressed={active}
-                            title={condition.description}
-                            onClick={() => {
+                            title={`${condition.description}${suppressed ? " Suppressed by immunity; the condition stays recorded. Shift-click to inspect." : ""}`}
+                            onClick={(event) => {
+                              if (suppressed && event.shiftKey) {
+                                setSelectedTraceId(suppressionTraceId);
+                                return;
+                              }
                               const updated = setConditionActive(
                                 character,
                                 condition.id,
@@ -1741,6 +1769,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             }}
                           >
                             {condition.name}
+                            {suppressed ? " · suppressed" : ""}
                           </button>
                         );
                       })}

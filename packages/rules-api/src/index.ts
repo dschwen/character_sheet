@@ -338,6 +338,13 @@ export interface SavingThrowAuraSummary {
   active: boolean;
   recipientStatusId: string;
   traceId: string;
+  conditionImmunities?: {
+    sourceId: string;
+    name: string;
+    conditionIds: string[];
+    recipientStatusId: string;
+    traceId: string;
+  }[];
 }
 
 export interface SpellSlotRecoverySummary {
