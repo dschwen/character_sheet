@@ -95,7 +95,7 @@ describe("guided character level up", () => {
     expect(proposal.applicable).toBe(true);
     expect(proposal.nextState.currentHitPoints).toBe(20);
     expect(proposal.nextState.expendedResources["srd521.resource.monk.wholeness-of-body"]).toBe(1);
-    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: false });
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: true, targetLevel: 7 });
   });
   it.each([
     barbarianId,

@@ -242,7 +242,7 @@ def extract_open_hand_features(document: dict[str, Any]) -> tuple[dict[str, Any]
 
 
 def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
-    return {
+    entity: dict[str, Any] = {
         "id": feature["id"],
         "kind": kind,
         "name": {"en": feature["name"]},
@@ -255,6 +255,22 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
         "rules": [],
         "review": _review(f"{feature['name']} extracted from the Monk description."),
     }
+    if feature["name"] == "Evasion":
+        entity["body"].update(
+            {
+                "automationLevel": "state-automated",
+                "savingThrowDamageEffects": [
+                    {
+                        "ability": "dexterity",
+                        "requiresHalfDamageOnSuccess": True,
+                        "successFraction": 0,
+                        "failureFraction": 0.5,
+                        "inactiveConditionIds": ["srd521.condition.incapacitated"],
+                    }
+                ],
+            }
+        )
+    return entity
 
 
 def _starting_equipment() -> dict[str, Any]:
@@ -320,12 +336,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 7)},
+                "countByLevel": {str(level): 2 for level in range(1, 8)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 8,
                     "dexterity": 15,

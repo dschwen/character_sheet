@@ -21,7 +21,13 @@ import type {
   StateChange,
   ValidationMessage,
 } from "@dnd/rules-api";
-import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeAction,
+  proposeRest,
+  proposeSpellCast,
+  resolveSavingThrowDamage,
+} from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
 import { spellProtectionInstructions } from "../lib/spell-protection";
@@ -62,6 +68,7 @@ import {
   shortEntityName,
   signed,
   titleCase,
+  type Ability,
 } from "../lib/presentation";
 import {
   applyDamage,
@@ -350,6 +357,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [builderOpen, setBuilderOpen] = useState(false);
   const [levelUpOpen, setLevelUpOpen] = useState(false);
   const [playAmount, setPlayAmount] = useState("1");
+  const [resolveSaveDamage, setResolveSaveDamage] = useState(false);
+  const [incomingSaveAbility, setIncomingSaveAbility] = useState<Ability>("dexterity");
+  const [incomingSaveOutcome, setIncomingSaveOutcome] = useState<"success" | "failure">("failure");
+  const [incomingSuccessDamage, setIncomingSuccessDamage] = useState<"half" | "none" | "full">(
+    "half",
+  );
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
@@ -571,6 +584,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     [builderCatalog, character],
   );
   const evaluation = result.evaluation;
+  const incomingDamage =
+    resolveSaveDamage &&
+    evaluation !== undefined &&
+    Number.isSafeInteger(Number(playAmount)) &&
+    Number(playAmount) > 0
+      ? resolveSavingThrowDamage(evaluation, {
+          damage: Number(playAmount),
+          ability: incomingSaveAbility,
+          outcome: incomingSaveOutcome,
+          damageOnSuccess: incomingSuccessDamage,
+        })
+      : undefined;
   const attackRollMode =
     evaluation?.facts["attackRoll.mode"] === "advantage" ||
     evaluation?.facts["attackRoll.mode"] === "disadvantage"
@@ -588,7 +613,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const trace =
     selectedTraceId === undefined
       ? undefined
-      : (evaluation?.traces[selectedTraceId] ?? castFeedback?.traces[selectedTraceId]);
+      : (evaluation?.traces[selectedTraceId] ??
+        castFeedback?.traces[selectedTraceId] ??
+        (incomingDamage?.trace.id === selectedTraceId ? incomingDamage.trace : undefined));
 
   function linkedStatusIds(spellId: string | undefined): string[] {
     if (spellId === undefined) return [];
@@ -764,6 +791,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setSpellHealsOther({});
     setProtectedCreatureCounts({});
     setWeaponDamageModes({});
+    setResolveSaveDamage(false);
     setSpellRecoverySelections({});
     setCastFeedback(undefined);
     setPreparedSpellDraft(undefined);
@@ -791,6 +819,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setSpellHealsOther({});
       setProtectedCreatureCounts({});
       setWeaponDamageModes({});
+      setResolveSaveDamage(false);
       setSpellRecoverySelections({});
       setCastFeedback(undefined);
       setPreparedSpellDraft(undefined);
@@ -894,9 +923,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   function damageCharacter(): void {
     const amount = positivePlayAmount();
     if (amount === undefined) return;
+    if (resolveSaveDamage && incomingDamage === undefined) {
+      setNotice("Enter a valid safe whole-number damage amount before resolving the save.");
+      return;
+    }
     savePlayState(
-      applyDamage(character, amount),
-      `${character.name} took ${String(amount)} damage.`,
+      applyDamage(character, incomingDamage?.damage ?? amount),
+      `${character.name} took ${String(incomingDamage?.damage ?? amount)} damage. ${incomingDamage?.explanation ?? ""}`.trim(),
     );
   }
 
@@ -1385,7 +1418,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     </div>
                   </div>
                   <div className="play-control">
-                    <label htmlFor="hp-amount">Damage or healing amount</label>
+                    <label htmlFor="hp-amount">
+                      {resolveSaveDamage
+                        ? "Damage before saving throw (or healing amount)"
+                        : "Damage or healing amount"}
+                    </label>
                     <div>
                       <input
                         id="hp-amount"
@@ -1399,12 +1436,104 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         }}
                       />
                       <button className="button danger" type="button" onClick={damageCharacter}>
-                        Apply damage
+                        Apply{" "}
+                        {incomingDamage === undefined
+                          ? "damage"
+                          : `${String(incomingDamage.damage)} damage`}
                       </button>
                       <button className="button heal" type="button" onClick={healCharacter}>
                         Heal
                       </button>
                     </div>
+                  </div>
+                  <div className="play-control save-damage-controls">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={resolveSaveDamage}
+                        onChange={(event) => {
+                          setResolveSaveDamage(event.target.checked);
+                        }}
+                      />
+                      Resolve damage from a saving throw
+                    </label>
+                    <small>
+                      Leave off for damage already resolved by the DM. Resistances, vulnerability,
+                      and other reductions remain manual. If they apply, resolve them separately and
+                      turn this off before entering the final total. Healing ignores these save
+                      controls.
+                    </small>
+                    {resolveSaveDamage ? (
+                      <>
+                        <label>
+                          Saving throw ability
+                          <select
+                            value={incomingSaveAbility}
+                            onChange={(event) => {
+                              setIncomingSaveAbility(event.target.value as Ability);
+                            }}
+                          >
+                            {abilities.map((ability) => (
+                              <option key={ability} value={ability}>
+                                {titleCase(ability)}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          Saving throw outcome
+                          <select
+                            value={incomingSaveOutcome}
+                            onChange={(event) => {
+                              setIncomingSaveOutcome(event.target.value as "success" | "failure");
+                            }}
+                          >
+                            <option value="failure">Failed save</option>
+                            <option value="success">Successful save</option>
+                          </select>
+                        </label>
+                        <label>
+                          The effect normally deals on a successful save
+                          <select
+                            value={incomingSuccessDamage}
+                            onChange={(event) => {
+                              setIncomingSuccessDamage(
+                                event.target.value as "half" | "none" | "full",
+                              );
+                            }}
+                          >
+                            <option value="half">Half damage</option>
+                            <option value="none">No damage</option>
+                            <option value="full">Full damage</option>
+                          </select>
+                        </label>
+                        {incomingDamage === undefined ? null : (
+                          <TraceButton
+                            traceId={incomingDamage.trace.id}
+                            onSelect={setSelectedTraceId}
+                            inspectOnClick
+                          >
+                            {incomingDamage.explanation} · Explain
+                          </TraceButton>
+                        )}
+                      </>
+                    ) : null}
+                    {(evaluation.savingThrowDamageEffects ?? []).map((effect) => (
+                      <div key={effect.traceId}>
+                        <TraceButton
+                          traceId={effect.traceId}
+                          onSelect={setSelectedTraceId}
+                          inspectOnClick
+                        >
+                          {effect.sourceName} · {effect.active ? "Active" : "Inactive"}
+                        </TraceButton>
+                        <small>
+                          {effect.reasons.length > 0
+                            ? effect.reasons.join(" ")
+                            : `For ${effect.ability} saves that normally halve damage: success × ${String(effect.successFraction)}, failure × ${String(effect.failureFraction)}. Declare the save context above to apply.`}
+                        </small>
+                      </div>
+                    ))}
                   </div>
                   <div className="play-control">
                     <label htmlFor="temporary-hp">Replace Temporary Hit Points</label>
@@ -3405,6 +3534,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSpellHealsOther({});
             setProtectedCreatureCounts({});
             setWeaponDamageModes({});
+            setResolveSaveDamage(false);
             setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
@@ -3432,6 +3562,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSpellHealsOther({});
             setProtectedCreatureCounts({});
             setWeaponDamageModes({});
+            setResolveSaveDamage(false);
             setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);

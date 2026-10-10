@@ -453,6 +453,19 @@ export const weaponPropertyBodySchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    savingThrowDamageEffects: z
+      .array(
+        z
+          .object({
+            ability: characterBuilderAbilitySchema,
+            requiresHalfDamageOnSuccess: z.literal(true),
+            successFraction: z.number().min(0).max(1),
+            failureFraction: z.number().min(0).max(1),
+            inactiveConditionIds: z.array(entityIdSchema),
+          })
+          .strict(),
+      )
+      .default([]),
     weaponDamageDieMinimums: z
       .array(
         z

@@ -2,10 +2,38 @@ import pytest
 
 from srd_extract.monk import (
     MonkProgressionRow,
+    _feature_entity,
     _starting_equipment,
     _wholeness_ir,
     parse_core_traits,
 )
+
+
+def test_evasion_retains_text_source_and_requires_half_damage_dexterity_save() -> None:
+    source = [{"page": 51, "sourceId": "wotc-srd-5.2.1-en", "blocks": ["p0051-b001"]}]
+    entity = _feature_entity(
+        {
+            "id": "srd521.class-feature.monk.evasion",
+            "name": "Evasion",
+            "level": 7,
+            "source": source,
+            "bodyNodes": [{"normalizedText": "Dexterity save for half; not Incapacitated."}],
+        },
+        "class-feature",
+    )
+    assert entity["source"] == source
+    assert entity["body"]["level"] == 7
+    assert entity["body"]["text"] == "Dexterity save for half; not Incapacitated."
+    assert entity["body"]["savingThrowDamageEffects"] == [
+        {
+            "ability": "dexterity",
+            "requiresHalfDamageOnSuccess": True,
+            "successFraction": 0,
+            "failureFraction": 0.5,
+            "inactiveConditionIds": ["srd521.condition.incapacitated"],
+        }
+    ]
+    assert entity["review"]["semanticsApproved"] is False
 
 
 def test_wholeness_uses_progression_die_and_separate_long_rest_resource() -> None:

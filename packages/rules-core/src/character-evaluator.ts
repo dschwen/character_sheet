@@ -6755,6 +6755,44 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateActionMovement(state);
   validateConcentration(character, index, state);
   validateActiveState(character, state);
+  const savingThrowDamageEffects = [...granted].flatMap((sourceId) => {
+    const entity = index.entities.get(sourceId);
+    const body = featureAutomationBodySchema.safeParse(entity?.body);
+    if (entity === undefined || !body.success) return [];
+    return body.data.savingThrowDamageEffects.map((effect, effectIndex) => {
+      const reasons = effect.inactiveConditionIds
+        .filter((id) => conditions.some((condition) => condition.entity.id === id))
+        .map(
+          (id) =>
+            `${entity.name.en ?? entity.id} is inactive while ${index.entities.get(id)?.name.en ?? id}.`,
+        );
+      const traceId = `${sourceId}.saveDamage.${String(effectIndex)}`;
+      state.traces[traceId] = {
+        id: traceId,
+        result: reasons.length === 0,
+        nodes: [
+          {
+            id: `${traceId}.active`,
+            operation: "saving-throw-damage-feature-eligibility",
+            inputs: [effect.inactiveConditionIds],
+            output: reasons.length === 0,
+          },
+        ],
+        sourceReferences: entitySourceReferences(entity),
+      };
+      return {
+        sourceId,
+        sourceName: entity.name.en ?? sourceId,
+        ability: effect.ability,
+        requiresHalfDamageOnSuccess: effect.requiresHalfDamageOnSuccess,
+        successFraction: effect.successFraction,
+        failureFraction: effect.failureFraction,
+        active: reasons.length === 0,
+        reasons,
+        traceId,
+      };
+    });
+  });
   const coverageWarnings = index.authoringIr
     .filter((ir) => granted.has(ir.id) && ir.review.semantics !== "approved")
     .map((ir) => ({
@@ -6764,6 +6802,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     }));
   return {
     facts: state.facts,
+    savingThrowDamageEffects,
     savingThrowAuras: savingThrowAuras.auras,
     spellSlotRecoveries,
     values: state.values,

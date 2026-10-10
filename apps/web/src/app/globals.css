@@ -639,6 +639,34 @@ button.vital-card:hover {
 .play-control input {
   width: 90px;
 }
+.save-damage-controls > label {
+  display: grid;
+  gap: 6px;
+}
+.save-damage-controls > label:first-child {
+  display: flex;
+  align-items: center;
+}
+.save-damage-controls input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  flex-shrink: 0;
+}
+.save-damage-controls select {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  background: white;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.save-damage-controls > div {
+  display: grid;
+}
 .button.danger {
   border-color: #c67d72;
   color: #8b3026;

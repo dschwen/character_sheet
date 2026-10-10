@@ -5,3 +5,4 @@ export { proficiencyContribution, resolveProficiencyLevel, resolveRollMode } fro
 export { ExpressionEvaluator, type EvaluationContext, type EvaluationLimits } from "./evaluator.js";
 export { proposeRest } from "./rest.js";
 export { proposeSpellCast } from "./spell-transition.js";
+export { resolveSavingThrowDamage } from "./saving-throw-damage.js";

@@ -1,4 +1,4 @@
-# Monk levels 1–6 vertical slice
+# Monk levels 1–7 vertical slice
 
 The reviewed `monk-5.json` fixture is a Human Soldier Warrior of the Open Hand. It is unarmored,
 wields a Spear, has Dexterity 18 and Wisdom 15, and exercises every persistent level-1–5 Monk
@@ -11,7 +11,7 @@ Deflect Attacks redirection, and Stunning Strike. Action proposals spend Focus a
 either Short or Long Rest restores it.
 
 The generated content retains every Monk and Warrior of the Open Hand feature through level 20 as
-source-linked structured text. The builder and advancement flow support level 6, granting six Focus
+source-linked structured text. The builder and advancement flow support level 7, granting seven Focus
 Points, Empowered Strikes, and Wholeness of Body. Unarmed Strike damage offers a Force alternative
 without changing weapon damage or requiring armor-free Martial Arts eligibility.
 
@@ -20,6 +20,30 @@ Wisdom, heals at least 1 HP, and caps healing at maximum HP. Its separate resour
 equal to Wisdom's modifier (minimum 1), recharges only on Long Rest, and cannot be used at 0 HP.
 The generic action controls use the existing fullscreen dice roller before applying healing and
 spending one use. The die is derived from the progression table rather than fixed in the UI.
+
+At level 7, Evasion adds a source-linked saving-throw damage effect (page 51). For an effect that
+normally permits a Dexterity save for half damage, a successful save deals zero and a failed save
+deals half, rounded down. No Focus is spent, and armor or Shield use does not disable Evasion.
+Effective Incapacitated disables it, including that granted by Stunned, Paralyzed, or Unconscious.
+Prone and Grappled alone do not disable it.
+
+Play → Hit Points offers an opt-in saving-throw damage resolver. Declare the ability, outcome,
+and normal successful-save damage; the preview shows the fraction, rounded total, and explanation
+trace. Only eligible, granted, active effects apply. Duplicate benefits select the lowest fraction
+rather than multiplying. Ordinary resolved damage entry remains the default. Switching, importing,
+creating, or advancing a character turns the resolver off to avoid carrying save declarations
+across sheets.
+
+Applying the preview uses the ordinary reversible HP update: Temporary HP absorbs damage first,
+then current HP, without applying Evasion twice. The resolver itself changes no state. Healing
+ignores save declarations. Outcome declaration (including forced failures), effect eligibility,
+resistances, vulnerability, other reductions, and concentration checks remain manual. If other
+modifiers apply, resolve those separately and turn off the resolver before entering an
+already-resolved final total. Outgoing spell damage is unchanged.
+
+Tests cover level gates, successful/failed and odd damage, condition inheritance, exhausted Focus,
+armor, other abilities and save types, Temporary HP, duplicate/data-edited effects, malformed
+inputs, and level-up preservation. Browser verification of the controls remains outstanding.
 
 These limits remain intentionally assisted:
 

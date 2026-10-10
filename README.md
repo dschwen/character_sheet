@@ -110,6 +110,10 @@ including upcast dice and Disciple of Life on slotted casts; apply the rolled he
 Free casts do not trigger either Life Domain bonus. At Monk level 6,
 Wholeness of Body rolls the Martial Arts die, heals with Wisdom (minimum 1 HP), and tracks
 Long Rest uses; Empowered Strikes offers Force-damage and critical-damage buttons for Unarmed Strikes.
+At Monk level 7, Evasion reduces eligible Dexterity-save damage unless Incapacitated. In Play →
+Hit Points, enable the optional saving-throw resolver, declare the outcome and normal save damage,
+inspect the preview, then apply it. Leave this off for damage already resolved by the DM; other
+damage modifiers remain manual.
 At Ranger level 6,
 Roving automatically increases walking Speed when eligible and grants matching Climb and Swim
 Speeds. Bard advancement permits one cantrip and one prepared-spell
@@ -148,7 +152,7 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-level 1–6 vertical slices for all twelve SRD classes, plus level 7 for Fighter and Barbarian, with
+level 1–6 vertical slices for all twelve SRD classes, plus level 7 for Fighter, Barbarian, and Monk, with
 every standard SRD background and species. Higher levels and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 

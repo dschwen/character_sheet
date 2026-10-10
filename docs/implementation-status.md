@@ -29,7 +29,8 @@ because some of its functionality exists or tests pass.
   source-linked conditional damage modes and shared physical/fallback dice resolution. Eligibility
   declarations and turn/action tracking remain manual. Barbarian also reaches level 7: Feral Instinct
   grants traced Initiative advantage, and Enter Rage includes Instinctive Pounce movement guidance
-  using final adjusted Speed. Other class builders remain capped at 6.
+  using final adjusted Speed. Monk reaches level 7 with condition-aware Evasion and a shared,
+  opt-in saving-throw damage resolver in Play. Other class builders remain capped at 6.
 
 ## Remaining milestone gates
 
@@ -42,7 +43,7 @@ because some of its functionality exists or tests pass.
 | 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                           |
 | 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                             |
 | 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                |
-| 7: Levels 6–20                   | In progress. All twelve builders reach level 6; Fighter and Barbarian reach 7. Finish higher-level features, repeat choices, Epic Boons, spell progression, interactions, and twelve reviewed level-20 fixtures.            |
+| 7: Levels 6–20                   | In progress. All twelve builders reach level 6; Fighter, Barbarian, and Monk reach 7. Finish higher-level features, repeat choices, Epic Boons, spell progression, interactions, and twelve reviewed level-20 fixtures.     |
 | 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                    |
 | 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.              |
 | 10: Beta hardening               | Complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit.                                |

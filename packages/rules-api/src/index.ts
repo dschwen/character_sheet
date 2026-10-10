@@ -348,6 +348,7 @@ export interface SpellSlotRecoverySummary {
 }
 
 export interface CharacterEvaluation {
+  savingThrowDamageEffects?: SavingThrowDamageEffectSummary[];
   spellProtections?: SpellProtectionSummary[];
   spellSlotRecoveries?: SpellSlotRecoverySummary[];
   savingThrowAuras?: SavingThrowAuraSummary[];
@@ -367,6 +368,33 @@ export interface CharacterEvaluation {
   validations: ValidationMessage[];
   traces: Readonly<Record<string, CalculationTrace>>;
   coverageWarnings: CoverageWarning[];
+}
+
+export interface SavingThrowDamageEffectSummary {
+  sourceId: string;
+  sourceName: string;
+  ability: "strength" | "dexterity" | "constitution" | "intelligence" | "wisdom" | "charisma";
+  requiresHalfDamageOnSuccess: true;
+  successFraction: number;
+  failureFraction: number;
+  active: boolean;
+  reasons: string[];
+  traceId: string;
+}
+
+export interface SavingThrowDamageRequest {
+  damage: number;
+  ability: SavingThrowDamageEffectSummary["ability"];
+  outcome: "success" | "failure";
+  damageOnSuccess: "half" | "none" | "full";
+}
+
+export interface SavingThrowDamageResolution {
+  damage: number;
+  fraction: number;
+  appliedEffectIds: string[];
+  explanation: string;
+  trace: CalculationTrace;
 }
 
 export interface SpellProtectionSummary {
