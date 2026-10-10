@@ -302,8 +302,14 @@ export class ExpressionEvaluator {
       }
       case "resourceAvailable": {
         const amount = this.#context.resourceAmounts?.[predicate.resourceId] ?? 0;
-        const result = amount > 0;
-        this.#record(state, "predicate.resourceAvailable", [predicate.resourceId, amount], result);
+        const minimum = predicate.minimum;
+        const result = minimum === undefined ? amount > 0 : amount >= minimum;
+        this.#record(
+          state,
+          "predicate.resourceAvailable",
+          [predicate.resourceId, amount, minimum ?? 0],
+          result,
+        );
         return result;
       }
     }

@@ -19901,7 +19901,7 @@
           "srd521.skill.persuasion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 6,
@@ -20343,7 +20343,8 @@
           "3": 2,
           "4": 2,
           "5": 2,
-          "6": 2
+          "6": 2,
+          "7": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -52798,6 +52799,57 @@
       "status",
       "aura",
       "paladin"
+    ]
+  },
+  {
+    "body": {
+      "concentration": false,
+      "description": "For 1 minute, your Sorcerer spell save DC increases by 1 and your Sorcerer spell attacks have Advantage. End this status when the minute expires. At Sorcerer level 7, you may use up to two Metamagic options on each spell while active; adjudicate their timing and costs manually.",
+      "duration": "1 minute",
+      "endsOnRest": true,
+      "sourceFeatureId": "srd521.class-feature.sorcerer.innate-sorcery",
+      "spellcastingEnhancement": {
+        "attackRollAdvantage": true,
+        "castingClassId": "srd521.class.sorcerer",
+        "saveDifficultyClassBonus": 1
+      }
+    },
+    "id": "srd521.status.feature.innate-sorcery",
+    "kind": "status",
+    "name": {
+      "en": "Innate Sorcery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Innate Sorcery spellcasting benefits; duration and Metamagic timing remain manual.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0065-b004"
+        ],
+        "page": 65,
+        "quoteHash": "096ec76e1831309172a5e9a5eebbe4d6403addd35eca8b148a5f81c91dcaa6fa",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0066-b002",
+          "p0066-b003"
+        ],
+        "page": 66,
+        "quoteHash": "ecb0315b3e09d70c7ddaae845c03b25235c840b7937db8040f904e507c3d149a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "feature",
+      "sorcerer"
     ]
   }
 ]

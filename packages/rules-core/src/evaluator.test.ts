@@ -106,6 +106,33 @@ describe("ExpressionEvaluator", () => {
     expect(result.value).toBe(true);
   });
 
+  it.each([0, 1, 2, 3])("checks a requested minimum against %s resource points", (amount) => {
+    const evaluator = new ExpressionEvaluator({
+      facts: {},
+      resourceAmounts: { "srd521.resource.points": amount },
+    });
+    expect(
+      evaluator.evaluatePredicate({
+        kind: "resourceAvailable",
+        resourceId: "srd521.resource.points",
+        minimum: 2,
+      }).value,
+    ).toBe(amount >= 2);
+    expect(
+      evaluator.evaluatePredicate({
+        kind: "resourceAvailable",
+        resourceId: "srd521.resource.points",
+      }).value,
+    ).toBe(amount > 0);
+    expect(
+      evaluator.evaluatePredicate({
+        kind: "resourceAvailable",
+        resourceId: "srd521.resource.missing",
+        minimum: 2,
+      }).value,
+    ).toBe(false);
+  });
+
   it("is deterministic", () => {
     fc.assert(
       fc.property(

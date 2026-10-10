@@ -5,9 +5,17 @@ import {
   classFeatureChoiceSchema,
   exprSchema,
   packageManifestSchema,
+  predicateSchema,
 } from "./index.js";
 
 describe("content schemas", () => {
+  it("accepts positive resource thresholds without changing legacy predicates", () => {
+    const predicate = { kind: "resourceAvailable", resourceId: "srd521.resource.points" };
+    expect(predicateSchema.parse(predicate)).toEqual(predicate);
+    expect(predicateSchema.parse({ ...predicate, minimum: 2 })).toMatchObject({ minimum: 2 });
+    for (const minimum of [0, -1, 1.5, Number.POSITIVE_INFINITY])
+      expect(predicateSchema.safeParse({ ...predicate, minimum }).success).toBe(false);
+  });
   it("accepts an empty pinned SRD package manifest", () => {
     expect(
       packageManifestSchema.parse({

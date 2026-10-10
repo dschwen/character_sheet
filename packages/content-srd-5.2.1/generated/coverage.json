@@ -2,7 +2,7 @@
   "authoringIr": {
     "semanticsApproved": 0,
     "testsApproved": 0,
-    "total": 56
+    "total": 57
   },
   "classes": [
     {
@@ -60,7 +60,7 @@
       "name": "Rogue"
     },
     {
-      "builderMaximum": 6,
+      "builderMaximum": 7,
       "builderMinimum": 1,
       "id": "srd521.class.sorcerer",
       "name": "Sorcerer"
@@ -80,7 +80,7 @@
   ],
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 864,
+    "STRUCTURED": 865,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
@@ -101,7 +101,7 @@
     "rule-table": 14,
     "species": 9,
     "spell": 339,
-    "status": 16,
+    "status": 17,
     "subclass": 12,
     "subclass-feature": 58,
     "subclass-option": 8,

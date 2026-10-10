@@ -179,6 +179,7 @@ export interface SpellSlotSummary {
 }
 
 export interface SpellcastingSummary {
+  attackRollMode?: "normal" | "advantage" | "disadvantage";
   classId: string;
   model: "standard" | "pact-magic";
   slotRecharge: "long-rest" | "short-rest";
@@ -221,6 +222,7 @@ export interface SpellHealingEffectSummary {
 }
 
 export interface SpellCastingOptionSummary {
+  attackRollMode?: "normal" | "advantage" | "disadvantage";
   sourceId: string;
   ability: string;
   attackBonus: number;

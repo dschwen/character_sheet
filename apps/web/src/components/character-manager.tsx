@@ -711,7 +711,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     castingSourceId?: string,
   ): React.ReactNode {
     const spellcasting = evaluation?.spellcasting;
-    const castingOption = spell.castingOptions?.[0];
+    const castingOption =
+      castingSourceId === undefined
+        ? spell.castingOptions?.[0]
+        : spell.castingOptions?.find(({ sourceId }) => sourceId === castingSourceId);
+    const spellAttackMode =
+      castingOption === undefined
+        ? (spellcasting?.attackRollMode ?? attackRollMode)
+        : (castingOption.attackRollMode ?? attackRollMode);
     const attackBonus = castingOption?.attackBonus ?? spellcasting?.attackBonus;
     const saveDifficultyClass =
       castingOption?.saveDifficultyClass ?? spellcasting?.saveDifficultyClass;
@@ -753,7 +760,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 performRoll({
                   label: `${spell.name} spell attack`,
                   modifier: attackBonus,
-                  mode: attackRollMode,
+                  mode: spellAttackMode,
                   ...d20RerollRequest(universalD20Test, evaluation?.attackRollBonusDice ?? []),
                 });
               }
@@ -1120,9 +1127,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       if (actionRollRequest !== undefined && actionRoll === undefined) return;
       if (actionRoll !== undefined) request.rolls = [...actionRoll.dice];
       const proposal = proposeAction({ character, packages: [rulesPackage] }, request);
+      const activatedEffect = rulesPackage.entities.find(
+        ({ id }) => id === action.parameters?.activatesEffectId,
+      );
+      const effectDescription = objectValue(activatedEffect?.body)?.description;
       applyTransition(
         proposal,
-        `${actionName} applied (${String(proposal.changes.length)} changes). ${actionMovementMessage(action) ?? ""}`.trim(),
+        `${actionName} applied (${String(proposal.changes.length)} changes). ${actionMovementMessage(action) ?? ""} ${typeof effectDescription === "string" ? effectDescription : ""}`.trim(),
       );
       if (
         requiresCompletedD20Test(action) &&
@@ -3314,7 +3325,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           roll={{
                             label: "Spell attack",
                             modifier: evaluation.spellcasting.attackBonus,
-                            mode: attackRollMode,
+                            mode: evaluation.spellcasting.attackRollMode ?? attackRollMode,
                             ...d20RerollRequest(universalD20Test, evaluation.attackRollBonusDice),
                           }}
                           onRoll={performRoll}

@@ -23,18 +23,38 @@
       "type": "grant-resource"
     },
     {
-      "automationLevel": "roll-assisted",
+      "automationLevel": "state-automated",
       "id": "use-innate-sorcery",
       "parameters": {
         "actionEconomy": "bonus-action",
+        "activatesEffectId": "srd521.status.feature.innate-sorcery",
         "resourceId": "srd521.resource.sorcerer.innate-sorcery",
         "spends": 1
       },
       "target": "action.innate-sorcery",
       "type": "grant-action",
       "when": {
-        "kind": "resourceAvailable",
-        "resourceId": "srd521.resource.sorcerer.innate-sorcery"
+        "args": [
+          {
+            "kind": "resourceAvailable",
+            "resourceId": "srd521.resource.sorcerer.innate-sorcery"
+          },
+          {
+            "arg": {
+              "kind": "equals",
+              "left": {
+                "kind": "ref",
+                "path": "status.innateSorcery.active"
+              },
+              "right": {
+                "kind": "literal",
+                "value": true
+              }
+            },
+            "kind": "not"
+          }
+        ],
+        "kind": "all"
       }
     }
   ],

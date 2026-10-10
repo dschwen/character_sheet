@@ -1,6 +1,7 @@
 {
   "authoringIr": [
     "sorcerer.innate-sorcery.json",
+    "sorcerer.sorcery-incarnate.json",
     "sorcerer.font-of-magic.json",
     "sorcerer.sorcerous-restoration.json",
     "metamagic.quickened.json",
@@ -77,7 +78,8 @@
     "srd521.spell.fear",
     "srd521.spell.fire-bolt",
     "srd521.spell.haste",
-    "srd521.spell.sorcerous-burst"
+    "srd521.spell.sorcerous-burst",
+    "srd521.status.feature.innate-sorcery"
   ],
   "metamagicOptions": 10,
   "progression": [

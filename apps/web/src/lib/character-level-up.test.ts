@@ -1004,9 +1004,9 @@ describe("guided character level up", () => {
       },
     ]);
     expect(levelUpEligibility(advanced, catalog)).toMatchObject({
-      eligible: false,
+      eligible: true,
       currentLevel: 6,
-      reason: "Sorcerer advancement is currently reviewed through level 6.",
+      targetLevel: 7,
     });
   });
 

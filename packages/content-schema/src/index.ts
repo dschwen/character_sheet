@@ -36,7 +36,7 @@ export type Predicate =
   | { kind: "hasEntity"; entityId: EntityId }
   | { kind: "hasTag"; subject: Expr; tag: string }
   | { kind: "isEquipped"; itemId: EntityId }
-  | { kind: "resourceAvailable"; resourceId: EntityId };
+  | { kind: "resourceAvailable"; resourceId: EntityId; minimum?: number | undefined };
 
 export const exprSchema: z.ZodType<Expr> = z.lazy(() =>
   z.discriminatedUnion("kind", [
@@ -82,7 +82,13 @@ export const predicateSchema: z.ZodType<Predicate> = z.lazy(() =>
     z.object({ kind: z.literal("hasEntity"), entityId: entityIdSchema }).strict(),
     z.object({ kind: z.literal("hasTag"), subject: exprSchema, tag: z.string().min(1) }).strict(),
     z.object({ kind: z.literal("isEquipped"), itemId: entityIdSchema }).strict(),
-    z.object({ kind: z.literal("resourceAvailable"), resourceId: entityIdSchema }).strict(),
+    z
+      .object({
+        kind: z.literal("resourceAvailable"),
+        resourceId: entityIdSchema,
+        minimum: z.number().int().positive().optional(),
+      })
+      .strict(),
   ]),
 );
 

@@ -739,6 +739,35 @@ export function proposeRest(
       })) ?? [],
     );
   }
+  const expiringStatuses = input.packages
+    .flatMap((pack) => pack.entities)
+    .filter(
+      (entity) =>
+        entity.kind === "status" &&
+        z.object({ endsOnRest: z.literal(true) }).safeParse(entity.body).success &&
+        character.state.activeEffectIds.includes(entity.id),
+    );
+  if (expiringStatuses.length > 0) {
+    const ended = new Set(expiringStatuses.map(({ id }) => id));
+    nextState.activeEffectIds = nextState.activeEffectIds.filter((id) => !ended.has(id));
+    recordChange(
+      changes,
+      traces,
+      "state.activeEffectIds",
+      character.state.activeEffectIds,
+      nextState.activeEffectIds,
+      "Rest ends short-duration feature statuses.",
+      "expire-statuses-on-rest",
+      [...ended],
+      expiringStatuses.flatMap((entity) =>
+        entity.source.map((span) => ({
+          entityId: entity.id,
+          sourceId: span.sourceId,
+          page: span.page,
+        })),
+      ),
+    );
+  }
   if (request.event === "short-rest") {
     proposeShortRest(character, request, spending, evaluation, nextState, changes, traces);
     applySpellSlotRecovery(request, evaluation, nextState, changes, traces);

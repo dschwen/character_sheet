@@ -1,0 +1,79 @@
+{
+  "id": "srd521.class-feature.sorcerer.sorcery-incarnate",
+  "kind": "class-feature",
+  "level": 7,
+  "parentId": "srd521.class.sorcerer",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "id": "activate-with-sorcery-points",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "activatesEffectId": "srd521.status.feature.innate-sorcery",
+        "resourceId": "srd521.resource.sorcerer.sorcery-points",
+        "spends": 2
+      },
+      "target": "action.sorcery-incarnate",
+      "type": "grant-action",
+      "when": {
+        "args": [
+          {
+            "arg": {
+              "kind": "equals",
+              "left": {
+                "kind": "ref",
+                "path": "status.innateSorcery.active"
+              },
+              "right": {
+                "kind": "literal",
+                "value": true
+              }
+            },
+            "kind": "not"
+          },
+          {
+            "arg": {
+              "kind": "resourceAvailable",
+              "resourceId": "srd521.resource.sorcerer.innate-sorcery"
+            },
+            "kind": "not"
+          },
+          {
+            "kind": "resourceAvailable",
+            "minimum": 2,
+            "resourceId": "srd521.resource.sorcerer.sorcery-points"
+          }
+        ],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Spell targets and encounter effects remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0066-b022"
+      ],
+      "page": 66,
+      "quoteHash": "7c8415ac4a8b4d3018f47dca5edea9f5e3f7cb37c49756fe9c6590c48cacfd93",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "If you have no uses of Innate Sorcery left, you can use it if you spend 2 Sorcery Points when you take the Bonus Action to activate it. In addition, while your Innate Sorcery feature is active, you can use up to two of your Metamagic options on each spell you cast."
+      }
+    ],
+    "title": "Sorcery Incarnate"
+  }
+}

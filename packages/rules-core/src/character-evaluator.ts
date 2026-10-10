@@ -129,6 +129,14 @@ const statusBodySchema = z
     description: z.string(),
     sourceSpellId: z.string().optional(),
     sourceFeatureId: z.string().optional(),
+    spellcastingEnhancement: z
+      .object({
+        castingClassId: z.string().min(1),
+        saveDifficultyClassBonus: z.number().int(),
+        attackRollAdvantage: z.boolean(),
+      })
+      .strict()
+      .optional(),
     savingThrowAuraRecipient: savingThrowAuraRecipientSchema.optional(),
     duration: z.string(),
     concentration: z.boolean(),
@@ -1095,16 +1103,28 @@ function evaluateGrantedAttackEnhancements(
   }
 }
 
+function statusActiveFact(id: string): string {
+  const slug = id.slice(id.lastIndexOf(".") + 1);
+  return `status.${slug.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase())}.active`;
+}
+
 function resolveActiveStatuses(
   character: CharacterDocument,
   index: PackageIndex,
   state: EngineState,
 ): ActiveStatus[] {
-  return character.state.activeEffectIds.flatMap((effectId) => {
+  for (const entity of index.entities.values()) {
+    if (entity.kind === "status") {
+      state.facts[`status.${entity.id.slice(entity.id.lastIndexOf(".") + 1)}.active`] = false;
+      state.facts[statusActiveFact(entity.id)] = false;
+    }
+  }
+  return [...new Set(character.state.activeEffectIds)].flatMap((effectId) => {
     const entity = index.entities.get(effectId);
     if (entity?.kind !== "status") return [];
     const body = statusBodySchema.parse(entity.body);
     state.facts[`status.${entity.id.slice(entity.id.lastIndexOf(".") + 1)}.active`] = true;
+    state.facts[statusActiveFact(entity.id)] = true;
     Object.assign(state.facts, body.factGrants);
     return [{ entity, body }];
   });
@@ -4094,6 +4114,95 @@ function resolveFeatureSpellSelections(
   return { alwaysPrepared: grantedSpells, spellbookBonusCount };
 }
 
+function evaluateStatusSpellcastingEnhancements(
+  statuses: readonly ActiveStatus[],
+  conditions: readonly ActiveCondition[],
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  const casting = state.spellcasting;
+  if (casting === undefined) return;
+  const active = statuses.filter(
+    ({ body }) =>
+      body.spellcastingEnhancement?.castingClassId === casting.classId &&
+      body.sourceFeatureId !== undefined &&
+      granted.has(body.sourceFeatureId),
+  );
+  if (active.length === 0) return;
+  const sources = active.flatMap(({ entity, body }) => {
+    const feature =
+      body.sourceFeatureId === undefined ? undefined : index.entities.get(body.sourceFeatureId);
+    return [
+      ...entitySourceReferences(entity),
+      ...(feature === undefined ? [] : entitySourceReferences(feature)),
+    ];
+  });
+  const bonus = active.reduce(
+    (total, { body }) => total + (body.spellcastingEnhancement?.saveDifficultyClassBonus ?? 0),
+    0,
+  );
+  const before = casting.saveDifficultyClass;
+  casting.saveDifficultyClass += bonus;
+  state.facts[casting.saveTraceId] = casting.saveDifficultyClass;
+  state.values[casting.saveTraceId] = {
+    value: casting.saveDifficultyClass,
+    traceId: casting.saveTraceId,
+  };
+  const saveTrace = state.traces[casting.saveTraceId];
+  if (saveTrace) {
+    saveTrace.result = casting.saveDifficultyClass;
+    saveTrace.nodes.push({
+      id: `${casting.saveTraceId}.statuses`,
+      operation: "apply-class-spellcasting-statuses",
+      inputs: [before, bonus, ...active.map(({ entity }) => entity.id)],
+      output: casting.saveDifficultyClass,
+    });
+    saveTrace.sourceReferences.push(...sources);
+  }
+  const attacks = conditions.flatMap(({ entity, body }) =>
+    body.d20RollEffects
+      .filter(({ scope }) => scope === "attack-rolls")
+      .map((effect) => ({ ...effect, source: entity.id })),
+  );
+  const advantages = [
+    ...attacks.filter(({ kind }) => kind === "advantage").map(({ source }) => source),
+    ...active
+      .filter(({ body }) => body.spellcastingEnhancement?.attackRollAdvantage)
+      .map(({ entity }) => entity.id),
+  ];
+  const disadvantages = attacks
+    .filter(({ kind }) => kind === "disadvantage")
+    .map(({ source }) => source);
+  const attackRollMode = resolveRollMode(advantages, disadvantages);
+  casting.attackRollMode = attackRollMode;
+  const attackTrace = state.traces[casting.attackTraceId];
+  if (attackTrace) {
+    attackTrace.nodes.push({
+      id: `${casting.attackTraceId}.mode`,
+      operation: "resolve-class-spell-attack-mode",
+      inputs: [advantages, disadvantages],
+      output: casting.attackRollMode,
+    });
+    attackTrace.sourceReferences.push(
+      ...sources,
+      ...conditions.flatMap(({ entity }) => entitySourceReferences(entity)),
+    );
+  }
+  for (const spell of state.spells) {
+    if (spell.castingOptions === undefined) continue;
+    spell.castingOptions = spell.castingOptions.map((option) =>
+      option.sourceId === casting.classId
+        ? {
+            ...option,
+            saveDifficultyClass: casting.saveDifficultyClass,
+            attackRollMode,
+          }
+        : option,
+    );
+  }
+}
+
 function evaluateSpellcasting(
   character: CharacterDocument,
   classLevels: ReadonlyMap<string, number>,
@@ -6943,6 +7052,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateAttacks(character, equipment, attackRules, index, state);
   evaluateGrantedAttackEnhancements(granted, index, state);
   evaluateConditionMechanics(character, conditions, state);
+  evaluateStatusSpellcastingEnhancements(statuses, conditions, granted, index, state);
   evaluateD20Minimums(granted, index, state);
   evaluateGrantedActionEnhancements(granted, index, state);
   evaluateActionMovement(state);

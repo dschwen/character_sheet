@@ -45,7 +45,12 @@ magic, choose Weapon Masteries and a Fighting Style, and swear the Oath of Devot
 Deft Explorer Expertise, prepare wilderness magic, and choose a Hunter’s Prey tactic. Rogues choose
 two Expertise skills and eligible Weapon Masteries, then gain Sneak Attack, the Thief subclass, and
 Cunning Strike. Sorcerers prepare arcane magic, choose two Metamagic options, use Innate Sorcery
-and Sorcery Points, and manifest Draconic Sorcery. Warlocks prepare Pact Magic, choose
+and Sorcery Points, and manifest Draconic Sorcery. Sorcerers reach level 7 with fourth-level slots
+and Sorcery Incarnate. Innate Sorcery activates a visible status with traced +1 Sorcerer spell DC
+and spell-attack Advantage, leaving other casting sources unchanged. When its normal uses are
+exhausted, Sorcery Incarnate spends two Sorcery Points instead. End the status after one minute;
+rests clear it. The level-7 permission to use two Metamagic options remains guided and manually
+adjudicated. Warlocks prepare Pact Magic, choose
 level-eligible Eldritch Invocations, recover slots with Magical Cunning, and serve a Fiend Patron.
 Wizards build a level-appropriate spellbook,
 choose prepared spells, and select Scholar Expertise. The review step

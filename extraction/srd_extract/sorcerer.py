@@ -25,6 +25,7 @@ CLASS_ID = "srd521.class.sorcerer"
 SUBCLASS_ID = "srd521.subclass.sorcerer.draconic-sorcery"
 SORCERY_POINTS_ID = "srd521.resource.sorcerer.sorcery-points"
 INNATE_SORCERY_ID = "srd521.resource.sorcerer.innate-sorcery"
+INNATE_STATUS_ID = "srd521.status.feature.innate-sorcery"
 RESTORATION_ID = "srd521.resource.sorcerer.sorcerous-restoration"
 METAMAGIC_CHOICE_ID = "srd521.choice.sorcerer.metamagic"
 ELEMENTAL_AFFINITY_CHOICE_ID = "srd521.choice.sorcerer.draconic.elemental-affinity"
@@ -444,12 +445,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 7)},
+                "countByLevel": {str(level): 2 for level in range(1, 8)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -727,6 +728,87 @@ def _metamagic_ir(option: dict[str, Any], feature: dict[str, Any]) -> dict[str, 
     )
 
 
+def _innate_sorcery_content(
+    innate: dict[str, Any], incarnate: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    inactive = {
+        "kind": "not",
+        "arg": {
+            "kind": "equals",
+            "left": {"kind": "ref", "path": "status.innateSorcery.active"},
+            "right": {"kind": "literal", "value": True},
+        },
+    }
+    ordinary = _resource_ir(
+        innate, INNATE_SORCERY_ID, {"kind": "literal", "value": 2}, "innate-sorcery"
+    )
+    action = ordinary["proposedRules"][1]
+    action["when"] = {"kind": "all", "args": [action["when"], inactive]}
+    action["parameters"]["activatesEffectId"] = INNATE_STATUS_ID
+    action["automationLevel"] = "state-automated"
+    alternate = _ir(
+        incarnate,
+        [
+            {
+                "id": "activate-with-sorcery-points",
+                "type": "grant-action",
+                "target": "action.sorcery-incarnate",
+                "when": {
+                    "kind": "all",
+                    "args": [
+                        inactive,
+                        {
+                            "kind": "not",
+                            "arg": {"kind": "resourceAvailable", "resourceId": INNATE_SORCERY_ID},
+                        },
+                        {
+                            "kind": "resourceAvailable",
+                            "resourceId": SORCERY_POINTS_ID,
+                            "minimum": 2,
+                        },
+                    ],
+                },
+                "parameters": {
+                    "actionEconomy": "bonus-action",
+                    "spends": 2,
+                    "resourceId": SORCERY_POINTS_ID,
+                    "activatesEffectId": INNATE_STATUS_ID,
+                },
+                "automationLevel": "state-automated",
+            }
+        ],
+    )
+    status = {
+        "id": INNATE_STATUS_ID,
+        "kind": "status",
+        "name": {"en": "Innate Sorcery"},
+        "tags": ["status", "feature", "sorcerer"],
+        "source": innate["source"],
+        "body": {
+            "sourceFeatureId": innate["id"],
+            "description": (
+                "For 1 minute, your Sorcerer spell save DC increases by 1 and your Sorcerer "
+                "spell attacks have Advantage. End this status when the minute expires. "
+                "At Sorcerer level 7, you may use up to two Metamagic options on each spell "
+                "while active; adjudicate their timing and costs manually."
+            ),
+            "duration": "1 minute",
+            "concentration": False,
+            "endsOnRest": True,
+            "spellcastingEnhancement": {
+                "castingClassId": CLASS_ID,
+                "saveDifficultyClassBonus": 1,
+                "attackRollAdvantage": True,
+            },
+        },
+        "rules": [],
+        "review": _review(
+            "Innate Sorcery spellcasting benefits; duration and Metamagic timing remain manual."
+        ),
+    }
+    return ordinary, alternate, status
+
+
 def _resilience_ir(feature: dict[str, Any]) -> dict[str, Any]:
     return _ir(
         feature,
@@ -794,27 +876,24 @@ def generate_sorcerer_content(class_root: Path, spell_root: Path, output: Path) 
         *_draconic_entities(document, draconic),
         *spells,
     ]
-    replacement = {entity["id"] for entity in entities}
-    all_entities = [
-        *[
-            entity
-            for entity in read_json(output / "entities.json")
-            if entity["id"] not in replacement
-        ],
-        *entities,
-    ]
+    by_name = {feature["name"]: feature for feature in features}
+    innate, incarnate, status = _innate_sorcery_content(
+        by_name["Innate Sorcery"], by_name["Sorcery Incarnate"]
+    )
+    entities.append(status)
+    current_entities = read_json(output / "entities.json")
+    # Preserve independent spell annotations and stable aggregate entity ordering.
+    replacements = {entity["id"]: entity for entity in entities if entity["kind"] != "spell"}
+    existing_ids = {entity["id"] for entity in current_entities}
+    all_entities = [replacements.get(entity["id"], entity) for entity in current_entities]
+    all_entities.extend(entity for entity in entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "sorcerer.json", entities)
     write_json(output / "entities.json", all_entities)
-    by_name = {feature["name"]: feature for feature in features}
     draconic_by_name = {feature["name"]: feature for feature in draconic}
     option_by_name = {option["name"]: option for option in options}
     authoring = {
-        "sorcerer.innate-sorcery.json": _resource_ir(
-            by_name["Innate Sorcery"],
-            INNATE_SORCERY_ID,
-            {"kind": "literal", "value": 2},
-            "innate-sorcery",
-        ),
+        "sorcerer.innate-sorcery.json": innate,
+        "sorcerer.sorcery-incarnate.json": incarnate,
         "sorcerer.font-of-magic.json": _ir(
             by_name["Font of Magic"],
             [
@@ -858,7 +937,7 @@ def generate_sorcerer_content(class_root: Path, spell_root: Path, output: Path) 
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Sorcerer through level 6; other reviewed classes through their documented limits; "
+        "Sorcerer through level 7; other reviewed classes through their documented limits; "
         "Human, Soldier, equipment, and representative spells."
     )
     write_json(output / "coverage.json", coverage)

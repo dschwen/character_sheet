@@ -1,6 +1,13 @@
+from typing import Any
+
 import pytest
 
-from srd_extract.sorcerer import SorcererProgressionRow, _starting_equipment, parse_core_traits
+from srd_extract.sorcerer import (
+    SorcererProgressionRow,
+    _innate_sorcery_content,
+    _starting_equipment,
+    parse_core_traits,
+)
 
 
 def test_parse_core_sorcerer_traits() -> None:
@@ -32,6 +39,41 @@ def test_sorcerer_progression_row_accepts_level_five_values() -> None:
 def test_sorcerer_progression_row_rejects_wrong_bonus() -> None:
     with pytest.raises(ValueError, match="expected 3"):
         SorcererProgressionRow(5, 2, (), 5, 5, 9, (4, 3, 2, 0, 0, 0, 0, 0, 0))
+
+
+def test_level_seven_incarnate_activation_preserves_source_and_exhaustion_prerequisite() -> None:
+    def feature(name: str, slug: str, level: int) -> dict[str, Any]:
+        return {
+            "id": f"srd521.class-feature.sorcerer.{slug}",
+            "name": name,
+            "level": level,
+            "source": [{"sourceId": "test", "page": 66}],
+            "bodyNodes": [],
+        }
+
+    innate = feature("Innate Sorcery", "innate-sorcery", 1)
+    incarnate = feature("Sorcery Incarnate", "sorcery-incarnate", 7)
+    ordinary, alternate, status = _innate_sorcery_content(innate, incarnate)
+    assert ordinary["source"] == innate["source"]
+    assert alternate["source"] == incarnate["source"]
+    action = alternate["proposedRules"][0]
+    assert action["parameters"]["spends"] == 2
+    assert action["when"]["args"][1] == {
+        "kind": "not",
+        "arg": {
+            "kind": "resourceAvailable",
+            "resourceId": "srd521.resource.sorcerer.innate-sorcery",
+        },
+    }
+    assert action["when"]["args"][2]["minimum"] == 2
+    assert ordinary["proposedRules"][1]["parameters"]["activatesEffectId"] == status["id"]
+    assert status["body"]["spellcastingEnhancement"]["castingClassId"] == "srd521.class.sorcerer"
+    assert status["body"]["endsOnRest"] is True
+    row = SorcererProgressionRow(
+        7, 3, ("Sorcery Incarnate",), 7, 5, 11, (4, 3, 3, 1, 0, 0, 0, 0, 0)
+    )
+    assert row.sorcery_points == 7
+    assert row.prepared_spells == 11
 
 
 def test_sorcerer_starting_equipment_preserves_both_source_packages() -> None:
