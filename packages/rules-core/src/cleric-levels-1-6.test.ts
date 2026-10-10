@@ -36,7 +36,95 @@ function loadCharacter(): CharacterDocument {
   return characterDocumentSchema.parse(readJson(new URL("characters/cleric-5.json", fixturesRoot)));
 }
 
-describe("evaluateCharacter Cleric level-5 vertical slice", () => {
+describe("evaluateCharacter Cleric levels 1–6 vertical slice", () => {
+  function levelSixInput() {
+    const character = loadCharacter();
+    character.build.levels.push({
+      characterLevel: 6,
+      classId: "srd521.class.cleric",
+      hitPointChoice: "fixed",
+      selectedFeatureChoices: [],
+    });
+    character.loadout.preparedSpellIds.push("srd521.spell.command");
+    character.state.currentHitPoints = 10;
+    return { character, packages: [loadRulesPackage()] };
+  }
+
+  it("heals the caster only after a slotted spell restores HP to another creature", () => {
+    const input = levelSixInput();
+    const evaluation = evaluateCharacter(input);
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.spellcasting?.slots).toMatchObject([
+      { maximum: 4 },
+      { maximum: 3 },
+      { maximum: 3 },
+    ]);
+    expect(
+      evaluation.resources.find(({ id }) => id === "srd521.resource.cleric.channel-divinity")
+        ?.maximum,
+    ).toBe(3);
+    expect(evaluation.spells.find(({ id }) => id === "srd521.spell.cure-wounds")?.healing).toEqual([
+      { diceCount: 2, diceSize: 8, addSpellcastingModifier: true, dicePerSlotLevel: 2 },
+    ]);
+    const cast = proposeSpellCast(input, {
+      spellId: "srd521.spell.cure-wounds",
+      slotLevel: 3,
+      restoresHitPointsToOther: true,
+    });
+    expect(cast.applicable).toBe(true);
+    expect(cast.nextState.currentHitPoints).toBe(15);
+    expect(cast.nextState.expendedSpellSlots["3"]).toBe(2);
+    expect(cast.traces["transition.spell-cast.state.currentHitPoints"]?.sourceReferences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "srd521.subclass-feature.cleric.life-domain.blessed-healer",
+        }),
+      ]),
+    );
+    expect(
+      proposeSpellCast(input, { spellId: "srd521.spell.cure-wounds", slotLevel: 1 }).nextState
+        .currentHitPoints,
+    ).toBe(10);
+    expect(
+      proposeSpellCast(input, {
+        spellId: "srd521.spell.bless",
+        slotLevel: 1,
+        restoresHitPointsToOther: true,
+      }).nextState.currentHitPoints,
+    ).toBe(10);
+  });
+
+  it("caps Blessed Healer at maximum HP and never heals on a rejected cast", () => {
+    const input = levelSixInput();
+    input.character.state.currentHitPoints = 44;
+    const cast = proposeSpellCast(input, {
+      spellId: "srd521.spell.healing-word",
+      slotLevel: 1,
+      restoresHitPointsToOther: true,
+    });
+    expect(cast.applicable).toBe(true);
+    expect(cast.nextState.currentHitPoints).toBe(45);
+    input.character.state.expendedSpellSlots["1"] = 4;
+    const rejected = proposeSpellCast(input, {
+      spellId: "srd521.spell.healing-word",
+      slotLevel: 1,
+      restoresHitPointsToOther: true,
+    });
+    expect(rejected.applicable).toBe(false);
+    expect(rejected.nextState).toEqual(input.character.state);
+    expect(rejected.changes).toEqual([]);
+  });
+
+  it("does not grant Blessed Healer below level 6", () => {
+    const character = loadCharacter();
+    character.state.currentHitPoints = 10;
+    const cast = proposeSpellCast(
+      { character, packages: [loadRulesPackage()] },
+      { spellId: "srd521.spell.cure-wounds", slotLevel: 1, restoresHitPointsToOther: true },
+    );
+    expect(cast.applicable).toBe(true);
+    expect(cast.nextState.currentHitPoints).toBe(10);
+  });
   it("evaluates prepared divine spellcasting, Life Domain spells, and Channel Divinity", () => {
     const evaluation = evaluateCharacter({
       character: loadCharacter(),

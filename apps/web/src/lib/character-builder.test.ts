@@ -576,9 +576,9 @@ describe("guided character builder", () => {
   it("builds Life Domain Clerics with prepared divine magic at every supported level", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [10, 17, 24, 31, 38];
+    const expectedHitPoints = [10, 17, 24, 31, 38, 45];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(clericId, catalog, level, `Level ${String(level)} Cleric`);
       const counts = spellSelectionCounts(draft, catalog);
       const character = buildCharacter(draft, rulesPackage, options);
@@ -597,6 +597,11 @@ describe("guided character builder", () => {
       expect(character.build.subclassId).toBe(
         level >= 3 ? "srd521.subclass.cleric.life-domain" : undefined,
       );
+      expect(
+        evaluation.spellHealingEffects?.some(
+          ({ target }) => target === "caster-after-healing-other",
+        ),
+      ).toBe(level >= 6);
       if (level === 1) {
         expect(character.loadout.inventory).toHaveLength(5);
         expect(character.loadout.equippedItemIds).toHaveLength(3);

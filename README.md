@@ -77,8 +77,12 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Barbarian, Fighter, Monk, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
-Cleric, Druid, Paladin, Warlock, and Wizard advancement through level 5. At Monk level 6,
+same-class Barbarian, Cleric, Fighter, Monk, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
+Druid, Paladin, Warlock, and Wizard advancement through level 5. Life Domain Clerics gain Blessed Healer:
+confirm that a healing spell restores HP to another creature to heal the caster by 2 + the slot level.
+Healing-roll buttons support Cure Wounds, Healing Word, Mass Healing Word, and Prayer of Healing,
+including upcast dice and Disciple of Life on slotted casts; apply the rolled healing to the target's sheet.
+Free casts do not trigger either Life Domain bonus. At Monk level 6,
 Wholeness of Body rolls the Martial Arts die, heals with Wisdom (minimum 1 HP), and tracks
 Long Rest uses; Empowered Strikes offers Force-damage and critical-damage buttons for Unarmed Strikes.
 At Ranger level 6,
@@ -88,7 +92,7 @@ replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
 one prepared-spell and cantrip replacement when gaining a level. Magic Initiate permits one
 same-level feat spell replacement while preserving its original casting ability. Multiclassing,
-Barbarian, Fighter, Ranger, Rogue, and Sorcerer levels 7–20, and levels 6–20 for the other classes remain future work.
+levels 7–20 for the classes listed above, and levels 6–20 for the other classes remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -267,6 +271,10 @@ Generate Cleric content from pages 36–40 using the already extracted spell des
 .venv/bin/python -m srd_extract.cleric \
   --class-extraction generated/extraction/srd-5.2.1-cleric \
   --spell-extraction generated/extraction/srd-5.2.1-spells \
+  --output packages/content-srd-5.2.1/generated
+
+# Run after class/spell generation to annotate reviewed healing formulas.
+.venv/bin/python -m srd_extract.spell_healing \
   --output packages/content-srd-5.2.1/generated
 ```
 
@@ -470,7 +478,7 @@ Generate the fifteen source-linked standard conditions from Rules Glossary pages
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
 Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite; the
-web integration suite also covers Barbarian, Fighter, Monk, Ranger, Rogue, and Sorcerer creation and
+web integration suite also covers Barbarian, Cleric, Fighter, Monk, Ranger, Rogue, and Sorcerer creation and
 advancement through level 6. Results
 include origin and feat ability increases, subclass features, species size, speed, senses, traits,
 typed skill and saving-throw proficiencies, d20-test roll states, Initiative, Passive Perception,

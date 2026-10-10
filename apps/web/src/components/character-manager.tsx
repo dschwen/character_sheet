@@ -25,6 +25,7 @@ import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from 
 import { levelUpEligibility } from "../lib/character-level-up";
 import { characterBuilderCatalog, migrateMagicInitiateChoices } from "../lib/character-builder";
 import { actionDiceRequest } from "../lib/action-roll";
+import { spellHealingRequests } from "../lib/spell-healing";
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
 import { CharacterLevelUp } from "./character-level-up";
@@ -139,6 +140,9 @@ interface CastFeedback {
   freeCast?: boolean;
   slotLevel?: number;
   slotsRemaining?: number;
+  castingSourceId?: string;
+  selfHealing?: number;
+  selfHealingSource?: string;
 }
 
 function objectValue(value: unknown): Readonly<Record<string, unknown>> | undefined {
@@ -333,6 +337,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
+  const [spellHealsOther, setSpellHealsOther] = useState<Readonly<Record<string, boolean>>>({});
   const [preparedSpellDraft, setPreparedSpellDraft] = useState<string[]>();
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
   const [diceRolling, setDiceRolling] = useState(false);
@@ -620,7 +625,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     });
   }
 
-  function spellRollControls(spell: SpellSummary): React.ReactNode {
+  function spellRollControls(
+    spell: SpellSummary,
+    slotLevel?: number,
+    castingSourceId?: string,
+  ): React.ReactNode {
     const spellcasting = evaluation?.spellcasting;
     const castingOption = spell.castingOptions?.[0];
     const attackBonus = castingOption?.attackBonus ?? spellcasting?.attackBonus;
@@ -628,14 +637,32 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       castingOption?.saveDifficultyClass ?? spellcasting?.saveDifficultyClass;
     const attackTraceId = castingOption?.attackTraceId ?? spellcasting?.attackTraceId;
     const damageRolls = spellDamageRolls(spell);
+    const healingRolls =
+      evaluation === undefined
+        ? []
+        : spellHealingRequests(spell, evaluation, slotLevel, castingSourceId);
     if (
       spell.attackType === undefined &&
       damageRolls.length === 0 &&
+      healingRolls.length === 0 &&
       spell.savingThrows.length === 0
     )
       return null;
     return (
       <div className="spell-roll-actions">
+        {healingRolls.map((healing, index) => (
+          <button
+            key={`healing-${String(index)}`}
+            type="button"
+            onClick={() => {
+              void performDicePoolRoll(healing);
+            }}
+            title="Roll healing; apply the result to the target's sheet. Slotted spell healing bonuses apply only on the casting turn."
+          >
+            Heal {String(healing.diceCount)}d{String(healing.diceSize)}
+            {signed(healing.modifier ?? 0)}
+          </button>
+        ))}
         {spell.attackType === undefined || attackBonus === undefined ? null : (
           <button
             type="button"
@@ -695,6 +722,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setSelectedTraceId(undefined);
     setActionDrafts({});
     setSpellLevels({});
+    setSpellHealsOther({});
+    setCastFeedback(undefined);
     setPreparedSpellDraft(undefined);
     setNotice(`Loaded ${fixture.character.name}.`);
   }
@@ -710,6 +739,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setSelectedTraceId(undefined);
       setActionDrafts({});
       setSpellLevels({});
+      setSpellHealsOther({});
+      setCastFeedback(undefined);
       setPreparedSpellDraft(undefined);
       setNotice(
         imported === parsed
@@ -922,6 +953,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       asRitual,
       useFreeCast,
       ...(castingSourceId === undefined ? {} : { castingSourceId }),
+      restoresHitPointsToOther: spellHealsOther[spell.id] ?? false,
     };
     const slotLevel =
       spell.level > 0 && !asRitual && !useFreeCast ? selectedSlotLevel(spell) : undefined;
@@ -939,6 +971,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         request,
       );
       if (proposal.applicable) {
+        setSpellHealsOther((current) => ({ ...current, [spell.id]: false }));
         const slot = evaluation?.spellcasting?.slots.find(
           (candidate) => candidate.level === slotLevel,
         );
@@ -948,6 +981,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           ...(useFreeCast ? { freeCast: true } : {}),
           ...(slotLevel === undefined ? {} : { slotLevel }),
           ...(slot === undefined ? {} : { slotsRemaining: Math.max(0, slot.current - 1) }),
+          ...(castingSourceId === undefined ? {} : { castingSourceId }),
+          ...(!request.restoresHitPointsToOther || slotLevel === undefined
+            ? {}
+            : {
+                selfHealing: proposal.nextState.currentHitPoints - character.state.currentHitPoints,
+                selfHealingSource:
+                  evaluation?.spellHealingEffects
+                    ?.filter(({ target }) => target === "caster-after-healing-other")
+                    .map(({ sourceName }) => sourceName)
+                    .join(", ") ?? "Spell effect",
+              }),
         });
       }
       applyTransition(
@@ -1973,6 +2017,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   ? "Cantrip · no spell slot spent"
                                   : `Level ${String(castFeedback.slotLevel)} slot spent · ${String(castFeedback.slotsRemaining ?? 0)} remaining`}
                             {castFeedback.spell.concentration ? " · Concentration started" : ""}
+                            {castFeedback.selfHealing === undefined
+                              ? ""
+                              : ` · ${castFeedback.selfHealingSource ?? "Spell effect"} restored ${String(castFeedback.selfHealing)} HP to you`}
                           </p>
                           {castFeedback.slotLevel !== undefined &&
                           castFeedback.slotLevel > castFeedback.spell.level &&
@@ -1985,7 +2032,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           {spellStatusInstructions(castFeedback.spell).map((instruction) => (
                             <em key={instruction}>{instruction}</em>
                           ))}
-                          {spellRollControls(castFeedback.spell)}
+                          {spellRollControls(
+                            castFeedback.spell,
+                            castFeedback.slotLevel,
+                            castFeedback.castingSourceId,
+                          )}
                         </div>
                         <button
                           type="button"
@@ -2021,9 +2072,32 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   : `Level ${String(spell.level)} · ${spell.prepared ? "Prepared" : "Not prepared"}`}
                                 {spell.concentration ? " · Concentration" : ""}
                               </small>
-                              {spellRollControls(spell)}
+                              {spellRollControls(spell, spell.level === 0 ? undefined : slotLevel)}
                             </div>
                             <div className="spell-cast-controls">
+                              {(spell.healing?.length ?? 0) > 0 &&
+                              evaluation.spellHealingEffects?.some(
+                                ({ target }) => target === "caster-after-healing-other",
+                              ) ? (
+                                <label>
+                                  <input
+                                    type="checkbox"
+                                    checked={spellHealsOther[spell.id] ?? false}
+                                    onChange={(event) => {
+                                      setSpellHealsOther((current) => ({
+                                        ...current,
+                                        [spell.id]: event.target.checked,
+                                      }));
+                                    }}
+                                  />
+                                  This spell restores HP to another creature (triggers{" "}
+                                  {evaluation.spellHealingEffects
+                                    .filter(({ target }) => target === "caster-after-healing-other")
+                                    .map(({ sourceName }) => sourceName)
+                                    .join(", ")}{" "}
+                                  with a spell slot)
+                                </label>
+                              ) : null}
                               {spell.level === 0 || eligibleSlots.length === 0 ? null : (
                                 <select
                                   aria-label={`Slot level for ${spell.name}`}
@@ -2931,6 +3005,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSelectedTraceId(undefined);
             setActionDrafts({});
             setSpellLevels({});
+            setSpellHealsOther({});
+            setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
             setBuilderOpen(false);
             setNotice(`${builtCharacter.name} was created and saved in this browser.`);
@@ -2953,6 +3029,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSelectedTraceId(undefined);
             setActionDrafts({});
             setSpellLevels({});
+            setSpellHealsOther({});
+            setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
             setLevelUpOpen(false);
           }}

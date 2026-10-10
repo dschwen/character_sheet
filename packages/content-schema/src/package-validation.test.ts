@@ -338,6 +338,16 @@ describe("bootstrap content package", () => {
       defaultAbilityScoreImprovementAbility: "dexterity",
       defaultClassSkillIds: ["srd521.skill.acrobatics", "srd521.skill.insight"],
     });
+    expect(metadata.find(({ id }) => id === "srd521.class.cleric")?.builder).toMatchObject({
+      supportedLevelMaximum: 6,
+    });
+    expect(
+      featureAutomationBodySchema.parse(
+        entities.find(
+          ({ id }) => id === "srd521.subclass-feature.cleric.life-domain.blessed-healer",
+        )?.body,
+      ).spellHealingEffects,
+    ).toEqual([{ target: "caster-after-healing-other", base: 2, perSlotLevel: 1 }]);
     expect(
       featureAutomationBodySchema.parse(
         entities.find(({ id }) => id === "srd521.class-feature.monk.empowered-strikes")?.body,

@@ -19,6 +19,7 @@ const spellCastRequestSchema = z
     asRitual: z.boolean().default(false),
     castingSourceId: z.string().min(1).optional(),
     useFreeCast: z.boolean().default(false),
+    restoresHitPointsToOther: z.boolean().default(false),
   })
   .strict();
 
@@ -277,6 +278,34 @@ export function proposeSpellCast(
       [before, spell.id],
       spell.sources,
     );
+  }
+  if (
+    request.restoresHitPointsToOther &&
+    (spell.healing?.length ?? 0) > 0 &&
+    !request.useFreeCast &&
+    !request.asRitual &&
+    request.slotLevel !== undefined
+  ) {
+    for (const effect of evaluation.spellHealingEffects ?? []) {
+      if (effect.target !== "caster-after-healing-other") continue;
+      const maximum = evaluation.values["hitPoints.maximum"]?.value;
+      if (typeof maximum !== "number") throw new TypeError("Spell healing requires maximum HP.");
+      const before = nextState.currentHitPoints;
+      const amount = effect.base + effect.perSlotLevel * request.slotLevel;
+      const after = Math.min(maximum, before + amount);
+      nextState.currentHitPoints = after;
+      recordChange(
+        changes,
+        traces,
+        "state.currentHitPoints",
+        before,
+        after,
+        `${effect.sourceName} restores ${String(after - before)} Hit Points after healing another creature.`,
+        "heal-caster-after-healing-other",
+        [before, amount, maximum, request.slotLevel],
+        effect.sources,
+      );
+    }
   }
   return {
     kind: "spell-cast",

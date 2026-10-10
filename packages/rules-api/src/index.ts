@@ -190,6 +190,22 @@ export interface SpellDamageSummary {
   bonusTraceId?: string;
 }
 
+export interface SpellHealingSummary {
+  diceCount: number;
+  diceSize: number;
+  addSpellcastingModifier: boolean;
+  dicePerSlotLevel: number;
+}
+
+export interface SpellHealingEffectSummary {
+  sourceId: string;
+  sourceName: string;
+  target: "healed-creature" | "caster-after-healing-other";
+  base: number;
+  perSlotLevel: number;
+  sources: SourceReference[];
+}
+
 export interface SpellCastingOptionSummary {
   sourceId: string;
   ability: string;
@@ -215,6 +231,7 @@ export interface SpellSummary {
   attackType?: "melee" | "ranged";
   savingThrows: string[];
   damage: SpellDamageSummary[];
+  healing?: SpellHealingSummary[];
   hasHigherLevelEffect: boolean;
   appliedStatuses: SpellAppliedStatusSummary[];
   sources: SourceReference[];
@@ -279,6 +296,7 @@ export interface SpellCastRequest {
   asRitual?: boolean;
   castingSourceId?: string;
   useFreeCast?: boolean;
+  restoresHitPointsToOther?: boolean;
 }
 
 export interface SpellCastTransitionProposal {
@@ -301,6 +319,7 @@ export interface CharacterEvaluation {
   attacks: AttackSummary[];
   spellcasting?: SpellcastingSummary;
   spells: SpellSummary[];
+  spellHealingEffects?: SpellHealingEffectSummary[];
   actions: ActionSummary[];
   resources: ResourceInstance[];
   resistances: string[];

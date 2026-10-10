@@ -6575,7 +6575,7 @@
           "srd521.skill.religion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 5,
+        "supportedLevelMaximum": 6,
         "supportedLevelMinimum": 1
       },
       "divineOrderChoice": {
@@ -6991,7 +6991,8 @@
           "2": 2,
           "3": 2,
           "4": 2,
-          "5": 2
+          "5": 2,
+          "6": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -7847,7 +7848,15 @@
   },
   {
     "body": {
+      "automationLevel": "roll-assisted",
       "level": 3,
+      "spellHealingEffects": [
+        {
+          "base": 2,
+          "perSlotLevel": 1,
+          "target": "healed-creature"
+        }
+      ],
       "text": "When a spell you cast with a spell slot restores Hit Points to a creature, that creature regains additional Hit Points on the turn you cast the spell. The additional Hit Points equal 2 plus the spell slot’s level."
     },
     "id": "srd521.subclass-feature.cleric.life-domain.disciple-of-life",
@@ -7953,7 +7962,15 @@
   },
   {
     "body": {
+      "automationLevel": "state-automated",
       "level": 6,
+      "spellHealingEffects": [
+        {
+          "base": 2,
+          "perSlotLevel": 1,
+          "target": "caster-after-healing-other"
+        }
+      ],
       "text": "The healing spells you cast on others heal you as well. Immediately after you cast a spell with a spell slot that restores Hit Points to one or more creatures other than yourself, you regain Hit Points equal to 2 plus the spell slot’s level."
     },
     "id": "srd521.subclass-feature.cleric.life-domain.blessed-healer",
@@ -8237,7 +8254,14 @@
       "description": "A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases by 2d8 for each spell slot level above 1.",
       "duration": "Instantaneous",
       "hasHigherLevelEffect": true,
-      "healing": [],
+      "healing": [
+        {
+          "addSpellcastingModifier": true,
+          "diceCount": 2,
+          "dicePerSlotLevel": 2,
+          "diceSize": 8
+        }
+      ],
       "level": 1,
       "range": "Touch",
       "ritual": false,
@@ -8550,7 +8574,14 @@
       "description": "Up to five creatures of your choice who remain within range for the spell’s entire casting gain the benefits of a Short Rest and also regain 2d8 Hit Points. A creature can’t be affected by this spell again until that creature finishes a Long Rest. Using a Higher-Level Spell Slot. The healing increases by 1d8 for each spell slot level above 2.",
       "duration": "Instantaneous",
       "hasHigherLevelEffect": true,
-      "healing": [],
+      "healing": [
+        {
+          "addSpellcastingModifier": false,
+          "diceCount": 2,
+          "dicePerSlotLevel": 1,
+          "diceSize": 8
+        }
+      ],
       "level": 2,
       "range": "30 feet",
       "ritual": false,
@@ -33709,7 +33740,14 @@
       "description": "A creature of your choice that you can see within range regains Hit Points equal to 2d4 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases by 2d4 for each spell slot level above 1.",
       "duration": "Instantaneous",
       "hasHigherLevelEffect": true,
-      "healing": [],
+      "healing": [
+        {
+          "addSpellcastingModifier": true,
+          "diceCount": 2,
+          "dicePerSlotLevel": 2,
+          "diceSize": 4
+        }
+      ],
       "level": 1,
       "range": "60 feet",
       "ritual": false,
@@ -33830,7 +33868,14 @@
       "description": "Up to six creatures of your choice that you can see within range regain Hit Points equal to 2d4 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases by 1d4 for each spell slot level above 3.",
       "duration": "Instantaneous",
       "hasHigherLevelEffect": true,
-      "healing": [],
+      "healing": [
+        {
+          "addSpellcastingModifier": true,
+          "diceCount": 2,
+          "dicePerSlotLevel": 1,
+          "diceSize": 4
+        }
+      ],
       "level": 3,
       "range": "60 feet",
       "ritual": false,

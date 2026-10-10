@@ -382,6 +382,17 @@ export const classFeatureChoiceSchema = z
 export const featureAutomationBodySchema = z
   .object({
     unarmedStrikeDamageTypes: z.array(z.string().min(1)).default([]),
+    spellHealingEffects: z
+      .array(
+        z
+          .object({
+            target: z.enum(["healed-creature", "caster-after-healing-other"]),
+            base: z.number().int().nonnegative(),
+            perSlotLevel: z.number().int().nonnegative(),
+          })
+          .strict(),
+      )
+      .default([]),
     activeEffectConditionImmunities: z
       .array(
         z

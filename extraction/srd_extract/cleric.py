@@ -484,12 +484,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits.get("skillProficiencyChoice", {}),
-                "countByLevel": {str(level): 2 for level in range(1, 6)},
+                "countByLevel": {str(level): 2 for level in range(1, 7)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 13,
                     "dexterity": 10,
@@ -774,13 +774,27 @@ def generate_cleric_content(
         *_life_domain_entities(class_document, life_features),
         *spell_entities,
     ]
-    replacement_ids = {entity["id"] for entity in cleric_entities}
-    existing = [
-        entity
-        for entity in read_json(output / "entities.json")
-        if entity["id"] not in replacement_ids
-    ]
-    all_entities = [*existing, *cleric_entities]
+    for entity in cleric_entities:
+        target = {
+            "srd521.subclass-feature.cleric.life-domain.disciple-of-life": "healed-creature",
+            "srd521.subclass-feature.cleric.life-domain.blessed-healer": (
+                "caster-after-healing-other"
+            ),
+        }.get(entity["id"])
+        if target is not None:
+            entity["body"]["spellHealingEffects"] = [
+                {"target": target, "base": 2, "perSlotLevel": 1}
+            ]
+            entity["body"]["automationLevel"] = (
+                "roll-assisted" if target == "healed-creature" else "state-automated"
+            )
+    # Shared spells can carry annotations from later parser passes. Preserve them
+    # rather than erasing statuses or replacing another class's source boundaries.
+    existing = read_json(output / "entities.json")
+    replacements = {entity["id"]: entity for entity in cleric_entities if entity["kind"] != "spell"}
+    existing_ids = {entity["id"] for entity in existing}
+    all_entities = [replacements.get(entity["id"], entity) for entity in existing]
+    all_entities.extend(entity for entity in cleric_entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "cleric.json", cleric_entities)
     write_json(output / "entities.json", all_entities)
     write_json(
@@ -793,10 +807,6 @@ def generate_cleric_content(
     )
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
-    coverage["note"] = (
-        "Barbarian, Cleric through level 5, Fighter through level 5, Wizard through level 5, "
-        "Human, Soldier, equipment, and representative spells."
-    )
     write_json(output / "coverage.json", coverage)
     report = {
         "classId": CLASS_ID,

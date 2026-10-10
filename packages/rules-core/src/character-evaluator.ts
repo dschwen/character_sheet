@@ -667,6 +667,16 @@ const spellBodySchema = z
       .nullish()
       .transform((damage) => damage ?? []),
     hasHigherLevelEffect: z.boolean().default(false),
+    healing: z
+      .array(
+        z.object({
+          diceCount: z.number().int().positive(),
+          diceSize: z.number().int().positive(),
+          addSpellcastingModifier: z.boolean().default(false),
+          dicePerSlotLevel: z.number().int().nonnegative().default(0),
+        }),
+      )
+      .default([]),
     appliedStatuses: z
       .array(
         z
@@ -3791,6 +3801,7 @@ function evaluateSpellcasting(
         diceCount: damage.diceCount * cantripDamageMultiplier,
       })),
       hasHigherLevelEffect: body.hasHigherLevelEffect,
+      healing: body.healing,
       appliedStatuses: body.appliedStatuses,
       sources: entitySourceReferences(entity),
       castingOptions: [
@@ -3963,6 +3974,7 @@ function addMagicInitiateSpell(
       diceCount: damage.diceCount * cantripDamageMultiplier,
     })),
     hasHigherLevelEffect: body.hasHigherLevelEffect,
+    healing: body.healing,
     appliedStatuses: body.appliedStatuses,
     sources: entitySourceReferences(entity),
     castingOptions: [castingOption],
@@ -6101,6 +6113,18 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     attacks: state.attacks,
     ...(state.spellcasting === undefined ? {} : { spellcasting: state.spellcasting }),
     spells: state.spells,
+    spellHealingEffects: [...granted].flatMap((sourceId) => {
+      const entity = index.entities.get(sourceId);
+      const body = featureAutomationBodySchema.safeParse(entity?.body);
+      return entity !== undefined && body.success
+        ? body.data.spellHealingEffects.map((effect) => ({
+            ...effect,
+            sourceId,
+            sourceName: entity.name.en ?? sourceId,
+            sources: entitySourceReferences(entity),
+          }))
+        : [];
+    }),
     actions: state.actions,
     resources: state.resources,
     resistances: [...state.resistances].sort(),

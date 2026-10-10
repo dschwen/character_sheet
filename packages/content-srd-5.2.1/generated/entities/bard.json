@@ -1642,7 +1642,14 @@
       "description": "A creature of your choice that you can see within range regains Hit Points equal to 2d4 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases by 2d4 for each spell slot level above 1.",
       "duration": "Instantaneous",
       "hasHigherLevelEffect": true,
-      "healing": [],
+      "healing": [
+        {
+          "addSpellcastingModifier": true,
+          "diceCount": 2,
+          "dicePerSlotLevel": 2,
+          "diceSize": 4
+        }
+      ],
       "level": 1,
       "range": "60 feet",
       "ritual": false,
@@ -1763,7 +1770,14 @@
       "description": "Up to six creatures of your choice that you can see within range regain Hit Points equal to 2d4 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases by 1d4 for each spell slot level above 3.",
       "duration": "Instantaneous",
       "hasHigherLevelEffect": true,
-      "healing": [],
+      "healing": [
+        {
+          "addSpellcastingModifier": true,
+          "diceCount": 2,
+          "dicePerSlotLevel": 1,
+          "diceSize": 4
+        }
+      ],
       "level": 3,
       "range": "60 feet",
       "ritual": false,
