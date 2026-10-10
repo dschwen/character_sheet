@@ -77,8 +77,12 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Barbarian, Cleric, Fighter, Monk, Paladin, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
-Druid, Warlock, and Wizard advancement through level 5. Paladins gain Aura of Protection:
+same-class Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
+Warlock, and Wizard advancement through level 5. Circle of the Land Druids gain Natural Recovery:
+one free leveled Circle spell casting per Long Rest, plus a separate once-per-Long-Rest spell-slot
+recovery during a Short Rest. The Rest panel lets you select slots within the recovery budget;
+ordinary Short Rests do not spend this benefit. Wizards use the same controls for Arcane Recovery.
+Paladins gain Aura of Protection:
 it adds Charisma (minimum +1) to saves and is inactive while Incapacitated. Allies can toggle
 the chosen Paladin's aura on their sheets and select its bonus; overlapping auras never stack.
 Life Domain Clerics gain Blessed Healer:

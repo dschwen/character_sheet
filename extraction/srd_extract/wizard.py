@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from srd_extract.io import read_json, write_json
+from srd_extract.spell_recovery import recovery_resource_ir
 
 SOURCE_ID = "wotc-srd-5.2.1-en"
 CLASS_ID = "srd521.class.wizard"
@@ -743,55 +744,31 @@ def generate_wizard_content(
         *_subclass_entities(class_document, evoker_features),
         *spell_entities,
     ]
+    arcane_recovery = next(feature for feature in features if feature["name"] == "Arcane Recovery")
+    recovery_id = "srd521.resource.wizard.arcane-recovery"
+    for entity in wizard_entities:
+        if entity["id"] == arcane_recovery["id"]:
+            entity["body"]["spellSlotRecovery"] = {
+                "classId": CLASS_ID,
+                "resourceId": recovery_id,
+                "levelDivisor": 2,
+                "maximumSlotLevel": 5,
+                "event": "short-rest",
+            }
+            entity["body"]["automationLevel"] = "state-automated"
+    write_json(
+        output / "authoring-ir" / "wizard.arcane-recovery.json",
+        recovery_resource_ir(arcane_recovery, CLASS_ID, [recovery_id]),
+    )
     current_entities = read_json(output / "entities.json")
-    representative_spell_ids = {f"srd521.spell.{_slug(name)}" for name in REPRESENTATIVE_SPELLS}
-    externally_owned_spell_ids = {
-        str(entity["id"])
-        for entity in current_entities
-        if entity["id"] in representative_spell_ids
-        and entity["kind"] == "spell"
-        and "wizard" not in entity["tags"]
-    }
-    wizard_entity_ids = {
-        CLASS_ID,
-        SUBCLASS_ID,
-        SPELLBOOK_ID,
-        *(representative_spell_ids - externally_owned_spell_ids),
-    }
-    wizard_positions = [
-        index
-        for index, entity in enumerate(current_entities)
-        if entity["id"] in wizard_entity_ids
-        or str(entity["id"]).startswith("srd521.class-feature.wizard.")
-        or str(entity["id"]).startswith("srd521.subclass-feature.wizard.")
-    ]
-    insertion_index = min(wizard_positions, default=0)
-    existing = [
-        entity
-        for entity in current_entities
-        if entity["id"] != CLASS_ID
-        and entity["id"] != SUBCLASS_ID
-        and entity["id"] != SPELLBOOK_ID
-        and not str(entity["id"]).startswith("srd521.class-feature.wizard.")
-        and not str(entity["id"]).startswith("srd521.subclass-feature.wizard.")
-        and str(entity["id"]) not in representative_spell_ids - externally_owned_spell_ids
-    ]
-    package_wizard_entities = [
-        entity for entity in wizard_entities if entity["id"] not in externally_owned_spell_ids
-    ]
-    all_entities = [
-        *existing[:insertion_index],
-        *package_wizard_entities,
-        *existing[insertion_index:],
-    ]
+    replacements = {entity["id"]: entity for entity in wizard_entities if entity["kind"] != "spell"}
+    existing_ids = {entity["id"] for entity in current_entities}
+    all_entities = [replacements.get(entity["id"], entity) for entity in current_entities]
+    all_entities.extend(entity for entity in wizard_entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "wizard.json", wizard_entities)
     write_json(output / "entities.json", all_entities)
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
-    coverage["note"] = (
-        "Barbarian, Fighter through level 5, Wizard source content, Human, Soldier, "
-        "equipment, and 27 representative spells. Proposed executable rules remain under review."
-    )
     write_json(output / "coverage.json", coverage)
     report = {
         "classId": CLASS_ID,

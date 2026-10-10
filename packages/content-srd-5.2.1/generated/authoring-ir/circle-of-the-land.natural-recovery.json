@@ -1,0 +1,72 @@
+{
+  "id": "srd521.subclass-feature.druid.circle-of-the-land.natural-recovery",
+  "kind": "subclass-feature",
+  "level": 6,
+  "parentId": "srd521.subclass.druid.circle-of-the-land",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 1
+      },
+      "id": "natural-recovery-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.druid.natural-recovery",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 1
+      },
+      "id": "natural-recovery-free-cast-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.druid.natural-recovery-free-cast",
+      "type": "grant-resource"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Slot selection is an explicit atomic Short Rest request."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0046-b031"
+      ],
+      "page": 46,
+      "quoteHash": "8a850e96cfae3ab956afb96ecf5e407272e8e9e86dc236e86894543da6465bf6",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can cast one of the level 1+ spells that you have prepared from your Circle Spells feature without expending a spell slot, and you must finish a Long Rest before you do so again. In addition, when you finish a Short Rest, you can choose expended spell slots to recover. The spell slots can have a combined level that is equal to or less than half your Druid level (round up), and none of them can be level 6+. For example, if you’re a level 6 Druid, you can recover up to three levels’ worth of spell slots. You can recover a level 3 spell slot, a level 2 and a level 1 spell slot, or three level 1 spell slots. Once you recover spell slots with this feature, you can’t do so again until you finish a Long Rest."
+      }
+    ],
+    "title": "Natural Recovery"
+  }
+}

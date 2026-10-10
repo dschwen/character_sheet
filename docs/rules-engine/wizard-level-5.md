@@ -14,6 +14,11 @@ Ritual Adept allows a ritual-tagged spell in the spellbook to be cast without pr
 slot. `proposeRest` restores all expended slots and ends Concentration on a Long Rest. Neither
 operation mutates the input character.
 
+Arcane Recovery is a separate once-per-Long-Rest resource. A Short Rest can optionally recover
+selected expended slots with combined levels up to half Wizard level rounded up, excluding slots
+above level 5. The Play rest controls expose the selection and its budget; invalid selections reject
+the entire rest proposal. Ordinary Short Rests do not spend the optional use.
+
 The reviewed `wizard-5.json` fixture exercises a Human Soldier Evoker with a legal spellbook,
 preparation list, active Web Concentration, and partially expended slots. Its golden assertions
 cover spell display, source links, attack/DC traces, spellbook and slot validation, ritual casting,

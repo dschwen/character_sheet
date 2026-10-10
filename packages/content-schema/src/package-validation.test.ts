@@ -341,6 +341,9 @@ describe("bootstrap content package", () => {
     expect(metadata.find(({ id }) => id === "srd521.class.cleric")?.builder).toMatchObject({
       supportedLevelMaximum: 6,
     });
+    expect(metadata.find(({ id }) => id === "srd521.class.druid")?.builder).toMatchObject({
+      supportedLevelMaximum: 6,
+    });
     expect(
       featureAutomationBodySchema.parse(
         entities.find(

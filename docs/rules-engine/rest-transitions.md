@@ -23,6 +23,20 @@ Short Rest restores one expended Rage use, not every use.
 For the level-5 Fighter fixture, a Short Rest restores one Second Wind use and all expended Action
 Surge uses. The different amounts come from each feature's own recharge data.
 
+## Optional spell-slot recovery
+
+Short Rest requests may include `spellSlotRecoveries`, each with a granted feature's `sourceId`
+and explicitly selected slot levels/counts. Natural Recovery and Arcane Recovery use the same
+validation and atomic transition path. Selection cannot exceed the feature's combined-level budget,
+the maximum eligible slot level, or actual expenditure. A feature can be used only once before
+Long Rest, and partial recovery still spends the use. Ordinary Short Rests leave these optional
+uses untouched. Invalid choices reject the entire rest proposal, including Hit Dice and resource
+recharges. Recovered slots and spent feature uses cite the relevant feature's source spans.
+
+The Play UI's combined Short Rest/recovery button is the rest itself, not an extra benefit to
+apply after taking a separate Short Rest. Natural Recovery's free spell casting is a different
+resource and neither consumes nor recharges its spell-slot recovery use.
+
 ## Long Rest
 
 The modeled Long Rest proposal:

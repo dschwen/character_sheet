@@ -409,6 +409,24 @@ export const savingThrowAuraRecipientSchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    spellSlotRecovery: z
+      .object({
+        classId: entityIdSchema,
+        resourceId: entityIdSchema,
+        levelDivisor: z.number().int().positive(),
+        maximumSlotLevel: z.number().int().min(1).max(9),
+        event: z.literal("short-rest"),
+      })
+      .strict()
+      .optional(),
+    freeSpellCasting: z
+      .object({
+        classId: entityIdSchema,
+        resourceId: entityIdSchema,
+        optionChoiceId: entityIdSchema,
+      })
+      .strict()
+      .optional(),
     savingThrowAura: savingThrowAuraSchema.optional(),
     unarmedStrikeDamageTypes: z.array(z.string().min(1)).default([]),
     spellHealingEffects: z

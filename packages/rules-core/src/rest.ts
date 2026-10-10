@@ -30,6 +30,25 @@ const restRequestSchema = z
           .strict(),
       )
       .default([]),
+    spellSlotRecoveries: z
+      .array(
+        z
+          .object({
+            sourceId: z.string().min(1),
+            slots: z
+              .array(
+                z
+                  .object({
+                    level: z.number().int().min(1).max(9),
+                    count: z.number().int().positive(),
+                  })
+                  .strict(),
+              )
+              .min(1),
+          })
+          .strict(),
+      )
+      .default([]),
   })
   .strict();
 
@@ -293,6 +312,147 @@ function restoreShortRestSpellSlots(
   }
 }
 
+function validateSpellSlotRecovery(
+  request: z.infer<typeof restRequestSchema>,
+  evaluation: ReturnType<typeof evaluateCharacter>,
+  validations: ValidationMessage[],
+): void {
+  const sources = new Set<string>();
+  const resourceUses = new Map<string, number>();
+  const restored = new Map<number, number>();
+  for (const selection of request.spellSlotRecoveries) {
+    const definition = evaluation.spellSlotRecoveries?.find(
+      ({ sourceId }) => sourceId === selection.sourceId,
+    );
+    if (
+      request.event !== "short-rest" ||
+      definition === undefined ||
+      !definition.available ||
+      sources.has(selection.sourceId)
+    ) {
+      validation(
+        validations,
+        "SPELL_SLOT_RECOVERY_UNAVAILABLE",
+        "Choose a granted, unspent Short Rest recovery feature only once.",
+        ["request.spellSlotRecoveries"],
+      );
+      continue;
+    }
+    sources.add(selection.sourceId);
+    const uses = (resourceUses.get(definition.resourceId) ?? 0) + 1;
+    resourceUses.set(definition.resourceId, uses);
+    if (
+      uses > (evaluation.resources.find(({ id }) => id === definition.resourceId)?.current ?? 0)
+    ) {
+      validation(
+        validations,
+        "SPELL_SLOT_RECOVERY_UNAVAILABLE",
+        "The selected recoveries exceed their shared resource's remaining uses.",
+        ["request.spellSlotRecoveries"],
+      );
+    }
+    const total = selection.slots.reduce((sum, slot) => sum + slot.level * slot.count, 0);
+    if (total > definition.maximumCombinedLevel) {
+      validation(
+        validations,
+        "SPELL_SLOT_RECOVERY_BUDGET_EXCEEDED",
+        `${definition.name} can recover only ${String(definition.maximumCombinedLevel)} combined slot levels.`,
+        ["request.spellSlotRecoveries"],
+      );
+    }
+    const levels = new Set<number>();
+    for (const slot of selection.slots) {
+      const current = evaluation.spellcasting?.slots.find(({ level }) => level === slot.level);
+      const count = (restored.get(slot.level) ?? 0) + slot.count;
+      restored.set(slot.level, count);
+      if (
+        evaluation.spellcasting?.slotRecharge === "short-rest" ||
+        levels.has(slot.level) ||
+        slot.level > definition.maximumSlotLevel ||
+        current === undefined ||
+        count > current.expended
+      ) {
+        validation(
+          validations,
+          "SPELL_SLOT_RECOVERY_SELECTION_INVALID",
+          "Recover only eligible expended slots, without duplicate slot levels or over-recovery.",
+          ["request.spellSlotRecoveries"],
+        );
+      }
+      levels.add(slot.level);
+    }
+  }
+}
+
+function applySpellSlotRecovery(
+  request: z.infer<typeof restRequestSchema>,
+  evaluation: ReturnType<typeof evaluateCharacter>,
+  nextState: CharacterState,
+  changes: StateChange[],
+  traces: Record<string, CalculationTrace>,
+): void {
+  interface RecoveryAmount {
+    count: number;
+    names: string[];
+    sources: SourceReference[];
+  }
+  const slotAmounts = new Map<number, RecoveryAmount>();
+  const resourceAmounts = new Map<string, RecoveryAmount>();
+  for (const selection of request.spellSlotRecoveries) {
+    const definition = evaluation.spellSlotRecoveries?.find(
+      ({ sourceId }) => sourceId === selection.sourceId,
+    );
+    if (definition === undefined)
+      throw new TypeError("Missing validated spell recovery definition.");
+    for (const slot of selection.slots) {
+      const previous = slotAmounts.get(slot.level);
+      slotAmounts.set(slot.level, {
+        count: (previous?.count ?? 0) + slot.count,
+        names: [...(previous?.names ?? []), definition.name],
+        sources: [...(previous?.sources ?? []), ...definition.sources],
+      });
+    }
+    const previous = resourceAmounts.get(definition.resourceId);
+    resourceAmounts.set(definition.resourceId, {
+      count: (previous?.count ?? 0) + 1,
+      names: [...(previous?.names ?? []), definition.name],
+      sources: [...(previous?.sources ?? []), ...definition.sources],
+    });
+  }
+  for (const [level, amount] of slotAmounts) {
+    const key = String(level);
+    const before = nextState.expendedSpellSlots[key] ?? 0;
+    const after = before - amount.count;
+    nextState.expendedSpellSlots[key] = after;
+    recordChange(
+      changes,
+      traces,
+      `state.expendedSpellSlots.${key}`,
+      before,
+      after,
+      `${amount.names.join(" and ")} restores ${String(amount.count)} level ${key} spell slot(s).`,
+      "recover-selected-spell-slots",
+      [before, amount.count, level],
+      amount.sources,
+    );
+  }
+  for (const [resourceId, amount] of resourceAmounts) {
+    const before = nextState.expendedResources[resourceId] ?? 0;
+    nextState.expendedResources[resourceId] = before + amount.count;
+    recordChange(
+      changes,
+      traces,
+      `state.expendedResources.${resourceId}`,
+      before,
+      before + amount.count,
+      `${amount.names.join(" and ")} expends its slot recovery use.`,
+      "expend-spell-slot-recovery",
+      [before, amount.count],
+      amount.sources,
+    );
+  }
+}
+
 function proposeShortRest(
   character: CharacterDocument,
   request: z.infer<typeof restRequestSchema>,
@@ -492,6 +652,8 @@ export function proposeRest(
     );
   }
   const spending = validateHitDieSpending(input, character, request, validations);
+  const evaluation = evaluateCharacter({ ...input, character });
+  validateSpellSlotRecovery(request, evaluation, validations);
   if (validations.some((message) => message.severity === "error")) {
     return {
       kind: "rest",
@@ -504,12 +666,12 @@ export function proposeRest(
     };
   }
 
-  const evaluation = evaluateCharacter({ ...input, character });
   const nextState = cloneState(character.state);
   const changes: StateChange[] = [];
   const traces: Record<string, CalculationTrace> = {};
   if (request.event === "short-rest") {
     proposeShortRest(character, request, spending, evaluation, nextState, changes, traces);
+    applySpellSlotRecovery(request, evaluation, nextState, changes, traces);
   } else {
     proposeLongRest(character, evaluation, nextState, changes, traces);
   }

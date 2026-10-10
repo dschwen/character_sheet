@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from srd_extract.io import read_json, write_json
+from srd_extract.spell_recovery import recovery_resource_ir
 from srd_extract.wizard import (
     ABILITIES,
     SCHOOLS,
@@ -488,12 +489,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits.get("skillProficiencyChoice", {}),
-                "countByLevel": {str(level): 2 for level in range(1, 6)},
+                "countByLevel": {str(level): 2 for level in range(1, 7)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 13,
                     "dexterity": 10,
@@ -829,16 +830,40 @@ def generate_druid_content(
         *_circle_entities(class_document, circle_features),
         *spell_entities,
     ]
-    replacement_ids = {entity["id"] for entity in druid_entities}
-    existing = [
-        entity
-        for entity in read_json(output / "entities.json")
-        if entity["id"] not in replacement_ids
-    ]
-    all_entities = [*existing, *druid_entities]
+    natural_recovery = next(
+        feature for feature in circle_features if feature["name"] == "Natural Recovery"
+    )
+    recovery_id = "srd521.resource.druid.natural-recovery"
+    free_id = "srd521.resource.druid.natural-recovery-free-cast"
+    for entity in druid_entities:
+        if entity["id"] == natural_recovery["id"]:
+            entity["body"]["spellSlotRecovery"] = {
+                "classId": CLASS_ID,
+                "resourceId": recovery_id,
+                "levelDivisor": 2,
+                "maximumSlotLevel": 5,
+                "event": "short-rest",
+            }
+            entity["body"]["freeSpellCasting"] = {
+                "classId": CLASS_ID,
+                "resourceId": free_id,
+                "optionChoiceId": "srd521.choice.druid.circle-of-land",
+            }
+            entity["body"]["automationLevel"] = "state-automated"
+    existing = read_json(output / "entities.json")
+    replacements = {entity["id"]: entity for entity in druid_entities if entity["kind"] != "spell"}
+    existing_ids = {entity["id"] for entity in existing}
+    all_entities = [replacements.get(entity["id"], entity) for entity in existing]
+    all_entities.extend(entity for entity in druid_entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "druid.json", druid_entities)
     write_json(output / "entities.json", all_entities)
     write_json(output / "authoring-ir" / "druid.wild-shape.json", _wild_shape_ir(wild_shape))
+    write_json(
+        output / "authoring-ir" / "circle-of-the-land.natural-recovery.json",
+        recovery_resource_ir(
+            natural_recovery, SUBCLASS_ID, [recovery_id, free_id], kind="subclass-feature"
+        ),
+    )
     write_json(
         output / "authoring-ir" / "druid.wild-companion.json",
         _resource_action_ir(wild_companion, "wild-companion"),
@@ -849,10 +874,6 @@ def generate_druid_content(
     )
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
-    coverage["note"] = (
-        "Barbarian, Cleric through level 5, Druid through level 5, Fighter through level 5, "
-        "Wizard through level 5, Human, Soldier, equipment, and representative spells."
-    )
     write_json(output / "coverage.json", coverage)
     report = {
         "classId": CLASS_ID,

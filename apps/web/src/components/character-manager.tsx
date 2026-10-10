@@ -338,6 +338,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
   const [spellHealsOther, setSpellHealsOther] = useState<Readonly<Record<string, boolean>>>({});
+  const [spellRecoverySelections, setSpellRecoverySelections] = useState<
+    Readonly<Record<string, Readonly<Record<string, string>>>>
+  >({});
   const [preparedSpellDraft, setPreparedSpellDraft] = useState<string[]>();
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
   const [diceRolling, setDiceRolling] = useState(false);
@@ -735,6 +738,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setActionDrafts({});
     setSpellLevels({});
     setSpellHealsOther({});
+    setSpellRecoverySelections({});
     setCastFeedback(undefined);
     setPreparedSpellDraft(undefined);
     setNotice(`Loaded ${fixture.character.name}.`);
@@ -752,6 +756,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setActionDrafts({});
       setSpellLevels({});
       setSpellHealsOther({});
+      setSpellRecoverySelections({});
       setCastFeedback(undefined);
       setPreparedSpellDraft(undefined);
       setNotice(
@@ -897,9 +902,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     savePlayState(commitCharacterState(character, proposal.nextState), message);
   }
 
-  function rest(event: "short-rest" | "long-rest"): void {
+  function rest(
+    event: "short-rest" | "long-rest",
+    recovery?: { sourceId: string; slots: { level: number; count: number }[] },
+  ): void {
     try {
-      const proposal = proposeRest({ character, packages: [rulesPackage] }, { event });
+      const proposal = proposeRest(
+        { character, packages: [rulesPackage] },
+        { event, ...(recovery === undefined ? {} : { spellSlotRecoveries: [recovery] }) },
+      );
+      if (proposal.applicable) setSpellRecoverySelections({});
       applyTransition(
         proposal,
         `${event === "short-rest" ? "Short" : "Long"} Rest applied (${String(proposal.changes.length)} changes).`,
@@ -1939,6 +1951,80 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       <small>Restore HP, slots, and resources</small>
                     </button>
                   </div>
+                  {(evaluation.spellSlotRecoveries ?? []).map((recovery) => {
+                    const selected = spellRecoverySelections[recovery.sourceId] ?? {};
+                    const slots = Object.entries(selected)
+                      .filter(([, count]) => Number(count) > 0)
+                      .map(([level, count]) => ({ level: Number(level), count: Number(count) }));
+                    const total = slots.reduce((sum, slot) => sum + slot.level * slot.count, 0);
+                    return (
+                      <div key={recovery.sourceId} className="effect-selection">
+                        <strong>
+                          {recovery.name} · {recovery.available ? "Ready" : "Spent until Long Rest"}
+                        </strong>
+                        <TraceButton
+                          traceId={recovery.traceId}
+                          onSelect={setSelectedTraceId}
+                          inspectOnClick
+                        >
+                          Recovery budget: {String(recovery.maximumCombinedLevel)} combined slot
+                          levels
+                        </TraceButton>
+                        <small>
+                          Choose expended slots as part of your Short Rest, up to{" "}
+                          {String(recovery.maximumCombinedLevel)} combined levels; no slot above
+                          level {String(recovery.maximumSlotLevel)}. A partial recovery spends the
+                          use.
+                        </small>
+                        {(evaluation.spellcasting?.slots ?? [])
+                          .filter(
+                            (slot) => slot.level <= recovery.maximumSlotLevel && slot.expended > 0,
+                          )
+                          .map((slot) => (
+                            <label key={slot.level}>
+                              Level {String(slot.level)} slots
+                              <select
+                                aria-label={`${recovery.name} level ${String(slot.level)} slots`}
+                                value={selected[String(slot.level)] ?? "0"}
+                                disabled={!recovery.available}
+                                onChange={(event) => {
+                                  setSpellRecoverySelections((current) => ({
+                                    ...current,
+                                    [recovery.sourceId]: {
+                                      ...current[recovery.sourceId],
+                                      [String(slot.level)]: event.target.value,
+                                    },
+                                  }));
+                                }}
+                              >
+                                {Array.from({ length: slot.expended + 1 }, (_, count) => (
+                                  <option key={count} value={String(count)}>
+                                    {String(count)}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          ))}
+                        <small>
+                          Selected {String(total)} of {String(recovery.maximumCombinedLevel)} levels
+                        </small>
+                        <button
+                          type="button"
+                          className="button secondary compact"
+                          disabled={
+                            !recovery.available ||
+                            total === 0 ||
+                            total > recovery.maximumCombinedLevel
+                          }
+                          onClick={() => {
+                            rest("short-rest", { sourceId: recovery.sourceId, slots });
+                          }}
+                        >
+                          Short Rest &amp; {recovery.name}
+                        </button>
+                      </div>
+                    );
+                  })}
                 </Section>
 
                 <Section
@@ -2085,7 +2171,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             {castFeedback.asRitual
                               ? "Ritual · no spell slot spent"
                               : castFeedback.freeCast === true
-                                ? "Innate feature · free casting spent"
+                                ? "Feature · free casting spent"
                                 : castFeedback.slotLevel === undefined
                                   ? "Cantrip · no spell slot spent"
                                   : `Level ${String(castFeedback.slotLevel)} slot spent · ${String(castFeedback.slotsRemaining ?? 0)} remaining`}
@@ -2132,7 +2218,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         const selectedSlot = eligibleSlots.find((slot) => slot.level === slotLevel);
                         const canCastWithSlot =
                           spell.level === 0 || (spell.prepared && (selectedSlot?.current ?? 0) > 0);
-                        const freeCastingOption = spell.castingOptions?.find(
+                        const freeCastingOptions = spell.castingOptions?.filter(
                           (option) => option.freeCastResourceId !== undefined,
                         );
                         return (
@@ -2205,8 +2291,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   Cast
                                 </button>
                               ) : null}
-                              {freeCastingOption === undefined ? null : (
+                              {freeCastingOptions?.map((freeCastingOption) => (
                                 <button
+                                  key={freeCastingOption.sourceId}
                                   className="button secondary compact"
                                   type="button"
                                   disabled={freeCastingOption.freeCastAvailable !== true}
@@ -2217,8 +2304,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   {freeCastingOption.freeCastAvailable === true
                                     ? "Free cast"
                                     : "Free cast spent"}
+                                  {" · "}
+                                  {names.get(freeCastingOption.sourceId) ??
+                                    shortEntityName(freeCastingOption.sourceId)}
                                 </button>
-                              )}
+                              ))}
                               {spell.ritual ? (
                                 <button
                                   className="button secondary compact"
@@ -3079,6 +3169,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setActionDrafts({});
             setSpellLevels({});
             setSpellHealsOther({});
+            setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
             setBuilderOpen(false);
@@ -3103,6 +3194,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setActionDrafts({});
             setSpellLevels({});
             setSpellHealsOther({});
+            setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
             setLevelUpOpen(false);

@@ -635,9 +635,9 @@ describe("guided character builder", () => {
   it("builds Circle of the Land Druids with prepared primal magic at every supported level", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [10, 17, 24, 31, 38];
+    const expectedHitPoints = [10, 17, 24, 31, 38, 45];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(druidId, catalog, level, `Level ${String(level)} Druid`);
       const counts = spellSelectionCounts(draft, catalog);
       const character = buildCharacter(draft, rulesPackage, options);

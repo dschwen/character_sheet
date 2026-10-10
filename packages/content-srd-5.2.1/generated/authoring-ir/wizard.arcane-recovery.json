@@ -1,0 +1,54 @@
+{
+  "id": "srd521.class-feature.wizard.arcane-recovery",
+  "kind": "class-feature",
+  "level": 1,
+  "parentId": "srd521.class.wizard",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "kind": "literal",
+        "value": 1
+      },
+      "id": "arcane-recovery-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.wizard.arcane-recovery",
+      "type": "grant-resource"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Slot selection is an explicit atomic Short Rest request."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0078-b008"
+      ],
+      "page": 78,
+      "quoteHash": "129b7fc498425f4755d82a6c627f470c5601fb6180dae479716f820a354099a6",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can regain some of your magical energy by studying your spellbook. When you finish a Short Rest, you can choose expended spell slots to recover. The spell slots can have a combined level equal to no more than half your Wizard level (round up), and none of the slots can be level 6 or higher. For example, if you’re a level 4 Wizard, you can recover up to two levels’ worth of spell slots, regaining either one level 2 spell slot or two level 1 spell slots. Once you use this feature, you can’t do so again until you finish a Long Rest."
+      }
+    ],
+    "title": "Arcane Recovery"
+  }
+}

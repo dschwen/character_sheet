@@ -254,6 +254,7 @@ export interface HitDieSpend {
 export interface RestRequest {
   event: RestEvent;
   hitDice?: HitDieSpend[];
+  spellSlotRecoveries?: { sourceId: string; slots: { level: number; count: number }[] }[];
 }
 
 export interface StateChange {
@@ -319,7 +320,19 @@ export interface SavingThrowAuraSummary {
   traceId: string;
 }
 
+export interface SpellSlotRecoverySummary {
+  sourceId: string;
+  name: string;
+  resourceId: string;
+  maximumCombinedLevel: number;
+  maximumSlotLevel: number;
+  available: boolean;
+  traceId: string;
+  sources: SourceReference[];
+}
+
 export interface CharacterEvaluation {
+  spellSlotRecoveries?: SpellSlotRecoverySummary[];
   savingThrowAuras?: SavingThrowAuraSummary[];
   facts: Readonly<Record<string, JsonValue>>;
   values: Readonly<Record<StatId, DerivedValue>>;

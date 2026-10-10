@@ -2,7 +2,7 @@
   "authoringIr": {
     "semanticsApproved": 0,
     "testsApproved": 0,
-    "total": 51
+    "total": 53
   },
   "classes": [
     {
@@ -24,7 +24,7 @@
       "name": "Cleric"
     },
     {
-      "builderMaximum": 5,
+      "builderMaximum": 6,
       "builderMinimum": 1,
       "id": "srd521.class.druid",
       "name": "Druid"

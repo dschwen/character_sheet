@@ -20,7 +20,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | Barbarian | 1 | 6 |
 | Bard | 1 | 5 |
 | Cleric | 1 | 6 |
-| Druid | 1 | 5 |
+| Druid | 1 | 6 |
 | Fighter | 1 | 6 |
 | Monk | 1 | 6 |
 | Paladin | 1 | 6 |
@@ -32,7 +32,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 
 ## Review evidence
 
-- Authoring IR records: 51.
+- Authoring IR records: 53.
 - Semantics approved: 0.
 - Tests approved: 0.
 

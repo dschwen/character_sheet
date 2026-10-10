@@ -1326,6 +1326,90 @@ function evaluateSavingThrowAuras(
   };
 }
 
+function evaluateSpellRecoveryFeatures(
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): NonNullable<CharacterEvaluation["spellSlotRecoveries"]> {
+  const recoveries: NonNullable<CharacterEvaluation["spellSlotRecoveries"]> = [];
+  for (const id of granted) {
+    const entity = index.entities.get(id);
+    const body = featureAutomationBodySchema.safeParse(entity?.body);
+    if (entity === undefined || !body.success) continue;
+    const recovery = body.data.spellSlotRecovery;
+    if (recovery !== undefined) {
+      const level = requireNumber(
+        state.facts[`classLevel.${recovery.classId.split(".").at(-1) ?? ""}`] ?? null,
+        "Recovery class level",
+      );
+      const maximumCombinedLevel = Math.ceil(level / recovery.levelDivisor);
+      const traceId = `${id}.spellSlotRecovery.maximumCombinedLevel`;
+      state.traces[traceId] = {
+        id: traceId,
+        result: maximumCombinedLevel,
+        nodes: [
+          {
+            id: `${traceId}.ceil`,
+            operation: "ceil-class-level-division",
+            inputs: [level, recovery.levelDivisor],
+            output: maximumCombinedLevel,
+          },
+        ],
+        sourceReferences: entitySourceReferences(entity),
+      };
+      recoveries.push({
+        sourceId: id,
+        name: entity.name.en ?? id,
+        resourceId: recovery.resourceId,
+        maximumCombinedLevel,
+        maximumSlotLevel: recovery.maximumSlotLevel,
+        available: (state.resources.find(({ id }) => id === recovery.resourceId)?.current ?? 0) > 0,
+        traceId,
+        sources: entitySourceReferences(entity),
+      });
+    }
+    const free = body.data.freeSpellCasting;
+    if (free === undefined) continue;
+    const classLevel = requireNumber(
+      state.facts[`classLevel.${free.classId.split(".").at(-1) ?? ""}`] ?? null,
+      "Free casting class level",
+    );
+    const eligible = new Set(
+      [...granted].flatMap((optionId) => {
+        const option = index.entities.get(optionId);
+        const parsed = z
+          .object({
+            choiceId: z.string(),
+            alwaysPreparedSpells: z.record(z.array(z.string())).default({}),
+          })
+          .passthrough()
+          .safeParse(option?.body);
+        return parsed.success && parsed.data.choiceId === free.optionChoiceId
+          ? Object.entries(parsed.data.alwaysPreparedSpells).flatMap(([level, ids]) =>
+              Number(level) <= classLevel ? ids : [],
+            )
+          : [];
+      }),
+    );
+    for (const spell of state.spells) {
+      if (spell.level === 0 || !spell.prepared || !eligible.has(spell.id)) continue;
+      const base = spell.castingOptions?.find(({ sourceId }) => sourceId === free.classId);
+      if (base === undefined) continue;
+      spell.castingOptions = [
+        ...(spell.castingOptions ?? []),
+        {
+          ...base,
+          sourceId: id,
+          freeCastResourceId: free.resourceId,
+          freeCastAvailable:
+            (state.resources.find(({ id }) => id === free.resourceId)?.current ?? 0) > 0,
+        },
+      ];
+    }
+  }
+  return recoveries;
+}
+
 function evaluateConditionMechanics(
   character: CharacterDocument,
   conditions: readonly ActiveCondition[],
@@ -6186,6 +6270,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateMagicInitiate(character, index, state);
   evaluateSpeciesTraits(character, origins, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
+  const spellSlotRecoveries = evaluateSpellRecoveryFeatures(granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment, statuses);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
   evaluateGrantedActionEnhancements(granted, index, state);
@@ -6205,6 +6290,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   return {
     facts: state.facts,
     savingThrowAuras: savingThrowAuras.auras,
+    spellSlotRecoveries,
     values: state.values,
     proficiencies: state.proficiencies,
     d20Tests: state.d20Tests,

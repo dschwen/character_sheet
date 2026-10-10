@@ -47,6 +47,6 @@ the plan's explicit deferred work, not a character-sheet completion gate.
 4. Audit each requirement and exit criterion in the original plan against authoritative artifacts,
    commands, tests, and rendered behavior before marking the overall goal complete.
 
-Browser verification is currently outstanding for the latest healing controls: no browser connection
+Browser verification is currently outstanding for the latest healing, aura, and recovery controls: no browser connection
 was available in the session. Engine/roll-helper tests, type checks, and a production build passed;
 these are not a substitute for rendered interaction verification.
