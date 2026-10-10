@@ -67,6 +67,16 @@ const characterLevelSchema = z
     hitPointChoice: z.enum(["rolled", "fixed", "manual"]),
     hitPointRoll: z.number().int().positive().optional(),
     selectedFeatureChoices: z.array(choiceSelectionSchema).default([]),
+    featSelections: z
+      .array(
+        z
+          .object({
+            featId: entityIdSchema,
+            abilityScoreIncreases: featAbilityScoreIncreasesSchema,
+          })
+          .strict(),
+      )
+      .optional(),
   })
   .strict()
   .superRefine((level, context) => {

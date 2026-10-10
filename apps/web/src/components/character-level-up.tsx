@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import type { CharacterDocument } from "@dnd/character-model";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
+import { asiLabel, asiOptions } from "../lib/ability-score-improvements";
 
 import {
   createLevelUpDraft,
@@ -27,7 +28,7 @@ import {
   updateMagicInitiateSelection,
   type CharacterBuilderDraft,
 } from "../lib/character-builder";
-import { abilities, numericFact, shortEntityName, signed, titleCase } from "../lib/presentation";
+import { numericFact, shortEntityName, signed, titleCase } from "../lib/presentation";
 
 interface CharacterLevelUpProps {
   character: CharacterDocument;
@@ -364,6 +365,20 @@ export function CharacterLevelUp({
                 </p>
               </div>
 
+              {selectedClass.abilityScoreImprovementLevels.some(
+                (level) =>
+                  level <= currentLevel &&
+                  character.build.levels[level - 1]?.featSelections === undefined,
+              ) ? (
+                <div className="builder-callout">
+                  <strong>Earlier ability increases are stored as combined totals</strong>
+                  <p>
+                    Those totals are preserved. The older sheet does not record which allocation was
+                    taken at each level; this advancement records only the new choice.
+                  </p>
+                </div>
+              ) : null}
+
               {introducesSubclass ? (
                 <div className="builder-callout">
                   <strong>{selectedClass.subclassName} begins at this level</strong>
@@ -575,25 +590,27 @@ export function CharacterLevelUp({
                 <label className="builder-field compact-field">
                   Level {String(targetLevel)} Ability Score Improvement
                   <select
-                    value={draft.asiAbilities[asiIndex]}
+                    value={draft.asiAllocations[asiIndex]?.join(",")}
                     onChange={(event) => {
                       setDraft((value) =>
                         value === undefined
                           ? value
                           : {
                               ...value,
-                              asiAbilities: value.asiAbilities.map((ability, index) =>
+                              asiAllocations: value.asiAllocations.map((allocation, index) =>
                                 index === asiIndex
-                                  ? (event.target.value as typeof ability)
-                                  : ability,
+                                  ? (asiOptions.find(
+                                      (option) => option.value === event.target.value,
+                                    )?.allocation ?? allocation)
+                                  : allocation,
                               ),
                             },
                       );
                     }}
                   >
-                    {abilities.map((ability) => (
-                      <option key={ability} value={ability}>
-                        +2 {titleCase(ability)}
+                    {asiOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
                       </option>
                     ))}
                   </select>
@@ -952,7 +969,9 @@ export function CharacterLevelUp({
                   <p>One class level using the fixed Hit Point value</p>
                   {introducesSubclass ? <small>{selectedClass.subclassName} added</small> : null}
                   {introducesAsi ? (
-                    <small>+2 {titleCase(draft.asiAbilities[asiIndex] ?? "strength")}</small>
+                    <small>
+                      {asiLabel(draft.asiAllocations[asiIndex] ?? ["strength", "strength"])}
+                    </small>
                   ) : null}
                 </article>
                 <article>

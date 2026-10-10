@@ -141,7 +141,7 @@ describe("guided character level up", () => {
         const previousState = character.state;
         const previousLearnedSpells = character.build.learnedSpellIds;
         const draft = createLevelUpDraft(character, catalog);
-        if (targetLevel === 4) draft.asiAbilities[0] = "dexterity";
+        if (targetLevel === 4) draft.asiAllocations[0] = ["dexterity", "dexterity"];
         const options = {
           id: character.id,
           now: new Date(`2026-08-0${String(targetLevel + 3)}T12:00:00.000Z`),
@@ -1091,8 +1091,11 @@ describe("guided character level up", () => {
     const draft = createLevelUpDraft(levelFive, catalog);
 
     expect(draft.level).toBe(6);
-    expect(draft.asiAbilities).toEqual(["strength", "strength"]);
-    draft.asiAbilities[1] = "dexterity";
+    expect(draft.asiAllocations).toEqual([
+      ["strength", "strength"],
+      ["strength", "strength"],
+    ]);
+    draft.asiAllocations[1] = ["dexterity", "dexterity"];
     const preview = previewLevelUp(levelFive, draft, rulesPackage, {
       id: levelFive.id,
       now: new Date("2026-08-12T03:00:00.000Z"),
@@ -1114,7 +1117,7 @@ describe("guided character level up", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
     const levelSix = buildCharacter(
-      defaultBuilderDraft(fighterId, catalog, 7, "Max Fighter"),
+      defaultBuilderDraft(fighterId, catalog, 8, "Max Fighter"),
       rulesPackage,
       initialOptions,
     );
@@ -1129,8 +1132,8 @@ describe("guided character level up", () => {
 
     expect(levelUpEligibility(levelSix, catalog)).toMatchObject({
       eligible: false,
-      currentLevel: 7,
-      reason: "Fighter advancement is currently reviewed through level 7.",
+      currentLevel: 8,
+      reason: "Fighter advancement is currently reviewed through level 8.",
     });
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
@@ -1138,7 +1141,7 @@ describe("guided character level up", () => {
         "Level-up support currently covers Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
     });
     expect(() => createLevelUpDraft(levelSix, catalog)).toThrow(
-      "Fighter advancement is currently reviewed through level 7.",
+      "Fighter advancement is currently reviewed through level 8.",
     );
   });
 

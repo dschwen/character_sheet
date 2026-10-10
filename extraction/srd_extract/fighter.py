@@ -504,7 +504,7 @@ def _class_entity(
         **traits,
         "skillProficiencyChoice": {
             **traits.get("skillProficiencyChoice", {}),
-            "countByLevel": {str(level): 2 for level in range(1, 8)},
+            "countByLevel": {str(level): 2 for level in range(1, 9)},
         },
         "startingEquipment": {
             "id": "srd521.choice.class.fighter.starting-equipment",
@@ -607,7 +607,7 @@ def _class_entity(
         },
         "builder": {
             "supportedLevelMinimum": 1,
-            "supportedLevelMaximum": 7,
+            "supportedLevelMaximum": 8,
             "defaultAbilityScores": {
                 "strength": 15,
                 "dexterity": 13,
@@ -1178,7 +1178,7 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Barbarian, Fighter through level 7, Human, Soldier, and equipment content. "
+        "Barbarian, Fighter through level 8, Human, Soldier, and equipment content. "
         "Proposed executable rules remain under review."
     )
     write_json(output / "coverage.json", coverage)

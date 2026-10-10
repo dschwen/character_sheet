@@ -82,7 +82,11 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class advancement for all twelve SRD classes through level 7. Champion Fighters gain
+same-class advancement for all twelve SRD classes through level 7, and Fighters through level 8.
+Ability Score Improvement offers +2 to one ability or +1 to two abilities, with the 20-point cap
+validated before saving. New sheets record each allocation at its acquisition level. Advancement
+locks earlier allocations and preserves legacy aggregate-only bonuses without inventing history.
+Other General feats, including Grappler, are not yet offered by this workflow. Champion Fighters gain
 distinct Fighting Style choices. Barbarians gain Initiative
 advantage and an optional half-Speed movement reminder when entering Rage. Archery and Defense are calculated; Great Weapon
 Fighting and Two-Weapon Fighting use explicit conditional weapon-damage modes. Turn eligibility
@@ -276,7 +280,7 @@ College of Lore feature, and the level-5 Inspiration die and recharge changes. I
 source-linked representative spells plus authoring IR for Bardic Inspiration, Jack of All Trades,
 Cutting Words, and Countercharm.
 
-Generate the typed Fighter-through-level-7 content from class pages 47–49, Ability Score
+Generate the typed Fighter-through-level-8 content from class pages 47–49, Ability Score
 Improvement and Fighting Styles on pages 87–88:
 
 ```bash
@@ -293,7 +297,7 @@ Improvement and Fighting Styles on pages 87–88:
 
 This parser validates all 20 progression rows, reconciles every feature reference, extracts the
 Champion subclass and all four SRD Fighting Styles, and generates draft authoring IR for the
-supported Fighter features. Fighter choices and progression currently reach level 7.
+supported Fighter features. Fighter choices and progression currently reach level 8.
 
 Generate the source-linked Light, Two-Handed, and Versatile damage modes:
 

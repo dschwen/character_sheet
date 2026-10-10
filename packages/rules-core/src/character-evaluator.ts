@@ -2698,6 +2698,67 @@ function validateProgressionSelections(
     }
   }
 
+  const recordedFeatSelections = character.build.levels.flatMap(
+    (level) => level.featSelections ?? [],
+  );
+  const recordedCounts = new Map<string, number>();
+  const levelsSeen = new Map<string, number>();
+  for (const level of character.build.levels) {
+    const classLevel = (levelsSeen.get(level.classId) ?? 0) + 1;
+    levelsSeen.set(level.classId, classLevel);
+    if (level.featSelections === undefined) continue; // Legacy aggregate-only documents.
+    const classEntity = index.entities.get(level.classId);
+    const row =
+      classEntity?.kind === "class"
+        ? classBodySchema
+            .parse(classEntity.body)
+            .progression.find((row) => row.level === classLevel)
+        : undefined;
+    const expected =
+      row?.features.filter((feature) => feature.name === "Ability Score Improvement").length ?? 0;
+    if (level.featSelections.length !== expected)
+      addValidation(
+        state,
+        "FEAT_ACQUISITION_LEVEL",
+        "Recorded General feat choices must match the granting class level.",
+        ["build.levels"],
+      );
+    for (const selection of level.featSelections) {
+      recordedCounts.set(selection.featId, (recordedCounts.get(selection.featId) ?? 0) + 1);
+      const entity = index.entities.get(selection.featId);
+      const body = entity?.kind === "feat" ? featBodySchema.parse(entity.body) : undefined;
+      if (
+        body?.category !== "general" ||
+        (body.prerequisite?.minimumCharacterLevel ?? 0) > level.characterLevel
+      )
+        addValidation(
+          state,
+          "FEAT_ACQUISITION_PREREQUISITE",
+          "Recorded feat is unavailable at its acquisition level.",
+          ["build.levels"],
+        );
+      if (
+        body?.abilityScoreIncreasePatterns === undefined &&
+        Object.keys(selection.abilityScoreIncreases).length > 0
+      )
+        addValidation(
+          state,
+          "FEAT_ACQUISITION_ABILITY_PATTERN",
+          "Recorded feat does not grant ability score increases.",
+          ["build.levels"],
+        );
+    }
+  }
+  for (const [featId, count] of recordedCounts) {
+    if (count > selectedGeneralFeats.filter((id) => id === featId).length)
+      addValidation(
+        state,
+        "FEAT_ACQUISITION_COUNT",
+        "Recorded feat choices must be present in the selected feat list.",
+        ["build.levels", "build.featIds"],
+      );
+  }
+
   const increases = Object.entries(character.build.featAbilityScoreIncreases) as [
     Ability,
     number,
@@ -2745,11 +2806,20 @@ function validateProgressionSelections(
           allocationIndex,
       );
     };
-    const allocationsByFeat = abilityIncreaseFeats.map((feat) =>
-      (featBodySchema.parse(feat.body).abilityScoreIncreasePatterns ?? []).flatMap(
+    const pendingRecords = [...recordedFeatSelections];
+    const allocationsByFeat = abilityIncreaseFeats.map((feat) => {
+      const possible = (featBodySchema.parse(feat.body).abilityScoreIncreasePatterns ?? []).flatMap(
         allocationsForPattern,
-      ),
-    );
+      );
+      const recordIndex = pendingRecords.findIndex((record) => record.featId === feat.id);
+      if (recordIndex < 0) return possible;
+      const [record] = pendingRecords.splice(recordIndex, 1);
+      return possible.filter((allocation) =>
+        abilities.every(
+          (ability, index) => allocation[index] === (record?.abilityScoreIncreases[ability] ?? 0),
+        ),
+      );
+    });
     const selected = abilities.map(
       (ability) => character.build.featAbilityScoreIncreases[ability] ?? 0,
     );

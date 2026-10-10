@@ -30,7 +30,7 @@
       "name": "Druid"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.fighter",
       "name": "Fighter"

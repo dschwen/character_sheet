@@ -20,6 +20,7 @@ import {
   type MagicInitiateSelection,
 } from "./character-builder";
 import { abilities, type Ability } from "./presentation";
+import { asiIncreases, savedAsiAllocations } from "./ability-score-improvements";
 
 export interface LevelUpEligibility {
   eligible: boolean;
@@ -64,23 +65,6 @@ function choiceSelections(character: CharacterDocument): Readonly<Record<string,
     selections[choice.choiceId] = [...(selections[choice.choiceId] ?? []), ...choice.optionIds];
   }
   return selections;
-}
-
-function chosenAsiAbilities(
-  character: CharacterDocument,
-  selectedClass: BuilderCatalog["classes"][BuilderClassId],
-  fallback: Ability,
-): Ability[] {
-  const required = selectedClass.abilityScoreImprovementLevels.filter(
-    (level) => level <= character.build.levels.length,
-  ).length;
-  const selected = abilities.flatMap((ability) =>
-    Array.from(
-      { length: Math.floor((character.build.featAbilityScoreIncreases[ability] ?? 0) / 2) },
-      () => ability,
-    ),
-  );
-  return Array.from({ length: required }, (_, index) => selected[index] ?? fallback);
 }
 
 export function magicInitiateSelections(
@@ -241,10 +225,11 @@ export function createLevelUpDraft(
     ),
     originFeatId: originFeatId ?? "",
     abilityScores: { ...character.build.abilityScores },
-    asiAbilities: chosenAsiAbilities(
+    asiAllocations: savedAsiAllocations(
       character,
-      selectedClass,
-      selectedClass.builder.defaultAbilityScoreImprovementAbility,
+      selectedClass.abilityScoreImprovementLevels.filter(
+        (level) => level <= eligibility.currentLevel,
+      ),
     ),
     classSkillIds: skills
       .filter((choice) => choice.sourceId === eligibility.classId)
@@ -298,6 +283,22 @@ function advancementIssues(
   }
   const selectedClass = catalog.classes[eligibility.classId];
   const targetLevel = eligibility.targetLevel;
+  const previousAsiLevels = selectedClass.abilityScoreImprovementLevels.filter(
+    (level) => level < targetLevel,
+  );
+  try {
+    const saved = savedAsiAllocations(character, previousAsiLevels);
+    if (
+      saved.some((allocation, index) => {
+        const before = asiIncreases([allocation]);
+        const after = asiIncreases(draft.asiAllocations.slice(index, index + 1));
+        return abilities.some((ability) => before[ability] !== after[ability]);
+      })
+    )
+      issues.push("Earlier Ability Score Improvement allocations cannot change during level up.");
+  } catch (error) {
+    issues.push(error instanceof Error ? error.message : "Existing ASI choices could not be read.");
+  }
   const currentChoices = choiceSelections(character);
   for (const choice of selectedClass.featureChoices.filter(
     (candidate) => candidate.level < targetLevel && candidate.changeOn?.includes("level-up"),

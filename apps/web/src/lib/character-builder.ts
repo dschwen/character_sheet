@@ -12,6 +12,13 @@ import type { CharacterEvaluation, LoadedRulesPackage } from "@dnd/rules-api";
 import { evaluateCharacter } from "@dnd/rules-core";
 
 import { abilities, type Ability, shortEntityName, titleCase } from "./presentation";
+import {
+  abilityScoreImprovementId,
+  asiIncreases,
+  asiOptions,
+  validAsiAllocation,
+  type AsiAllocation,
+} from "./ability-score-improvements";
 
 export const fighterId = "srd521.class.fighter";
 export const wizardId = "srd521.class.wizard";
@@ -25,7 +32,6 @@ export const rangerId = "srd521.class.ranger";
 export const rogueId = "srd521.class.rogue";
 export const sorcererId = "srd521.class.sorcerer";
 export const warlockId = "srd521.class.warlock";
-const abilityScoreImprovementId = "srd521.feat.general.ability-score-improvement";
 const skillPrefix = "srd521.skill.";
 
 export const builderClassIds = [
@@ -75,7 +81,7 @@ export interface CharacterBuilderDraft {
   name: string;
   level: number;
   abilityScores: Record<Ability, number>;
-  asiAbilities: Ability[];
+  asiAllocations: AsiAllocation[];
   classSkillIds: string[];
   speciesSkillIds: string[];
   speciesChoiceSelections: Readonly<Record<string, string[]>>;
@@ -1745,27 +1751,44 @@ function reconciledFeatureChoiceSelections(
   );
 }
 
-function reconciledAsiAbilities(
+function reconciledAsiAllocations(
   selectedClass: ClassBuilderCatalog,
-  current: readonly Ability[],
+  current: readonly AsiAllocation[],
   level: number,
-): Ability[] {
+  abilityScores: Readonly<Record<Ability, number>>,
+  backgroundIncreases: Partial<Record<Ability, number>>,
+): AsiAllocation[] {
   const count = selectedClass.abilityScoreImprovementLevels.filter(
     (grantLevel) => grantLevel <= level,
   ).length;
-  return Array.from(
-    { length: count },
-    (_, index) => current[index] ?? selectedClass.builder.defaultAbilityScoreImprovementAbility,
-  );
-}
-
-function featAbilityScoreIncreases(
-  asiAbilities: readonly Ability[],
-): Partial<Record<Ability, number>> {
-  return asiAbilities.reduce<Partial<Record<Ability, number>>>((increases, ability) => {
-    increases[ability] = (increases[ability] ?? 0) + 2;
-    return increases;
-  }, {});
+  const result: AsiAllocation[] = [];
+  for (let index = 0; index < count; index++) {
+    const previous = current[index];
+    if (previous !== undefined) {
+      result.push([...previous]);
+      continue;
+    }
+    const preferred = selectedClass.builder.defaultAbilityScoreImprovementAbility;
+    const increases = asiIncreases(result);
+    const candidates = [...asiOptions].sort(
+      (left, right) =>
+        Number(right.allocation.every((ability) => ability === preferred)) -
+        Number(left.allocation.every((ability) => ability === preferred)),
+    );
+    const chosen = candidates.find(({ allocation }) => {
+      const addition = asiIncreases([allocation]);
+      return abilities.every(
+        (ability) =>
+          abilityScores[ability] +
+            (backgroundIncreases[ability] ?? 0) +
+            (increases[ability] ?? 0) +
+            (addition[ability] ?? 0) <=
+          20,
+      );
+    });
+    result.push(chosen === undefined ? [preferred, preferred] : [...chosen.allocation]);
+  }
+  return result;
 }
 
 export function spellSelectionCounts(
@@ -1940,7 +1963,13 @@ export function defaultBuilderDraft(
     name,
     level,
     abilityScores: { ...selectedClass.builder.defaultAbilityScores },
-    asiAbilities: reconciledAsiAbilities(selectedClass, [], level),
+    asiAllocations: reconciledAsiAllocations(
+      selectedClass,
+      [],
+      level,
+      selectedClass.builder.defaultAbilityScores,
+      backgroundAbilityOption.abilityIncreases,
+    ),
     classSkillIds,
     speciesSkillIds,
     speciesChoiceSelections: reconcileSpeciesChoiceSelections(species, {}),
@@ -1999,7 +2028,13 @@ export function updateBuilderLevel(
     ...draft,
     level,
     classSkillIds,
-    asiAbilities: reconciledAsiAbilities(selectedClass, draft.asiAbilities, level),
+    asiAllocations: reconciledAsiAllocations(
+      selectedClass,
+      draft.asiAllocations,
+      level,
+      draft.abilityScores,
+      draft.backgroundAbilityScoreIncreases,
+    ),
     featureChoiceSelections,
     weaponMasteryIds: fillSelections(
       draft.weaponMasteryIds,
@@ -2127,7 +2162,10 @@ export function validateBuilderDraft(
   const requiredAsiCount = selectedClass.abilityScoreImprovementLevels.filter(
     (level) => level <= draft.level,
   ).length;
-  if (draft.asiAbilities.length !== requiredAsiCount) {
+  if (
+    draft.asiAllocations.length !== requiredAsiCount ||
+    draft.asiAllocations.some((allocation) => !validAsiAllocation(allocation))
+  ) {
     issues.push(`Choose ${String(requiredAsiCount)} Ability Score Improvement allocation(s).`);
   }
   for (const ability of abilities) {
@@ -2420,6 +2458,20 @@ function assembleCharacter(
     classId: draft.classId,
     hitPointChoice: "fixed" as const,
     selectedFeatureChoices: selectedFeatureChoicesByLevel.get(index + 1) ?? [],
+    ...(selectedClass.abilityScoreImprovementLevels.includes(index + 1)
+      ? {
+          featSelections: [
+            {
+              featId: abilityScoreImprovementId,
+              abilityScoreIncreases: asiIncreases([
+                draft.asiAllocations[
+                  selectedClass.abilityScoreImprovementLevels.indexOf(index + 1)
+                ] ?? ["strength", "strength"],
+              ]),
+            },
+          ],
+        }
+      : {}),
   }));
   const selectedFeatureFeatIds = selectedClass.featureChoices.flatMap((choice) => {
     const selectedOptions = new Set(draft.featureChoiceSelections[choice.id] ?? []);
@@ -2437,7 +2489,7 @@ function assembleCharacter(
       ...(selectedOriginFeat === undefined ? [] : [selectedOriginFeat.id]),
     ]),
   ];
-  featIds.push(...draft.asiAbilities.map(() => abilityScoreImprovementId));
+  featIds.push(...draft.asiAllocations.map(() => abilityScoreImprovementId));
   const timestamp = options.now.toISOString();
   const spellcaster = selectedClass.spellcasting !== undefined;
   const hasSubclass =
@@ -2493,7 +2545,7 @@ function assembleCharacter(
       backgroundId: selectedBackground.id,
       backgroundAbilityScoreIncreases: draft.backgroundAbilityScoreIncreases,
       ...(hasSubclass ? { subclassId: selectedClass.subclassId } : {}),
-      featAbilityScoreIncreases: featAbilityScoreIncreases(draft.asiAbilities),
+      featAbilityScoreIncreases: asiIncreases(draft.asiAllocations),
       featIds,
       learnedSpellIds: spellcaster ? draft.learnedSpellIds : [],
       choices: [

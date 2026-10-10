@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import type { CharacterDocument } from "@dnd/character-model";
 import type { StartingEquipmentItem } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
+import { asiIncreases, asiOptions } from "../lib/ability-score-improvements";
 
 import {
   activeSpeciesChoices,
@@ -617,8 +618,8 @@ export function CharacterBuilder({
                 selectedClass.subclassName === undefined ? null : (
                   <small>
                     Level {String(selectedClass.subclassLevel)} introduces the reviewed{" "}
-                    {selectedClass.subclassName} subclass. Level 4 applies a +2 Ability Score
-                    Improvement.
+                    {selectedClass.subclassName} subclass. Ability Score Improvements offer +2 to
+                    one ability or +1 to two abilities, to a maximum of 20.
                   </small>
                 )}
               </label>
@@ -767,8 +768,7 @@ export function CharacterBuilder({
               <div className="ability-editor">
                 {abilities.map((ability) => {
                   const backgroundIncrease = draft.backgroundAbilityScoreIncreases[ability] ?? 0;
-                  const featIncrease =
-                    draft.asiAbilities.filter((selected) => selected === ability).length * 2;
+                  const featIncrease = asiIncreases(draft.asiAllocations)[ability] ?? 0;
                   const finalScore =
                     draft.abilityScores[ability] + backgroundIncrease + featIncrease;
                   return (
@@ -792,7 +792,7 @@ export function CharacterBuilder({
                   );
                 })}
               </div>
-              {draft.asiAbilities.map((selectedAbility, index) => (
+              {draft.asiAllocations.map((allocation, index) => (
                 <label
                   key={selectedClass.abilityScoreImprovementLevels[index]}
                   className="builder-field compact-field"
@@ -800,19 +800,22 @@ export function CharacterBuilder({
                   Level {String(selectedClass.abilityScoreImprovementLevels[index])} Ability Score
                   Improvement
                   <select
-                    value={selectedAbility}
+                    value={allocation.join(",")}
                     onChange={(event) => {
                       setDraft((value) => ({
                         ...value,
-                        asiAbilities: value.asiAbilities.map((ability, abilityIndex) =>
-                          abilityIndex === index ? (event.target.value as Ability) : ability,
+                        asiAllocations: value.asiAllocations.map((previous, abilityIndex) =>
+                          abilityIndex === index
+                            ? (asiOptions.find((option) => option.value === event.target.value)
+                                ?.allocation ?? previous)
+                            : previous,
                         ),
                       }));
                     }}
                   >
-                    {abilities.map((ability) => (
-                      <option key={ability} value={ability}>
-                        +2 {titleCase(ability)}
+                    {asiOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
                       </option>
                     ))}
                   </select>
