@@ -38,7 +38,10 @@ describe("content-driven healing spells and Cleric advancement", () => {
         expect.objectContaining({ target: "caster-after-healing-other", base: 2, perSlotLevel: 1 }),
       ]),
     );
-    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: false });
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 6,
+    });
   });
 
   it("scales healing dice with slot level and adds Disciple of Life only for slotted casts", () => {

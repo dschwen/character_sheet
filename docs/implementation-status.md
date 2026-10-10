@@ -50,7 +50,11 @@ because some of its functionality exists or tests pass.
   status granting +1 Sorcerer spell DC and spell-attack Advantage, without enhancing other casting
   sources. Rests end the short-duration status; one-minute expiration and multiple Metamagic
   timing remain manual. Rendered interaction verification is pending without a connected browser.
-  Cleric and Druid builders remain capped at 6.
+  Cleric and Druid also reach level 7 with fourth-level slots, eleven selected prepared spells,
+  and new Life Domain/Circle land spells. Blessed Strikes and Elemental Fury offer permanent,
+  source-driven choices: Wisdom damage bonuses scoped to class cantrip casting sources, or
+  guided attack riders with damage-type and critical-hit controls. Creature hits, Wild Shape
+  eligibility, turn boundaries, and target HP remain manual. All twelve builders now reach 7.
 
 ## Remaining milestone gates
 
@@ -63,7 +67,7 @@ because some of its functionality exists or tests pass.
 | 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                           |
 | 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                             |
 | 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                |
-| 7: Levels 6–20                   | In progress. All twelve builders reach level 6; all except Cleric and Druid reach 7. Finish higher-level features, repeat choices, Epic Boons, spell progression, interactions, and twelve reviewed level-20 fixtures.      |
+| 7: Levels 6–20                   | In progress. All twelve builders reach level 7. Finish levels 8–20, higher-level features, repeat choices, Epic Boons, spell progression, interactions, and twelve reviewed level-20 fixtures.                              |
 | 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                    |
 | 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.              |
 | 10: Beta hardening               | Complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit.                                |
@@ -81,6 +85,6 @@ the plan's explicit deferred work, not a character-sheet completion gate.
 4. Audit each requirement and exit criterion in the original plan against authoritative artifacts,
    commands, tests, and rendered behavior before marking the overall goal complete.
 
-Browser verification is currently outstanding for the latest healing, aura, recovery, post-roll bonus, spell-choice, and rest-time feature-option controls: no browser connection
+Browser verification is currently outstanding for the latest healing, aura, recovery, post-roll bonus, spell-choice, rest-time feature-option, and damage-rider controls: no browser connection
 was available in the session. Engine/roll-helper tests, type checks, and a production build passed;
 these are not a substitute for rendered interaction verification.

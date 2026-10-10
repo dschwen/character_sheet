@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validateFeatureOptionChoices } from "./feature-option-choices.js";
+import { validateFeatureOptionChoices, validFeatureOptionIds } from "./feature-option-choices.js";
 
 import type {
   CalculationTrace,
@@ -29,6 +29,7 @@ import {
 import type {
   ActionSummary,
   AttackSummary,
+  AttackDamageRiderSummary,
   CharacterEvaluation,
   D20BonusDice,
   D20RollEffect,
@@ -4114,6 +4115,80 @@ function resolveFeatureSpellSelections(
   return { alwaysPrepared: grantedSpells, spellbookBonusCount };
 }
 
+function evaluateBattleBlessings(
+  character: CharacterDocument,
+  packages: LoadedRulesPackage[],
+  index: PackageIndex,
+  state: EngineState,
+): AttackDamageRiderSummary[] {
+  const riders: AttackDamageRiderSummary[] = [];
+  for (const optionId of validFeatureOptionIds(character, packages)) {
+    const entity = index.entities.get(optionId);
+    const parsed = featureAutomationBodySchema.safeParse(entity?.body);
+    if (entity === undefined || !parsed.success) continue;
+    const sourceName = entity.name.en ?? entity.id;
+    for (const bonus of parsed.data.cantripDamageBonuses) {
+      const amount = requireNumber(
+        state.facts[`ability.${bonus.ability}.modifier`] ?? null,
+        sourceName,
+      );
+      const traceId = `${entity.id}.cantripDamageBonus`;
+      state.traces[traceId] = {
+        id: traceId,
+        result: amount,
+        nodes: [
+          {
+            id: `${traceId}.ability`,
+            operation: "class-cantrip-damage-bonus",
+            inputs: [bonus.castingClassId, bonus.ability, amount],
+            output: amount,
+          },
+        ],
+        sourceReferences: entitySourceReferences(entity),
+      };
+      for (const spell of state.spells) {
+        if (spell.level !== 0 || spell.damage.length === 0 || spell.castingOptions === undefined)
+          continue;
+        spell.castingOptions = spell.castingOptions.map((option) =>
+          option.sourceId === bonus.castingClassId
+            ? {
+                ...option,
+                cantripDamageBonuses: [
+                  ...(option.cantripDamageBonuses ?? []),
+                  { sourceId: entity.id, sourceName, amount, traceId },
+                ],
+              }
+            : option,
+        );
+      }
+    }
+    for (const [index, rider] of parsed.data.attackDamageRiders.entries()) {
+      const traceId = `${entity.id}.attackDamageRider.${String(index)}`;
+      state.traces[traceId] = {
+        id: traceId,
+        result: rider.diceCount,
+        nodes: [
+          {
+            id: `${traceId}.grant`,
+            operation: "grant-conditional-attack-damage-rider",
+            inputs: [
+              rider.diceCount,
+              rider.diceSize,
+              rider.damageTypes,
+              rider.attackKinds,
+              rider.frequency,
+            ],
+            output: rider.diceCount,
+          },
+        ],
+        sourceReferences: entitySourceReferences(entity),
+      };
+      riders.push({ ...rider, sourceId: entity.id, sourceName, traceId });
+    }
+  }
+  return riders;
+}
+
 function evaluateStatusSpellcastingEnhancements(
   statuses: readonly ActiveStatus[],
   conditions: readonly ActiveCondition[],
@@ -7053,6 +7128,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateGrantedAttackEnhancements(granted, index, state);
   evaluateConditionMechanics(character, conditions, state);
   evaluateStatusSpellcastingEnhancements(statuses, conditions, granted, index, state);
+  const attackDamageRiders = evaluateBattleBlessings(character, input.packages, index, state);
   evaluateD20Minimums(granted, index, state);
   evaluateGrantedActionEnhancements(granted, index, state);
   evaluateActionMovement(state);
@@ -7105,6 +7181,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     }));
   return {
     facts: state.facts,
+    attackDamageRiders,
     savingThrowDamageEffects,
     savingThrowAuras: savingThrowAuras.auras,
     spellSlotRecoveries,

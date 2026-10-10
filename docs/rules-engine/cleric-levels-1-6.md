@@ -1,4 +1,4 @@
-# Cleric through level 6
+# Cleric through level 7
 
 The Cleric vertical slice uses the shared full-caster evaluation pipeline with Wisdom as its
 spellcasting ability and `full-list` preparation. At level 5 it calculates four cantrips, nine
@@ -27,3 +27,17 @@ and Prayer of Healing. Their dice scale with slot level. The roll helper uses th
 source's ability, and adds Disciple of Life only on slotted casts. Target HP, multi-target selection,
 Prayer of Healing's Short Rest and once-per-Long-Rest restriction, and whether a target actually
 regained HP remain player-resolved. Disciple of Life's bonus applies only on the casting turn.
+
+At level 7, preparation increases to eleven selected spells and slots become 4/3/3/1. Life Domain
+adds Aura of Life and Death Ward as always-prepared spells outside that limit. Blessed Strikes
+requires one permanent choice: Potent Spellcasting or Divine Strike. The builder and advancement
+workflow share the same source-linked option metadata and validate cardinality and level.
+
+Potent Spellcasting adds the Wisdom modifier, including negative values, to structured Cleric
+cantrip damage rolls. It does not enhance a separate species or Magic Initiate casting source.
+Damage buttons use the selected casting source; Shift-click explains the bonus.
+
+Divine Strike exposes a separate fullscreen/fallback 1d8 Necrotic or Radiant rider in Play → Damage
+riders. Confirm a weapon hit against a creature, your own turn, and that the rider is unused this
+turn. A declared critical hit doubles the rider dice. A successful roll clears the unused checkbox;
+confirm it again on a later turn. Encounter timing, hit adjudication, and target HP remain manual.

@@ -29,6 +29,8 @@ import {
 } from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
+import { DamageRiderControls } from "./damage-rider-controls";
+import { spellDamageRollRequest } from "../lib/feature-damage-roll";
 import { spellProtectionInstructions } from "../lib/spell-protection";
 import {
   characterBuilderCatalog,
@@ -696,13 +698,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
   }
 
-  function rollSpellDamage(spell: SpellSummary, damage: SpellSummary["damage"][number]): void {
-    void performDicePoolRoll({
-      label: `${spell.name} · ${titleCase(damage.type)} damage`,
-      diceCount: damage.diceCount,
-      diceSize: damage.diceSize,
-      modifier: damage.bonus ?? 0,
-    });
+  function rollSpellDamage(
+    spell: SpellSummary,
+    damage: SpellSummary["damage"][number],
+    sourceId?: string,
+  ): void {
+    void performDicePoolRoll(spellDamageRollRequest(spell, damage, sourceId));
   }
 
   function spellRollControls(
@@ -774,19 +775,32 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           <button
             key={`${damage.type}-${String(index)}`}
             type="button"
-            onClick={() => {
-              rollSpellDamage(spell, damage);
+            onClick={(event) => {
+              const traceId = castingOption?.cantripDamageBonuses?.[0]?.traceId;
+              if (event.shiftKey && traceId !== undefined) setSelectedTraceId(traceId);
+              else rollSpellDamage(spell, damage, castingOption?.sourceId);
             }}
             title={
-              damage.bonusAppliesToOneRoll
-                ? `Roll damage with ${signed(damage.bonus ?? 0)} Elemental Affinity bonus; apply it to only one damage roll of this spell`
-                : spell.hasHigherLevelEffect
-                  ? "Roll listed base damage; higher-level scaling is not included"
-                  : "Roll listed spell damage"
+              castingOption?.cantripDamageBonuses?.length
+                ? `Includes ${castingOption.cantripDamageBonuses.map(({ sourceName, amount }) => `${sourceName} ${signed(amount)}`).join(", ")} · Shift-click to explain`
+                : damage.bonusAppliesToOneRoll
+                  ? `Roll damage with ${signed(damage.bonus ?? 0)} Elemental Affinity bonus; apply it to only one damage roll of this spell`
+                  : spell.hasHigherLevelEffect
+                    ? "Roll listed base damage; higher-level scaling is not included"
+                    : "Roll listed spell damage"
             }
           >
             {String(damage.diceCount)}d{String(damage.diceSize)}
-            {damage.bonus === undefined ? "" : signed(damage.bonus)} {titleCase(damage.type)}
+            {damage.bonus === undefined && !castingOption?.cantripDamageBonuses?.length
+              ? ""
+              : signed(
+                  (damage.bonus ?? 0) +
+                    (castingOption?.cantripDamageBonuses ?? []).reduce(
+                      (sum, { amount }) => sum + amount,
+                      0,
+                    ),
+                )}{" "}
+            {titleCase(damage.type)}
           </button>
         ))}
         {saveDifficultyClass === undefined
@@ -2405,6 +2419,21 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   })}
                 </Section>
 
+                {(evaluation.attackDamageRiders?.length ?? 0) === 0 ? null : (
+                  <Section title="Damage riders" eyebrow="After an eligible hit">
+                    {evaluation.attackDamageRiders?.map((rider) => (
+                      <DamageRiderControls
+                        key={`${character.id}:${character.metadata.updatedAt}:${rider.traceId}`}
+                        rider={rider}
+                        busy={diceRolling}
+                        onRoll={performDicePoolRoll}
+                        onExplain={() => {
+                          setSelectedTraceId(rider.traceId);
+                        }}
+                      />
+                    ))}
+                  </Section>
+                )}
                 <Section
                   title="Use a feature"
                   eyebrow={`${String(playActions.length)} active actions`}

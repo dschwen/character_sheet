@@ -25,8 +25,24 @@
           "srd521.skill.nature"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
+      },
+      "elementalFuryChoice": {
+        "defaultOptionIds": [
+          "srd521.option.druid.elemental-fury.potent-spellcasting"
+        ],
+        "id": "srd521.choice.druid.elemental-fury",
+        "level": 7,
+        "maximum": 1,
+        "minimum": 1,
+        "optionSelection": {
+          "sourceFeatureId": "srd521.class-feature.druid.elemental-fury"
+        },
+        "options": [
+          "srd521.option.druid.elemental-fury.potent-spellcasting",
+          "srd521.option.druid.elemental-fury.primal-strike"
+        ]
       },
       "hitPointDie": 8,
       "primalOrderChoice": {
@@ -455,7 +471,8 @@
           "3": 2,
           "4": 2,
           "5": 2,
-          "6": 2
+          "6": 2,
+          "7": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -2919,6 +2936,97 @@
       "level-3",
       "transmutation",
       "druid"
+    ]
+  },
+  {
+    "body": {
+      "cantripDamageBonuses": [
+        {
+          "ability": "wisdom",
+          "castingClassId": "srd521.class.druid"
+        }
+      ],
+      "choiceId": "srd521.choice.druid.elemental-fury",
+      "description": "Add your Wisdom modifier to damage dealt with any Druid cantrip."
+    },
+    "id": "srd521.option.druid.elemental-fury.potent-spellcasting",
+    "kind": "class-option",
+    "name": {
+      "en": "Potent Spellcasting"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Source-linked choice; hit, turn, target, and damage application remain manual.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b012"
+        ],
+        "page": 43,
+        "quoteHash": "1114df58ab22e2b89c6b1be6d8638dc4dcf1466035c4c7105d2e430544e16928",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "druid",
+      "elemental-fury"
+    ]
+  },
+  {
+    "body": {
+      "attackDamageRiders": [
+        {
+          "attackKinds": [
+            "weapon",
+            "wild-shape-beast"
+          ],
+          "damageTypes": [
+            "cold",
+            "fire",
+            "lightning",
+            "thunder"
+          ],
+          "diceCount": 1,
+          "diceSize": 8,
+          "frequency": "once-on-each-of-your-turns"
+        }
+      ],
+      "choiceId": "srd521.choice.druid.elemental-fury",
+      "description": "Once on each of your turns, after hitting a creature with a weapon attack or a Beast form's attack in Wild Shape, deal an extra 1d8 cold or fire or lightning or thunder damage (choose when you hit)."
+    },
+    "id": "srd521.option.druid.elemental-fury.primal-strike",
+    "kind": "class-option",
+    "name": {
+      "en": "Primal Strike"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Source-linked choice; hit, turn, target, and damage application remain manual.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0043-b012"
+        ],
+        "page": 43,
+        "quoteHash": "1114df58ab22e2b89c6b1be6d8638dc4dcf1466035c4c7105d2e430544e16928",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "druid",
+      "elemental-fury"
     ]
   }
 ]

@@ -247,6 +247,7 @@ describe("guided character builder", () => {
     expect(druidChoices.map((choice) => [choice.id, choice.level])).toEqual([
       ["srd521.choice.druid.primal-order", 1],
       ["srd521.choice.druid.circle-of-land", 3],
+      ["srd521.choice.druid.elemental-fury", 7],
     ]);
     expect(
       druidChoices[0]?.options.map((option) => [option.id, option.additionalCantrips]),

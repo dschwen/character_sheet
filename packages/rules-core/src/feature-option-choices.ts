@@ -50,6 +50,24 @@ export function featureOptionChoices(packages: LoadedRulesPackage[]) {
     });
 }
 
+export function validFeatureOptionIds(
+  character: CharacterDocument,
+  packages: LoadedRulesPackage[],
+): ReadonlySet<string> {
+  const invalid = new Set(validateFeatureOptionChoices(character, packages).map(({ id }) => id));
+  return new Set(
+    featureOptionChoices(packages)
+      .filter(({ choice }) => !invalid.has(`feature-option-${choice.id}`))
+      .flatMap(({ choice }) =>
+        character.build.levels.flatMap(({ selectedFeatureChoices }) =>
+          selectedFeatureChoices
+            .filter(({ choiceId }) => choiceId === choice.id)
+            .flatMap(({ optionIds }) => optionIds),
+        ),
+      ),
+  );
+}
+
 export function validateFeatureOptionChoices(
   character: CharacterDocument,
   packages: LoadedRulesPackage[],

@@ -1,4 +1,4 @@
-# Druid levels 1–6 vertical slice
+# Druid levels 1–7 vertical slice
 
 The reviewed `druid-5.json` fixture is a Human Soldier Circle of the Land Druid. It selects the
 Warden Primal Order and Polar land, equips medium armor and a Shield, learns three cantrips, and
@@ -10,7 +10,7 @@ Shape uses. Wild Shape, Wild Companion, and Land’s Aid expose atomic actions t
 resource. Short Rest restores one use; Long Rest restores all uses and spell slots.
 
 The generated content retains every Druid and Circle of the Land feature through level 20 as
-source-linked structured text. The builder and advancement workflow support level 6, including
+source-linked structured text. At level 6, the builder and advancement workflow include
 ten selected prepared spells, three third-level slots, and Natural Recovery.
 
 Natural Recovery grants two independent once-per-Long-Rest resources. One free-casts a leveled
@@ -23,6 +23,22 @@ cannot exceed half Druid level rounded up (three at level 6), no slot can exceed
 expended slots can be recovered. Partial recovery spends the entire use. Invalid selections leave
 all rest effects unapplied, and ordinary Short Rests do not consume the benefit. Both resources
 recharge on Long Rest. The same engine and UI support Wizard's Arcane Recovery.
+
+Level 7 increases preparation to eleven selected spells and slots to 4/3/3/1. Each land adds one
+always-prepared spell: Arid → Blight, Polar → Ice Storm, Temperate → Freedom of Movement, and
+Tropical → Polymorph. Natural Recovery's slot budget becomes four; its free-casting source also
+offers the newly available land spell.
+
+Elemental Fury requires one permanent choice: Potent Spellcasting or Primal Strike. Potent
+Spellcasting adds the Wisdom modifier (including negative values) to structured Druid cantrip
+damage using the selected Druid casting source, not a separate feat or species source.
+Shift-click the damage button to explain the bonus.
+
+Primal Strike appears in Play → Damage riders as a separate fullscreen/fallback 1d8 Cold, Fire,
+Lightning, or Thunder roll. Confirm a creature hit with a weapon or a Beast form's attack in Wild
+Shape, your own turn, and that the rider is unused this turn. Declared critical hits double the
+rider dice; successful rolls clear the unused checkbox. Wild Shape eligibility, turn boundaries,
+hit adjudication, and applying damage to the target remain manual.
 
 These limits remain intentionally roll-assisted:
 

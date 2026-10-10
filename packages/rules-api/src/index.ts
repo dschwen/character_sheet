@@ -222,6 +222,7 @@ export interface SpellHealingEffectSummary {
 }
 
 export interface SpellCastingOptionSummary {
+  cantripDamageBonuses?: SpellDamageBonusSummary[];
   attackRollMode?: "normal" | "advantage" | "disadvantage";
   sourceId: string;
   ability: string;
@@ -253,6 +254,24 @@ export interface SpellSummary {
   appliedStatuses: SpellAppliedStatusSummary[];
   sources: SourceReference[];
   castingOptions?: SpellCastingOptionSummary[];
+}
+
+export interface SpellDamageBonusSummary {
+  sourceId: string;
+  sourceName: string;
+  amount: number;
+  traceId: string;
+}
+
+export interface AttackDamageRiderSummary {
+  sourceId: string;
+  sourceName: string;
+  diceCount: number;
+  diceSize: number;
+  damageTypes: string[];
+  attackKinds: ("weapon" | "wild-shape-beast")[];
+  frequency: "once-on-each-of-your-turns";
+  traceId: string;
 }
 
 export interface SpellAppliedStatusSummary {
@@ -375,6 +394,7 @@ export interface SpellSlotRecoverySummary {
 }
 
 export interface CharacterEvaluation {
+  attackDamageRiders?: AttackDamageRiderSummary[];
   savingThrowDamageEffects?: SavingThrowDamageEffectSummary[];
   spellProtections?: SpellProtectionSummary[];
   spellSlotRecoveries?: SpellSlotRecoverySummary[];

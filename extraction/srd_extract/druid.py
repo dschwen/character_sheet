@@ -10,6 +10,7 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
+from srd_extract.battle_blessings import battle_blessing_choice
 from srd_extract.io import read_json, write_json
 from srd_extract.spell_recovery import recovery_resource_ir
 from srd_extract.wizard import (
@@ -489,12 +490,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits.get("skillProficiencyChoice", {}),
-                "countByLevel": {str(level): 2 for level in range(1, 7)},
+                "countByLevel": {str(level): 2 for level in range(1, 8)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 13,
                     "dexterity": 10,
@@ -850,6 +851,17 @@ def generate_druid_content(
                 "optionChoiceId": "srd521.choice.druid.circle-of-land",
             }
             entity["body"]["automationLevel"] = "state-automated"
+    fury = next(feature for feature in features if feature["name"] == "Elemental Fury")
+    choice, options = battle_blessing_choice(
+        fury,
+        CLASS_ID,
+        "elemental-fury",
+        "Primal Strike",
+        ["cold", "fire", "lightning", "thunder"],
+        beast_attacks=True,
+    )
+    druid_entities[0]["body"]["elementalFuryChoice"] = choice
+    druid_entities.extend(options)
     existing = read_json(output / "entities.json")
     replacements = {entity["id"]: entity for entity in druid_entities if entity["kind"] != "spell"}
     existing_ids = {entity["id"] for entity in existing}

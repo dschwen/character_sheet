@@ -81,7 +81,9 @@
     "srd521.spell.shocking-grasp",
     "srd521.spell.sleet-storm",
     "srd521.spell.speak-with-animals",
-    "srd521.spell.water-breathing"
+    "srd521.spell.water-breathing",
+    "srd521.option.druid.elemental-fury.potent-spellcasting",
+    "srd521.option.druid.elemental-fury.primal-strike"
   ],
   "progression": [
     {

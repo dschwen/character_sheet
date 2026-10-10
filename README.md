@@ -82,8 +82,8 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class advancement for all twelve SRD classes through level 6, plus Champion Fighters through
-level 7 with distinct Fighting Style choices. Barbarians also reach level 7, gaining Initiative
+same-class advancement for all twelve SRD classes through level 7. Champion Fighters gain
+distinct Fighting Style choices. Barbarians gain Initiative
 advantage and an optional half-Speed movement reminder when entering Rage. Archery and Defense are calculated; Great Weapon
 Fighting and Two-Weapon Fighting use explicit conditional weapon-damage modes. Turn eligibility
 and action usage remain manually adjudicated. Evokers select separate
@@ -94,6 +94,11 @@ eleven prepared spells, and one additional Evocation Savant spellbook choice. Wa
 invocations, eight selected prepared spells, fourth-level Pact slots, and always-prepared Fire
 Shield and Wall of Fire. Pact slot upgrades retain their spent count, rather than refilling the
 pool. Eldritch Mind's conditional Concentration-save advantage remains manually adjudicated.
+Clerics and Druids gain fourth-level slots, eleven selected prepared spells, and new subclass
+spells. Blessed Strikes and Elemental Fury offer a permanent choice of class-scoped Wisdom
+cantrip damage bonuses or a guided 1d8 attack rider. In Play → Damage riders, confirm the creature
+hit, attack kind, own turn, and unused rider; choose its damage type and whether the hit was
+critical, then roll. Turn tracking, Wild Shape eligibility, and target HP remain manual.
 Lore Bards select two Magical Discoveries from the Cleric,
 Druid, and Wizard lists, including cantrips, up to their available slot level. These use Charisma
 and remain always prepared outside the normal Bard limit. The builder and advancement flow offer
@@ -179,7 +184,7 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-level 1–6 vertical slices for all twelve SRD classes, plus level 7 for Fighter, Barbarian, Monk, Rogue, Ranger, Paladin, and Bard, with
+level 1–7 builder and advancement slices for all twelve SRD classes, with
 every standard SRD background and species. Higher levels and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 
@@ -545,8 +550,7 @@ Generate the fifteen source-linked standard conditions from Rules Glossary pages
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
 Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite; the
-web integration suite also covers Barbarian, Cleric, Fighter, Monk, Ranger, Rogue, and Sorcerer creation and
-advancement through level 6. Results
+web integration suite also covers creation and advancement through level 7 for all twelve classes. Results
 include origin and feat ability increases, subclass features, species size, speed, senses, traits,
 typed skill and saving-throw proficiencies, d20-test roll states, Initiative, Passive Perception,
 inventory, armor and Shield

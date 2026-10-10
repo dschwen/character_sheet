@@ -478,6 +478,29 @@ export const weaponPropertyBodySchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    cantripDamageBonuses: z
+      .array(
+        z
+          .object({
+            castingClassId: entityIdSchema,
+            ability: characterBuilderAbilitySchema,
+          })
+          .strict(),
+      )
+      .default([]),
+    attackDamageRiders: z
+      .array(
+        z
+          .object({
+            diceCount: z.number().int().positive(),
+            diceSize: z.number().int().min(2),
+            damageTypes: z.array(z.string().min(1)).min(1),
+            attackKinds: z.array(z.enum(["weapon", "wild-shape-beast"])).min(1),
+            frequency: z.literal("once-on-each-of-your-turns"),
+          })
+          .strict(),
+      )
+      .default([]),
     d20Minimums: z
       .array(
         z

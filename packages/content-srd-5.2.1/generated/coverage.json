@@ -18,13 +18,13 @@
       "name": "Bard"
     },
     {
-      "builderMaximum": 6,
+      "builderMaximum": 7,
       "builderMinimum": 1,
       "id": "srd521.class.cleric",
       "name": "Cleric"
     },
     {
-      "builderMaximum": 6,
+      "builderMaximum": 7,
       "builderMinimum": 1,
       "id": "srd521.class.druid",
       "name": "Druid"
@@ -80,7 +80,7 @@
   ],
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 865,
+    "STRUCTURED": 869,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
@@ -90,7 +90,7 @@
     "background": 4,
     "class": 12,
     "class-feature": 174,
-    "class-option": 50,
+    "class-option": 54,
     "condition": 15,
     "equipment-ammunition": 5,
     "equipment-armor": 12,

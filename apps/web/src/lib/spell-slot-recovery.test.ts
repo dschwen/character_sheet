@@ -59,7 +59,10 @@ describe("rest-based spell slot recovery", () => {
       expect.objectContaining({ maximum: 1, current: 1 }),
       expect.objectContaining({ maximum: 1, current: 1 }),
     ]);
-    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: false });
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 6,
+    });
   });
 
   it("recovers a chosen mix atomically with rest benefits, without spending free casting", () => {

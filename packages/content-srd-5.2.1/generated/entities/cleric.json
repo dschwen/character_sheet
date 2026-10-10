@@ -6,6 +6,22 @@
         "medium",
         "shield"
       ],
+      "blessedStrikesChoice": {
+        "defaultOptionIds": [
+          "srd521.option.cleric.blessed-strikes.potent-spellcasting"
+        ],
+        "id": "srd521.choice.cleric.blessed-strikes",
+        "level": 7,
+        "maximum": 1,
+        "minimum": 1,
+        "optionSelection": {
+          "sourceFeatureId": "srd521.class-feature.cleric.blessed-strikes"
+        },
+        "options": [
+          "srd521.option.cleric.blessed-strikes.potent-spellcasting",
+          "srd521.option.cleric.blessed-strikes.divine-strike"
+        ]
+      },
       "builder": {
         "defaultAbilityScoreImprovementAbility": "wisdom",
         "defaultAbilityScores": {
@@ -21,7 +37,7 @@
           "srd521.skill.religion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
       },
       "divineOrderChoice": {
@@ -438,7 +454,8 @@
           "3": 2,
           "4": 2,
           "5": 2,
-          "6": 2
+          "6": 2,
+          "7": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -2554,6 +2571,94 @@
       "level-0",
       "transmutation",
       "cleric"
+    ]
+  },
+  {
+    "body": {
+      "cantripDamageBonuses": [
+        {
+          "ability": "wisdom",
+          "castingClassId": "srd521.class.cleric"
+        }
+      ],
+      "choiceId": "srd521.choice.cleric.blessed-strikes",
+      "description": "Add your Wisdom modifier to damage dealt with any Cleric cantrip."
+    },
+    "id": "srd521.option.cleric.blessed-strikes.potent-spellcasting",
+    "kind": "class-option",
+    "name": {
+      "en": "Potent Spellcasting"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Source-linked choice; hit, turn, target, and damage application remain manual.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0038-b002"
+        ],
+        "page": 38,
+        "quoteHash": "c7fb49e610b3673eb29fc7075a0f0995fdec85e91dbc3351faf13b06e2ae7f3d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "cleric",
+      "blessed-strikes"
+    ]
+  },
+  {
+    "body": {
+      "attackDamageRiders": [
+        {
+          "attackKinds": [
+            "weapon"
+          ],
+          "damageTypes": [
+            "necrotic",
+            "radiant"
+          ],
+          "diceCount": 1,
+          "diceSize": 8,
+          "frequency": "once-on-each-of-your-turns"
+        }
+      ],
+      "choiceId": "srd521.choice.cleric.blessed-strikes",
+      "description": "Once on each of your turns, after hitting a creature with a weapon attack, deal an extra 1d8 necrotic or radiant damage (choose when you hit)."
+    },
+    "id": "srd521.option.cleric.blessed-strikes.divine-strike",
+    "kind": "class-option",
+    "name": {
+      "en": "Divine Strike"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Source-linked choice; hit, turn, target, and damage application remain manual.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0038-b002"
+        ],
+        "page": 38,
+        "quoteHash": "c7fb49e610b3673eb29fc7075a0f0995fdec85e91dbc3351faf13b06e2ae7f3d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "cleric",
+      "blessed-strikes"
     ]
   }
 ]

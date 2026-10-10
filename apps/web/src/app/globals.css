@@ -940,6 +940,34 @@ button.vital-card:hover {
   display: grid;
   align-items: start;
 }
+.damage-rider-card {
+  display: grid;
+  gap: 10px;
+}
+
+.damage-rider-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.damage-rider-controls label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.damage-rider-controls input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.damage-rider-controls select {
+  max-width: 100%;
+}
+
 .saving-throw-reroll-controls {
   display: grid;
   min-width: 0;

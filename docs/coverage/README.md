@@ -8,7 +8,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | --- | ---: |
 | UNCLASSIFIED | 0 |
 | TEXT_ONLY | 0 |
-| STRUCTURED | 865 |
+| STRUCTURED | 869 |
 | EXECUTABLE | 0 |
 | TESTED | 0 |
 | VERIFIED | 0 |
@@ -19,8 +19,8 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | --- | ---: | ---: |
 | Barbarian | 1 | 7 |
 | Bard | 1 | 7 |
-| Cleric | 1 | 6 |
-| Druid | 1 | 6 |
+| Cleric | 1 | 7 |
+| Druid | 1 | 7 |
 | Fighter | 1 | 7 |
 | Monk | 1 | 7 |
 | Paladin | 1 | 7 |
@@ -47,7 +47,7 @@ See `docs/rules-engine` for class-specific assisted mechanics and limits.
 | background | 4 |
 | class | 12 |
 | class-feature | 174 |
-| class-option | 50 |
+| class-option | 54 |
 | condition | 15 |
 | equipment-ammunition | 5 |
 | equipment-armor | 12 |

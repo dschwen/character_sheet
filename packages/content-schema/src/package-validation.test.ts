@@ -67,7 +67,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(865);
+    expect(parsedEntities).toHaveLength(869);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -383,10 +383,10 @@ describe("bootstrap content package", () => {
       defaultClassSkillIds: ["srd521.skill.acrobatics", "srd521.skill.insight"],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.cleric")?.builder).toMatchObject({
-      supportedLevelMaximum: 6,
+      supportedLevelMaximum: 7,
     });
     expect(metadata.find(({ id }) => id === "srd521.class.druid")?.builder).toMatchObject({
-      supportedLevelMaximum: 6,
+      supportedLevelMaximum: 7,
     });
     expect(
       featureAutomationBodySchema.parse(
@@ -737,7 +737,7 @@ describe("bootstrap content package", () => {
       })
       .parse(cleric?.body);
 
-    expect(entities).toHaveLength(38);
+    expect(entities).toHaveLength(40);
     expect(entities.filter((entity) => entity.kind === "spell")).toHaveLength(17);
     expect(clericBody.spellList).toHaveLength(109);
     expect(clericBody.progression[4]).toMatchObject({

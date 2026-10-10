@@ -10,6 +10,7 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
+from srd_extract.battle_blessings import battle_blessing_choice
 from srd_extract.io import read_json, write_json
 from srd_extract.wizard import (
     ABILITIES,
@@ -484,12 +485,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits.get("skillProficiencyChoice", {}),
-                "countByLevel": {str(level): 2 for level in range(1, 7)},
+                "countByLevel": {str(level): 2 for level in range(1, 8)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 13,
                     "dexterity": 10,
@@ -774,6 +775,12 @@ def generate_cleric_content(
         *_life_domain_entities(class_document, life_features),
         *spell_entities,
     ]
+    blessing = next(feature for feature in features if feature["name"] == "Blessed Strikes")
+    choice, options = battle_blessing_choice(
+        blessing, CLASS_ID, "blessed-strikes", "Divine Strike", ["necrotic", "radiant"]
+    )
+    class_entity["body"]["blessedStrikesChoice"] = choice
+    cleric_entities.extend(options)
     for entity in cleric_entities:
         target = {
             "srd521.subclass-feature.cleric.life-domain.disciple-of-life": "healed-creature",
@@ -791,6 +798,17 @@ def generate_cleric_content(
     # Shared spells can carry annotations from later parser passes. Preserve them
     # rather than erasing statuses or replacing another class's source boundaries.
     existing = read_json(output / "entities.json")
+    existing_by_id = {entity["id"]: entity for entity in existing}
+    for entity in cleric_entities:
+        previous = existing_by_id.get(entity["id"])
+        # Healing is independently annotated after class spell extraction.
+        if (
+            entity["kind"] == "spell"
+            and previous is not None
+            and previous["body"].get("healing")
+            and not entity["body"].get("healing")
+        ):
+            entity["body"]["healing"] = previous["body"]["healing"]
     replacements = {entity["id"]: entity for entity in cleric_entities if entity["kind"] != "spell"}
     existing_ids = {entity["id"] for entity in existing}
     all_entities = [replacements.get(entity["id"], entity) for entity in existing]

@@ -71,7 +71,9 @@
     "srd521.spell.shield-of-faith",
     "srd521.spell.spirit-guardians",
     "srd521.spell.spiritual-weapon",
-    "srd521.spell.thaumaturgy"
+    "srd521.spell.thaumaturgy",
+    "srd521.option.cleric.blessed-strikes.potent-spellcasting",
+    "srd521.option.cleric.blessed-strikes.divine-strike"
   ],
   "progression": [
     {
