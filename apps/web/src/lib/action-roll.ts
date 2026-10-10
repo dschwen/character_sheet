@@ -76,7 +76,8 @@ export function canApplyPostRollBonus(
     ? "saving-throw"
     : roll.testId === "initiative" ||
         roll.testId.startsWith("abilityCheck.") ||
-        roll.testId.startsWith("skill.")
+        roll.testId.startsWith("skill.") ||
+        roll.testId.startsWith("tool.")
       ? "ability-check"
       : undefined;
   const appliesTo = objectValue(action.parameters?.checkBonus)?.appliesTo;

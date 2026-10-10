@@ -28,6 +28,7 @@ def test_parse_soldier_background() -> None:
     assert body["abilityScoreOptions"] == ["strength", "dexterity", "constitution"]
     assert body["abilityScoreIncreasePatterns"] == [[2, 1], [1, 1, 1]]
     assert body["featId"] == "srd521.feat.origin.savage-attacker"
+    assert body["toolProficiencies"] == []
     assert body["skillProficiencies"] == [
         "srd521.skill.athletics",
         "srd521.skill.intimidation",
@@ -75,6 +76,7 @@ def test_parse_additional_backgrounds(
     )
 
     assert body["featId"] == expected_feat_id
+    assert body["toolProficiencies"] == ["Thieves’ Tools"]
     assert len(body["abilityScoreOptions"]) == 3
     assert len(body["skillProficiencies"]) == 2
 

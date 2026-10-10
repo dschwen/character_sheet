@@ -453,6 +453,17 @@ export const weaponPropertyBodySchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    d20Minimums: z
+      .array(
+        z
+          .object({
+            testKinds: z.array(z.enum(["skill", "tool"])).min(1),
+            requiresProficiency: z.literal(true),
+            minimum: z.number().int().min(1).max(20),
+          })
+          .strict(),
+      )
+      .default([]),
     savingThrowDamageEffects: z
       .array(
         z

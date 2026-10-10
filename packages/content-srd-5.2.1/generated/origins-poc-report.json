@@ -23,6 +23,9 @@
         "srd521.skill.insight",
         "srd521.skill.religion"
       ],
+      "toolProficiencies": [
+        "Calligrapher’s Supplies"
+      ],
       "toolProficiencyChoice": {
         "category": "tool",
         "maximum": 1,
@@ -52,6 +55,9 @@
       "skillProficiencies": [
         "srd521.skill.sleight-of-hand",
         "srd521.skill.stealth"
+      ],
+      "toolProficiencies": [
+        "Thieves’ Tools"
       ],
       "toolProficiencyChoice": {
         "category": "tool",
@@ -83,6 +89,9 @@
         "srd521.skill.arcana",
         "srd521.skill.history"
       ],
+      "toolProficiencies": [
+        "Calligrapher’s Supplies"
+      ],
       "toolProficiencyChoice": {
         "category": "tool",
         "maximum": 1,
@@ -113,6 +122,7 @@
         "srd521.skill.athletics",
         "srd521.skill.intimidation"
       ],
+      "toolProficiencies": [],
       "toolProficiencyChoice": {
         "category": "tool",
         "maximum": 1,

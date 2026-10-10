@@ -1,6 +1,23 @@
-import type { D20BonusDice, RollMode } from "@dnd/rules-api";
+import type { D20BonusDice, D20TestSummary, RollMode } from "@dnd/rules-api";
+
+export function d20RerollRequest(
+  test: D20TestSummary | undefined,
+  bonusDice = test?.bonusDice ?? [],
+): Pick<D20RollRequest, "rerollValues" | "rerollSource" | "bonusDice" | "dieMinimum"> {
+  return {
+    ...(test === undefined || test.rerollValues.length === 0
+      ? {}
+      : {
+          rerollValues: test.rerollValues,
+          rerollSource: test.rerollSources.join(", ") || "Feature",
+        }),
+    ...(test?.dieMinimum === undefined ? {} : { dieMinimum: test.dieMinimum }),
+    ...(bonusDice.length === 0 ? {} : { bonusDice }),
+  };
+}
 
 export interface D20RollRequest {
+  dieMinimum?: { value: number; sourceName: string; traceId?: string };
   testId?: string;
   label: string;
   modifier: number;
@@ -12,6 +29,7 @@ export interface D20RollRequest {
 }
 
 export interface D20RollResult extends D20RollRequest {
+  effectiveKept?: number;
   kind: "d20";
   dice: readonly number[];
   kept: number;
@@ -54,6 +72,16 @@ export interface DicePoolRollResult {
 }
 
 export type DiceRollResult = D20RollResult | DicePoolRollResult;
+
+export function applyD20MinimumPreference(
+  request: D20RollRequest,
+  enabled: boolean,
+): D20RollRequest {
+  if (enabled) return request;
+  const adjusted = { ...request };
+  delete adjusted.dieMinimum;
+  return adjusted;
+}
 
 export type RandomSource = () => number;
 
@@ -140,13 +168,22 @@ export function resolveD20Roll(
   const bonusTotal = bonusDiceRolls
     .flatMap((bonus) => bonus.dice)
     .reduce((sum, die) => sum + die, 0);
+  if (
+    request.dieMinimum !== undefined &&
+    (!Number.isInteger(request.dieMinimum.value) ||
+      request.dieMinimum.value < 1 ||
+      request.dieMinimum.value > 20)
+  )
+    throw new RangeError("A d20 minimum must be a whole number from 1 through 20.");
+  const effectiveKept = Math.max(kept, request.dieMinimum?.value ?? 1);
 
   return {
     ...request,
     kind: "d20",
     dice,
     kept,
-    total: kept + request.modifier + bonusTotal,
+    total: effectiveKept + request.modifier + bonusTotal,
+    ...(request.dieMinimum === undefined ? {} : { effectiveKept }),
     ...(rerolls.length === 0 ? {} : { rerolls }),
     ...(bonusDiceRolls.length === 0 ? {} : { bonusDiceRolls }),
   };

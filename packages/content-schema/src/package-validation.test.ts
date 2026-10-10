@@ -438,7 +438,7 @@ describe("bootstrap content package", () => {
       ]),
     );
     expect(metadata.find(({ id }) => id === "srd521.class.rogue")?.builder).toMatchObject({
-      supportedLevelMaximum: 6,
+      supportedLevelMaximum: 7,
       defaultAbilityScoreImprovementAbility: "dexterity",
       expertiseChoice: {
         sourceId: "srd521.class-feature.rogue.expertise",

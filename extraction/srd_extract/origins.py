@@ -149,6 +149,9 @@ def parse_background(name: str, text: str) -> dict[str, Any]:
             "category": "tool",
             "text": match.group("tool"),
         },
+        "toolProficiencies": []
+        if "choose" in match.group("tool").casefold()
+        else [match.group("tool")],
         "equipmentText": match.group("equipment").replace("Callig- rapher", "Calligrapher"),
     }
 

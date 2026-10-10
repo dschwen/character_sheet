@@ -1,6 +1,42 @@
 import pytest
 
-from srd_extract.rogue import RogueProgressionRow, _starting_equipment, parse_core_traits
+from srd_extract.rogue import (
+    RogueProgressionRow,
+    _feature_entity,
+    _starting_equipment,
+    parse_core_traits,
+)
+
+
+@pytest.mark.parametrize("name", ["Evasion", "Reliable Talent"])
+def test_level_seven_features_retain_source_and_structured_semantics(name: str) -> None:
+    source = [{"sourceId": "wotc-srd-5.2.1-en", "page": 63, "blocks": ["p0063-b001"]}]
+    entity = _feature_entity(
+        {
+            "id": "test.feature",
+            "name": name,
+            "level": 7,
+            "source": source,
+            "bodyNodes": [{"normalizedText": "Source rule text."}],
+        },
+        "class-feature",
+    )
+    assert entity["source"] == source
+    assert entity["body"]["text"] == "Source rule text."
+    assert entity["body"]["level"] == 7
+    if name == "Reliable Talent":
+        assert entity["body"]["d20Minimums"] == [
+            {"testKinds": ["skill", "tool"], "requiresProficiency": True, "minimum": 10}
+        ]
+    else:
+        assert entity["body"]["savingThrowDamageEffects"][0] == {
+            "ability": "dexterity",
+            "requiresHalfDamageOnSuccess": True,
+            "successFraction": 0,
+            "failureFraction": 0.5,
+            "inactiveConditionIds": ["srd521.condition.incapacitated"],
+        }
+    assert entity["review"]["semanticsApproved"] is False
 
 
 def test_parse_core_rogue_traits() -> None:

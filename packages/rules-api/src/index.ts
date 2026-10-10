@@ -49,6 +49,8 @@ export interface ProficiencySummary {
 }
 
 export interface D20TestSummary {
+  dieMinimum?: { value: number; sourceName: string; traceId: string };
+  name?: string;
   id: string;
   ability: string;
   modifier: number;

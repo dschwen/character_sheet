@@ -54,7 +54,7 @@
       "name": "Ranger"
     },
     {
-      "builderMaximum": 6,
+      "builderMaximum": 7,
       "builderMinimum": 1,
       "id": "srd521.class.rogue",
       "name": "Rogue"

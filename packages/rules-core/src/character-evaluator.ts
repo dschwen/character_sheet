@@ -206,6 +206,7 @@ interface ActiveStatus {
 
 const classBodySchema = z
   .object({
+    toolProficiencies: z.array(z.string().min(1)).default([]),
     hitPointDie: z.number().int().positive(),
     savingThrowProficiencies: z.array(z.enum(abilities)).default([]),
     weaponProficiencies: z.array(z.enum(["simple", "martial"])).default([]),
@@ -350,6 +351,7 @@ const armorBodySchema = z
 
 const backgroundBodySchema = z
   .object({
+    toolProficiencies: z.array(z.string().min(1)).default([]),
     abilityScoreOptions: z.array(z.enum(abilities)).length(3),
     abilityScoreIncreasePatterns: z.array(z.array(z.number().int().positive())),
     featId: z.string().min(1),
@@ -3574,6 +3576,73 @@ function evaluateD20Tests(
     );
   }
 
+  const toolGrants = [
+    ...(firstClassBody?.toolProficiencies ?? []).map((name) => ({
+      name,
+      sourceId: firstClassId ?? "",
+    })),
+    ...(origins.backgroundBody?.toolProficiencies ?? []).map((name) => ({
+      name,
+      sourceId: origins.background?.id ?? "",
+    })),
+  ];
+  const toolIds = [
+    ...new Set(
+      toolGrants.map(({ name }) =>
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/gu, "-")
+          .replace(/^-|-$/gu, ""),
+      ),
+    ),
+  ];
+  for (const toolId of toolIds) {
+    const grants = toolGrants.filter(
+      ({ name }) =>
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/gu, "-")
+          .replace(/^-|-$/gu, "") === toolId,
+    );
+    const sources = grants.map(({ sourceId }) => sourceId);
+    const entry = proficiencyEntry("proficient", proficiencyBonus, sources);
+    for (const ability of abilities) {
+      const id = `tool.${toolId}.${ability}`;
+      const baseId = `abilityCheck.${ability}`;
+      recordD20Test(
+        id,
+        ability,
+        entry,
+        context,
+        [
+          ...additionalRollEffects,
+          ...additionalRollEffects
+            .filter((effect) => effect.testId === baseId)
+            .map((effect) => ({ ...effect, testId: id })),
+        ],
+        [
+          ...ruleModifiers,
+          ...ruleModifiers
+            .filter((modifier) => modifier.target === baseId)
+            .map((modifier) => ({ ...modifier, target: id })),
+        ],
+        [
+          ...bonusDice,
+          ...bonusDice
+            .filter((bonus) => bonus.testId === baseId)
+            .map((bonus) => ({ ...bonus, testId: id })),
+        ],
+        rerollValues,
+        rerollSources,
+        rerollSourceReferences,
+        testSourceReferences(baseId, sources),
+        state,
+      );
+      const test = state.d20Tests[id];
+      if (test !== undefined) test.name = `${grants[0]?.name ?? toolId} · ${ability}`;
+    }
+  }
+
   const noProficiency = proficiencyEntry("none", proficiencyBonus, []);
   recordD20Test(
     "initiative",
@@ -6663,6 +6732,51 @@ function validateActiveState(character: CharacterDocument, state: EngineState): 
   }
 }
 
+function evaluateD20Minimums(
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  for (const sourceId of granted) {
+    const entity = index.entities.get(sourceId);
+    const body = featureAutomationBodySchema.safeParse(entity?.body);
+    if (entity === undefined || !body.success) continue;
+    for (const minimum of body.data.d20Minimums) {
+      for (const test of Object.values(state.d20Tests)) {
+        const matchesKind = minimum.testKinds.some((kind) => test.id.startsWith(`${kind}.`));
+        if (!matchesKind || !["proficient", "expertise"].includes(test.proficiency.level)) continue;
+        if (test.dieMinimum !== undefined && test.dieMinimum.value >= minimum.minimum) continue;
+        const traceId = `${test.id}.dieMinimum`;
+        test.dieMinimum = {
+          value: minimum.minimum,
+          sourceName: entity.name.en ?? sourceId,
+          traceId,
+        };
+        state.traces[traceId] = {
+          id: traceId,
+          result: minimum.minimum,
+          nodes: [
+            {
+              id: `${traceId}.grant`,
+              operation: "grant-proficient-check-d20-minimum",
+              inputs: [test.id, test.proficiency.level, minimum.minimum],
+              output: minimum.minimum,
+            },
+          ],
+          sourceReferences: entitySourceReferences(entity),
+        };
+        state.traces[test.traceId]?.nodes.push({
+          id: `${test.traceId}.minimum`,
+          operation: "grant-proficient-check-d20-minimum",
+          inputs: [test.proficiency.level],
+          output: minimum.minimum,
+        });
+        state.traces[test.traceId]?.sourceReferences.push(...entitySourceReferences(entity));
+      }
+    }
+  }
+}
+
 export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvaluation {
   const character = characterDocumentSchema.parse(input.character);
   const index = buildPackageIndex(input.packages);
@@ -6751,6 +6865,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateAttacks(character, equipment, attackRules, index, state);
   evaluateGrantedAttackEnhancements(granted, index, state);
   evaluateConditionMechanics(character, conditions, state);
+  evaluateD20Minimums(granted, index, state);
   evaluateGrantedActionEnhancements(granted, index, state);
   evaluateActionMovement(state);
   validateConcentration(character, index, state);

@@ -180,6 +180,7 @@ export function proposeAction(
         ? "saving-throw"
         : testId === "initiative" ||
             testId.startsWith("skill.") ||
+            testId.startsWith("tool.") ||
             testId.startsWith("abilityCheck.")
           ? "ability-check"
           : undefined;

@@ -942,9 +942,9 @@ describe("guided character level up", () => {
     expect(advanced.build.proficiencyChoices.expertise).toHaveLength(4);
     expect(advanced.build.levels).toHaveLength(6);
     expect(levelUpEligibility(advanced, catalog)).toMatchObject({
-      eligible: false,
+      eligible: true,
       currentLevel: 6,
-      reason: "Rogue advancement is currently reviewed through level 6.",
+      targetLevel: 7,
     });
   });
 

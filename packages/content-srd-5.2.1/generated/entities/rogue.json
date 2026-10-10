@@ -28,7 +28,8 @@
             "3": 2,
             "4": 2,
             "5": 2,
-            "6": 4
+            "6": 4,
+            "7": 4
           },
           "eligibleSkillIds": [
             "srd521.skill.acrobatics",
@@ -54,7 +55,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.rogue.expertise"
         },
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
       },
       "conditionalWeaponProficiencies": [
@@ -415,7 +416,8 @@
           "3": 4,
           "4": 4,
           "5": 4,
-          "6": 4
+          "6": 4,
+          "7": 4
         },
         "maximum": 4,
         "minimum": 4,
@@ -943,7 +945,19 @@
   },
   {
     "body": {
+      "automationLevel": "state-automated",
       "level": 7,
+      "savingThrowDamageEffects": [
+        {
+          "ability": "dexterity",
+          "failureFraction": 0.5,
+          "inactiveConditionIds": [
+            "srd521.condition.incapacitated"
+          ],
+          "requiresHalfDamageOnSuccess": true,
+          "successFraction": 0
+        }
+      ],
       "text": "You can nimbly dodge out of the way of certain dangers. When you’re subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you instead take no damage if you succeed on the saving throw and only half damage if you fail. You can’t use this feature if you have the Incapacitated condition."
     },
     "id": "srd521.class-feature.rogue.evasion",
@@ -976,6 +990,17 @@
   },
   {
     "body": {
+      "automationLevel": "roll-automated",
+      "d20Minimums": [
+        {
+          "minimum": 10,
+          "requiresProficiency": true,
+          "testKinds": [
+            "skill",
+            "tool"
+          ]
+        }
+      ],
       "level": 7,
       "text": "Whenever you make an ability check that uses one of your skill or tool proficiencies, you can treat a d20 roll of 9 or lower as a 10."
     },

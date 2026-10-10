@@ -258,7 +258,7 @@ def extract_thief_features(document: dict[str, Any]) -> tuple[dict[str, Any], ..
 
 
 def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
-    return {
+    entity: dict[str, Any] = {
         "id": feature["id"],
         "kind": kind,
         "name": {"en": feature["name"]},
@@ -271,6 +271,31 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
         "rules": [],
         "review": _review(f"{feature['name']} extracted from the Rogue description."),
     }
+    if feature["name"] == "Evasion":
+        entity["body"].update(
+            {
+                "automationLevel": "state-automated",
+                "savingThrowDamageEffects": [
+                    {
+                        "ability": "dexterity",
+                        "requiresHalfDamageOnSuccess": True,
+                        "successFraction": 0,
+                        "failureFraction": 0.5,
+                        "inactiveConditionIds": ["srd521.condition.incapacitated"],
+                    }
+                ],
+            }
+        )
+    if feature["name"] == "Reliable Talent":
+        entity["body"].update(
+            {
+                "automationLevel": "roll-automated",
+                "d20Minimums": [
+                    {"testKinds": ["skill", "tool"], "requiresProficiency": True, "minimum": 10}
+                ],
+            }
+        )
+    return entity
 
 
 def _starting_equipment() -> dict[str, Any]:
@@ -360,7 +385,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 4 for level in range(1, 7)},
+                "countByLevel": {str(level): 4 for level in range(1, 8)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple"],
@@ -370,7 +395,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 15,
@@ -414,6 +439,7 @@ def _class_entity(
                     "countByLevel": {
                         **{str(level): 2 for level in range(1, 6)},
                         "6": 4,
+                        "7": 4,
                     },
                 },
             },

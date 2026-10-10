@@ -13,7 +13,6 @@ import type {
   ActionUseRequest,
   AttackSummary,
   CharacterEvaluation,
-  D20TestSummary,
   LoadedRulesPackage,
   SpellCastRequest,
   SpellProtectionApplication,
@@ -95,6 +94,8 @@ import {
   rollDice,
   dicePoolRollExpression,
   dicePoolRollDetail,
+  d20RerollRequest,
+  applyD20MinimumPreference,
   type D20RollRequest,
   type DicePoolRollRequest,
   type DicePoolRollResult,
@@ -237,7 +238,7 @@ function rollExpression(result: DiceRollResult): string {
     const bonusTotal = (result.bonusDiceRolls ?? [])
       .flatMap((bonus) => bonus.dice)
       .reduce((total, die) => total + die, 0);
-    return `${String(result.kept)}${bonusTotal === 0 ? "" : ` + ${String(bonusTotal)}`} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))} = ${String(result.total)}`;
+    return `${String(result.effectiveKept ?? result.kept)}${bonusTotal === 0 ? "" : ` + ${String(bonusTotal)}`} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))} = ${String(result.total)}`;
   }
   return dicePoolRollExpression(result);
 }
@@ -259,26 +260,14 @@ function rollDetail(result: DiceRollResult): string {
       dice,
       ...(rerolls === undefined ? [] : [`${result.rerollSource ?? "Feature"} rerolled ${rerolls}`]),
       ...(bonusDice === undefined ? [] : [bonusDice]),
+      ...(result.dieMinimum === undefined || result.effectiveKept === result.kept
+        ? []
+        : [
+            `${result.dieMinimum.sourceName}: ${String(result.kept)} → ${String(result.effectiveKept)} (treated, not rerolled)`,
+          ]),
     ].join(" · ");
   }
   return dicePoolRollDetail(result);
-}
-
-function d20RerollRequest(
-  test: D20TestSummary | undefined,
-  bonusDice = test?.bonusDice ?? [],
-): Pick<D20RollRequest, "rerollValues" | "rerollSource" | "bonusDice"> {
-  const rerolls =
-    test === undefined || test.rerollValues.length === 0
-      ? {}
-      : {
-          rerollValues: test.rerollValues,
-          rerollSource: test.rerollSources.join(", ") || "Feature",
-        };
-  return {
-    ...rerolls,
-    ...(bonusDice.length === 0 ? {} : { bonusDice }),
-  };
 }
 
 function spellDamageRolls(spell: SpellSummary): SpellSummary["damage"] {
@@ -376,6 +365,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   >({});
   const [preparedSpellDraft, setPreparedSpellDraft] = useState<string[]>();
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
+  const [useD20Minimums, setUseD20Minimums] = useState(true);
   const [diceRolling, setDiceRolling] = useState(false);
   const [castFeedback, setCastFeedback] = useState<CastFeedback>();
   const diceRollingRef = useRef(false);
@@ -642,10 +632,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
   function performRoll(request: D20RollRequest): void {
     if (!beginDiceRoll()) return;
-    void rollD20Fullscreen(request)
+    const rollRequest = applyD20MinimumPreference(request, useD20Minimums);
+    void rollD20Fullscreen(rollRequest)
       .catch((error: unknown) => {
         setNotice(`3D dice were unavailable (${errorMessage(error)}); used the fallback roller.`);
-        return rollD20(request);
+        return rollD20(rollRequest);
       })
       .then(setLatestRoll)
       .finally(finishDiceRoll);
@@ -792,6 +783,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setProtectedCreatureCounts({});
     setWeaponDamageModes({});
     setResolveSaveDamage(false);
+    setUseD20Minimums(true);
     setSpellRecoverySelections({});
     setCastFeedback(undefined);
     setPreparedSpellDraft(undefined);
@@ -820,6 +812,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setProtectedCreatureCounts({});
       setWeaponDamageModes({});
       setResolveSaveDamage(false);
+      setUseD20Minimums(true);
       setSpellRecoverySelections({});
       setCastFeedback(undefined);
       setPreparedSpellDraft(undefined);
@@ -2669,10 +2662,28 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   </div>
                 </Section>
 
-                <Section title="Skills" eyebrow="Checks & proficiencies">
+                <Section title="Skills & fixed tool grants" eyebrow="Checks & proficiencies">
+                  {Object.values(evaluation.d20Tests).some(
+                    (test) => test.dieMinimum !== undefined,
+                  ) ? (
+                    <button
+                      type="button"
+                      className="button secondary compact"
+                      aria-pressed={useD20Minimums}
+                      onClick={() => {
+                        setUseD20Minimums((current) => !current);
+                      }}
+                    >
+                      Optional d20 minimums: {useD20Minimums ? "On" : "Off"}
+                    </button>
+                  ) : null}
+                  <p className="empty">
+                    Tool checks list each ability; use the ability called for by the DM. Unresolved
+                    tool choices, tool ownership, and skill/tool overlap Advantage remain manual.
+                  </p>
                   <div className="skill-list">
                     {Object.values(evaluation.d20Tests)
-                      .filter((test) => test.id.startsWith("skill."))
+                      .filter((test) => test.id.startsWith("skill.") || test.id.startsWith("tool."))
                       .sort((left, right) => left.id.localeCompare(right.id))
                       .map((skill) => (
                         <TraceButton
@@ -2680,7 +2691,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           traceId={skill.traceId}
                           onSelect={setSelectedTraceId}
                           roll={{
-                            label: titleCase(skill.id.replace("skill.", "")),
+                            label: skill.name ?? titleCase(skill.id.replace("skill.", "")),
                             testId: skill.id,
                             modifier: skill.modifier,
                             mode: skill.rollMode,
@@ -2689,7 +2700,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           onRoll={performRoll}
                         >
                           <i className={`prof-dot ${skill.proficiency.level}`} aria-hidden="true" />
-                          <span>{titleCase(skill.id.replace("skill.", ""))}</span>
+                          <span>
+                            {skill.name ?? titleCase(skill.id.replace("skill.", ""))}
+                            {skill.dieMinimum === undefined
+                              ? ""
+                              : ` · ${skill.dieMinimum.sourceName}: d20 minimum ${String(skill.dieMinimum.value)}`}
+                          </span>
                           <small>{skill.ability.slice(0, 3).toUpperCase()}</small>
                           <strong>{signed(skill.modifier)}</strong>
                         </TraceButton>
@@ -3535,6 +3551,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setProtectedCreatureCounts({});
             setWeaponDamageModes({});
             setResolveSaveDamage(false);
+            setUseD20Minimums(true);
             setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
@@ -3563,6 +3580,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setProtectedCreatureCounts({});
             setWeaponDamageModes({});
             setResolveSaveDamage(false);
+            setUseD20Minimums(true);
             setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
