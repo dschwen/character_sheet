@@ -297,6 +297,14 @@ export interface ActionUseRequest {
   rolls?: number[];
   amount?: number;
   completedD20Test?: { testId: string; appliedActionIds: string[] };
+  failedSavingThrow?: {
+    target: "self" | "other";
+    ability: "strength" | "dexterity" | "constitution" | "intelligence" | "wisdom" | "charisma";
+    conditionId: string;
+    failed: boolean;
+    reactionAvailable: boolean;
+    distanceFeet?: number;
+  };
 }
 
 export interface ActionTransitionProposal {
@@ -305,6 +313,12 @@ export interface ActionTransitionProposal {
   applicable: boolean;
   changes: StateChange[];
   nextState: CharacterState;
+  savingThrowReroll?: {
+    target: "self" | "other";
+    ability: string;
+    mode: "advantage";
+    traceId: string;
+  };
   validations: ValidationMessage[];
   traces: Readonly<Record<string, CalculationTrace>>;
 }

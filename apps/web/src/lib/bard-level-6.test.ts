@@ -211,25 +211,21 @@ describe("Bard level 6 Magical Discoveries", () => {
 
   it("limits later replacements to one while allowing spells from newly available slot levels", () => {
     const { character, rulesPackage } = setup();
-    // Exercise replacement semantics with a raised test-only cap; level 7 is not released yet.
-    const entity = rulesPackage.entities.find(({ id }) => id === bardId);
-    if (entity === undefined) throw new Error("Missing Bard.");
-    const body = entity.body as {
-      builder: {
-        supportedLevelMaximum: number;
-        expertiseChoice: { countByLevel: Record<string, number> };
-      };
-      skillProficiencyChoice: { countByLevel: Record<string, number> };
-    };
-    body.builder.supportedLevelMaximum = 7;
-    body.builder.expertiseChoice.countByLevel["7"] = 2;
-    body.skillProficiencyChoice.countByLevel["7"] = 6;
     const catalog = characterBuilderCatalog(rulesPackage);
     const draft = createLevelUpDraft(character, catalog);
     draft.featureChoiceSelections = {
       [choiceId]: ["srd521.spell.ice-storm", "srd521.spell.spiritual-weapon"],
     };
     expect(previewLevelUp(character, draft, rulesPackage, options).issues).toEqual([]);
+    const advanced = levelUpCharacter(character, draft, rulesPackage, options);
+    expect(
+      evaluateCharacter({ character: advanced, packages: [rulesPackage] }).validations.filter(
+        ({ severity }) => severity === "error",
+      ),
+    ).toEqual([]);
+    expect(spellPreparationEditor(advanced, rulesPackage)?.alwaysPreparedSpellIds).toContain(
+      "srd521.spell.ice-storm",
+    );
     draft.featureChoiceSelections = {
       [choiceId]: ["srd521.spell.ice-storm", "srd521.spell.guidance"],
     };

@@ -88,7 +88,11 @@ Lore Bards select two Magical Discoveries from the Cleric,
 Druid, and Wizard lists, including cantrips, up to their available slot level. These use Charisma
 and remain always prepared outside the normal Bard limit. The builder and advancement flow offer
 searchable, level-filtered choices. The shared advancement model permits one later replacement;
-levels above 6 remain gated.
+Lore Bards now reach level 7, gaining fourth-level slots and Countercharm. In Play → Feature
+actions, confirm a failed save against Charmed or Frightened and an available Reaction, then
+reroll your latest save or instruct a creature within 30 feet to reroll on its own sheet.
+Countercharm grants Advantage (canceled by Disadvantage), spends no Inspiration, and does not
+automatically remove conditions. Range, DC, and Reaction timing remain manual.
 The package now loads all 339 source-linked spell descriptions. Previously annotated spells keep
 their automation; new descriptive entries show **Effects assisted** and require source-text
 adjudication for damage and conditional effects.
@@ -133,7 +137,7 @@ replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
 one prepared-spell and cantrip replacement when gaining a level. Magic Initiate permits one
 same-level feat spell replacement while preserving its original casting ability. Multiclassing,
-levels 8–20 for Fighter, Barbarian, Monk, Rogue, Ranger, and Paladin, and levels 7–20 for the other
+levels 8–20 for Fighter, Barbarian, Monk, Rogue, Ranger, Paladin, and Bard, and levels 7–20 for the other
 classes remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
@@ -165,7 +169,7 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-level 1–6 vertical slices for all twelve SRD classes, plus level 7 for Fighter, Barbarian, Monk, Rogue, Ranger, and Paladin, with
+level 1–6 vertical slices for all twelve SRD classes, plus level 7 for Fighter, Barbarian, Monk, Rogue, Ranger, Paladin, and Bard, with
 every standard SRD background and species. Higher levels and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 
@@ -255,7 +259,7 @@ Generate Bard content from pages 31–35 using the shared spell-description extr
 The Bard parser validates all 20 progression rows, the 129-entry class spell list, every Bard and
 College of Lore feature, and the level-5 Inspiration die and recharge changes. It generates seven
 source-linked representative spells plus authoring IR for Bardic Inspiration, Jack of All Trades,
-and Cutting Words.
+Cutting Words, and Countercharm.
 
 Generate the typed Fighter-through-level-7 content from class pages 47–49, Ability Score
 Improvement and Fighting Styles on pages 87–88:

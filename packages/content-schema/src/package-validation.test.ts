@@ -360,7 +360,7 @@ describe("bootstrap content package", () => {
       ],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.bard")?.builder).toMatchObject({
-      supportedLevelMaximum: 6,
+      supportedLevelMaximum: 7,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: [
         "srd521.skill.performance",

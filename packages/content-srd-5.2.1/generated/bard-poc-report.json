@@ -2,6 +2,7 @@
   "authoringIr": [
     "bard.bardic-inspiration.json",
     "bard.jack-of-all-trades.json",
+    "bard.countercharm.json",
     "college-of-lore.cutting-words.json"
   ],
   "bardSpellListEntries": 129,

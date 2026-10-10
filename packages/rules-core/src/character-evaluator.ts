@@ -19,6 +19,7 @@ import {
   featureAutomationBodySchema,
   weaponPropertyBodySchema,
   savingThrowAuraRecipientSchema,
+  savingThrowRerollSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -719,6 +720,7 @@ const resourceParametersSchema = z
 const actionParametersSchema = z
   .object({
     actionEconomy: z.string().optional(),
+    savingThrowReroll: savingThrowRerollSchema.optional(),
     spends: z.number().int().positive().optional(),
     resourceId: z.string().min(1).optional(),
     activatesEffectId: z.string().min(1).optional(),
@@ -6520,6 +6522,8 @@ function evaluateConditionalRules(
       const available = trace.result === true;
       const parameters = actionParametersSchema.parse(rule.parameters);
       const actionParameters: Record<string, JsonValue> = {};
+      if (parameters.savingThrowReroll !== undefined)
+        actionParameters.savingThrowReroll = parameters.savingThrowReroll;
       if (parameters.spends !== undefined) {
         actionParameters.spends = parameters.spends;
       }

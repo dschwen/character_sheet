@@ -2,7 +2,7 @@
   "authoringIr": {
     "semanticsApproved": 0,
     "testsApproved": 0,
-    "total": 55
+    "total": 56
   },
   "classes": [
     {
@@ -12,7 +12,7 @@
       "name": "Barbarian"
     },
     {
-      "builderMaximum": 6,
+      "builderMaximum": 7,
       "builderMinimum": 1,
       "id": "srd521.class.bard",
       "name": "Bard"

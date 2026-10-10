@@ -1,0 +1,55 @@
+{
+  "id": "srd521.class-feature.bard.countercharm",
+  "kind": "class-feature",
+  "level": 7,
+  "parentId": "srd521.class.bard",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-countercharm",
+      "parameters": {
+        "actionEconomy": "reaction",
+        "savingThrowReroll": {
+          "conditionIds": [
+            "srd521.condition.charmed",
+            "srd521.condition.frightened"
+          ],
+          "mode": "advantage",
+          "rangeFeet": 30
+        }
+      },
+      "target": "action.countercharm",
+      "type": "grant-action",
+      "when": {
+        "entityId": "srd521.class-feature.bard.countercharm",
+        "kind": "hasEntity"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0033-b002"
+      ],
+      "page": 33,
+      "quoteHash": "6e2e1a9fd25ba60951b68eb4fda8de2023bd1ac5e85f454a0598f75b519ae4cf",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can use musical notes or words of power to disrupt mind-influencing effects. If you or a creature within 30 feet of you fails a saving throw against an effect that applies the Charmed or Frightened condition, you can take a Reaction to cause the save to be rerolled, and the new roll has Advantage."
+      }
+    ],
+    "title": "Countercharm"
+  }
+}

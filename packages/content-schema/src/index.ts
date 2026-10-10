@@ -417,6 +417,14 @@ export const classFeatureChoiceSchema = z
     }
   });
 
+export const savingThrowRerollSchema = z
+  .object({
+    mode: z.literal("advantage"),
+    conditionIds: z.array(entityIdSchema).min(1),
+    rangeFeet: z.number().positive(),
+  })
+  .strict();
+
 export const savingThrowAuraSchema = z
   .object({
     auraId: entityIdSchema,

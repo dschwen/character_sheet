@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { savingThrowRerollSchema } from "@dnd/content-schema";
 
 import type { CalculationTrace, JsonValue } from "@dnd/calculation-trace";
 import { characterDocumentSchema, type CharacterState } from "@dnd/character-model";
@@ -17,6 +18,24 @@ const actionUseRequestSchema = z
     actionId: z.string().min(1),
     rolls: z.array(z.number().int().positive()).default([]),
     amount: z.number().int().positive().optional(),
+    failedSavingThrow: z
+      .object({
+        target: z.enum(["self", "other"]),
+        ability: z.enum([
+          "strength",
+          "dexterity",
+          "constitution",
+          "intelligence",
+          "wisdom",
+          "charisma",
+        ]),
+        conditionId: z.string().min(1),
+        failed: z.boolean(),
+        reactionAvailable: z.boolean(),
+        distanceFeet: z.number().finite().nonnegative().optional(),
+      })
+      .strict()
+      .optional(),
     completedD20Test: z
       .object({
         testId: z.string().min(1),
@@ -158,6 +177,121 @@ export function proposeAction(
     );
   }
 
+  const reroll = savingThrowRerollSchema.safeParse(action?.parameters?.savingThrowReroll);
+  if (action !== undefined && reroll.success) {
+    const context = request.failedSavingThrow;
+    if (
+      action.parameters?.resourceId !== undefined ||
+      action.parameters?.spends !== undefined ||
+      action.parameters?.variableSpend !== undefined
+    ) {
+      addValidation(
+        validations,
+        "SAVING_THROW_REROLL_COST_UNSUPPORTED",
+        "Resource-cost rerolls require a separately modeled atomic spend; this path supports free Reactions only.",
+        ["action.parameters"],
+      );
+    }
+    if (
+      context === undefined ||
+      !context.failed ||
+      !context.reactionAvailable ||
+      !reroll.data.conditionIds.includes(context.conditionId) ||
+      (context.target === "other" &&
+        (context.distanceFeet === undefined || context.distanceFeet > reroll.data.rangeFeet)) ||
+      (context.target === "self" &&
+        context.distanceFeet !== undefined &&
+        context.distanceFeet !== 0)
+    ) {
+      addValidation(
+        validations,
+        "SAVING_THROW_REROLL_TRIGGER_REQUIRED",
+        "Confirm a failed save against an eligible condition, an available Reaction, and a target in range.",
+        ["request.failedSavingThrow"],
+      );
+    }
+    if (context?.target === "self") {
+      const completed = request.completedD20Test;
+      if (
+        completed?.testId !== `savingThrow.${context.ability}` ||
+        evaluation.d20Tests[completed.testId] === undefined ||
+        completed.appliedActionIds.includes(action.id)
+      ) {
+        addValidation(
+          validations,
+          "SAVING_THROW_REROLL_TEST_REQUIRED",
+          "Choose a matching completed saving throw that has not already used this feature.",
+          ["request.completedD20Test"],
+        );
+      }
+    } else if (request.completedD20Test !== undefined) {
+      addValidation(
+        validations,
+        "SAVING_THROW_REROLL_OTHER_TEST",
+        "Another creature must reroll using its own sheet and modifiers.",
+        ["request.completedD20Test"],
+      );
+    }
+    if (request.rolls.length > 0 || request.amount !== undefined)
+      addValidation(
+        validations,
+        "SAVING_THROW_REROLL_SPEND_NOT_EXPECTED",
+        "This reaction spends no tracked resource and does not accept healing or bonus dice.",
+        ["request.rolls", "request.amount"],
+      );
+    const applicable = validations.length === 0 && context !== undefined;
+    const traceId = `${action.traceId}.saving-throw-reroll`;
+    return {
+      kind: "action",
+      actionId: action.id,
+      applicable,
+      changes: [],
+      nextState: originalState,
+      validations,
+      ...(applicable
+        ? {
+            savingThrowReroll: {
+              target: context.target,
+              ability: context.ability,
+              mode: reroll.data.mode,
+              traceId,
+            },
+          }
+        : {}),
+      traces: applicable
+        ? {
+            [traceId]: {
+              id: traceId,
+              result: reroll.data.mode,
+              nodes: [
+                {
+                  id: `${traceId}.trigger`,
+                  operation: "authorize-saving-throw-reroll",
+                  inputs: [
+                    context.target,
+                    context.ability,
+                    context.conditionId,
+                    context.failed,
+                    context.reactionAvailable,
+                    context.distanceFeet ?? 0,
+                    reroll.data.rangeFeet,
+                  ],
+                  output: reroll.data.mode,
+                },
+              ],
+              sourceReferences: evaluation.traces[action.traceId]?.sourceReferences ?? [],
+            },
+          }
+        : {},
+    };
+  }
+  if (request.failedSavingThrow !== undefined)
+    addValidation(
+      validations,
+      "SAVING_THROW_REROLL_NOT_EXPECTED",
+      "This action does not grant a saving-throw reroll.",
+      ["request.failedSavingThrow"],
+    );
   const parsedParameters = stateActionParametersSchema.safeParse(action?.parameters);
   if (action !== undefined && !parsedParameters.success) {
     addValidation(

@@ -438,12 +438,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 7)},
+                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 8)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -467,7 +467,7 @@ def _class_entity(
                     "minimumLevel": 2,
                     "requireClassProficiency": False,
                     "eligibleSkillIds": all_skills,
-                    "countByLevel": {str(level): 2 for level in range(2, 7)},
+                    "countByLevel": {str(level): 2 for level in range(2, 8)},
                 },
             },
             "spellcastingAbility": "charisma",
@@ -642,6 +642,29 @@ def _bardic_inspiration_ir(feature: dict[str, Any], font: dict[str, Any]) -> dic
     )
 
 
+def _countercharm_ir(feature: dict[str, Any]) -> dict[str, Any]:
+    return _ir(
+        feature,
+        [
+            {
+                "id": "use-countercharm",
+                "type": "grant-action",
+                "target": "action.countercharm",
+                "when": {"kind": "hasEntity", "entityId": feature["id"]},
+                "parameters": {
+                    "actionEconomy": "reaction",
+                    "savingThrowReroll": {
+                        "mode": "advantage",
+                        "conditionIds": ["srd521.condition.charmed", "srd521.condition.frightened"],
+                        "rangeFeet": 30,
+                    },
+                },
+                "automationLevel": "roll-assisted",
+            }
+        ],
+    )
+
+
 def _jack_of_all_trades_ir(feature: dict[str, Any]) -> dict[str, Any]:
     return _ir(
         feature,
@@ -785,6 +808,7 @@ def generate_bard_content(class_root: Path, spell_root: Path, output: Path) -> d
             by_name["Bardic Inspiration"], by_name["Font of Inspiration"]
         ),
         "bard.jack-of-all-trades.json": _jack_of_all_trades_ir(by_name["Jack of All Trades"]),
+        "bard.countercharm.json": _countercharm_ir(by_name["Countercharm"]),
         "college-of-lore.cutting-words.json": _cutting_words_ir(lore_by_name["Cutting Words"]),
     }
     for filename, ir in authoring.items():

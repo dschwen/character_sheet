@@ -936,6 +936,45 @@ button.vital-card:hover {
   color: var(--muted);
   font-size: 10px;
 }
+.play-action-list > .saving-throw-reroll-card {
+  display: grid;
+  align-items: start;
+}
+.saving-throw-reroll-controls {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+  font-size: 13px;
+}
+.saving-throw-reroll-controls label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+.saving-throw-reroll-controls input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.saving-throw-reroll-controls input[type="number"],
+.saving-throw-reroll-controls select {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 36px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  background: white;
+}
+.saving-throw-reroll-controls p {
+  margin: 0;
+  line-height: 1.5;
+}
+.saving-throw-reroll-controls .button {
+  justify-self: start;
+}
 .action-inputs,
 .spell-cast-controls {
   display: flex;

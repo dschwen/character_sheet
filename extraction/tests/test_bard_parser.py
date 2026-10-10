@@ -1,6 +1,37 @@
 import pytest
 
-from srd_extract.bard import BardProgressionRow, _starting_equipment, parse_core_traits
+from srd_extract.bard import (
+    BardProgressionRow,
+    _countercharm_ir,
+    _starting_equipment,
+    parse_core_traits,
+)
+
+
+def test_countercharm_grants_a_source_linked_reaction_without_inspiration_spending() -> None:
+    source = [{"sourceId": "wotc-srd-5.2.1-en", "page": 33, "blocks": ["countercharm"]}]
+    ir = _countercharm_ir(
+        {
+            "id": "srd521.class-feature.bard.countercharm",
+            "name": "Countercharm",
+            "level": 7,
+            "source": source,
+            "bodyNodes": [],
+        }
+    )
+    assert ir["level"] == 7
+    assert ir["source"] == source
+    rule = ir["proposedRules"][0]
+    assert rule["target"] == "action.countercharm"
+    assert rule["when"] == {"kind": "hasEntity", "entityId": ir["id"]}
+    assert rule["parameters"] == {
+        "actionEconomy": "reaction",
+        "savingThrowReroll": {
+            "mode": "advantage",
+            "conditionIds": ["srd521.condition.charmed", "srd521.condition.frightened"],
+            "rangeFeet": 30,
+        },
+    }
 
 
 def test_parse_core_bard_traits() -> None:

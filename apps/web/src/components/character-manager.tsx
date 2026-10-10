@@ -47,6 +47,8 @@ import { spellHealingRequests } from "../lib/spell-healing";
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
 import { CharacterLevelUp } from "./character-level-up";
+import { SavingThrowRerollControls } from "./saving-throw-reroll-controls";
+import { savingThrowRerollDefinition, savingThrowRerollRequest } from "../lib/saving-throw-reroll";
 import {
   addInventoryItem,
   adjustInventoryQuantity,
@@ -618,7 +620,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const playActions =
     evaluation?.actions.filter(
       (action) =>
-        supportsStateTransition(action) || actionRequirements(action).damageDiceCount !== undefined,
+        supportsStateTransition(action) ||
+        savingThrowRerollDefinition(action) !== undefined ||
+        actionRequirements(action).damageDiceCount !== undefined,
     ) ?? [];
   const trace =
     selectedTraceId === undefined
@@ -1029,6 +1033,54 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       ...current,
       [actionId]: { amount: "", ...current[actionId], ...update },
     }));
+  }
+
+  async function useSavingThrowReroll(
+    action: ActionSummary,
+    request: ActionUseRequest,
+    disadvantage: boolean,
+  ): Promise<void> {
+    if (evaluation === undefined) return;
+    const previous = latestRoll;
+    try {
+      const proposal = proposeAction({ character, packages: [rulesPackage] }, request);
+      if (!proposal.applicable || proposal.savingThrowReroll === undefined) {
+        applyTransition(proposal, "Reaction unavailable.");
+        return;
+      }
+      if (proposal.savingThrowReroll.target === "other") {
+        setNotice(
+          `${actionDisplayName(action, names)}: tell the target to reroll its ${titleCase(proposal.savingThrowReroll.ability)} save with Advantage on its own sheet. Disadvantage cancels Advantage. Use the new result. Your Reaction is used; track its availability manually.`,
+        );
+        return;
+      }
+      const rollRequest = applyD20MinimumPreference(
+        savingThrowRerollRequest(action, evaluation, previous, disadvantage),
+        useD20Minimums,
+      );
+      if (!beginDiceRoll()) return;
+      try {
+        const result = await rollD20Fullscreen(rollRequest).catch((error: unknown) => {
+          setNotice(`3D dice were unavailable (${errorMessage(error)}); used the fallback roller.`);
+          return rollD20(rollRequest);
+        });
+        setLatestRoll({
+          ...result,
+          appliedActionIds: [
+            ...(previous?.kind === "d20" ? (previous.appliedActionIds ?? []) : []),
+            action.id,
+          ],
+        });
+        setNotice(
+          `${actionDisplayName(action, names)} reroll: ${String(result.total)} replaces the failed save. Compare with the DC and resolve conditions manually. Your Reaction is used; post-roll consumable bonuses were not retained.`,
+        );
+      } finally {
+        finishDiceRoll();
+      }
+    } catch (error) {
+      setLatestRoll(previous);
+      setNotice(`Reroll failed: ${errorMessage(error)}`);
+    }
   }
 
   async function useAction(action: ActionSummary): Promise<void> {
@@ -2358,7 +2410,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         const actionName = actionDisplayName(action, names);
                         const transitionDice = actionDiceRequest(action, evaluation, actionName);
                         return (
-                          <div key={action.id}>
+                          <div
+                            key={action.id}
+                            className={
+                              savingThrowRerollDefinition(action)
+                                ? "saving-throw-reroll-card"
+                                : undefined
+                            }
+                          >
                             <span>
                               <strong>{actionName}</strong>
                               <small>
@@ -2377,6 +2436,19 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   : ` · ${actionMovementMessage(action) ?? ""}`}
                               </small>
                             </span>
+                            <SavingThrowRerollControls
+                              key={`${character.id}:${character.metadata.updatedAt}:${action.id}`}
+                              action={action}
+                              evaluation={evaluation}
+                              previous={latestRoll}
+                              busy={diceRolling}
+                              onExplain={() => {
+                                setSelectedTraceId(action.traceId);
+                              }}
+                              onUse={(request, disadvantage) => {
+                                void useSavingThrowReroll(action, request, disadvantage);
+                              }}
+                            />
                             <div className="action-inputs">
                               {requirements.rollDiceCount === undefined ||
                               requirements.rollDiceSize === undefined ? null : (
