@@ -33,6 +33,7 @@ import {
 } from "../lib/character-builder";
 import {
   actionDiceRequest,
+  actionMovementMessage,
   applyPostRollBonus,
   canApplyPostRollBonus,
   requiresCompletedD20Test,
@@ -1003,7 +1004,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       const proposal = proposeAction({ character, packages: [rulesPackage] }, request);
       applyTransition(
         proposal,
-        `${actionName} applied (${String(proposal.changes.length)} changes).`,
+        `${actionName} applied (${String(proposal.changes.length)} changes). ${actionMovementMessage(action) ?? ""}`.trim(),
       );
       if (
         requiresCompletedD20Test(action) &&
@@ -2142,6 +2143,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 {typeof action.parameters?.requirement === "string"
                                   ? ` · Requires ${action.parameters.requirement}`
                                   : ""}
+                                {actionMovementMessage(action) === undefined
+                                  ? ""
+                                  : ` · ${actionMovementMessage(action) ?? ""}`}
                               </small>
                             </span>
                             <div className="action-inputs">
@@ -3237,6 +3241,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               ? ` · ${titleCase(action.parameters.effect)}`
                               : ""}
                             {actionDamageLabel(action)}
+                            {actionMovementMessage(action) === undefined
+                              ? ""
+                              : ` · ${actionMovementMessage(action) ?? ""}`}
                           </small>
                         </span>
                         <i className={action.available ? "ready" : "blocked"}>

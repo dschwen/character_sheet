@@ -78,7 +78,8 @@ Expertise, spell and preparation additions, the reviewed level-3 subclass, and t
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
 same-class advancement for all twelve SRD classes through level 6, plus Champion Fighters through
-level 7 with distinct Fighting Style choices. Archery and Defense are calculated; Great Weapon
+level 7 with distinct Fighting Style choices. Barbarians also reach level 7, gaining Initiative
+advantage and an optional half-Speed movement reminder when entering Rage. Archery and Defense are calculated; Great Weapon
 Fighting and Two-Weapon Fighting use explicit conditional weapon-damage modes. Turn eligibility
 and action usage remain manually adjudicated. Evokers select separate
 Evocation Savant spellbook additions and can declare Sculpt Spells protection while casting,
@@ -147,8 +148,8 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-level 1–6 vertical slices for all twelve SRD classes, with every standard SRD background and
-species. Higher levels and multiclassing are the next builder increments.
+level 1–6 vertical slices for all twelve SRD classes, plus level 7 for Fighter and Barbarian, with
+every standard SRD background and species. Higher levels and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 
 ## Requirements

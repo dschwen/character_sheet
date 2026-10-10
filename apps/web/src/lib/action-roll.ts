@@ -16,6 +16,12 @@ function objectValue(value: unknown): Readonly<Record<string, unknown>> | undefi
     : undefined;
 }
 
+export function actionMovementMessage(action: ActionSummary): string | undefined {
+  const movement = objectValue(action.parameters?.movement);
+  if (typeof movement?.maximumFeet !== "number") return undefined;
+  return `You may move up to ${String(movement.maximumFeet)} ft. as part of this action. ${movement.provokesOpportunityAttacks === false ? "This movement does not provoke Opportunity Attacks." : "Normal Opportunity Attack rules apply."} Resolve movement manually.`;
+}
+
 export function actionDiceRequest(
   action: ActionSummary,
   evaluation: CharacterEvaluation,

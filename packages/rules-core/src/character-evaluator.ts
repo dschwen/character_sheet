@@ -961,9 +961,68 @@ function evaluateGrantedActionEnhancements(
       if (action === undefined) continue;
       action.parameters = {
         ...(action.parameters ?? {}),
-        endsConditionIds: enhancement.endsConditionIds,
+        ...(enhancement.endsConditionIds.length === 0
+          ? {}
+          : {
+              endsConditionIds: [
+                ...new Set([
+                  ...((action.parameters?.endsConditionIds as string[] | undefined) ?? []),
+                  ...enhancement.endsConditionIds,
+                ]),
+              ],
+            }),
+        ...(enhancement.movement === undefined ? {} : { movement: enhancement.movement }),
       };
+      state.traces[action.traceId]?.sourceReferences.push(...entitySourceReferences(entity));
     }
+  }
+}
+
+function evaluateActionMovement(state: EngineState): void {
+  const speed = state.values["speed.walking"];
+  if (speed === undefined || typeof speed.value !== "number") return;
+  for (const action of state.actions) {
+    const movement = action.parameters?.movement;
+    if (movement === null || typeof movement !== "object" || Array.isArray(movement)) continue;
+    const fraction = movement.speedFraction;
+    if (typeof fraction !== "number") continue;
+    const maximumFeet = Math.floor(speed.value * fraction);
+    const traceId = `${action.id}.maximumMovement`;
+    action.parameters = {
+      ...action.parameters,
+      movement: { ...movement, maximumFeet, traceId },
+    };
+    state.facts[traceId] = maximumFeet;
+    state.values[traceId] = { value: maximumFeet, traceId };
+    state.traces[traceId] = {
+      id: traceId,
+      result: maximumFeet,
+      nodes: [
+        {
+          id: `${traceId}.fraction`,
+          operation: "multiply-speed-fraction",
+          inputs: [speed.value, fraction],
+          output: speed.value * fraction,
+        },
+        {
+          id: `${traceId}.round-down`,
+          operation: "floor",
+          inputs: [speed.value * fraction],
+          output: maximumFeet,
+        },
+      ],
+      sourceReferences: [
+        ...(state.traces[action.traceId]?.sourceReferences ?? []),
+        ...(state.traces[speed.traceId]?.sourceReferences ?? []),
+      ],
+    };
+    state.traces[action.traceId]?.nodes.push({
+      id: `${action.traceId}.movement`,
+      operation: "optional-action-movement",
+      inputs: [speed.value, fraction],
+      output: maximumFeet,
+      label: `May move up to ${String(maximumFeet)} feet; movement remains manual.`,
+    });
   }
 }
 
@@ -6477,33 +6536,7 @@ function evaluateConditionalRules(
         actionParameters.refundIfCheckStillFails = parameters.refundIfCheckStillFails;
       }
       if (parameters.movement !== undefined) {
-        const walkingSpeed = state.facts["speed.walking"];
-        const maximumFeet =
-          typeof walkingSpeed === "number"
-            ? walkingSpeed * parameters.movement.speedFraction
-            : undefined;
-        actionParameters.movement = {
-          ...parameters.movement,
-          ...(maximumFeet === undefined ? {} : { maximumFeet }),
-        };
-        if (maximumFeet !== undefined && typeof walkingSpeed === "number") {
-          const movementTraceId = `${rule.target ?? rule.id}.maximumMovement`;
-          state.facts[movementTraceId] = maximumFeet;
-          state.values[movementTraceId] = { value: maximumFeet, traceId: movementTraceId };
-          state.traces[movementTraceId] = {
-            id: movementTraceId,
-            result: maximumFeet,
-            nodes: [
-              {
-                id: `${movementTraceId}.fraction`,
-                operation: "multiply-speed-fraction",
-                inputs: [walkingSpeed, parameters.movement.speedFraction],
-                output: maximumFeet,
-              },
-            ],
-            sourceReferences: sourceReferences(ir),
-          };
-        }
+        actionParameters.movement = { ...parameters.movement };
       }
       state.actions.push({
         id: rule.target ?? rule.id,
@@ -6714,11 +6747,12 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const spellSlotRecoveries = evaluateSpellRecoveryFeatures(granted, index, state);
   evaluateArmorClass(rules, granted, index, state, equipment, statuses);
   evaluateConditionalRules(character, rules, granted, resourceAmounts, index, state);
-  evaluateGrantedActionEnhancements(granted, index, state);
   const attackRules = evaluateAttackRules(rules, granted, index, state);
   evaluateAttacks(character, equipment, attackRules, index, state);
   evaluateGrantedAttackEnhancements(granted, index, state);
   evaluateConditionMechanics(character, conditions, state);
+  evaluateGrantedActionEnhancements(granted, index, state);
+  evaluateActionMovement(state);
   validateConcentration(character, index, state);
   validateActiveState(character, state);
   const coverageWarnings = index.authoringIr

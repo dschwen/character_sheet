@@ -1,0 +1,41 @@
+{
+  "id": "srd521.class-feature.barbarian.feral-instinct",
+  "kind": "class-feature",
+  "level": 7,
+  "parentId": "srd521.class.barbarian",
+  "proposedRules": [
+    {
+      "automationLevel": "sheet-automated",
+      "id": "feral-instinct-initiative",
+      "parameters": {},
+      "target": "initiative",
+      "type": "grant-advantage"
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0029-b015"
+      ],
+      "page": 29,
+      "quoteHash": "fe12b93a32cb80e2b80f12c103bc2b12dd4a85aef0cca71b37837d715b072416",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "Your instincts are so honed that you have Advantage on Initiative rolls."
+      }
+    ],
+    "title": "Feral Instinct"
+  }
+}

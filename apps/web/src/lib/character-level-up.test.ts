@@ -1075,9 +1075,9 @@ describe("guided character level up", () => {
       ),
     ).toHaveLength(2);
     expect(levelUpEligibility(advanced, catalog)).toMatchObject({
-      eligible: false,
+      eligible: true,
       currentLevel: 6,
-      reason: "Barbarian advancement is currently reviewed through level 6.",
+      targetLevel: 7,
     });
   });
 

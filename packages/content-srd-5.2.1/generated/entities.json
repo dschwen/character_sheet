@@ -22,7 +22,7 @@
           "srd521.skill.animal-handling"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 12,
@@ -346,7 +346,8 @@
           "3": 3,
           "4": 3,
           "5": 3,
-          "6": 3
+          "6": 3,
+          "7": 3
         },
         "maximum": 2,
         "minimum": 2,
@@ -1000,7 +1001,16 @@
   },
   {
     "body": {
-      "automationLevel": "structured",
+      "actionEnhancements": [
+        {
+          "actionId": "action.enter-rage",
+          "movement": {
+            "provokesOpportunityAttacks": true,
+            "speedFraction": 0.5
+          }
+        }
+      ],
+      "automationLevel": "sheet-automated",
       "level": 7,
       "parentId": "srd521.class.barbarian",
       "text": {

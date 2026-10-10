@@ -452,7 +452,7 @@ def _class_entity(
                 "minimum": traits.skill_choice_count,
                 "maximum": traits.skill_choice_count,
                 "options": list(traits.skill_options),
-                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 7)},
+                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 8)},
             },
             "weaponProficiencies": list(traits.weapon_proficiencies),
             "weaponMasteryChoice": {
@@ -464,7 +464,7 @@ def _class_entity(
             "startingEquipmentText": traits.starting_equipment_text,
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 15,
                     "dexterity": 13,
@@ -508,7 +508,7 @@ def _feature_text(feature: ExtractedFeature) -> dict[str, Any]:
 
 
 def _feature_entity(feature: ExtractedFeature) -> dict[str, Any]:
-    return {
+    entity: dict[str, Any] = {
         "id": feature.id,
         "kind": "class-feature",
         "name": {"en": feature.name},
@@ -529,6 +529,22 @@ def _feature_entity(feature: ExtractedFeature) -> dict[str, Any]:
             "notes": "Executable rules are proposals in the authoring IR.",
         },
     }
+    if feature.name == "Instinctive Pounce":
+        entity["body"].update(
+            {
+                "automationLevel": "sheet-automated",
+                "actionEnhancements": [
+                    {
+                        "actionId": "action.enter-rage",
+                        "movement": {
+                            "speedFraction": 0.5,
+                            "provokesOpportunityAttacks": True,
+                        },
+                    }
+                ],
+            }
+        )
+    return entity
 
 
 def _berserker_entities(
@@ -901,7 +917,13 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
     rage = selected_features[0]
     unarmored_defense = selected_features[1]
 
-    write_json(output / "entities.json", all_entities)
+    aggregate_path = output / "entities.json"
+    existing = read_json(aggregate_path) if aggregate_path.exists() else []
+    replacements = {entity["id"]: entity for entity in all_entities}
+    existing_ids = {entity["id"] for entity in existing}
+    aggregate = [replacements.get(entity["id"], entity) for entity in existing]
+    aggregate.extend(entity for entity in all_entities if entity["id"] not in existing_ids)
+    write_json(aggregate_path, aggregate)
     write_json(output / "entities" / "classes.json", [class_entity])
     write_json(output / "entities" / "class-features.json", feature_entities)
     write_json(output / "entities" / "rule-tables.json", rule_tables)
@@ -913,13 +935,13 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
             "counts": {
                 "UNCLASSIFIED": 0,
                 "TEXT_ONLY": 0,
-                "STRUCTURED": len(all_entities),
+                "STRUCTURED": len(aggregate),
                 "EXECUTABLE": 0,
                 "TESTED": 0,
                 "VERIFIED": 0,
             },
             "note": (
-                "Barbarian through level 6 from pages 28–30. Proposed executable rules remain "
+                "Barbarian through level 7 from pages 28–30. Proposed executable rules remain "
                 "in needs-review authoring IR."
             ),
         },
@@ -938,6 +960,34 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
     write_json(
         output / "authoring-ir" / "barbarian.extra-attack.json",
         _extra_attack_ir(extra_attack),
+    )
+    feral_instinct = next(feature for feature in features if feature.name == "Feral Instinct")
+    write_json(
+        output / "authoring-ir" / "barbarian.feral-instinct.json",
+        {
+            "schemaVersion": "0.1.0",
+            "id": feral_instinct.id,
+            "kind": "class-feature",
+            "parentId": CLASS_ID,
+            "level": feral_instinct.level,
+            "source": list(feral_instinct.source_spans),
+            "text": _feature_text(feral_instinct),
+            "proposedRules": [
+                {
+                    "id": "feral-instinct-initiative",
+                    "type": "grant-advantage",
+                    "target": "initiative",
+                    "parameters": {},
+                    "automationLevel": "sheet-automated",
+                }
+            ],
+            "review": {
+                "extraction": "approved",
+                "semantics": "needs-review",
+                "tests": "draft",
+                "notes": [],
+            },
+        },
     )
     write_json(output / "indexes" / "barbarian-reconciliation.json", reconciliation)
     report = {

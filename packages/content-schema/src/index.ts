@@ -531,7 +531,14 @@ export const featureAutomationBodySchema = z
         z
           .object({
             actionId: z.string().min(1),
-            endsConditionIds: z.array(entityIdSchema).min(1),
+            endsConditionIds: z.array(entityIdSchema).default([]),
+            movement: z
+              .object({
+                speedFraction: z.number().positive(),
+                provokesOpportunityAttacks: z.boolean(),
+              })
+              .strict()
+              .optional(),
           })
           .strict(),
       )

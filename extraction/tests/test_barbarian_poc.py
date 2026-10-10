@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from srd_extract.barbarian import generate_barbarian_content
-from srd_extract.io import read_json
+from srd_extract.io import read_json, write_json
 from srd_extract.pipeline import run_pipeline
 
 SOURCE_HASH = "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87"
@@ -42,3 +42,24 @@ def test_barbarian_pages_28_to_30_audit(tmp_path: Path) -> None:
     assert (content / "authoring-ir" / "barbarian.extra-attack.json").exists()
     assert reconciliation["valid"] is True
     assert reconciliation["counts"]["unresolved"] == 0
+    barbarian = next(entity for entity in entities if entity["id"] == "srd521.class.barbarian")
+    assert barbarian["body"]["builder"]["supportedLevelMaximum"] == 7
+    assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["7"] == 3
+    pounce = next(entity for entity in entities if entity["name"]["en"] == "Instinctive Pounce")
+    assert pounce["body"]["actionEnhancements"] == [
+        {
+            "actionId": "action.enter-rage",
+            "movement": {"speedFraction": 0.5, "provokesOpportunityAttacks": True},
+        }
+    ]
+    feral = read_json(content / "authoring-ir" / "barbarian.feral-instinct.json")
+    assert feral["level"] == 7
+    assert feral["proposedRules"][0]["target"] == "initiative"
+    assert feral["source"][0]["page"] == 29
+    assert feral["review"]["semantics"] == "needs-review"
+    unrelated = {"id": "test.other-class", "kind": "class", "body": {"sentinel": True}}
+    write_json(content / "entities.json", [*entities, unrelated])
+    generate_barbarian_content(extraction, content)
+    assert read_json(content / "entities.json") == [*entities, unrelated]
+    generate_barbarian_content(extraction, content)
+    assert read_json(content / "entities.json") == [*entities, unrelated]

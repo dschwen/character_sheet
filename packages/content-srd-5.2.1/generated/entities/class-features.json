@@ -517,7 +517,16 @@
   },
   {
     "body": {
-      "automationLevel": "structured",
+      "actionEnhancements": [
+        {
+          "actionId": "action.enter-rage",
+          "movement": {
+            "provokesOpportunityAttacks": true,
+            "speedFraction": 0.5
+          }
+        }
+      ],
+      "automationLevel": "sheet-automated",
       "level": 7,
       "parentId": "srd521.class.barbarian",
       "text": {

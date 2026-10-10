@@ -338,7 +338,7 @@ describe("bootstrap content package", () => {
 
     expect(metadata).toHaveLength(12);
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
-      supportedLevelMaximum: 6,
+      supportedLevelMaximum: 7,
       defaultAbilityScoreImprovementAbility: "strength",
     });
     const mindlessRage = entities.find(
