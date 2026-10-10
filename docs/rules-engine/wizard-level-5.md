@@ -1,4 +1,4 @@
-# Wizard through level 6
+# Wizard through level 7
 
 The Wizard vertical slice reads its mechanics from the generated Wizard class and spell entities.
 At level 5 it calculates four known cantrips, a minimum 17-spell spellbook, nine prepared spells,
@@ -22,11 +22,16 @@ automatic substitution if too few eligible new spells remain; the unresolved cho
 in validation and requires manual review. There is no dedicated editor for historical Savant
 choices yet; changing migrated defaults requires editing
 an exported character and importing it again. Higher-level choice metadata is present, but does
-not expand the current level-6 Wizard builder cap.
+not expand the current level-7 Wizard builder cap.
 
 At level 6, the spellbook minimum is 19 leveled spells plus four cantrips, preparation increases
 to ten spells, and slots are 4/3/3. Same-class advancement preserves the existing spellbook,
 historical choices, inventory, and current play state.
+
+At level 7, two ordinary spellbook additions and one separate Evocation Savant addition bring
+the minimum to 22 leveled spells plus four cantrips. Preparation increases to eleven, with
+4/3/3/1 slots. The Savant choice permits eligible Evocations through level 4 but does not
+automatically prepare them. Default creation and advancement use the same data-driven choices.
 
 Sculpt Spells is represented by generic spell-protection metadata on the granted feature.
 The Play casting controls let the player declare how many visible, affected creatures other

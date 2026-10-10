@@ -85,3 +85,10 @@ def test_wizard_progression_accepts_level_five_row() -> None:
 
     assert row.prepared_spells == 9
     assert row.spell_slots[:3] == (4, 3, 2)
+
+
+def test_wizard_level_seven_adds_fourth_level_slot_and_preparation() -> None:
+    row = WizardProgressionRow(7, 3, (), 4, 11, (4, 3, 3, 1, 0, 0, 0, 0, 0))
+    assert row.cantrips == 4
+    assert row.prepared_spells == 11
+    assert row.spell_slots[:4] == (4, 3, 3, 1)

@@ -178,8 +178,8 @@ describe("guided character builder", () => {
       id: "srd521.choice.warlock.eldritch-invocation",
       level: 1,
       minimum: 1,
-      maximum: 5,
-      countByLevel: { 1: 1, 2: 3, 3: 3, 4: 3, 5: 5 },
+      maximum: 6,
+      countByLevel: { 1: 1, 2: 3, 3: 3, 4: 3, 5: 5, 6: 5, 7: 6 },
     });
     expect(
       catalog.classes[warlockId].featureChoices[0]?.options.find(

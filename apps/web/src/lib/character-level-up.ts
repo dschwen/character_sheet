@@ -393,12 +393,40 @@ function mergeAdvancement(
   const newLevel = target.build.levels[character.build.levels.length];
   if (newLevel === undefined) throw new Error("The new class level is missing.");
   const targetLevels = target.build.levels;
+  const previousChoices = choiceSelections(character);
+  const targetChoices = choiceSelections(target);
+  // A builder may sort low-prerequisite options into earlier acquisition slots.
+  // When no option was replaced, keep the saved history and put only new grants
+  // on the new level rather than rewriting the earlier levels.
+  const retainedChoiceIds = new Set(
+    [...mutableChoiceIds].filter((id) =>
+      (previousChoices[id] ?? []).every((optionId) => targetChoices[id]?.includes(optionId)),
+    ),
+  );
+  const advancedLevel = {
+    ...newLevel,
+    selectedFeatureChoices: [
+      ...newLevel.selectedFeatureChoices.filter(
+        (choice) => !retainedChoiceIds.has(choice.choiceId),
+      ),
+      ...[...retainedChoiceIds].flatMap((choiceId) => {
+        const optionIds = (targetChoices[choiceId] ?? []).filter(
+          (id) => !previousChoices[choiceId]?.includes(id),
+        );
+        return optionIds.length === 0 ? [] : [{ choiceId, optionIds }];
+      }),
+    ],
+  };
   const existingLevels = character.build.levels.map((level, levelIndex) => ({
     ...level,
     selectedFeatureChoices: [
-      ...level.selectedFeatureChoices.filter((choice) => !mutableChoiceIds.has(choice.choiceId)),
-      ...(targetLevels[levelIndex]?.selectedFeatureChoices.filter((choice) =>
-        mutableChoiceIds.has(choice.choiceId),
+      ...level.selectedFeatureChoices.filter(
+        (choice) =>
+          !mutableChoiceIds.has(choice.choiceId) || retainedChoiceIds.has(choice.choiceId),
+      ),
+      ...(targetLevels[levelIndex]?.selectedFeatureChoices.filter(
+        (choice) =>
+          mutableChoiceIds.has(choice.choiceId) && !retainedChoiceIds.has(choice.choiceId),
       ) ?? []),
     ],
   }));
@@ -416,7 +444,7 @@ function mergeAdvancement(
     ...character,
     build: {
       ...character.build,
-      levels: [...existingLevels, newLevel],
+      levels: [...existingLevels, advancedLevel],
       subclassId: target.build.subclassId,
       featAbilityScoreIncreases: target.build.featAbilityScoreIncreases,
       featIds,
@@ -484,6 +512,32 @@ export function previewLevelUp(
       mutableChoiceIds,
       replacedFeatIds,
     );
+    // Pact Magic has one pool whose slot level grows. Advancing is not a rest:
+    // carry its spent slots into the upgraded pool instead of refilling it.
+    const previousCasting = evaluateCharacter({ character, packages: [rulesPackage] }).spellcasting;
+    const targetCasting = evaluateCharacter({
+      character: target,
+      packages: [rulesPackage],
+    }).spellcasting;
+    if (previousCasting?.model === "pact-magic" && targetCasting?.model === "pact-magic") {
+      const previousSlot = previousCasting.slots[0];
+      const nextSlot = targetCasting.slots[0];
+      if (previousSlot && nextSlot && previousSlot.level !== nextSlot.level) {
+        const previousKey = String(previousSlot.level);
+        const nextKey = String(nextSlot.level);
+        const spent = nextCharacter.state.expendedSpellSlots[previousKey];
+        if (spent !== undefined) {
+          nextCharacter.state.expendedSpellSlots = {
+            ...Object.fromEntries(
+              Object.entries(nextCharacter.state.expendedSpellSlots).filter(
+                ([key]) => key !== previousKey,
+              ),
+            ),
+            [nextKey]: (nextCharacter.state.expendedSpellSlots[nextKey] ?? 0) + spent,
+          };
+        }
+      }
+    }
     const evaluation = evaluateCharacter({ character: nextCharacter, packages: [rulesPackage] });
     return {
       character: nextCharacter,

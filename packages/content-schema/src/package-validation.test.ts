@@ -495,7 +495,7 @@ describe("bootstrap content package", () => {
     });
     const warlock = entities.find((entity) => entity.id === "srd521.class.warlock");
     const warlockBody = z.record(z.unknown()).parse(warlock?.body);
-    expect(warlockBody.builder).toMatchObject({ supportedLevelMaximum: 6 });
+    expect(warlockBody.builder).toMatchObject({ supportedLevelMaximum: 7 });
     expect(warlockBody.spellPreparationChange).toEqual({
       event: "level-up",
       replacementMaximum: 1,
@@ -504,14 +504,15 @@ describe("bootstrap content package", () => {
     expect(classFeatureChoiceSchema.parse(warlockBody.eldritchInvocationChoice)).toMatchObject({
       level: 1,
       minimum: 1,
-      maximum: 5,
-      countByLevel: { 1: 1, 2: 3, 3: 3, 4: 3, 5: 5 },
+      maximum: 6,
+      countByLevel: { 1: 1, 2: 3, 3: 3, 4: 3, 5: 5, 6: 5, 7: 6 },
       defaultOptionIds: [
         "srd521.option.warlock.invocation.pact-of-the-chain",
         "srd521.option.warlock.invocation.devil-s-sight",
         "srd521.option.warlock.invocation.fiendish-vigor",
         "srd521.option.warlock.invocation.ascendant-step",
         "srd521.option.warlock.invocation.one-with-shadows",
+        "srd521.option.warlock.invocation.eldritch-mind",
       ],
       changeOn: ["level-up"],
       replacementMaximum: 1,
@@ -643,6 +644,9 @@ describe("bootstrap content package", () => {
       .array()
       .parse(JSON.parse(readFileSync(new URL("entities/wizard.json", root), "utf8")));
     const wizard = entities.find((entity) => entity.id === "srd521.class.wizard");
+    expect(z.record(z.unknown()).parse(wizard?.body).builder).toMatchObject({
+      supportedLevelMaximum: 7,
+    });
     const spells = entities.filter((entity) => entity.kind === "spell");
     const wizardBody = z
       .object({

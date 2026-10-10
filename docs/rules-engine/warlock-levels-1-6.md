@@ -1,4 +1,4 @@
-# Warlock levels 1–6 vertical slice
+# Warlock levels 1–7 vertical slice
 
 The reviewed `warlock-5.json` fixture is Morrow, a Human Soldier Fiend Warlock. Morrow wears Leather
 Armor, prepares six Warlock spells, knows three cantrips, and always has the six level-3 and level-5
@@ -15,6 +15,18 @@ all 28 Eldritch Invocation options and their source prerequisites, and every Fie
 source-linked structured content. The builder and same-class advancement support level 6:
 45 maximum Hit Points with the default build, seven selected prepared spells, five invocations,
 and two third-level Pact slots.
+
+Level 7 supports 52 maximum Hit Points with the default build, eight selected prepared spells,
+six distinct invocations, and two fourth-level Pact slots. Fire Shield and Wall of Fire join the
+always-prepared Fiend spells. The sixth default invocation is Eldritch Mind; its conditional
+Concentration-save advantage remains assisted, not applied to all Constitution saves.
+Unchanged invocation selections retain their saved acquisition levels when a new one is added.
+One existing invocation may also be replaced during advancement, subject to prerequisites.
+
+When Pact slots increase in level, advancement moves their spent count to the new slot level
+without restoring them or changing other play state. This also covers earlier Pact upgrades.
+Lower-level spells consume the current Pact slot tier; rests and Magical Cunning recover that
+same pool. Spell outcomes and target-sheet updates remain manually adjudicated.
 
 Dark One's Own Luck grants a separate Charisma-modifier resource (minimum one use) that recharges
 only on Long Rest. The action requires a completed ability check or saving throw, rolls 1d10, and
@@ -39,4 +51,4 @@ These limits remain intentionally assisted:
 - Dark One’s Blessing’s temporary Hit Point formula and enemy-defeat trigger remain
   encounter-assisted. The fixture demonstrates the resulting persisted temporary Hit Points.
 - Fiend Spells are automatically always prepared. Later Fiend features are retained as structured
-  content outside the level-6 automation boundary.
+  content outside the level-7 automation boundary.

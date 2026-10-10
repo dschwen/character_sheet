@@ -491,12 +491,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 7)},
+                "countByLevel": {str(level): 2 for level in range(1, 8)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -535,11 +535,11 @@ def _class_entity(
                 "id": INVOCATION_CHOICE_ID,
                 "level": 1,
                 "minimum": 1,
-                "maximum": 5,
+                "maximum": 6,
                 "countByLevel": {
                     str(row.level): row.eldritch_invocations
                     for row in progression
-                    if row.level <= 5
+                    if row.level <= 7
                 },
                 "options": [invocation["id"] for invocation in invocations],
                 "defaultOptionIds": [
@@ -548,6 +548,7 @@ def _class_entity(
                     "srd521.option.warlock.invocation.fiendish-vigor",
                     "srd521.option.warlock.invocation.ascendant-step",
                     "srd521.option.warlock.invocation.one-with-shadows",
+                    "srd521.option.warlock.invocation.eldritch-mind",
                 ],
                 "changeOn": ["level-up"],
                 "replacementMaximum": 1,

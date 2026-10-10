@@ -84,6 +84,11 @@ Fighting and Two-Weapon Fighting use explicit conditional weapon-damage modes. T
 and action usage remain manually adjudicated. Evokers select separate
 Evocation Savant spellbook additions and can declare Sculpt Spells protection while casting,
 with conditional save/damage guidance for manually adjudicated targets.
+Wizard and Warlock creation and advancement reach level 7. Wizards gain fourth-level slots,
+eleven prepared spells, and one additional Evocation Savant spellbook choice. Warlocks gain six
+invocations, eight selected prepared spells, fourth-level Pact slots, and always-prepared Fire
+Shield and Wall of Fire. Pact slot upgrades retain their spent count, rather than refilling the
+pool. Eldritch Mind's conditional Concentration-save advantage remains manually adjudicated.
 Lore Bards select two Magical Discoveries from the Cleric,
 Druid, and Wizard lists, including cantrips, up to their available slot level. These use Charisma
 and remain always prepared outside the normal Bard limit. The builder and advancement flow offer

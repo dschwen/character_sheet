@@ -53,7 +53,7 @@ describe("Warlock level 6 and post-roll bonuses", () => {
       cantripsKnown: 3,
       slots: [{ level: 3, maximum: 2 }],
     });
-    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: false });
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: true, targetLevel: 7 });
   });
 
   it("grants a traced Charisma-based Long Rest resource only at level 6", () => {

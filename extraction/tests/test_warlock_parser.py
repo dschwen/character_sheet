@@ -38,6 +38,14 @@ def test_warlock_progression_row_rejects_wrong_slot_level() -> None:
         WarlockProgressionRow(5, 3, (), 5, 3, 6, 2, 6)
 
 
+def test_warlock_level_seven_adds_invocation_and_fourth_level_pact_slots() -> None:
+    row = WarlockProgressionRow(7, 3, (), 6, 3, 8, 2, 4)
+    assert row.eldritch_invocations == 6
+    assert row.prepared_spells == 8
+    assert row.spell_slots == 2
+    assert row.slot_level == 4
+
+
 def test_warlock_starting_equipment_preserves_package_and_gold_choices() -> None:
     equipment = _starting_equipment()
 

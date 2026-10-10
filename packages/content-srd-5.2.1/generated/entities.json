@@ -3634,7 +3634,7 @@
           "requireClassProficiency": true,
           "sourceId": "srd521.class-feature.wizard.scholar"
         },
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 6,
@@ -4020,7 +4020,8 @@
           "3": 2,
           "4": 2,
           "5": 2,
-          "6": 2
+          "6": 2,
+          "7": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -22341,7 +22342,7 @@
           "srd521.skill.deception"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
       },
       "cantripChange": {
@@ -22357,18 +22358,21 @@
           "2": 3,
           "3": 3,
           "4": 3,
-          "5": 5
+          "5": 5,
+          "6": 5,
+          "7": 6
         },
         "defaultOptionIds": [
           "srd521.option.warlock.invocation.pact-of-the-chain",
           "srd521.option.warlock.invocation.devil-s-sight",
           "srd521.option.warlock.invocation.fiendish-vigor",
           "srd521.option.warlock.invocation.ascendant-step",
-          "srd521.option.warlock.invocation.one-with-shadows"
+          "srd521.option.warlock.invocation.one-with-shadows",
+          "srd521.option.warlock.invocation.eldritch-mind"
         ],
         "id": "srd521.choice.warlock.eldritch-invocation",
         "level": 1,
-        "maximum": 5,
+        "maximum": 6,
         "minimum": 1,
         "options": [
           "srd521.option.warlock.invocation.agonizing-blast",
@@ -22768,7 +22772,8 @@
           "3": 2,
           "4": 2,
           "5": 2,
-          "6": 2
+          "6": 2,
+          "7": 2
         },
         "maximum": 2,
         "minimum": 2,
