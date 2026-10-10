@@ -432,6 +432,17 @@ export const savingThrowAuraRecipientSchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    spellProtection: z
+      .object({
+        school: z.string().min(1),
+        additionalTargets: z.number().int().nonnegative(),
+        requiresSight: z.literal(true),
+        othersOnly: z.literal(true),
+        automaticSaveSuccess: z.literal(true),
+        noDamageOnSuccessfulHalfSave: z.literal(true),
+      })
+      .strict()
+      .optional(),
     spellSlotRecovery: z
       .object({
         classId: entityIdSchema,

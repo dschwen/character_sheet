@@ -16,6 +16,7 @@ import type {
   D20TestSummary,
   LoadedRulesPackage,
   SpellCastRequest,
+  SpellProtectionApplication,
   SpellSummary,
   StateChange,
   ValidationMessage,
@@ -23,6 +24,7 @@ import type {
 import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
+import { spellProtectionInstructions } from "../lib/spell-protection";
 import {
   characterBuilderCatalog,
   migrateMagicInitiateChoices,
@@ -144,6 +146,8 @@ interface ActionRequirements {
 }
 
 interface CastFeedback {
+  traces: Readonly<Record<string, Trace>>;
+  protection?: SpellProtectionApplication;
   spell: SpellSummary;
   asRitual: boolean;
   freeCast?: boolean;
@@ -347,6 +351,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
   const [spellHealsOther, setSpellHealsOther] = useState<Readonly<Record<string, boolean>>>({});
+  const [protectedCreatureCounts, setProtectedCreatureCounts] = useState<
+    Readonly<Record<string, string>>
+  >({});
   const [spellRecoverySelections, setSpellRecoverySelections] = useState<
     Readonly<Record<string, Readonly<Record<string, string>>>>
   >({});
@@ -574,7 +581,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       (action) =>
         supportsStateTransition(action) || actionRequirements(action).damageDiceCount !== undefined,
     ) ?? [];
-  const trace = selectedTraceId === undefined ? undefined : evaluation?.traces[selectedTraceId];
+  const trace =
+    selectedTraceId === undefined
+      ? undefined
+      : (evaluation?.traces[selectedTraceId] ?? castFeedback?.traces[selectedTraceId]);
 
   function linkedStatusIds(spellId: string | undefined): string[] {
     if (spellId === undefined) return [];
@@ -752,6 +762,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setActionDrafts({});
     setSpellLevels({});
     setSpellHealsOther({});
+    setProtectedCreatureCounts({});
     setSpellRecoverySelections({});
     setCastFeedback(undefined);
     setPreparedSpellDraft(undefined);
@@ -774,6 +785,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setActionDrafts({});
       setSpellLevels({});
       setSpellHealsOther({});
+      setProtectedCreatureCounts({});
       setSpellRecoverySelections({});
       setCastFeedback(undefined);
       setPreparedSpellDraft(undefined);
@@ -1026,6 +1038,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       useFreeCast,
       ...(castingSourceId === undefined ? {} : { castingSourceId }),
       restoresHitPointsToOther: spellHealsOther[spell.id] ?? false,
+      protectedCreatureCount: Number(protectedCreatureCounts[spell.id] ?? 0),
     };
     const slotLevel =
       spell.level > 0 && !asRitual && !useFreeCast ? selectedSlotLevel(spell) : undefined;
@@ -1043,11 +1056,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         request,
       );
       if (proposal.applicable) {
+        setProtectedCreatureCounts((current) => ({ ...current, [spell.id]: "0" }));
         setSpellHealsOther((current) => ({ ...current, [spell.id]: false }));
         const slot = evaluation?.spellcasting?.slots.find(
           (candidate) => candidate.level === slotLevel,
         );
         setCastFeedback({
+          traces: proposal.traces,
+          ...(proposal.protection === undefined ? {} : { protection: proposal.protection }),
           spell,
           asRitual,
           ...(useFreeCast ? { freeCast: true } : {}),
@@ -1068,7 +1084,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       }
       applyTransition(
         proposal,
-        `${spell.name}${asRitual ? " was cast as a ritual" : useFreeCast ? " used its free casting" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.${spellStatusMessage(spell) === "" ? "" : ` ${spellStatusMessage(spell)}`}`,
+        `${spell.name}${asRitual ? " was cast as a ritual" : useFreeCast ? " used its free casting" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.${spellStatusMessage(spell) === "" ? "" : ` ${spellStatusMessage(spell)}`}${proposal.protection === undefined ? "" : ` ${spellProtectionInstructions(proposal.protection)}`}`,
       );
     } catch (error) {
       setNotice(`Spell cast failed: ${errorMessage(error)}`);
@@ -2262,6 +2278,20 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           {spellStatusInstructions(castFeedback.spell).map((instruction) => (
                             <em key={instruction}>{instruction}</em>
                           ))}
+                          {castFeedback.protection === undefined ? null : (
+                            <>
+                              <em>{spellProtectionInstructions(castFeedback.protection)}</em>
+                              <button
+                                type="button"
+                                className="button secondary compact"
+                                onClick={() => {
+                                  setSelectedTraceId(castFeedback.protection?.traceId);
+                                }}
+                              >
+                                Explain protection limit
+                              </button>
+                            </>
+                          )}
                           {spellRollControls(
                             castFeedback.spell,
                             castFeedback.slotLevel,
@@ -2286,6 +2316,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             (slot) => slot.level >= spell.level,
                           ) ?? [];
                         const slotLevel = selectedSlotLevel(spell);
+                        const protection = evaluation.spellProtections?.find(
+                          (effect) => effect.school === spell.school,
+                        );
                         const selectedSlot = eligibleSlots.find((slot) => slot.level === slotLevel);
                         const canCastWithSlot =
                           spell.level === 0 || (spell.prepared && (selectedSlot?.current ?? 0) > 0);
@@ -2311,6 +2344,34 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               {spellRollControls(spell, spell.level === 0 ? undefined : slotLevel)}
                             </div>
                             <div className="spell-cast-controls">
+                              {protection === undefined ? null : (
+                                <label>
+                                  {protection.sourceName}: visible, affected creatures other than
+                                  you
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    max={
+                                      (spell.level === 0 ? 0 : slotLevel) +
+                                      protection.additionalTargets
+                                    }
+                                    step={1}
+                                    aria-label={`Protected creature count for ${spell.name}`}
+                                    value={protectedCreatureCounts[spell.id] ?? "0"}
+                                    onChange={(event) => {
+                                      const value = event.target.value;
+                                      setProtectedCreatureCounts((current) => ({
+                                        ...current,
+                                        [spell.id]: value,
+                                      }));
+                                    }}
+                                  />
+                                  <small>
+                                    0 = unused. Saving throws only; no target sheet is changed.
+                                    Free/ritual casts use the spell’s base level.
+                                  </small>
+                                </label>
+                              )}
                               {(spell.healing?.length ?? 0) > 0 &&
                               evaluation.spellHealingEffects?.some(
                                 ({ target }) => target === "caster-after-healing-other",
@@ -3282,6 +3343,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setActionDrafts({});
             setSpellLevels({});
             setSpellHealsOther({});
+            setProtectedCreatureCounts({});
             setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
@@ -3307,6 +3369,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setActionDrafts({});
             setSpellLevels({});
             setSpellHealsOther({});
+            setProtectedCreatureCounts({});
             setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);

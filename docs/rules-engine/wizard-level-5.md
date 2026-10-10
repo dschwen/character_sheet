@@ -1,4 +1,4 @@
-# Wizard through level 5
+# Wizard through level 6
 
 The Wizard vertical slice reads its mechanics from the generated Wizard class and spell entities.
 At level 5 it calculates four known cantrips, a minimum 17-spell spellbook, nine prepared spells,
@@ -22,7 +22,24 @@ automatic substitution if too few eligible new spells remain; the unresolved cho
 in validation and requires manual review. There is no dedicated editor for historical Savant
 choices yet; changing migrated defaults requires editing
 an exported character and importing it again. Higher-level choice metadata is present, but does
-not expand the current level-5 Wizard builder cap.
+not expand the current level-6 Wizard builder cap.
+
+At level 6, the spellbook minimum is 19 leveled spells plus four cantrips, preparation increases
+to ten spells, and slots are 4/3/3. Same-class advancement preserves the existing spellbook,
+historical choices, inventory, and current play state.
+
+Sculpt Spells is represented by generic spell-protection metadata on the granted feature.
+The Play casting controls let the player declare how many visible, affected creatures other
+than the caster are protected. Zero leaves the feature unused. A cast can protect at most one
+plus the casting level (including upcasting; a cantrip is level zero). Counts beyond that limit,
+wrong-school spells, and use before the feature is granted reject the entire cast before slots
+or Concentration change. Successful proposals include a source-linked calculation trace.
+
+Cast feedback specifies automatic saving-throw success and no damage **only** when a successful
+save would normally halve damage. It does not negate attack-roll or automatic damage, including
+Magic Missile. Targets, sight, save outcomes, and target HP are adjudicated manually; no recipient
+status is persisted because this protection applies only against the particular spell, not other
+spells with the same school. Ritual/free casts use the base spell level, not the selected slot.
 
 `proposeSpellCast` atomically previews slot expenditure and Concentration replacement. Wizard
 Ritual Adept allows a ritual-tagged spell in the spellbook to be cast without preparation or a

@@ -16,7 +16,9 @@ because some of its functionality exists or tests pass.
   extracted spell effects are display-only and explicitly assisted, not complete rules automation.
 - Evocation Savant has source-linked, level-gated spellbook additions, separate from preparation.
   Saved Evokers receive missing defaults with a review notice; historical choice editing still
-  requires character export/import. Wizard level 6 and Sculpt Spells remain the next slice.
+  requires character export/import. All twelve class builders now reach level 6. Sculpt Spells
+  validates declared protection counts and supplies conditional, source-linked casting guidance;
+  target eligibility and target-sheet changes remain explicitly manual.
 - Acquisition, layout extraction, normalization, repeated parsers, and reviewed-formula annotation
   commands are in `extraction/srd_extract`. Generation is incremental; end-to-end clean regeneration
   of every artifact still needs a single verified workflow.

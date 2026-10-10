@@ -294,6 +294,7 @@ export interface ActionTransitionProposal {
 }
 
 export interface SpellCastRequest {
+  protectedCreatureCount?: number;
   spellId: string;
   slotLevel?: number;
   asRitual?: boolean;
@@ -303,6 +304,7 @@ export interface SpellCastRequest {
 }
 
 export interface SpellCastTransitionProposal {
+  protection?: SpellProtectionApplication;
   kind: "spell-cast";
   spellId: string;
   applicable: boolean;
@@ -334,6 +336,7 @@ export interface SpellSlotRecoverySummary {
 }
 
 export interface CharacterEvaluation {
+  spellProtections?: SpellProtectionSummary[];
   spellSlotRecoveries?: SpellSlotRecoverySummary[];
   savingThrowAuras?: SavingThrowAuraSummary[];
   facts: Readonly<Record<string, JsonValue>>;
@@ -352,4 +355,22 @@ export interface CharacterEvaluation {
   validations: ValidationMessage[];
   traces: Readonly<Record<string, CalculationTrace>>;
   coverageWarnings: CoverageWarning[];
+}
+
+export interface SpellProtectionSummary {
+  sourceId: string;
+  sourceName: string;
+  school: string;
+  additionalTargets: number;
+  requiresSight: true;
+  othersOnly: true;
+  automaticSaveSuccess: true;
+  noDamageOnSuccessfulHalfSave: true;
+  sources: SourceReference[];
+}
+
+export interface SpellProtectionApplication extends SpellProtectionSummary {
+  creatureCount: number;
+  maximumCreatures: number;
+  traceId: string;
 }

@@ -20,6 +20,7 @@ const spellCastRequestSchema = z
     castingSourceId: z.string().min(1).optional(),
     useFreeCast: z.boolean().default(false),
     restoresHitPointsToOther: z.boolean().default(false),
+    protectedCreatureCount: z.number().int().nonnegative().default(0),
   })
   .strict();
 
@@ -91,6 +92,24 @@ export function proposeSpellCast(
   const spell = evaluation.spells.find((candidate) => candidate.id === request.spellId);
   const originalState = cloneState(character.state);
   const validations: ValidationMessage[] = [];
+  const protection = evaluation.spellProtections?.find((effect) => effect.school === spell?.school);
+  const castingLevel =
+    request.useFreeCast || request.asRitual
+      ? (spell?.level ?? 0)
+      : (request.slotLevel ?? spell?.level ?? 0);
+  const maximumCreatures =
+    protection === undefined ? 0 : castingLevel + protection.additionalTargets;
+  if (
+    request.protectedCreatureCount > 0 &&
+    (protection === undefined || request.protectedCreatureCount > maximumCreatures)
+  ) {
+    addValidation(
+      validations,
+      "SPELL_PROTECTION_UNAVAILABLE",
+      "The selected spell protection is unavailable or exceeds its creature limit.",
+      ["request.protectedCreatureCount"],
+    );
+  }
   const castingOption =
     spell === undefined
       ? undefined
@@ -232,6 +251,22 @@ export function proposeSpellCast(
   const nextState = cloneState(character.state);
   const changes: StateChange[] = [];
   const traces: Record<string, CalculationTrace> = {};
+  const traceId = "transition.spell-cast.protection.maximumCreatures";
+  if (request.protectedCreatureCount > 0 && protection !== undefined) {
+    traces[traceId] = {
+      id: traceId,
+      result: maximumCreatures,
+      nodes: [
+        {
+          id: `${traceId}.calculate`,
+          operation: "spell-level-plus-additional-targets",
+          inputs: [castingLevel, protection.additionalTargets],
+          output: maximumCreatures,
+        },
+      ],
+      sourceReferences: protection.sources,
+    };
+  }
   if (request.useFreeCast && castingOption?.freeCastResourceId !== undefined) {
     const resourceId = castingOption.freeCastResourceId;
     const before = character.state.expendedResources[resourceId] ?? 0;
@@ -311,6 +346,16 @@ export function proposeSpellCast(
     kind: "spell-cast",
     spellId: request.spellId,
     applicable: true,
+    ...(request.protectedCreatureCount > 0 && protection !== undefined
+      ? {
+          protection: {
+            ...protection,
+            creatureCount: request.protectedCreatureCount,
+            maximumCreatures,
+            traceId,
+          },
+        }
+      : {}),
     changes,
     nextState,
     validations: [],

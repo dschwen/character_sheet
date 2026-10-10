@@ -552,7 +552,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits.get("skillProficiencyChoice", {}),
-                "countByLevel": {str(level): 2 for level in range(1, 6)},
+                "countByLevel": {str(level): 2 for level in range(1, 7)},
             },
             "startingEquipment": {
                 "id": "srd521.choice.class.wizard.starting-equipment",
@@ -607,7 +607,7 @@ def _class_entity(
             },
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 8,
                     "dexterity": 14,
@@ -745,6 +745,18 @@ def generate_wizard_content(
         *spell_entities,
     ]
     arcane_recovery = next(feature for feature in features if feature["name"] == "Arcane Recovery")
+    sculpt = next(feature for feature in evoker_features if feature["name"] == "Sculpt Spells")
+    for entity in wizard_entities:
+        if entity["id"] == sculpt["id"]:
+            entity["body"]["spellProtection"] = {
+                "school": "evocation",
+                "additionalTargets": 1,
+                "requiresSight": True,
+                "othersOnly": True,
+                "automaticSaveSuccess": True,
+                "noDamageOnSuccessfulHalfSave": True,
+            }
+            entity["body"]["automationLevel"] = "assisted"
     recovery_id = "srd521.resource.wizard.arcane-recovery"
     for entity in wizard_entities:
         if entity["id"] == arcane_recovery["id"]:

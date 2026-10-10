@@ -1200,9 +1200,9 @@ describe("guided character builder", () => {
   it("builds complete Wizard spellbooks at every supported level", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [8, 14, 20, 26, 32];
+    const expectedHitPoints = [8, 14, 20, 26, 32, 38];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(wizardId, catalog, level, `Level ${String(level)} Wizard`);
       const character = buildCharacter(draft, rulesPackage, options);
       const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });

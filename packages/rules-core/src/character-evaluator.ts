@@ -6457,6 +6457,20 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     attacks: state.attacks,
     ...(state.spellcasting === undefined ? {} : { spellcasting: state.spellcasting }),
     spells: state.spells,
+    spellProtections: [...granted].flatMap((sourceId) => {
+      const entity = index.entities.get(sourceId);
+      const body = featureAutomationBodySchema.safeParse(entity?.body);
+      return entity !== undefined && body.success && body.data.spellProtection !== undefined
+        ? [
+            {
+              ...body.data.spellProtection,
+              sourceId,
+              sourceName: entity.name.en ?? sourceId,
+              sources: entitySourceReferences(entity),
+            },
+          ]
+        : [];
+    }),
     spellHealingEffects: [...granted].flatMap((sourceId) => {
       const entity = index.entities.get(sourceId);
       const body = featureAutomationBodySchema.safeParse(entity?.body);

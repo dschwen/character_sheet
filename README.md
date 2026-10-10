@@ -77,8 +77,10 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, and Warlock advancement through level 6 and
-Wizard advancement through level 5. Lore Bards select two Magical Discoveries from the Cleric,
+same-class advancement for all twelve SRD classes through level 6. Evokers select separate
+Evocation Savant spellbook additions and can declare Sculpt Spells protection while casting,
+with conditional save/damage guidance for manually adjudicated targets.
+Lore Bards select two Magical Discoveries from the Cleric,
 Druid, and Wizard lists, including cantrips, up to their available slot level. These use Charisma
 and remain always prepared outside the normal Bard limit. The builder and advancement flow offer
 searchable, level-filtered choices. The shared advancement model permits one later replacement;
@@ -142,8 +144,7 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-reviewed Ranger and Rogue level 1–6 vertical slices plus Barbarian, Bard, Cleric, Druid, Fighter,
-Monk, Paladin, Sorcerer, Warlock, and Wizard levels 1–5, with every standard SRD background and
+level 1–6 vertical slices for all twelve SRD classes, with every standard SRD background and
 species. Higher levels and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 
