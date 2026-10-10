@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { asiFeatSelection, featIncreases } from "./advancement-feats";
 import { characterDocumentSchema } from "@dnd/character-model";
 import { evaluateCharacter } from "@dnd/rules-core";
 import {
@@ -31,8 +32,8 @@ function setup(level = 7) {
   const catalog = characterBuilderCatalog(rulesPackage);
   const draft = defaultBuilderDraft(fighterId, catalog, level, "Improving Fighter");
   // Deliberately reverse ability ordering across acquisitions.
-  draft.asiAllocations[0] = ["wisdom", "wisdom"];
-  if (level >= 6) draft.asiAllocations[1] = ["dexterity", "intelligence"];
+  draft.advancementFeats[0] = asiFeatSelection(["wisdom", "wisdom"]);
+  if (level >= 6) draft.advancementFeats[1] = asiFeatSelection(["dexterity", "intelligence"]);
   const character = buildCharacter(draft, rulesPackage, options);
   return { rulesPackage, catalog, draft, character };
 }
@@ -67,7 +68,7 @@ describe("repeatable, per-level Ability Score Improvements", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
     const draft = defaultBuilderDraft(classId, catalog, 4, "Split Caster");
-    draft.asiAllocations[0] = ["intelligence", "wisdom"];
+    draft.advancementFeats[0] = asiFeatSelection(["intelligence", "wisdom"]);
     const character = buildCharacter(draft, rulesPackage, options);
     expect(
       evaluateCharacter({ character, packages: [rulesPackage] }).validations.filter(
@@ -87,11 +88,11 @@ describe("repeatable, per-level Ability Score Improvements", () => {
     character.state.temporaryHitPoints = 3;
     character.state.expendedResources["srd521.resource.fighter.second-wind"] = 1;
     const draft = createLevelUpDraft(character, catalog);
-    expect(draft.asiAllocations.slice(0, 2)).toEqual([
-      ["wisdom", "wisdom"],
-      ["dexterity", "intelligence"],
+    expect(draft.advancementFeats.slice(0, 2)).toEqual([
+      asiFeatSelection(["wisdom", "wisdom"]),
+      asiFeatSelection(["dexterity", "intelligence"]),
     ]);
-    draft.asiAllocations[2] = ["constitution", "constitution"];
+    draft.advancementFeats[2] = asiFeatSelection(["constitution", "constitution"]);
     const next = levelUpCharacter(character, draft, rulesPackage, options);
     const evaluation = evaluateCharacter({ character: next, packages: [rulesPackage] });
     expect(evaluation.validations.filter(({ severity }) => severity === "error")).toEqual([]);
@@ -117,7 +118,7 @@ describe("repeatable, per-level Ability Score Improvements", () => {
     const { character, catalog, rulesPackage } = setup();
     const before = structuredClone(character);
     const draft = createLevelUpDraft(character, catalog);
-    draft.asiAllocations[0] = ["charisma", "charisma"];
+    draft.advancementFeats[0] = asiFeatSelection(["charisma", "charisma"]);
     expect(previewLevelUp(character, draft, rulesPackage, options).issues).toContain(
       "Earlier Ability Score Improvement allocations cannot change during level up.",
     );
@@ -130,10 +131,10 @@ describe("repeatable, per-level Ability Score Improvements", () => {
     for (const level of character.build.levels) delete level.featSelections;
     const before = structuredClone(character);
     const draft = createLevelUpDraft(character, catalog);
-    expect(asiIncreases(draft.asiAllocations.slice(0, 2))).toEqual(
+    expect(featIncreases(draft.advancementFeats.slice(0, 2))).toEqual(
       character.build.featAbilityScoreIncreases,
     );
-    draft.asiAllocations[2] = ["constitution", "charisma"];
+    draft.advancementFeats[2] = asiFeatSelection(["constitution", "charisma"]);
     const next = levelUpCharacter(character, draft, rulesPackage, options);
     expect(next.build.levels.slice(0, 7)).toEqual(before.build.levels);
     expect(next.build.featAbilityScoreIncreases).toEqual({
@@ -193,24 +194,24 @@ describe("repeatable, per-level Ability Score Improvements", () => {
       ),
     ).toEqual([]);
     draft.abilityScores.dexterity = 18;
-    draft.asiAllocations = [
-      ["dexterity", "dexterity"],
-      ["dexterity", "dexterity"],
-      ["dexterity", "dexterity"],
+    draft.advancementFeats = [
+      asiFeatSelection(["dexterity", "dexterity"]),
+      asiFeatSelection(["dexterity", "dexterity"]),
+      asiFeatSelection(["dexterity", "dexterity"]),
     ];
     expect(() => buildCharacter(draft, rulesPackage, options)).toThrow();
   });
 
   it("reconciles target level without dropping a split choice or sharing tuple references", () => {
     const { draft, catalog } = setup(5);
-    draft.asiAllocations[0] = ["dexterity", "wisdom"];
+    draft.advancementFeats[0] = asiFeatSelection(["dexterity", "wisdom"]);
     const next = updateBuilderLevel(draft, catalog, 8);
-    expect(next.asiAllocations[0]).toEqual(["dexterity", "wisdom"]);
-    expect(next.asiAllocations).toHaveLength(3);
-    const first = next.asiAllocations[0];
+    expect(next.advancementFeats[0]).toEqual(asiFeatSelection(["dexterity", "wisdom"]));
+    expect(next.advancementFeats).toHaveLength(3);
+    const first = next.advancementFeats[0];
     if (!first) throw new Error("Missing allocation");
-    first[0] = "charisma";
-    expect(draft.asiAllocations[0]).toEqual(["dexterity", "wisdom"]);
+    first.abilityScoreIncreases.charisma = 1;
+    expect(draft.advancementFeats[0]).toEqual(asiFeatSelection(["dexterity", "wisdom"]));
   });
 
   it("fails explicitly for incompatible legacy totals instead of silently adding a fallback", () => {

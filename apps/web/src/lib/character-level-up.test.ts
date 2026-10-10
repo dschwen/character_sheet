@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { asiFeatSelection } from "./advancement-feats";
 
 import { evaluateCharacter, proposeAction } from "@dnd/rules-core";
 
@@ -141,7 +142,8 @@ describe("guided character level up", () => {
         const previousState = character.state;
         const previousLearnedSpells = character.build.learnedSpellIds;
         const draft = createLevelUpDraft(character, catalog);
-        if (targetLevel === 4) draft.asiAllocations[0] = ["dexterity", "dexterity"];
+        if (targetLevel === 4)
+          draft.advancementFeats[0] = asiFeatSelection(["dexterity", "dexterity"]);
         const options = {
           id: character.id,
           now: new Date(`2026-08-0${String(targetLevel + 3)}T12:00:00.000Z`),
@@ -1091,11 +1093,11 @@ describe("guided character level up", () => {
     const draft = createLevelUpDraft(levelFive, catalog);
 
     expect(draft.level).toBe(6);
-    expect(draft.asiAllocations).toEqual([
-      ["strength", "strength"],
-      ["strength", "strength"],
+    expect(draft.advancementFeats).toEqual([
+      asiFeatSelection(["strength", "strength"]),
+      asiFeatSelection(["strength", "strength"]),
     ]);
-    draft.asiAllocations[1] = ["dexterity", "dexterity"];
+    draft.advancementFeats[1] = asiFeatSelection(["dexterity", "dexterity"]);
     const preview = previewLevelUp(levelFive, draft, rulesPackage, {
       id: levelFive.id,
       now: new Date("2026-08-12T03:00:00.000Z"),

@@ -5,7 +5,8 @@ import { useMemo, useState } from "react";
 import type { CharacterDocument } from "@dnd/character-model";
 import type { StartingEquipmentItem } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
-import { asiIncreases, asiOptions } from "../lib/ability-score-improvements";
+import { featIncreases } from "../lib/advancement-feats";
+import { AdvancementFeatSelect } from "./advancement-feat-select";
 
 import {
   activeSpeciesChoices,
@@ -768,7 +769,7 @@ export function CharacterBuilder({
               <div className="ability-editor">
                 {abilities.map((ability) => {
                   const backgroundIncrease = draft.backgroundAbilityScoreIncreases[ability] ?? 0;
-                  const featIncrease = asiIncreases(draft.asiAllocations)[ability] ?? 0;
+                  const featIncrease = featIncreases(draft.advancementFeats)[ability] ?? 0;
                   const finalScore =
                     draft.abilityScores[ability] + backgroundIncrease + featIncrease;
                   return (
@@ -792,34 +793,21 @@ export function CharacterBuilder({
                   );
                 })}
               </div>
-              {draft.asiAllocations.map((allocation, index) => (
-                <label
+              {draft.advancementFeats.map((_, index) => (
+                <AdvancementFeatSelect
                   key={selectedClass.abilityScoreImprovementLevels[index]}
-                  className="builder-field compact-field"
-                >
-                  Level {String(selectedClass.abilityScoreImprovementLevels[index])} Ability Score
-                  Improvement
-                  <select
-                    value={allocation.join(",")}
-                    onChange={(event) => {
-                      setDraft((value) => ({
-                        ...value,
-                        asiAllocations: value.asiAllocations.map((previous, abilityIndex) =>
-                          abilityIndex === index
-                            ? (asiOptions.find((option) => option.value === event.target.value)
-                                ?.allocation ?? previous)
-                            : previous,
-                        ),
-                      }));
-                    }}
-                  >
-                    {asiOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                  draft={draft}
+                  catalog={catalog}
+                  index={index}
+                  onChange={(selection) => {
+                    setDraft((value) => ({
+                      ...value,
+                      advancementFeats: value.advancementFeats.map((previous, abilityIndex) =>
+                        abilityIndex === index ? selection : previous,
+                      ),
+                    }));
+                  }}
+                />
               ))}
             </div>
           ) : null}

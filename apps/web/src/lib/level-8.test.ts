@@ -25,7 +25,8 @@ import {
   levelUpEligibility,
   previewLevelUp,
 } from "./character-level-up";
-import { abilityScoreImprovementId, asiIncreases } from "./ability-score-improvements";
+import { abilityScoreImprovementId } from "./ability-score-improvements";
+import { asiFeatSelection, featIncreases } from "./advancement-feats";
 import { loadWebData } from "./server-data";
 
 const options = { id: "level-eight", now: new Date("2026-10-10T18:00:00Z") };
@@ -43,7 +44,9 @@ describe.each(builderClassIds)("%s level-8 progression", (classId) => {
       classId === fighterId ? 3 : 2,
     );
     expect(character.build.levels[7]?.featSelections).toHaveLength(1);
-    expect(character.build.featAbilityScoreIncreases).toEqual(asiIncreases(draft.asiAllocations));
+    expect(character.build.featAbilityScoreIncreases).toEqual(
+      featIncreases(draft.advancementFeats),
+    );
     expect(evaluation.values.proficiencyBonus?.value).toBe(3);
     expect(levelUpEligibility(character, catalog)).toMatchObject({
       eligible: false,
@@ -90,7 +93,7 @@ describe.each(builderClassIds)("%s level-8 progression", (classId) => {
     const before = structuredClone(character);
     const draft = createLevelUpDraft(character, catalog);
     const asiIndex = catalog.classes[classId].abilityScoreImprovementLevels.indexOf(8);
-    draft.asiAllocations[asiIndex] = ["dexterity", "constitution"];
+    draft.advancementFeats[asiIndex] = asiFeatSelection(["dexterity", "constitution"]);
     const next = levelUpCharacter(character, draft, rulesPackage, options);
     const evaluation = evaluateCharacter({ character: next, packages: [rulesPackage] });
     expect(evaluation.validations.filter(({ severity }) => severity === "error")).toEqual([]);

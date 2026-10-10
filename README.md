@@ -86,7 +86,11 @@ same-class advancement for all twelve SRD classes through level 8.
 Ability Score Improvement offers +2 to one ability or +1 to two abilities, with the 20-point cap
 validated before saving. New sheets record each allocation at its acquisition level. Advancement
 locks earlier allocations and preserves legacy aggregate-only bonuses without inventing history.
-Other General feats, including Grappler, are not yet offered by this workflow. Champion Fighters gain
+Grappler is also offered from source-linked feat metadata, with a +1 Strength or Dexterity choice,
+non-repeatability, and a level-4 plus Strength-or-Dexterity-13 prerequisite checked before its own
+increase. Combat displays its Punch and Grab, Attack Advantage, and Fast Wrestler guidance;
+targets, grapple saves, movement, and conditional Advantage remain manually adjudicated. Other
+feat categories and Epic Boons are not yet offered by this workflow. Champion Fighters gain
 distinct Fighting Style choices. Barbarians gain Initiative
 advantage and an optional half-Speed movement reminder when entering Rage. Archery and Defense are calculated; Great Weapon
 Fighting and Two-Weapon Fighting use explicit conditional weapon-damage modes. Turn eligibility

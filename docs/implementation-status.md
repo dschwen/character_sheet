@@ -60,7 +60,7 @@ because some of its functionality exists or tests pass.
   feat selections and their ability allocations on the acquisition level; engine validation checks
   grant levels, feat prerequisites, counts, patterns, and consistency with aggregate bonuses.
   Advancement locks earlier choices and preserves legacy totals without inventing acquisition
-  history. Grappler and the full General/Epic Boon selection workflow remain outstanding.
+  history. The full General/Epic Boon selection workflow remains outstanding.
 - All twelve builders and same-class advancement workflows now reach level 8. Repeated ASI
   table entries resolve to their original source-linked feature. Bard and Rogue retain their
   existing Expertise counts. Full casters gain twelve selected prepared spells and 4/3/3/2
@@ -72,6 +72,14 @@ because some of its functionality exists or tests pass.
   with form selection, stat replacement, equipment, duration, and temporary HP manually resolved.
 
 ## Remaining milestone gates
+
+Grappler is now available through shared, catalog-driven creation/advancement controls alongside
+ASI. Per-acquisition records store the feat and ability allocation. The engine enforces its
+Strength-or-Dexterity prerequisite before its own increase, allowed +1 abilities, level, maximum,
+non-repeatability, and aggregate consistency. Earlier selections remain locked; ambiguous legacy
+qualification is not invented. Combat displays its three benefits as explicitly assisted guidance;
+target tracking, grapple resolution, movement and conditional Advantage are not automated. Browser
+interaction verification and independent semantic review remain outstanding.
 
 | Milestone                        | Current evidence and required remaining work                                                                                                                                                                                |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

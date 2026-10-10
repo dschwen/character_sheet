@@ -80,7 +80,7 @@
   ],
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 869,
+    "STRUCTURED": 870,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
@@ -97,7 +97,7 @@
     "equipment-gear": 83,
     "equipment-shield": 1,
     "equipment-weapon": 38,
-    "feat": 11,
+    "feat": 12,
     "rule-table": 14,
     "species": 9,
     "spell": 339,

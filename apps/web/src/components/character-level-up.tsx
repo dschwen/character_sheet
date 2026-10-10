@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 
 import type { CharacterDocument } from "@dnd/character-model";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
-import { asiLabel, asiOptions } from "../lib/ability-score-improvements";
+import { featIncreaseLabel } from "../lib/advancement-feats";
+import { AdvancementFeatSelect } from "./advancement-feat-select";
 
 import {
   createLevelUpDraft,
@@ -587,35 +588,23 @@ export function CharacterLevelUp({
               ))}
 
               {introducesAsi ? (
-                <label className="builder-field compact-field">
-                  Level {String(targetLevel)} Ability Score Improvement
-                  <select
-                    value={draft.asiAllocations[asiIndex]?.join(",")}
-                    onChange={(event) => {
-                      setDraft((value) =>
-                        value === undefined
-                          ? value
-                          : {
-                              ...value,
-                              asiAllocations: value.asiAllocations.map((allocation, index) =>
-                                index === asiIndex
-                                  ? (asiOptions.find(
-                                      (option) => option.value === event.target.value,
-                                    )?.allocation ?? allocation)
-                                  : allocation,
-                              ),
-                            },
-                      );
-                    }}
-                  >
-                    {asiOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <small>The resulting score is validated by the rules engine.</small>
-                </label>
+                <AdvancementFeatSelect
+                  draft={draft}
+                  catalog={catalog}
+                  index={asiIndex}
+                  onChange={(selection) => {
+                    setDraft((value) =>
+                      value === undefined
+                        ? value
+                        : {
+                            ...value,
+                            advancementFeats: value.advancementFeats.map((allocation, index) =>
+                              index === asiIndex ? selection : allocation,
+                            ),
+                          },
+                    );
+                  }}
+                />
               ) : null}
 
               {newMasteryCount > 0 ? (
@@ -970,7 +959,10 @@ export function CharacterLevelUp({
                   {introducesSubclass ? <small>{selectedClass.subclassName} added</small> : null}
                   {introducesAsi ? (
                     <small>
-                      {asiLabel(draft.asiAllocations[asiIndex] ?? ["strength", "strength"])}
+                      {catalog.feats[draft.advancementFeats[asiIndex]?.featId ?? ""]?.name}:{" "}
+                      {draft.advancementFeats[asiIndex] === undefined
+                        ? ""
+                        : featIncreaseLabel(draft.advancementFeats[asiIndex])}
                     </small>
                   ) : null}
                 </article>

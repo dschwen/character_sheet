@@ -6,9 +6,12 @@ offer all 21 allocations through shared controls. The granting levels come from 
 source-linked progression table, including Fighter's extra level-6 grant and third grant at 8.
 All twelve class builders and same-class advancement workflows reach level 8. Repeated ASI
 entries in the source progression tables resolve to the original class feature rather than a
-missing reference. General feats beyond ASI remain an explicit unfinished workflow.
+missing reference. Grappler is now available alongside ASI; additional feat categories and Epic
+Boons remain an unfinished workflow.
 
-The draft stores allocations as two ability points. Saved documents retain the existing
+The draft stores generic feat IDs and per-feat ability increases, not class-specific ASI tuples.
+Shared controls generate the legal options from each supported feat's source-linked patterns,
+allowed abilities, repeatability, prerequisite, and maximum score. Saved documents retain the existing
 `build.featIds` and `build.featAbilityScoreIncreases` fields and additionally record each new
 General feat selection in `build.levels[].featSelections`. Each entry contains its `featId` and
 `abilityScoreIncreases`, allowing later General feat options without a class-specific UI branch.
@@ -29,9 +32,23 @@ produce an explanatory error rather than silently granting default bonuses.
 
 Defaults retain existing choices and choose a legal new allocation where available. Users may
 choose another allocation, and the complete rules evaluation must pass before confirmation.
-Grappler and other General/Epic Boon choices remain outside this workflow until their metadata,
-prerequisites, mechanics, and selection controls are implemented and tested. Optional combat
-timing and the other documented assisted Fighter mechanics remain unchanged.
+
+## Grappler
+
+The pinned page-87 feat grants +1 Strength or Dexterity (maximum 20), requires character level 4
+and Strength **or** Dexterity 13, and is not repeatable. Its prerequisite is evaluated at acquisition,
+before its own increase and before later feat bonuses. Explicit earlier acquisition records may
+qualify the character; ambiguous legacy aggregate bonuses are not assumed to have occurred earlier.
+Sheets with an unrecorded ability-prerequisite feat need their history repaired explicitly before
+advancement. Recorded Grappler plus unrecorded legacy ASIs is supported when qualification can
+be established without guessing the ASIs' historical order.
+
+Creation and advancement share one selector. Advancement cannot change a previous feat ID or
+its allocation. Combat shows source-derived Punch and Grab, Attack Advantage, and Fast Wrestler
+guidance. These benefits remain assisted: targets, the grapple save/condition, once-per-turn timing,
+size, movement costs, and target-specific Advantage are manual. The attack buttons do not grant
+global Advantage from Grappler. No character model migration or unrelated play-state rewrite is
+needed. Source extraction and tests do not constitute independent semantic review.
 
 ## Other level-8 progression
 

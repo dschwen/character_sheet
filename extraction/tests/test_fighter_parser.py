@@ -4,11 +4,72 @@ import pytest
 
 from srd_extract.fighter import (
     _class_entity,
+    _grappler_entity,
     extract_champion_features,
     extract_fighting_styles,
     parse_core_traits,
     parse_progression,
 )
+
+
+def test_grappler_metadata_and_source_boundaries() -> None:
+    text = (
+        "General Feat (Prerequisite: Level 4+, Strength or Dexterity 13+) "
+        "Increase your Strength or Dexterity score by 1, to a maximum of 20. "
+        "Punch and Grab can be used only once per turn. "
+        "Attack Advantage against a creature Grappled by you. "
+        "Fast Wrestler applies when it is your size or smaller."
+    )
+    nodes: list[dict[str, Any]] = [
+        {
+            "kind": "HeadingNode",
+            "normalizedText": "Grappler",
+            "parentId": "page-0087",
+            "sourceBlocks": ["grappler"],
+        },
+        {
+            "kind": "ParagraphNode",
+            "normalizedText": text,
+            "parentId": "page-0087",
+            "sourceBlocks": ["benefits"],
+        },
+        {
+            "kind": "HeadingNode",
+            "normalizedText": "Other feat",
+            "parentId": "page-0087",
+            "sourceBlocks": ["other"],
+        },
+        {
+            "kind": "ParagraphNode",
+            "normalizedText": "Unrelated content",
+            "parentId": "page-0087",
+            "sourceBlocks": ["unrelated"],
+        },
+    ]
+    feat = _grappler_entity({"nodes": nodes})
+    assert feat["id"] == "srd521.feat.general.grappler"
+    assert feat["source"][0]["page"] == 87
+    assert feat["source"][0]["blocks"] == ["grappler", "benefits"]
+    assert feat["body"]["abilityScoreIncreaseAbilities"] == ["strength", "dexterity"]
+    assert feat["body"]["abilityScoreIncreasePatterns"] == [[1]]
+    assert feat["body"]["maximumAbilityScore"] == 20
+    assert feat["body"]["prerequisite"]["minimumCharacterLevel"] == 4
+    assert feat["body"]["repeatable"] is False
+    assert len(feat["body"]["combatGuidance"]) == 3
+    assert "Unrelated content" not in str(feat)
+    for phrase in [
+        "Level 4+",
+        "Strength or Dexterity 13+",
+        "Increase your Strength or Dexterity score by 1",
+        "to a maximum of 20",
+        "Grappled by you",
+        "only once per turn",
+        "your size or smaller",
+    ]:
+        broken = {"nodes": [dict(node) for node in nodes]}
+        broken["nodes"][1]["normalizedText"] = text.replace(phrase, "missing")
+        with pytest.raises(ValueError, match="Grappler source is missing"):
+            _grappler_entity(broken)
 
 
 def _word(text: str, x: float, y: float) -> dict[str, Any]:

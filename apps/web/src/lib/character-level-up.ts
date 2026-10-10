@@ -20,7 +20,7 @@ import {
   type MagicInitiateSelection,
 } from "./character-builder";
 import { abilities, type Ability } from "./presentation";
-import { asiIncreases, savedAsiAllocations } from "./ability-score-improvements";
+import { featSelectionKey, savedAdvancementFeats } from "./advancement-feats";
 
 export interface LevelUpEligibility {
   eligible: boolean;
@@ -225,7 +225,7 @@ export function createLevelUpDraft(
     ),
     originFeatId: originFeatId ?? "",
     abilityScores: { ...character.build.abilityScores },
-    asiAllocations: savedAsiAllocations(
+    advancementFeats: savedAdvancementFeats(
       character,
       selectedClass.abilityScoreImprovementLevels.filter(
         (level) => level <= eligibility.currentLevel,
@@ -287,12 +287,11 @@ function advancementIssues(
     (level) => level < targetLevel,
   );
   try {
-    const saved = savedAsiAllocations(character, previousAsiLevels);
+    const saved = savedAdvancementFeats(character, previousAsiLevels);
     if (
       saved.some((allocation, index) => {
-        const before = asiIncreases([allocation]);
-        const after = asiIncreases(draft.asiAllocations.slice(index, index + 1));
-        return abilities.some((ability) => before[ability] !== after[ability]);
+        const after = draft.advancementFeats[index];
+        return after === undefined || featSelectionKey(allocation) !== featSelectionKey(after);
       })
     )
       issues.push("Earlier Ability Score Improvement allocations cannot change during level up.");

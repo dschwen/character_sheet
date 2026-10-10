@@ -1103,6 +1103,76 @@ def extract_fighting_styles(document: dict[str, Any]) -> list[dict[str, Any]]:
     return entities
 
 
+def _grappler_entity(document: dict[str, Any]) -> dict[str, Any]:
+    nodes = document["nodes"]
+    start = next(
+        index
+        for index, node in enumerate(nodes)
+        if node["kind"] == "HeadingNode" and node["normalizedText"] == "Grappler"
+    )
+    selected = [nodes[start]]
+    for node in nodes[start + 1 :]:
+        if node["kind"] == "HeadingNode":
+            break
+        if node["kind"] != "MetadataNode":
+            selected.append(node)
+    text = " ".join(node["normalizedText"] for node in selected)
+    for phrase in [
+        "Level 4+",
+        "Strength or Dexterity 13+",
+        "Increase your Strength or Dexterity score by 1",
+        "to a maximum of 20",
+        "Grappled by you",
+        "only once per turn",
+        "your size or smaller",
+    ]:
+        if phrase not in text:
+            raise ValueError(f"Grappler source is missing {phrase}")
+    return {
+        "id": "srd521.feat.general.grappler",
+        "kind": "feat",
+        "name": {"en": "Grappler"},
+        "tags": ["feat", "general"],
+        "source": list(_source_spans_for_nodes(selected)),
+        "body": {
+            "category": "general",
+            "repeatable": False,
+            "prerequisite": {
+                "minimumCharacterLevel": 4,
+                "anyAbilityScoreMinimums": [
+                    {"ability": "strength", "minimum": 13},
+                    {"ability": "dexterity", "minimum": 13},
+                ],
+            },
+            "abilityScoreIncreasePatterns": [[1]],
+            "abilityScoreIncreaseAbilities": ["strength", "dexterity"],
+            "maximumAbilityScore": 20,
+            "combatGuidance": [
+                "Punch and Grab: once per turn, after hitting a creature with an Unarmed Strike "
+                "as part of the Attack action on your turn, use both the Damage and Grapple "
+                "options. Resolve the target's save and Grappled condition on its sheet.",
+                "Attack Advantage: you have Advantage on attack rolls against a creature Grappled "
+                "by you, not a creature grappled by someone else. Resolve cancellation with "
+                "Disadvantage normally.",
+                "Fast Wrestler: moving a creature Grappled by you costs no extra movement if it "
+                "is your size or smaller. Resolve size, movement, and remaining Speed manually.",
+            ],
+            "automationLevel": "roll-assisted",
+            "text": {
+                "title": "Grappler",
+                "nodes": [
+                    {"kind": node["kind"], "text": node["normalizedText"]} for node in selected[1:]
+                ],
+            },
+        },
+        "rules": [],
+        "review": _review(
+            "Source-linked Grappler; ability increases automated, target-specific combat benefits "
+            "assisted. Independent review outstanding."
+        ),
+    }
+
+
 def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, Any]:
     raw_page = read_json(extraction_root / "raw" / "pages" / "0047.json")
     layout = read_json(extraction_root / "layout" / "pages" / "0047.json")
@@ -1161,6 +1231,7 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
         *fighting_styles,
         *champion_entities,
         asi_entity,
+        _grappler_entity(document),
     ]
     existing = read_json(output / "entities.json")
     replacements = {entity["id"]: entity for entity in fighter_entities}

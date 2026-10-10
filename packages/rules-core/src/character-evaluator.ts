@@ -559,9 +559,18 @@ const featBodySchema = z
     prerequisite: z
       .object({
         minimumCharacterLevel: z.number().int().positive(),
+        anyAbilityScoreMinimums: z
+          .array(
+            z.object({
+              ability: z.enum(abilities),
+              minimum: z.number().int().positive(),
+            }),
+          )
+          .optional(),
       })
       .optional(),
     abilityScoreIncreasePatterns: z.array(z.array(z.number().int().positive())).optional(),
+    abilityScoreIncreaseAbilities: z.array(z.enum(abilities)).optional(),
     maximumAbilityScore: z.number().int().positive().optional(),
     proficiencyChoice: z
       .object({
@@ -2703,6 +2712,9 @@ function validateProgressionSelections(
   );
   const recordedCounts = new Map<string, number>();
   const levelsSeen = new Map<string, number>();
+  const acquiredIncreases: Partial<Record<Ability, number>> = {};
+  // Unrecorded legacy ASIs have no recoverable acquisition order. Their totals must
+  // not qualify a recorded feat retroactively; require explicit history for that.
   for (const level of character.build.levels) {
     const classLevel = (levelsSeen.get(level.classId) ?? 0) + 1;
     levelsSeen.set(level.classId, classLevel);
@@ -2728,6 +2740,22 @@ function validateProgressionSelections(
       const entity = index.entities.get(selection.featId);
       const body = entity?.kind === "feat" ? featBodySchema.parse(entity.body) : undefined;
       if (
+        body?.prerequisite?.anyAbilityScoreMinimums !== undefined &&
+        !body.prerequisite.anyAbilityScoreMinimums.some(
+          ({ ability, minimum }) =>
+            character.build.abilityScores[ability] +
+              (character.build.backgroundAbilityScoreIncreases[ability] ?? 0) +
+              (acquiredIncreases[ability] ?? 0) >=
+            minimum,
+        )
+      )
+        addValidation(
+          state,
+          "FEAT_ABILITY_PREREQUISITE",
+          "Feat ability prerequisites must be met before its own increase, using recorded earlier acquisitions.",
+          ["build.levels"],
+        );
+      if (
         body?.category !== "general" ||
         (body.prerequisite?.minimumCharacterLevel ?? 0) > level.characterLevel
       )
@@ -2747,7 +2775,22 @@ function validateProgressionSelections(
           "Recorded feat does not grant ability score increases.",
           ["build.levels"],
         );
+      for (const ability of abilities)
+        acquiredIncreases[ability] =
+          (acquiredIncreases[ability] ?? 0) + (selection.abilityScoreIncreases[ability] ?? 0);
     }
+  }
+  for (const featId of selectedGeneralFeats) {
+    const feat = index.entities.get(featId);
+    const prerequisite =
+      feat === undefined ? undefined : featBodySchema.parse(feat.body).prerequisite;
+    if (prerequisite?.anyAbilityScoreMinimums !== undefined && !recordedCounts.has(featId))
+      addValidation(
+        state,
+        "FEAT_ACQUISITION_HISTORY_REQUIRED",
+        "Ability-prerequisite feats require a recorded acquisition so qualification can be checked before their own increase.",
+        ["build.levels"],
+      );
   }
   for (const [featId, count] of recordedCounts) {
     if (count > selectedGeneralFeats.filter((id) => id === featId).length)
@@ -2808,9 +2851,17 @@ function validateProgressionSelections(
     };
     const pendingRecords = [...recordedFeatSelections];
     const allocationsByFeat = abilityIncreaseFeats.map((feat) => {
-      const possible = (featBodySchema.parse(feat.body).abilityScoreIncreasePatterns ?? []).flatMap(
-        allocationsForPattern,
-      );
+      const featBody = featBodySchema.parse(feat.body);
+      const possible = (featBody.abilityScoreIncreasePatterns ?? [])
+        .flatMap(allocationsForPattern)
+        .filter((allocation) =>
+          abilities.every(
+            (ability, index) =>
+              allocation[index] === 0 ||
+              featBody.abilityScoreIncreaseAbilities === undefined ||
+              featBody.abilityScoreIncreaseAbilities.includes(ability),
+          ),
+        );
       const recordIndex = pendingRecords.findIndex((record) => record.featId === feat.id);
       if (recordIndex < 0) return possible;
       const [record] = pendingRecords.splice(recordIndex, 1);

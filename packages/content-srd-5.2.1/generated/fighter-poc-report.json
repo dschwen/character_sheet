@@ -68,7 +68,8 @@
     "srd521.subclass-feature.fighter.champion.heroic-warrior",
     "srd521.subclass-feature.fighter.champion.superior-critical",
     "srd521.subclass-feature.fighter.champion.survivor",
-    "srd521.feat.general.ability-score-improvement"
+    "srd521.feat.general.ability-score-improvement",
+    "srd521.feat.general.grappler"
   ],
   "progression": [
     {

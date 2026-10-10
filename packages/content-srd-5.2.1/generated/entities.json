@@ -53078,5 +53078,81 @@
       "druid",
       "elemental-fury"
     ]
+  },
+  {
+    "body": {
+      "abilityScoreIncreaseAbilities": [
+        "strength",
+        "dexterity"
+      ],
+      "abilityScoreIncreasePatterns": [
+        [
+          1
+        ]
+      ],
+      "automationLevel": "roll-assisted",
+      "category": "general",
+      "combatGuidance": [
+        "Punch and Grab: once per turn, after hitting a creature with an Unarmed Strike as part of the Attack action on your turn, use both the Damage and Grapple options. Resolve the target's save and Grappled condition on its sheet.",
+        "Attack Advantage: you have Advantage on attack rolls against a creature Grappled by you, not a creature grappled by someone else. Resolve cancellation with Disadvantage normally.",
+        "Fast Wrestler: moving a creature Grappled by you costs no extra movement if it is your size or smaller. Resolve size, movement, and remaining Speed manually."
+      ],
+      "maximumAbilityScore": 20,
+      "prerequisite": {
+        "anyAbilityScoreMinimums": [
+          {
+            "ability": "strength",
+            "minimum": 13
+          },
+          {
+            "ability": "dexterity",
+            "minimum": 13
+          }
+        ],
+        "minimumCharacterLevel": 4
+      },
+      "repeatable": false,
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "General Feat (Prerequisite: Level 4+, Strength or Dexterity 13+)"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain the following benefits. Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Punch and Grab. When you hit a creature with an Unarmed Strike as part of the Attack action on your turn, you can use both the Damage and the Grapple option. You can use this benefit only once per turn. Attack Advantage. You have Advantage on attack rolls against a creature Grappled by you. Fast Wrestler. You don’t have to spend extra movement to move a creature Grappled by you if the creature is your size or smaller."
+          }
+        ],
+        "title": "Grappler"
+      }
+    },
+    "id": "srd521.feat.general.grappler",
+    "kind": "feat",
+    "name": {
+      "en": "Grappler"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Source-linked Grappler; ability increases automated, target-specific combat benefits assisted. Independent review outstanding.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0087-b016",
+          "p0087-b017"
+        ],
+        "page": 87,
+        "quoteHash": "db8dafb08a46318f1ce144a0e9136eef5bff34d31273ab782ca241689a417112",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "general"
+    ]
   }
 ]

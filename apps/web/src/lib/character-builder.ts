@@ -12,13 +12,16 @@ import type { CharacterEvaluation, LoadedRulesPackage } from "@dnd/rules-api";
 import { evaluateCharacter } from "@dnd/rules-core";
 
 import { abilities, type Ability, shortEntityName, titleCase } from "./presentation";
+import { asiIncreases, asiOptions } from "./ability-score-improvements";
 import {
-  abilityScoreImprovementId,
-  asiIncreases,
-  asiOptions,
-  validAsiAllocation,
-  type AsiAllocation,
-} from "./ability-score-improvements";
+  advancementFeatMetadataSchema,
+  asiFeatSelection,
+  featIncreases,
+  featAllocationOptions,
+  featSelectionKey,
+  type AdvancementFeatMetadata,
+  type AdvancementFeatSelection,
+} from "./advancement-feats";
 
 export const fighterId = "srd521.class.fighter";
 export const wizardId = "srd521.class.wizard";
@@ -81,7 +84,7 @@ export interface CharacterBuilderDraft {
   name: string;
   level: number;
   abilityScores: Record<Ability, number>;
-  asiAllocations: AsiAllocation[];
+  advancementFeats: AdvancementFeatSelection[];
   classSkillIds: string[];
   speciesSkillIds: string[];
   speciesChoiceSelections: Readonly<Record<string, string[]>>;
@@ -171,6 +174,7 @@ export interface FeatBuilderCatalog {
   description: string;
   category: string;
   repeatable: boolean;
+  advancement?: AdvancementFeatMetadata;
   skillMinimum: number;
   skillMaximum: number;
   magicInitiate?: MagicInitiateCatalog;
@@ -934,6 +938,9 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
             description: entityDescription(candidate),
             category: typeof body?.category === "string" ? body.category : "unknown",
             repeatable: body?.repeatable === true,
+            ...(advancementFeatMetadataSchema.safeParse(body).success
+              ? { advancement: advancementFeatMetadataSchema.parse(body) }
+              : {}),
             skillMinimum: categories.includes("skill")
               ? numericValue(proficiencyChoice?.minimum)
               : 0,
@@ -1751,25 +1758,61 @@ function reconciledFeatureChoiceSelections(
   );
 }
 
+/** Catalog-driven advancement choices; only fully supported metadata is offered. */
+export function advancementOptions(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  index: number,
+) {
+  const grantLevel = catalog.classes[draft.classId].abilityScoreImprovementLevels[index] ?? 0;
+  const earlier = draft.advancementFeats.slice(0, index);
+  const bonuses = featIncreases(earlier);
+  const score = (ability: Ability) =>
+    draft.abilityScores[ability] +
+    (draft.backgroundAbilityScoreIncreases[ability] ?? 0) +
+    (bonuses[ability] ?? 0);
+  return Object.values(catalog.feats).flatMap((feat) => {
+    const metadata = feat.advancement;
+    if (metadata === undefined || (metadata.prerequisite?.minimumCharacterLevel ?? 0) > grantLevel)
+      return [];
+    if (!metadata.repeatable && earlier.some((selection) => selection.featId === feat.id))
+      return [];
+    if (
+      metadata.prerequisite?.anyAbilityScoreMinimums !== undefined &&
+      !metadata.prerequisite.anyAbilityScoreMinimums.some(
+        ({ ability, minimum }) => score(ability) >= minimum,
+      )
+    )
+      return [];
+    return featAllocationOptions(feat).filter(({ selection }) =>
+      abilities.every(
+        (ability) =>
+          score(ability) + (selection.abilityScoreIncreases[ability] ?? 0) <=
+          metadata.maximumAbilityScore,
+      ),
+    );
+  });
+}
+
 function reconciledAsiAllocations(
   selectedClass: ClassBuilderCatalog,
-  current: readonly AsiAllocation[],
+  current: readonly AdvancementFeatSelection[],
   level: number,
   abilityScores: Readonly<Record<Ability, number>>,
   backgroundIncreases: Partial<Record<Ability, number>>,
-): AsiAllocation[] {
+): AdvancementFeatSelection[] {
   const count = selectedClass.abilityScoreImprovementLevels.filter(
     (grantLevel) => grantLevel <= level,
   ).length;
-  const result: AsiAllocation[] = [];
+  const result: AdvancementFeatSelection[] = [];
   for (let index = 0; index < count; index++) {
     const previous = current[index];
     if (previous !== undefined) {
-      result.push([...previous]);
+      result.push(structuredClone(previous));
       continue;
     }
     const preferred = selectedClass.builder.defaultAbilityScoreImprovementAbility;
-    const increases = asiIncreases(result);
+    const increases = featIncreases(result);
     const candidates = [...asiOptions].sort(
       (left, right) =>
         Number(right.allocation.every((ability) => ability === preferred)) -
@@ -1786,7 +1829,9 @@ function reconciledAsiAllocations(
           20,
       );
     });
-    result.push(chosen === undefined ? [preferred, preferred] : [...chosen.allocation]);
+    result.push(
+      asiFeatSelection(chosen === undefined ? [preferred, preferred] : chosen.allocation),
+    );
   }
   return result;
 }
@@ -1963,7 +2008,7 @@ export function defaultBuilderDraft(
     name,
     level,
     abilityScores: { ...selectedClass.builder.defaultAbilityScores },
-    asiAllocations: reconciledAsiAllocations(
+    advancementFeats: reconciledAsiAllocations(
       selectedClass,
       [],
       level,
@@ -2028,9 +2073,9 @@ export function updateBuilderLevel(
     ...draft,
     level,
     classSkillIds,
-    asiAllocations: reconciledAsiAllocations(
+    advancementFeats: reconciledAsiAllocations(
       selectedClass,
-      draft.asiAllocations,
+      draft.advancementFeats,
       level,
       draft.abilityScores,
       draft.backgroundAbilityScoreIncreases,
@@ -2163,10 +2208,17 @@ export function validateBuilderDraft(
     (level) => level <= draft.level,
   ).length;
   if (
-    draft.asiAllocations.length !== requiredAsiCount ||
-    draft.asiAllocations.some((allocation) => !validAsiAllocation(allocation))
+    draft.advancementFeats.length !== requiredAsiCount ||
+    draft.advancementFeats.some(
+      (selection, index) =>
+        !advancementOptions(draft, catalog, index).some(
+          (option) => option.value === featSelectionKey(selection),
+        ),
+    )
   ) {
-    issues.push(`Choose ${String(requiredAsiCount)} Ability Score Improvement allocation(s).`);
+    issues.push(
+      `Choose ${String(requiredAsiCount)} legal advancement feat allocation(s), meeting prerequisites before each increase.`,
+    );
   }
   for (const ability of abilities) {
     const score = draft.abilityScores[ability];
@@ -2461,14 +2513,11 @@ function assembleCharacter(
     ...(selectedClass.abilityScoreImprovementLevels.includes(index + 1)
       ? {
           featSelections: [
-            {
-              featId: abilityScoreImprovementId,
-              abilityScoreIncreases: asiIncreases([
-                draft.asiAllocations[
-                  selectedClass.abilityScoreImprovementLevels.indexOf(index + 1)
-                ] ?? ["strength", "strength"],
-              ]),
-            },
+            structuredClone(
+              draft.advancementFeats[
+                selectedClass.abilityScoreImprovementLevels.indexOf(index + 1)
+              ] ?? asiFeatSelection(["strength", "strength"]),
+            ),
           ],
         }
       : {}),
@@ -2489,7 +2538,7 @@ function assembleCharacter(
       ...(selectedOriginFeat === undefined ? [] : [selectedOriginFeat.id]),
     ]),
   ];
-  featIds.push(...draft.asiAllocations.map(() => abilityScoreImprovementId));
+  featIds.push(...draft.advancementFeats.map((selection) => selection.featId));
   const timestamp = options.now.toISOString();
   const spellcaster = selectedClass.spellcasting !== undefined;
   const hasSubclass =
@@ -2545,7 +2594,7 @@ function assembleCharacter(
       backgroundId: selectedBackground.id,
       backgroundAbilityScoreIncreases: draft.backgroundAbilityScoreIncreases,
       ...(hasSubclass ? { subclassId: selectedClass.subclassId } : {}),
-      featAbilityScoreIncreases: asiIncreases(draft.asiAllocations),
+      featAbilityScoreIncreases: featIncreases(draft.advancementFeats),
       featIds,
       learnedSpellIds: spellcaster ? draft.learnedSpellIds : [],
       choices: [

@@ -2978,6 +2978,24 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             {tab === "combat" ? (
               <div className="sheet-grid two-column">
                 <Section title="Attacks" eyebrow="Attack action">
+                  {character.build.featIds.flatMap((featId) =>
+                    (builderCatalog.feats[featId]?.advancement?.combatGuidance ?? []).map(
+                      (guidance) => (
+                        <p className="builder-callout" key={`${featId}:${guidance}`}>
+                          {guidance}
+                        </p>
+                      ),
+                    ),
+                  )}
+                  {character.build.featIds.some(
+                    (featId) =>
+                      (builderCatalog.feats[featId]?.advancement?.combatGuidance.length ?? 0) > 0,
+                  ) ? (
+                    <p className="empty">
+                      Target-specific feat benefits are assisted: attack buttons do not
+                      automatically apply their Advantage or track targets.
+                    </p>
+                  ) : null}
                   {evaluation.attacks.length === 0 ? (
                     <p className="empty">No attacks in this loadout.</p>
                   ) : (

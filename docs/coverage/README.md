@@ -8,7 +8,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | --- | ---: |
 | UNCLASSIFIED | 0 |
 | TEXT_ONLY | 0 |
-| STRUCTURED | 869 |
+| STRUCTURED | 870 |
 | EXECUTABLE | 0 |
 | TESTED | 0 |
 | VERIFIED | 0 |
@@ -54,7 +54,7 @@ See `docs/rules-engine` for class-specific assisted mechanics and limits.
 | equipment-gear | 83 |
 | equipment-shield | 1 |
 | equipment-weapon | 38 |
-| feat | 11 |
+| feat | 12 |
 | rule-table | 14 |
 | species | 9 |
 | spell | 339 |
