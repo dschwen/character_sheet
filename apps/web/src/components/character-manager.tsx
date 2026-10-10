@@ -2291,6 +2291,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   : `Level ${String(spell.level)} · ${spell.prepared ? "Prepared" : "Not prepared"}`}
                                 {spell.concentration ? " · Concentration" : ""}
                               </small>
+                              {spell.effectsRequireReview ? (
+                                <small>
+                                  Effects assisted · Use the source text; damage and conditional
+                                  effects are not automated.
+                                </small>
+                              ) : null}
                               {spellRollControls(spell, spell.level === 0 ? undefined : slotLevel)}
                             </div>
                             <div className="spell-cast-controls">
@@ -3027,6 +3033,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             </small>
                           </span>
                           <span className="spell-badges">
+                            {spell.effectsRequireReview ? (
+                              <i title="Damage and conditional effects require source-text adjudication.">
+                                Effects assisted
+                              </i>
+                            ) : null}
                             {spell.prepared ? <i>Prepared</i> : null}
                             {spell.concentration ? <i>Concentration</i> : null}
                             {spell.ritual ? <i>Ritual</i> : null}

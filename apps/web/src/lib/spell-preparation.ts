@@ -1,4 +1,5 @@
 import { characterDocumentSchema, type CharacterDocument } from "@dnd/character-model";
+import { classFeatureChoiceSchema } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 import { evaluateCharacter } from "@dnd/rules-core";
 
@@ -109,6 +110,21 @@ export function spellPreparationEditor(
   const subclassBody = objectValue(subclassEntity?.body);
   const selectedOptions = selectedFeatureOptionIds(character);
   const alwaysPreparedSpellIds = [
+    ...[classBody, subclassBody]
+      .flatMap((body) => Object.values(body ?? {}))
+      .flatMap((value) => {
+        const choice = classFeatureChoiceSchema.safeParse(value);
+        if (
+          !choice.success ||
+          choice.data.spellSelection?.castingClassId !== classEntity.id ||
+          choice.data.level > classLevel
+        )
+          return [];
+        return character.build.levels
+          .flatMap((level) => level.selectedFeatureChoices)
+          .filter((selection) => selection.choiceId === choice.data.id)
+          .flatMap((selection) => selection.optionIds);
+      }),
     ...grantsThroughLevel(classBody?.alwaysPreparedSpells, classLevel),
     ...grantsThroughLevel(subclassBody?.alwaysPreparedSpells, classLevel),
     ...choiceGrantedSpells(subclassBody?.alwaysPreparedSpellChoices, selectedOptions, classLevel),

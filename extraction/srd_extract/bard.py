@@ -438,12 +438,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 6)},
+                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 7)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -467,7 +467,7 @@ def _class_entity(
                     "minimumLevel": 2,
                     "requireClassProficiency": False,
                     "eligibleSkillIds": all_skills,
-                    "countByLevel": {str(level): 2 for level in range(2, 6)},
+                    "countByLevel": {str(level): 2 for level in range(2, 7)},
                 },
             },
             "spellcastingAbility": "charisma",
@@ -744,15 +744,38 @@ def generate_bard_content(class_root: Path, spell_root: Path, output: Path) -> d
         *_lore_entities(document, lore),
         *spells,
     ]
-    replacement = {entity["id"] for entity in entities}
-    all_entities = [
-        *[
-            entity
-            for entity in read_json(output / "entities.json")
-            if entity["id"] not in replacement
-        ],
-        *entities,
-    ]
+    existing = read_json(output / "entities.json")
+    source_class_ids = ["srd521.class.cleric", "srd521.class.druid", "srd521.class.wizard"]
+    source_classes = [entity for entity in existing if entity["id"] in source_class_ids]
+    if len(source_classes) != len(source_class_ids):
+        raise ValueError("Generate Cleric, Druid, and Wizard lists before Bard spell choices.")
+    spell_options = sorted(
+        {spell for entity in source_classes for spell in entity["body"]["spellList"]}
+    )
+    discoveries = next(feature for feature in lore if feature["name"] == "Magical Discoveries")
+    for entity in entities:
+        if entity["id"] == SUBCLASS_ID:
+            entity["body"]["magicalDiscoveriesChoice"] = {
+                "id": "srd521.choice.bard.magical-discoveries",
+                "level": discoveries["level"],
+                "minimum": 2,
+                "maximum": 2,
+                "options": spell_options,
+                "defaultOptionIds": ["srd521.spell.counterspell", "srd521.spell.spiritual-weapon"],
+                "changeOn": ["level-up"],
+                "replacementMaximum": 1,
+                "spellSelection": {
+                    "sourceFeatureId": discoveries["id"],
+                    "castingClassId": CLASS_ID,
+                    "sourceClassIds": source_class_ids,
+                    "alwaysPrepared": True,
+                    "allowCantrips": True,
+                },
+            }
+    replacements = {entity["id"]: entity for entity in entities if entity["kind"] != "spell"}
+    existing_ids = {entity["id"] for entity in existing}
+    all_entities = [replacements.get(entity["id"], entity) for entity in existing]
+    all_entities.extend(entity for entity in entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "bard.json", entities)
     write_json(output / "entities.json", all_entities)
     by_name = {feature["name"]: feature for feature in features}
@@ -768,10 +791,6 @@ def generate_bard_content(class_root: Path, spell_root: Path, output: Path) -> d
         write_json(output / "authoring-ir" / filename, ir)
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
-    coverage["note"] = (
-        "Bard, Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, "
-        "Warlock, and Wizard through level 5, Human, Soldier, equipment, and representative spells."
-    )
     write_json(output / "coverage.json", coverage)
     report = {
         "classId": CLASS_ID,

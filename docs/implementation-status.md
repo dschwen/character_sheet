@@ -12,6 +12,8 @@ because some of its functionality exists or tests pass.
   are in `packages/rules-core` and have focused, property, and class integration tests.
 - Source-linked class progression tables cover levels 1–20, but implemented builder limits are
   lower. The exact current limits and review counts are generated in [Rules coverage](coverage/README.md).
+- All 339 spell descriptions are loaded, and every class spell-list reference resolves. Newly
+  extracted spell effects are display-only and explicitly assisted, not complete rules automation.
 - Acquisition, layout extraction, normalization, repeated parsers, and reviewed-formula annotation
   commands are in `extraction/srd_extract`. Generation is incremental; end-to-end clean regeneration
   of every artifact still needs a single verified workflow.
@@ -47,6 +49,6 @@ the plan's explicit deferred work, not a character-sheet completion gate.
 4. Audit each requirement and exit criterion in the original plan against authoritative artifacts,
    commands, tests, and rendered behavior before marking the overall goal complete.
 
-Browser verification is currently outstanding for the latest healing, aura, recovery, and post-roll bonus controls: no browser connection
+Browser verification is currently outstanding for the latest healing, aura, recovery, post-roll bonus, and spell-choice controls: no browser connection
 was available in the session. Engine/roll-helper tests, type checks, and a production build passed;
 these are not a substitute for rendered interaction verification.

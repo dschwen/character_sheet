@@ -226,6 +226,19 @@ export interface ClassFeatureChoiceCatalog extends Omit<ClassFeatureChoice, "opt
   changeOn?: ("level-up" | "short-rest" | "long-rest")[] | undefined;
 }
 
+export function featureChoiceOptionsForLevel(
+  choice: ClassFeatureChoiceCatalog,
+  level: number,
+  search = "",
+): ClassFeatureChoiceOptionCatalog[] {
+  if (choice.spellSelection === undefined) return choice.options;
+  const query = search.trim().toLocaleLowerCase();
+  return choice.options.filter(
+    (option) =>
+      option.minimumClassLevel <= level && option.name.toLocaleLowerCase().includes(query),
+  );
+}
+
 export type SpellPreparationMode = "spellbook" | "full-list";
 
 export interface SpellSelectionCounts {
@@ -463,6 +476,30 @@ function classCatalog(
           ...(option.kind === "feat" ? { grantedFeatId: option.id } : {}),
         };
       });
+      if (parsed.data.spellSelection !== undefined) {
+        for (const option of choiceOptions) {
+          const spell = rulesPackage.entities.find((entity) => entity.id === option.id);
+          const spellLevel = numericValue(objectValue(spell?.body)?.level, 99);
+          option.minimumClassLevel =
+            spellLevel === 0
+              ? parsed.data.spellSelection.allowCantrips
+                ? parsed.data.level
+                : 99
+              : Math.max(
+                  parsed.data.level,
+                  Math.min(
+                    ...progression.flatMap((row) => {
+                      const body = objectValue(row);
+                      const slots = objectValue(body?.spellSlots);
+                      return Object.keys(slots ?? {}).some((level) => Number(level) >= spellLevel)
+                        ? [numericValue(body?.level, 99)]
+                        : [];
+                    }),
+                  ),
+                );
+          option.description = `${spellLevel === 0 ? "Cantrip" : `Level ${String(spellLevel)}`} · Always prepared · ${parsed.data.spellSelection.sourceClassIds.map(shortEntityName).join(" / ")}`;
+        }
+      }
       return [{ ...parsed.data, options: choiceOptions }];
     })
     .sort((left, right) => left.level - right.level || left.id.localeCompare(right.id));
@@ -1411,12 +1448,20 @@ function featureChoiceSelectionLevels(
   if (selectedIds.some((optionId) => !options.has(optionId))) return undefined;
 
   if (choice.countByLevel === undefined) {
-    const levels = new Map(selectedIds.map((optionId) => [optionId, choice.level]));
+    const levels = new Map(
+      selectedIds.map((optionId) => [
+        optionId,
+        choice.spellSelection === undefined
+          ? choice.level
+          : Math.max(choice.level, options.get(optionId)?.minimumClassLevel ?? 1),
+      ]),
+    );
     return selectedIds.some((optionId) => {
       const option = options.get(optionId);
       return (
         option === undefined ||
-        option.minimumClassLevel > choice.level ||
+        option.minimumClassLevel >
+          (choice.spellSelection === undefined ? choice.level : targetLevel) ||
         option.prerequisiteOptionIds.some((prerequisiteId) => !selected.has(prerequisiteId))
       );
     })
@@ -1590,11 +1635,16 @@ export function spellSelectionCounts(
     .flatMap((option) =>
       spellsGrantedThroughLevel(option.alwaysPreparedSpellsByLevel, draft.level),
     );
+  const chosenSpells = selectedClass.featureChoices
+    .filter(
+      (choice) => choice.spellSelection?.alwaysPrepared === true && choice.level <= draft.level,
+    )
+    .flatMap((choice) => draft.featureChoiceSelections[choice.id] ?? []);
   return {
     ...counts,
     cantrips: counts.cantrips + additionalCantrips,
     alwaysPreparedSpellIds: [
-      ...new Set([...counts.alwaysPreparedSpellIds, ...choiceGrantedSpells]),
+      ...new Set([...counts.alwaysPreparedSpellIds, ...choiceGrantedSpells, ...chosenSpells]),
     ],
   };
 }

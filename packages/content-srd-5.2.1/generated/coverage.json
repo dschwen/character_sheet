@@ -12,7 +12,7 @@
       "name": "Barbarian"
     },
     {
-      "builderMaximum": 5,
+      "builderMaximum": 6,
       "builderMinimum": 1,
       "id": "srd521.class.bard",
       "name": "Bard"
@@ -80,7 +80,7 @@
   ],
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 603,
+    "STRUCTURED": 855,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
@@ -100,7 +100,7 @@
     "feat": 8,
     "rule-table": 14,
     "species": 9,
-    "spell": 87,
+    "spell": 339,
     "status": 15,
     "subclass": 12,
     "subclass-feature": 58,

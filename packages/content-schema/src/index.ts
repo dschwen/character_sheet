@@ -334,6 +334,16 @@ export const classFeatureChoiceSchema = z
     defaultOptionIds: z.array(entityIdSchema).optional(),
     changeOn: z.array(z.enum(["level-up", "short-rest", "long-rest"])).optional(),
     replacementMaximum: z.number().int().positive().optional(),
+    spellSelection: z
+      .object({
+        sourceFeatureId: entityIdSchema,
+        castingClassId: entityIdSchema,
+        sourceClassIds: z.array(entityIdSchema).min(1),
+        alwaysPrepared: z.literal(true),
+        allowCantrips: z.boolean(),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
   .superRefine((choice, context) => {

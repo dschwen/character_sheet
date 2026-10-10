@@ -15,6 +15,50 @@ import {
 } from "./index.js";
 
 describe("bootstrap content package", () => {
+  it("loads all source-linked spell descriptions and resolves every class spell-list entry", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const catalog = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities/spells.json", root), "utf8")));
+    const entities = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities.json", root), "utf8")));
+    expect(catalog).toHaveLength(339);
+    expect(new Set(catalog.map(({ id }) => id)).size).toBe(339);
+    const spells = new Map(
+      entities.filter(({ kind }) => kind === "spell").map((entity) => [entity.id, entity]),
+    );
+    for (const entity of entities.filter(({ kind }) => kind === "class")) {
+      const body = z
+        .object({ spellList: z.array(z.string()).default([]) })
+        .passthrough()
+        .parse(entity.body);
+      for (const id of body.spellList) expect(spells.has(id), `${entity.id}: ${id}`).toBe(true);
+    }
+    for (const spell of catalog) {
+      expect(spell.kind).toBe("spell");
+      expect(spell.source.length).toBeGreaterThan(0);
+      expect(
+        z
+          .object({
+            automationLevel: z.literal("display-only"),
+            castingTime: z.string().min(1),
+            description: z.string().min(1),
+            damage: z.array(z.unknown()).length(0),
+          })
+          .passthrough()
+          .safeParse(spell.body).success,
+        spell.id,
+      ).toBe(true);
+    }
+    const nondetection = catalog.find(({ id }) => id === "srd521.spell.nondetection");
+    expect(nondetection?.source.some(({ blocks }) => blocks?.includes("p0151-b008"))).toBe(true);
+    expect(nondetection?.body).toMatchObject({
+      components: {
+        materialText: "a pinch of diamond dust worth 25+ GP, which the spell consumes",
+      },
+    });
+  });
   it("loads and validates", () => {
     const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
     const manifest: unknown = JSON.parse(readFileSync(new URL("manifest.json", root), "utf8"));
@@ -23,7 +67,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(603);
+    expect(parsedEntities).toHaveLength(855);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -316,7 +360,7 @@ describe("bootstrap content package", () => {
       ],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.bard")?.builder).toMatchObject({
-      supportedLevelMaximum: 5,
+      supportedLevelMaximum: 6,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: [
         "srd521.skill.performance",

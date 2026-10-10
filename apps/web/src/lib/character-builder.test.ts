@@ -373,31 +373,29 @@ describe("guided character builder", () => {
     expect(evaluation.validations).toEqual([]);
   });
 
-  it("builds every supported class with each reviewed species and SRD background", () => {
+  it.each(builderClassIds)("builds %s with each reviewed species and SRD background", (classId) => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
 
-    for (const classId of builderClassIds) {
-      for (const backgroundId of Object.keys(catalog.backgrounds)) {
-        const backgroundDraft = updateBuilderBackground(
-          defaultBuilderDraft(classId, catalog, 1, "Background matrix hero"),
-          catalog,
-          backgroundId,
-        );
-        for (const speciesId of Object.keys(catalog.species)) {
-          const draft = updateBuilderSpecies(backgroundDraft, catalog, speciesId);
-          const character = buildCharacter(draft, rulesPackage, options);
-          const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+    for (const backgroundId of Object.keys(catalog.backgrounds)) {
+      const backgroundDraft = updateBuilderBackground(
+        defaultBuilderDraft(classId, catalog, 1, "Background matrix hero"),
+        catalog,
+        backgroundId,
+      );
+      for (const speciesId of Object.keys(catalog.species)) {
+        const draft = updateBuilderSpecies(backgroundDraft, catalog, speciesId);
+        const character = buildCharacter(draft, rulesPackage, options);
+        const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
 
-          expect(
-            validateBuilderDraft(draft, catalog),
-            `${classId} / ${speciesId} / ${backgroundId}`,
-          ).toEqual([]);
-          expect(evaluation.validations, `${classId} / ${speciesId} / ${backgroundId}`).toEqual([]);
-        }
+        expect(
+          validateBuilderDraft(draft, catalog),
+          `${classId} / ${speciesId} / ${backgroundId}`,
+        ).toEqual([]);
+        expect(evaluation.validations, `${classId} / ${speciesId} / ${backgroundId}`).toEqual([]);
       }
     }
-  }, 10_000);
+  });
 
   it("persists projected origin selections into a rules-valid character", () => {
     const { rulesPackage } = loadWebData();
@@ -982,15 +980,15 @@ describe("guided character builder", () => {
     }
   });
 
-  it("builds College of Lore Bards with Expertise and prepared spells through level 5", () => {
+  it("builds College of Lore Bards with Expertise and prepared spells through level 6", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [10, 17, 24, 31, 38];
-    const expectedCantrips = [2, 2, 2, 3, 3];
-    const expectedPrepared = [4, 5, 6, 7, 9];
-    const expectedSkills = [3, 3, 6, 6, 6];
+    const expectedHitPoints = [10, 17, 24, 31, 38, 45];
+    const expectedCantrips = [2, 2, 2, 3, 3, 3];
+    const expectedPrepared = [4, 5, 6, 7, 9, 10];
+    const expectedSkills = [3, 3, 6, 6, 6, 6];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(bardId, catalog, level, `Level ${String(level)} Bard`);
       const character = buildCharacter(draft, rulesPackage, options);
       const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });

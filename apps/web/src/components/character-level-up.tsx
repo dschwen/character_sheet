@@ -17,6 +17,7 @@ import {
   expertiseCount,
   expertiseSkillCandidates,
   featureChoiceCount,
+  featureChoiceOptionsForLevel,
   magicInitiateFeatIds,
   masteryCount,
   spellSelectionCounts,
@@ -72,6 +73,7 @@ export function CharacterLevelUp({
 }: Readonly<CharacterLevelUpProps>) {
   const catalog = useMemo(() => characterBuilderCatalog(rulesPackage), [rulesPackage]);
   const [step, setStep] = useState(0);
+  const [featureSearch, setFeatureSearch] = useState<Record<string, string>>({});
   const [initial] = useState(() => initialState(character, rulesPackage));
   const [draft, setDraft] = useState(initial.draft);
   const previewOptions = useMemo(
@@ -463,9 +465,36 @@ export function CharacterLevelUp({
                         ? `${String((draft.featureChoiceSelections[choice.id] ?? []).length)} / ${String(featureChoiceCount(choice, targetLevel))} selected · replace up to ${String(choice.replacementMaximum ?? 1)}`
                         : `${String((draft.featureChoiceSelections[choice.id] ?? []).length)} / ${String(featureChoiceCount(choice, targetLevel))} selected`}
                     </small>
+                    {choice.spellSelection === undefined ? null : (
+                      <label>
+                        Search eligible spells
+                        <input
+                          type="search"
+                          value={featureSearch[choice.id] ?? ""}
+                          onChange={(event) => {
+                            setFeatureSearch((current) => ({
+                              ...current,
+                              [choice.id]: event.target.value,
+                            }));
+                          }}
+                        />
+                        <small>
+                          Always prepared; these do not use your normal spell selections. Selected:{" "}
+                          {(draft.featureChoiceSelections[choice.id] ?? [])
+                            .map(
+                              (id) => choice.options.find((option) => option.id === id)?.name ?? id,
+                            )
+                            .join(", ") || "None"}
+                        </small>
+                      </label>
+                    )}
                   </div>
                   <div className="builder-choice-grid">
-                    {choice.options.map((option) => {
+                    {featureChoiceOptionsForLevel(
+                      choice,
+                      targetLevel,
+                      featureSearch[choice.id],
+                    ).map((option) => {
                       const selected = (draft.featureChoiceSelections[choice.id] ?? []).includes(
                         option.id,
                       );

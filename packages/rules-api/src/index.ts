@@ -218,6 +218,7 @@ export interface SpellCastingOptionSummary {
 }
 
 export interface SpellSummary {
+  effectsRequireReview?: boolean;
   id: string;
   name: string;
   level: number;

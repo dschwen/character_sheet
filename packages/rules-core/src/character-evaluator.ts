@@ -14,6 +14,7 @@ import {
   type InventoryItem,
 } from "@dnd/character-model";
 import {
+  classFeatureChoiceSchema,
   featureAutomationBodySchema,
   savingThrowAuraRecipientSchema,
   type AuthoringIr,
@@ -1821,6 +1822,28 @@ function validateProgressionSelections(
   for (const level of character.build.levels) {
     classLevelCounts.set(level.classId, (classLevelCounts.get(level.classId) ?? 0) + 1);
   }
+  for (const entity of index.entities.values()) {
+    if (entity.kind !== "class" && entity.kind !== "subclass") continue;
+    const body = z.record(z.unknown()).safeParse(entity.body);
+    if (!body.success) continue;
+    for (const value of Object.values(body.data)) {
+      const choice = classFeatureChoiceSchema.safeParse(value);
+      if (!choice.success || choice.data.spellSelection === undefined) continue;
+      if (
+        !classLevelCounts.has(choice.data.spellSelection.castingClassId) &&
+        character.build.levels.some((level) =>
+          level.selectedFeatureChoices.some((selection) => selection.choiceId === choice.data.id),
+        )
+      ) {
+        addValidation(
+          state,
+          "FEATURE_SPELL_CHOICE_INVALID",
+          "This spell choice requires its granting class and feature.",
+          ["build.levels"],
+        );
+      }
+    }
+  }
   const fighterLevel = classLevelCounts.get("srd521.class.fighter") ?? 0;
   const wizardLevel = classLevelCounts.get("srd521.class.wizard") ?? 0;
   const clericLevel = classLevelCounts.get("srd521.class.cleric") ?? 0;
@@ -3627,6 +3650,114 @@ function evaluateHitPoints(
   }
 }
 
+function resolveFeatureSpellSelections(
+  character: CharacterDocument,
+  classId: string,
+  classLevel: number,
+  index: PackageIndex,
+  state: EngineState,
+): Set<string> {
+  const grantedSpells = new Set<string>();
+  const classLevels = new Map([[classId, classLevel]]);
+  const grantedFeatures = grantedFeatureIds(classLevels, index);
+  grantSubclassFeatures(character, classLevels, index, grantedFeatures);
+  for (const owner of index.entities.values()) {
+    if (owner.kind !== "class" && owner.kind !== "subclass") continue;
+    const ownerBody = z.record(z.unknown()).safeParse(owner.body);
+    if (!ownerBody.success) continue;
+    for (const value of Object.values(ownerBody.data)) {
+      const parsed = classFeatureChoiceSchema.safeParse(value);
+      if (!parsed.success || parsed.data.spellSelection?.castingClassId !== classId) continue;
+      const choice = parsed.data;
+      const definition = choice.spellSelection;
+      if (definition === undefined) continue;
+      const ownerValid =
+        owner.id === classId ||
+        (owner.id === character.build.subclassId && ownerBody.data.parentClassId === classId);
+      let entryClassLevel = 0;
+      const selections = character.build.levels.flatMap((entry) => {
+        if (entry.classId === classId) entryClassLevel++;
+        return entry.selectedFeatureChoices
+          .filter((selection) => selection.choiceId === choice.id)
+          .flatMap((selection) =>
+            selection.optionIds.map((id) => ({
+              id,
+              level: entryClassLevel,
+              classId: entry.classId,
+            })),
+          );
+      });
+      const required =
+        ownerValid && classLevel >= choice.level && grantedFeatures.has(definition.sourceFeatureId);
+      if (
+        (!required && selections.length > 0) ||
+        (required && (selections.length < choice.minimum || selections.length > choice.maximum)) ||
+        new Set(selections.map(({ id }) => id)).size !== selections.length
+      ) {
+        addValidation(
+          state,
+          "FEATURE_SPELL_CHOICE_COUNT",
+          `${choice.id} requires ${required ? `${String(choice.minimum)}–${String(choice.maximum)}` : "zero"} distinct spell choices.`,
+          ["build.levels"],
+        );
+      }
+      const pool = new Set(
+        definition.sourceClassIds.flatMap((id) => {
+          const source = index.entities.get(id);
+          const body = spellcastingClassBodySchema.safeParse(source?.body);
+          return source?.kind === "class" && body.success ? body.data.spellList : [];
+        }),
+      );
+      const castingBody = spellcastingClassBodySchema.parse(index.entities.get(classId)?.body);
+      const valid: string[] = [];
+      for (const selection of selections) {
+        const spell = index.entities.get(selection.id);
+        const body = spell?.kind === "spell" ? spellBodySchema.safeParse(spell.body) : undefined;
+        const row = castingBody.progression.find(({ level }) => level === selection.level);
+        const maximum = Math.max(0, ...Object.keys(row?.spellSlots ?? {}).map(Number));
+        if (
+          !required ||
+          selection.classId !== classId ||
+          selection.level < choice.level ||
+          !choice.options.includes(selection.id) ||
+          !pool.has(selection.id) ||
+          !body?.success ||
+          body.data.level > maximum ||
+          (body.data.level === 0 && !definition.allowCantrips)
+        ) {
+          addValidation(
+            state,
+            "FEATURE_SPELL_CHOICE_INVALID",
+            `${selection.id} is not an eligible spell for ${choice.id} at its selection level.`,
+            ["build.levels"],
+          );
+          continue;
+        }
+        valid.push(selection.id);
+        grantedSpells.add(selection.id);
+      }
+      if (required) {
+        state.traces[choice.id] = {
+          id: choice.id,
+          result: valid,
+          nodes: [
+            {
+              id: `${choice.id}.grant`,
+              operation: "grant-always-prepared-feature-spells",
+              inputs: [classLevel, ...valid],
+              output: valid,
+            },
+          ],
+          sourceReferences: entitySourceReferences(
+            index.entities.get(definition.sourceFeatureId) ?? owner,
+          ),
+        };
+      }
+    }
+  }
+  return grantedSpells;
+}
+
 function evaluateSpellcasting(
   character: CharacterDocument,
   classLevels: ReadonlyMap<string, number>,
@@ -3774,6 +3905,7 @@ function evaluateSpellcasting(
       .flatMap((choice) => choice.optionIds),
   );
   const alwaysPrepared = new Set([
+    ...resolveFeatureSpellSelections(character, classId, classLevel, index, state),
     ...Object.entries(classBody.alwaysPreparedSpells).flatMap(([level, spellIds]) =>
       Number(level) <= classLevel ? spellIds : [],
     ),
@@ -3967,6 +4099,7 @@ function evaluateSpellcasting(
               : 1;
     state.spells.push({
       id: spellId,
+      ...(body.automationLevel === "display-only" ? { effectsRequireReview: true } : {}),
       name: entity.name.en ?? spellId,
       level: body.level,
       school: body.school,
@@ -4140,6 +4273,7 @@ function addMagicInitiateSpell(
             : 1;
   state.spells.push({
     id: spellId,
+    ...(body.automationLevel === "display-only" ? { effectsRequireReview: true } : {}),
     name: entity.name.en ?? spellId,
     level: body.level,
     school: body.school,
