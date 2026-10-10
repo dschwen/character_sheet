@@ -388,6 +388,7 @@ function mergeAdvancement(
   target: CharacterDocument,
   now: Date,
   mutableChoiceIds: ReadonlySet<string>,
+  replacedFeatIds: ReadonlySet<string>,
 ): CharacterDocument {
   const newLevel = target.build.levels[character.build.levels.length];
   if (newLevel === undefined) throw new Error("The new class level is missing.");
@@ -406,6 +407,7 @@ function mergeAdvancement(
   for (const featId of featIds) targetCounts.set(featId, (targetCounts.get(featId) ?? 0) + 1);
   const retainedCounts = new Map<string, number>();
   for (const featId of character.build.featIds) {
+    if (replacedFeatIds.has(featId) && !targetCounts.has(featId)) continue;
     const retained = retainedCounts.get(featId) ?? 0;
     if (retained >= (targetCounts.get(featId) ?? 0)) featIds.push(featId);
     retainedCounts.set(featId, retained + 1);
@@ -466,7 +468,22 @@ export function previewLevelUp(
         .filter((choice) => choice.changeOn?.includes("level-up"))
         .map((choice) => choice.id),
     );
-    const nextCharacter = mergeAdvancement(character, target, options.now, mutableChoiceIds);
+    const replacedFeatIds = new Set(
+      builderCatalog.classes[draft.classId].featureChoices
+        .filter((choice) => mutableChoiceIds.has(choice.id))
+        .flatMap((choice) =>
+          choice.options.flatMap((option) =>
+            option.grantedFeatId === undefined ? [] : [option.grantedFeatId],
+          ),
+        ),
+    );
+    const nextCharacter = mergeAdvancement(
+      character,
+      target,
+      options.now,
+      mutableChoiceIds,
+      replacedFeatIds,
+    );
     const evaluation = evaluateCharacter({ character: nextCharacter, packages: [rulesPackage] });
     return {
       character: nextCharacter,

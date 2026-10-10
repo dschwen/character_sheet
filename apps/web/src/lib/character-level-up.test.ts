@@ -1115,7 +1115,7 @@ describe("guided character level up", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
     const levelSix = buildCharacter(
-      defaultBuilderDraft(fighterId, catalog, 6, "Max Fighter"),
+      defaultBuilderDraft(fighterId, catalog, 7, "Max Fighter"),
       rulesPackage,
       initialOptions,
     );
@@ -1130,8 +1130,8 @@ describe("guided character level up", () => {
 
     expect(levelUpEligibility(levelSix, catalog)).toMatchObject({
       eligible: false,
-      currentLevel: 6,
-      reason: "Fighter advancement is currently reviewed through level 6.",
+      currentLevel: 7,
+      reason: "Fighter advancement is currently reviewed through level 7.",
     });
     expect(levelUpEligibility(unsupported, catalog)).toMatchObject({
       eligible: false,
@@ -1139,7 +1139,7 @@ describe("guided character level up", () => {
         "Level-up support currently covers Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard.",
     });
     expect(() => createLevelUpDraft(levelSix, catalog)).toThrow(
-      "Fighter advancement is currently reviewed through level 6.",
+      "Fighter advancement is currently reviewed through level 7.",
     );
   });
 

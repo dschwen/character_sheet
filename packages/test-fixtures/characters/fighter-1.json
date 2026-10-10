@@ -18,7 +18,13 @@
       {
         "characterLevel": 1,
         "classId": "srd521.class.fighter",
-        "hitPointChoice": "fixed"
+        "hitPointChoice": "fixed",
+        "selectedFeatureChoices": [
+          {
+            "choiceId": "srd521.choice.fighter.fighting-style",
+            "optionIds": ["srd521.feat.fighting-style.defense"]
+          }
+        ]
       }
     ],
     "abilityScores": {

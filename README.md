@@ -77,7 +77,9 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class advancement for all twelve SRD classes through level 6. Evokers select separate
+same-class advancement for all twelve SRD classes through level 6, plus Champion Fighters through
+level 7 with distinct Fighting Style choices. Archery and Defense are calculated; the two conditional
+damage styles are labeled assisted. Evokers select separate
 Evocation Savant spellbook additions and can declare Sculpt Spells protection while casting,
 with conditional save/damage guidance for manually adjudicated targets.
 Lore Bards select two Magical Discoveries from the Cleric,
@@ -252,7 +254,8 @@ Improvement on page 87, and the Defense Fighting Style on page 88:
 ```
 
 This parser validates all 20 progression rows, reconciles every feature reference, extracts the
-Champion subclass, and generates draft authoring IR for the supported Fighter level 1–6 features.
+Champion subclass and all four SRD Fighting Styles, and generates draft authoring IR for the
+supported Fighter features. Fighter choices and progression currently reach level 7.
 
 Generate Wizard content from pages 77–82 and representative spell descriptions from pages
 107–175:

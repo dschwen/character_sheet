@@ -462,7 +462,7 @@ function classCatalog(
         return {
           id: option.id,
           name: localizedName(option),
-          description: classOptionDescription(option),
+          description: `${optionBody?.automationLevel === "assisted" ? "Assisted · " : ""}${classOptionDescription(option)}`,
           additionalCantrips: numericValue(optionBody?.additionalCantrips),
           minimumClassLevel: numericValue(optionBody?.minimumWarlockLevel, 1),
           prerequisiteOptionIds: stringArray(optionBody?.prerequisiteInvocationIds),
@@ -1368,6 +1368,75 @@ export function migrateFeatureSpellbookChoices(
     : character;
 }
 
+export function migrateFeatureFeatChoices(
+  character: CharacterDocument,
+  catalog: BuilderCatalog,
+): CharacterDocument {
+  const classId = character.build.levels[0]?.classId;
+  const selectedClass = Object.values(catalog.classes).find(
+    (candidate) => candidate.id === classId,
+  );
+  if (
+    selectedClass === undefined ||
+    character.build.levels.some((entry) => entry.classId !== classId)
+  )
+    return character;
+  const existing = new Set(
+    character.build.levels.flatMap((entry) =>
+      entry.selectedFeatureChoices.map((choice) => choice.choiceId),
+    ),
+  );
+  const used = new Set(
+    character.build.levels.flatMap((entry) =>
+      entry.selectedFeatureChoices.flatMap((choice) => choice.optionIds),
+    ),
+  );
+  const levels = character.build.levels.map((entry) => ({
+    ...entry,
+    selectedFeatureChoices: [...entry.selectedFeatureChoices],
+  }));
+  let changed = false;
+  for (const choice of selectedClass.featureChoices) {
+    if (
+      choice.featSelection === undefined ||
+      choice.level > levels.length ||
+      existing.has(choice.id)
+    )
+      continue;
+    const ids = choice.options
+      .map((option) => option.id)
+      .filter((id) => character.build.featIds.includes(id) && !used.has(id))
+      .slice(0, choice.minimum);
+    const entry = levels[choice.level - 1];
+    if (entry === undefined || ids.length !== choice.minimum) continue;
+    entry.selectedFeatureChoices.push({ choiceId: choice.id, optionIds: ids });
+    ids.forEach((id) => used.add(id));
+    changed = true;
+  }
+  return changed
+    ? characterDocumentSchema.parse({ ...character, build: { ...character.build, levels } })
+    : character;
+}
+
+export function featureFeatOptionAlreadySelected(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  choiceId: string,
+  optionId: string,
+): boolean {
+  const choices = catalog.classes[draft.classId].featureChoices;
+  const group = choices.find((choice) => choice.id === choiceId)?.featSelection?.exclusiveGroup;
+  return (
+    group !== undefined &&
+    choices.some(
+      (choice) =>
+        choice.id !== choiceId &&
+        choice.featSelection?.exclusiveGroup === group &&
+        (draft.featureChoiceSelections[choice.id] ?? []).includes(optionId),
+    )
+  );
+}
+
 export function updateBuilderBackground(
   draft: CharacterBuilderDraft,
   catalog: BuilderCatalog,
@@ -1644,6 +1713,7 @@ function reconciledFeatureChoiceSelections(
   level: number,
 ): Readonly<Record<string, string[]>> {
   const usedBookSpells = new Set<string>();
+  const usedFeatGroups = new Map<string, Set<string>>();
   return Object.fromEntries(
     selectedClass.featureChoices
       .filter((choice) => choice.level <= level)
@@ -1653,6 +1723,8 @@ function reconciledFeatureChoiceSelections(
           [...(choice.defaultOptionIds ?? []), ...choice.options.map((option) => option.id)].filter(
             (optionId, index, optionIds) =>
               optionIds.indexOf(optionId) === index &&
+              (choice.featSelection === undefined ||
+                !usedFeatGroups.get(choice.featSelection.exclusiveGroup)?.has(optionId)) &&
               (choice.spellSelection?.spellbookAddition !== true ||
                 !usedBookSpells.has(optionId)) &&
               (choice.options.find((option) => option.id === optionId)?.minimumClassLevel ?? 1) <=
@@ -1662,6 +1734,12 @@ function reconciledFeatureChoiceSelections(
         );
         if (choice.spellSelection?.spellbookAddition === true)
           selected.forEach((id) => usedBookSpells.add(id));
+        if (choice.featSelection !== undefined) {
+          const group =
+            usedFeatGroups.get(choice.featSelection.exclusiveGroup) ?? new Set<string>();
+          selected.forEach((id) => group.add(id));
+          usedFeatGroups.set(choice.featSelection.exclusiveGroup, group);
+        }
         return [choice.id, selected];
       }),
   );
@@ -1957,6 +2035,7 @@ export function updateBuilderFeatureChoice(
   const selectedClass = catalog.classes[draft.classId];
   const choice = selectedClass.featureChoices.find((candidate) => candidate.id === choiceId);
   if (choice === undefined || choice.level > draft.level) return draft;
+  if (featureFeatOptionAlreadySelected(draft, catalog, choiceId, optionId)) return draft;
   const optionIds = choice.options.map((option) => option.id);
   if (!optionIds.includes(optionId)) return draft;
   const option = choice.options.find((candidate) => candidate.id === optionId);
@@ -2185,6 +2264,8 @@ export function validateBuilderDraft(
 
   for (const choice of selectedClass.featureChoices) {
     const selected = draft.featureChoiceSelections[choice.id] ?? [];
+    if (selected.some((id) => featureFeatOptionAlreadySelected(draft, catalog, choice.id, id)))
+      issues.push("Each feature-granted feat in the same group must be distinct.");
     const optionIds = choice.options.map((option) => option.id);
     const requiredCount = featureChoiceCount(choice, draft.level);
     const selectionLevels =

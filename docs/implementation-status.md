@@ -24,6 +24,9 @@ because some of its functionality exists or tests pass.
   of every artifact still needs a single verified workflow.
 - Automated tests do not constitute the separate human extraction, semantics, and test approvals
   specified by the plan. No claim of complete SRD coverage or independent verification is made.
+- Fighter creation and advancement reach level 7 with distinct Fighting Style choices. Archery
+  and Defense affect traced sheet values. Great Weapon Fighting and Two-Weapon Fighting remain
+  explicitly assisted pending conditional damage-roll modes; other class builders remain capped at 6.
 
 ## Remaining milestone gates
 

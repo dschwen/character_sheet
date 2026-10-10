@@ -19,6 +19,7 @@ import {
   featureChoiceCount,
   featureChoiceOptionsForLevel,
   featureSpellbookChoices,
+  featureFeatOptionAlreadySelected,
   fighterId,
   masteryCount,
   magicInitiateFeatIds,
@@ -674,9 +675,10 @@ export function CharacterBuilder({
                       );
                       const unavailable = option.minimumClassLevel > draft.level;
                       const alreadyGranted =
-                        !selected &&
-                        choice.spellSelection?.spellbookAddition === true &&
-                        featureSpellbookChoices(draft, catalog).includes(option.id);
+                        featureFeatOptionAlreadySelected(draft, catalog, choice.id, option.id) ||
+                        (!selected &&
+                          choice.spellSelection?.spellbookAddition === true &&
+                          featureSpellbookChoices(draft, catalog).includes(option.id));
                       const maximumReached =
                         !selected && selectedIds.length >= featureChoiceCount(choice, draft.level);
                       return (
@@ -703,7 +705,7 @@ export function CharacterBuilder({
                             {selected
                               ? "Selected"
                               : alreadyGranted
-                                ? "Already selected for another spellbook grant"
+                                ? "Already selected for another feature grant"
                                 : unavailable
                                   ? `Requires level ${String(option.minimumClassLevel)}`
                                   : missingPrerequisite === undefined

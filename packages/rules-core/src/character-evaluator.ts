@@ -1822,6 +1822,114 @@ function validateProgressionSelections(
   for (const level of character.build.levels) {
     classLevelCounts.set(level.classId, (classLevelCounts.get(level.classId) ?? 0) + 1);
   }
+  const ownedFeatures = grantedFeatureIds(classLevelCounts, index);
+  grantSubclassFeatures(character, classLevelCounts, index, ownedFeatures);
+  const selectedGroups = new Map<string, Set<string>>();
+  const managedFeats = new Set<string>();
+  for (const featId of character.build.featIds) {
+    const body = featureAutomationBodySchema.safeParse(index.entities.get(featId)?.body);
+    if (
+      body.success &&
+      body.data.requiresAnyFeatureIds.length > 0 &&
+      !body.data.requiresAnyFeatureIds.some((id) => ownedFeatures.has(id))
+    ) {
+      addValidation(
+        state,
+        "FEAT_FEATURE_PREREQUISITE",
+        `${featId} requires one of its granting features.`,
+        ["build.featIds"],
+      );
+    }
+  }
+  for (const owner of index.entities.values()) {
+    if (owner.kind !== "class" && owner.kind !== "subclass") continue;
+    const body = z.record(z.unknown()).safeParse(owner.body);
+    if (!body.success) continue;
+    const classId = owner.kind === "class" ? owner.id : body.data.parentClassId;
+    const ownerValid =
+      typeof classId === "string" &&
+      classLevelCounts.has(classId) &&
+      (owner.kind === "class" || owner.id === character.build.subclassId);
+    for (const value of Object.values(body.data)) {
+      const parsed = classFeatureChoiceSchema.safeParse(value);
+      if (!parsed.success || parsed.data.featSelection === undefined) continue;
+      const choice = parsed.data;
+      const definition = parsed.data.featSelection;
+      const required =
+        ownerValid &&
+        typeof classId === "string" &&
+        (classLevelCounts.get(classId) ?? 0) >= choice.level &&
+        ownedFeatures.has(definition.sourceFeatureId);
+      let classLevel = 0;
+      const selections = character.build.levels.flatMap((entry) => {
+        if (entry.classId === classId) classLevel++;
+        return entry.selectedFeatureChoices
+          .filter((selection) => selection.choiceId === choice.id)
+          .flatMap((selection) =>
+            selection.optionIds.map((id) => ({ id, classId: entry.classId, level: classLevel })),
+          );
+      });
+      if (
+        (!required && selections.length > 0) ||
+        (required && (selections.length < choice.minimum || selections.length > choice.maximum)) ||
+        new Set(selections.map(({ id }) => id)).size !== selections.length
+      ) {
+        addValidation(
+          state,
+          "FEATURE_FEAT_CHOICE_COUNT",
+          `${choice.id} requires ${required ? String(choice.minimum) : "zero"} distinct feat choices.`,
+          ["build.levels"],
+        );
+      }
+      const group = selectedGroups.get(definition.exclusiveGroup) ?? new Set<string>();
+      for (const selection of selections) {
+        if (
+          !required ||
+          selection.classId !== classId ||
+          selection.level < choice.level ||
+          !choice.options.includes(selection.id) ||
+          index.entities.get(selection.id)?.kind !== "feat" ||
+          !character.build.featIds.includes(selection.id) ||
+          group.has(selection.id)
+        ) {
+          addValidation(
+            state,
+            "FEATURE_FEAT_CHOICE_INVALID",
+            "Feature feat choices must be eligible, distinct, and recorded in the character's feats.",
+            ["build.levels", "build.featIds"],
+          );
+        }
+        group.add(selection.id);
+      }
+      selectedGroups.set(definition.exclusiveGroup, group);
+      if (ownerValid) choice.options.forEach((id) => managedFeats.add(id));
+      if (required)
+        state.traces[choice.id] = {
+          id: choice.id,
+          result: selections.map(({ id }) => id),
+          nodes: [
+            {
+              id: `${choice.id}.grant`,
+              operation: "grant-selected-feature-feats",
+              inputs: selections.map(({ id }) => id),
+              output: selections.map(({ id }) => id),
+            },
+          ],
+          sourceReferences: entitySourceReferences(
+            index.entities.get(definition.sourceFeatureId) ?? owner,
+          ),
+        };
+    }
+  }
+  const selectedFeats = new Set([...selectedGroups.values()].flatMap((group) => [...group]));
+  if (character.build.featIds.some((id) => managedFeats.has(id) && !selectedFeats.has(id))) {
+    addValidation(
+      state,
+      "FEATURE_FEAT_NOT_SELECTED",
+      "Remove feature-granted feats that are not selected in their granting choices.",
+      ["build.featIds", "build.levels"],
+    );
+  }
   for (const entity of index.entities.values()) {
     if (entity.kind !== "class" && entity.kind !== "subclass") continue;
     const body = z.record(z.unknown()).safeParse(entity.body);
@@ -5815,7 +5923,17 @@ function evaluateAttacks(
     const abilityModifier = ability === "strength" ? strengthModifier : dexterityModifier;
     const proficient = weaponIsProficient(weapon, equipment);
     const proficiency = proficient ? proficiencyBonus : 0;
-    const attackBonus = abilityModifier + proficiency;
+    const attackModifiers = [...new Set(character.build.featIds)].flatMap((id) => {
+      const entity = index.entities.get(id);
+      const body = featureAutomationBodySchema.safeParse(entity?.body);
+      return entity?.kind === "feat" && body.success
+        ? body.data.weaponAttackModifiers
+            .filter((modifier) => modifier.attackType === weapon.attackType)
+            .map((modifier) => ({ ...modifier, entity }))
+        : [];
+    });
+    const styleBonus = attackModifiers.reduce((total, modifier) => total + modifier.bonus, 0);
+    const attackBonus = abilityModifier + proficiency + styleBonus;
     const attackId = `attack.${resolved.item.id}`;
     const traceId = `${attackId}.bonus`;
     const proficiencySources =
@@ -5844,14 +5962,24 @@ function evaluateAttacks(
           inputs: [weapon.category, proficiencyBonus, proficient],
           output: proficiency,
         },
+        ...attackModifiers.map((modifier, index) => ({
+          id: `${traceId}.${modifier.entity.id}.${String(index)}`,
+          operation: "apply-weapon-attack-modifier",
+          inputs: [modifier.attackType, modifier.bonus],
+          output: modifier.bonus,
+        })),
         {
           id: `${traceId}.total`,
           operation: "add",
-          inputs: [abilityModifier, proficiency],
+          inputs: [abilityModifier, proficiency, styleBonus],
           output: attackBonus,
         },
       ],
-      sourceReferences: [...entitySourceReferences(entity), ...proficiencySources],
+      sourceReferences: [
+        ...entitySourceReferences(entity),
+        ...proficiencySources,
+        ...attackModifiers.flatMap((modifier) => entitySourceReferences(modifier.entity)),
+      ],
     };
     state.facts[traceId] = attackBonus;
     state.values[traceId] = { value: attackBonus, traceId };
@@ -6388,6 +6516,10 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   character.build.levels
     .flatMap((level) => level.selectedFeatureChoices)
     .flatMap((choice) => choice.optionIds)
+    .filter(
+      (optionId) =>
+        index.entities.get(optionId)?.kind !== "feat" || character.build.featIds.includes(optionId),
+    )
     .forEach((optionId) => granted.add(optionId));
   const conditions = resolveActiveConditions(character, index, state, statuses, granted);
   const rules = applicableRules(index, granted);

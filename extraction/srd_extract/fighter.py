@@ -16,6 +16,12 @@ from srd_extract.io import read_json, write_json
 SOURCE_ID = "wotc-srd-5.2.1-en"
 CLASS_ID = "srd521.class.fighter"
 DEFENSE_ID = "srd521.feat.fighting-style.defense"
+FIGHTING_STYLE_IDS = [
+    "srd521.feat.fighting-style.archery",
+    DEFENSE_ID,
+    "srd521.feat.fighting-style.great-weapon-fighting",
+    "srd521.feat.fighting-style.two-weapon-fighting",
+]
 CHAMPION_ID = "srd521.subclass.fighter.champion"
 ASI_ID = "srd521.feat.general.ability-score-improvement"
 HEADING_PATTERN = re.compile(r"^Level (?P<level>\d+): (?P<name>.+)$")
@@ -498,7 +504,7 @@ def _class_entity(
         **traits,
         "skillProficiencyChoice": {
             **traits.get("skillProficiencyChoice", {}),
-            "countByLevel": {str(level): 2 for level in range(1, 6)},
+            "countByLevel": {str(level): 2 for level in range(1, 8)},
         },
         "startingEquipment": {
             "id": "srd521.choice.class.fighter.starting-equipment",
@@ -601,7 +607,7 @@ def _class_entity(
         },
         "builder": {
             "supportedLevelMinimum": 1,
-            "supportedLevelMaximum": 6,
+            "supportedLevelMaximum": 7,
             "defaultAbilityScores": {
                 "strength": 15,
                 "dexterity": 13,
@@ -615,7 +621,21 @@ def _class_entity(
                 "srd521.skill.perception",
                 "srd521.skill.survival",
             ],
-            "defaultGrantedFeatIds": [DEFENSE_ID],
+            "defaultGrantedFeatIds": [],
+        },
+        "fightingStyleChoice": {
+            "id": "srd521.choice.fighter.fighting-style",
+            "level": 1,
+            "minimum": 1,
+            "maximum": 1,
+            "options": FIGHTING_STYLE_IDS,
+            "defaultOptionIds": [DEFENSE_ID],
+            "changeOn": ["level-up"],
+            "replacementMaximum": 1,
+            "featSelection": {
+                "sourceFeatureId": "srd521.class-feature.fighter.fighting-style",
+                "exclusiveGroup": "fighting-style",
+            },
         },
         "progression": [
             {
@@ -970,7 +990,15 @@ def _defense_entity_and_ir(nodes: list[dict[str, Any]]) -> tuple[dict[str, Any],
         "name": {"en": "Defense"},
         "tags": ["feat", "fighting-style"],
         "source": source,
-        "body": {"category": "fighting-style", "text": text},
+        "body": {
+            "category": "fighting-style",
+            "text": text,
+            "requiresAnyFeatureIds": [
+                "srd521.class-feature.fighter.fighting-style",
+                "srd521.class-feature.paladin.fighting-style",
+                "srd521.class-feature.ranger.fighting-style",
+            ],
+        },
         "rules": [],
         "review": _review("Defense Fighting Style extracted from page 88."),
     }
@@ -1007,6 +1035,61 @@ def _defense_entity_and_ir(nodes: list[dict[str, Any]]) -> tuple[dict[str, Any],
     return entity, ir
 
 
+def extract_fighting_styles(document: dict[str, Any]) -> list[dict[str, Any]]:
+    names = {"Archery", "Defense", "Great Weapon Fighting", "Two-Weapon Fighting"}
+    nodes = list(document["nodes"])
+    entities: list[dict[str, Any]] = []
+    for index, node in enumerate(nodes):
+        if node["kind"] != "HeadingNode" or node["normalizedText"] not in names:
+            continue
+        selected = [node]
+        for following in nodes[index + 1 :]:
+            if following["kind"] == "HeadingNode":
+                break
+            if following["kind"] != "MetadataNode":
+                selected.append(following)
+        name = node["normalizedText"]
+        body: dict[str, Any] = {
+            "category": "fighting-style",
+            "requiresAnyFeatureIds": [
+                "srd521.class-feature.fighter.fighting-style",
+                "srd521.class-feature.paladin.fighting-style",
+                "srd521.class-feature.ranger.fighting-style",
+            ],
+            "automationLevel": "assisted",
+            "text": {
+                "title": name,
+                "nodes": [
+                    {"kind": part["kind"], "text": part["normalizedText"]} for part in selected[1:]
+                ],
+            },
+        }
+        if name == "Archery":
+            text = " ".join(str(part["normalizedText"]) for part in selected[1:])
+            bonus = re.search(r"\+(\d+) bonus to attack rolls you make with Ranged weapons", text)
+            if bonus is None:
+                raise ValueError("Archery attack bonus could not be extracted")
+            body["weaponAttackModifiers"] = [{"attackType": "ranged", "bonus": int(bonus.group(1))}]
+            body["automationLevel"] = "sheet-automated"
+        entities.append(
+            {
+                "id": f"srd521.feat.fighting-style.{_slug(name)}",
+                "kind": "feat",
+                "name": {"en": name},
+                "tags": ["feat", "fighting-style"],
+                "body": body,
+                "rules": [],
+                "source": list(_source_spans_for_nodes(selected)),
+                "review": _review(
+                    "Fighting Style extracted from pages 87–88; semantics need independent review."
+                ),
+            }
+        )
+    if {entity["name"]["en"] for entity in entities} != names:
+        raise ValueError("Fighting Style extraction is incomplete")
+    return entities
+
+
 def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, Any]:
     raw_page = read_json(extraction_root / "raw" / "pages" / "0047.json")
     layout = read_json(extraction_root / "layout" / "pages" / "0047.json")
@@ -1037,29 +1120,40 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
     feature_entities = [_feature_entity(feature) for feature in features]
     champion_features = extract_champion_features(document)
     champion_entities = _champion_entities(document, champion_features)
+    champion_entities[0]["body"]["additionalFightingStyleChoice"] = {
+        "id": "srd521.choice.fighter.champion.additional-fighting-style",
+        "level": 7,
+        "minimum": 1,
+        "maximum": 1,
+        "options": FIGHTING_STYLE_IDS,
+        "defaultOptionIds": [FIGHTING_STYLE_IDS[0]],
+        "featSelection": {
+            "sourceFeatureId": "srd521.subclass-feature.fighter.champion.additional-fighting-style",
+            "exclusiveGroup": "fighting-style",
+        },
+    }
     asi_entity, asi_ir = _ability_score_improvement_entity(document)
     second_wind = next(feature for feature in features if feature["name"] == "Second Wind")
     defense_nodes = [node for node in document["nodes"] if str(node["parentId"]) == "page-0088"]
     defense_entity, defense_ir = _defense_entity_and_ir(defense_nodes)
+    fighting_styles = [
+        entity for entity in extract_fighting_styles(document) if entity["id"] != DEFENSE_ID
+    ]
     second_wind_table = _rule_table(progression, progression_source)
     fighter_entities = [
         class_entity,
         *feature_entities,
         second_wind_table,
         defense_entity,
+        *fighting_styles,
         *champion_entities,
         asi_entity,
     ]
-    existing = [
-        entity
-        for entity in read_json(output / "entities.json")
-        if entity["id"] != CLASS_ID
-        and not str(entity["id"]).startswith("srd521.class-feature.fighter.")
-        and not str(entity["id"]).startswith("srd521.subclass-feature.fighter.champion.")
-        and entity["id"]
-        not in {"srd521.table.fighter.second-wind", DEFENSE_ID, CHAMPION_ID, ASI_ID}
-    ]
-    all_entities = [*existing, *fighter_entities]
+    existing = read_json(output / "entities.json")
+    replacements = {entity["id"]: entity for entity in fighter_entities}
+    existing_ids = {entity["id"] for entity in existing}
+    all_entities = [replacements.get(entity["id"], entity) for entity in existing]
+    all_entities.extend(entity for entity in fighter_entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "fighter.json", fighter_entities)
     write_json(output / "entities.json", all_entities)
     write_json(output / "authoring-ir" / "fighter.second-wind.json", _second_wind_ir(second_wind))
@@ -1071,7 +1165,7 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Barbarian, Fighter through level 6, Human, Soldier, and equipment content. "
+        "Barbarian, Fighter through level 7, Human, Soldier, and equipment content. "
         "Proposed executable rules remain under review."
     )
     write_json(output / "coverage.json", coverage)

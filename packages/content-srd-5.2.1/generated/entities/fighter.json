@@ -21,11 +21,32 @@
           "srd521.skill.perception",
           "srd521.skill.survival"
         ],
-        "defaultGrantedFeatIds": [
+        "defaultGrantedFeatIds": [],
+        "supportedLevelMaximum": 7,
+        "supportedLevelMinimum": 1
+      },
+      "fightingStyleChoice": {
+        "changeOn": [
+          "level-up"
+        ],
+        "defaultOptionIds": [
           "srd521.feat.fighting-style.defense"
         ],
-        "supportedLevelMaximum": 6,
-        "supportedLevelMinimum": 1
+        "featSelection": {
+          "exclusiveGroup": "fighting-style",
+          "sourceFeatureId": "srd521.class-feature.fighter.fighting-style"
+        },
+        "id": "srd521.choice.fighter.fighting-style",
+        "level": 1,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.feat.fighting-style.archery",
+          "srd521.feat.fighting-style.defense",
+          "srd521.feat.fighting-style.great-weapon-fighting",
+          "srd521.feat.fighting-style.two-weapon-fighting"
+        ],
+        "replacementMaximum": 1
       },
       "hitPointDie": 10,
       "primaryAbilities": [
@@ -312,7 +333,9 @@
           "2": 2,
           "3": 2,
           "4": 2,
-          "5": 2
+          "5": 2,
+          "6": 2,
+          "7": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -1251,6 +1274,11 @@
   {
     "body": {
       "category": "fighting-style",
+      "requiresAnyFeatureIds": [
+        "srd521.class-feature.fighter.fighting-style",
+        "srd521.class-feature.paladin.fighting-style",
+        "srd521.class-feature.ranger.fighting-style"
+      ],
       "text": {
         "nodes": [
           {
@@ -1296,6 +1324,187 @@
   },
   {
     "body": {
+      "automationLevel": "sheet-automated",
+      "category": "fighting-style",
+      "requiresAnyFeatureIds": [
+        "srd521.class-feature.fighter.fighting-style",
+        "srd521.class-feature.paladin.fighting-style",
+        "srd521.class-feature.ranger.fighting-style"
+      ],
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Fighting Style Feat (Prerequisite: Fighting Style Feature)"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "You gain a +2 bonus to attack rolls you make with Ranged weapons."
+          }
+        ],
+        "title": "Archery"
+      },
+      "weaponAttackModifiers": [
+        {
+          "attackType": "ranged",
+          "bonus": 2
+        }
+      ]
+    },
+    "id": "srd521.feat.fighting-style.archery",
+    "kind": "feat",
+    "name": {
+      "en": "Archery"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Fighting Style extracted from pages 87–88; semantics need independent review.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0087-b018",
+          "p0087-b019"
+        ],
+        "page": 87,
+        "quoteHash": "828a60a7e257def3c9092d3066408ef083521a2237473a3daea234725778542f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "fighting-style"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "assisted",
+      "category": "fighting-style",
+      "requiresAnyFeatureIds": [
+        "srd521.class-feature.fighter.fighting-style",
+        "srd521.class-feature.paladin.fighting-style",
+        "srd521.class-feature.ranger.fighting-style"
+      ],
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Fighting Style Feat (Prerequisite: Fighting Style Feature)"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "When you roll damage for an attack you make with a Melee weapon that you are holding with two hands, you can treat any 1 or 2 on a damage die as a 3. The weapon must have the Two-Handed or Versatile property to gain this benefit."
+          }
+        ],
+        "title": "Great Weapon Fighting"
+      }
+    },
+    "id": "srd521.feat.fighting-style.great-weapon-fighting",
+    "kind": "feat",
+    "name": {
+      "en": "Great Weapon Fighting"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Fighting Style extracted from pages 87–88; semantics need independent review.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0088-b004",
+          "p0088-b005"
+        ],
+        "page": 88,
+        "quoteHash": "26380bdd7341ea406099295ad8478e3ed842244e086a20253dd7b03df5a87162",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "fighting-style"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "assisted",
+      "category": "fighting-style",
+      "requiresAnyFeatureIds": [
+        "srd521.class-feature.fighter.fighting-style",
+        "srd521.class-feature.paladin.fighting-style",
+        "srd521.class-feature.ranger.fighting-style"
+      ],
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "Fighting Style Feat (Prerequisite: Fighting Style Feature)"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "When you make an extra attack as a result of using a weapon that has the Light property, you can add your ability modifier to the damage of that attack if you aren’t already adding it to the damage."
+          }
+        ],
+        "title": "Two-Weapon Fighting"
+      }
+    },
+    "id": "srd521.feat.fighting-style.two-weapon-fighting",
+    "kind": "feat",
+    "name": {
+      "en": "Two-Weapon Fighting"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Fighting Style extracted from pages 87–88; semantics need independent review.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0088-b006",
+          "p0088-b007"
+        ],
+        "page": 88,
+        "quoteHash": "fe09eed865e12b9ed7f26e1f44a6eae29b29236d70e7796719c29370e8bff391",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "feat",
+      "fighting-style"
+    ]
+  },
+  {
+    "body": {
+      "additionalFightingStyleChoice": {
+        "defaultOptionIds": [
+          "srd521.feat.fighting-style.archery"
+        ],
+        "featSelection": {
+          "exclusiveGroup": "fighting-style",
+          "sourceFeatureId": "srd521.subclass-feature.fighter.champion.additional-fighting-style"
+        },
+        "id": "srd521.choice.fighter.champion.additional-fighting-style",
+        "level": 7,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.feat.fighting-style.archery",
+          "srd521.feat.fighting-style.defense",
+          "srd521.feat.fighting-style.great-weapon-fighting",
+          "srd521.feat.fighting-style.two-weapon-fighting"
+        ]
+      },
       "parentClassId": "srd521.class.fighter",
       "progression": [
         {

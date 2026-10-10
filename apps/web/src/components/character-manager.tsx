@@ -29,6 +29,7 @@ import {
   characterBuilderCatalog,
   migrateMagicInitiateChoices,
   migrateFeatureSpellbookChoices,
+  migrateFeatureFeatChoices,
 } from "../lib/character-builder";
 import {
   actionDiceRequest,
@@ -523,8 +524,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     try {
       const parsed = characterDocumentSchema.parse(JSON.parse(saved) as unknown);
       const catalog = characterBuilderCatalog(rulesPackage);
-      const restored = migrateFeatureSpellbookChoices(
-        migrateMagicInitiateChoices(parsed, catalog),
+      const restored = migrateFeatureFeatChoices(
+        migrateFeatureSpellbookChoices(migrateMagicInitiateChoices(parsed, catalog), catalog),
         catalog,
       );
       setCharacter(restored);
@@ -532,7 +533,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setNotice(
         restored === parsed
           ? "Restored your last browser-local character."
-          : "Restored your character and added missing default spell choices, including feature spellbook additions; review them before play.",
+          : "Restored your character and recorded missing feature choices or default spell choices; review them before play.",
       );
     } catch {
       window.localStorage.removeItem(storageKey);
@@ -773,8 +774,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     if (file === undefined) return;
     try {
       const parsed = characterDocumentSchema.parse(JSON.parse(await file.text()) as unknown);
-      const imported = migrateFeatureSpellbookChoices(
-        migrateMagicInitiateChoices(parsed, builderCatalog),
+      const imported = migrateFeatureFeatChoices(
+        migrateFeatureSpellbookChoices(
+          migrateMagicInitiateChoices(parsed, builderCatalog),
+          builderCatalog,
+        ),
         builderCatalog,
       );
       setCharacter(imported);
@@ -792,7 +796,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setNotice(
         imported === parsed
           ? `Imported ${parsed.name}; it is saved only in this browser.`
-          : `Imported ${parsed.name} and added missing default spell choices, including feature spellbook additions; review them before play.`,
+          : `Imported ${parsed.name} and recorded missing feature choices or default spell choices; review them before play.`,
       );
     } catch (error) {
       setNotice(`Import failed: ${errorMessage(error)}`);

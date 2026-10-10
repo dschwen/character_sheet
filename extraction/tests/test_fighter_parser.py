@@ -1,8 +1,11 @@
 from typing import Any
 
+import pytest
+
 from srd_extract.fighter import (
     _class_entity,
     extract_champion_features,
+    extract_fighting_styles,
     parse_core_traits,
     parse_progression,
 )
@@ -32,6 +35,52 @@ def test_parse_core_fighter_traits() -> None:
     assert traits["savingThrowProficiencies"] == ["strength", "constitution"]
     assert traits["skillProficiencyChoice"]["maximum"] == 2
     assert traits["armorTraining"] == ["light", "medium", "heavy", "shield"]
+
+
+def test_extract_all_four_fighting_styles_with_source_spans() -> None:
+    nodes = []
+    for name in ("Archery", "Defense", "Great Weapon Fighting", "Two-Weapon Fighting"):
+        nodes.extend(
+            [
+                {
+                    "kind": "HeadingNode",
+                    "normalizedText": name,
+                    "parentId": "page-0088",
+                    "sourceBlocks": [name],
+                },
+                {
+                    "kind": "ParagraphNode",
+                    "normalizedText": "Fighting Style Feat (Prerequisite: Fighting Style Feature)",
+                    "parentId": "page-0088",
+                    "sourceBlocks": [f"{name}-prerequisite"],
+                },
+                {
+                    "kind": "ParagraphNode",
+                    "normalizedText": (
+                        "You gain a +2 bonus to attack rolls you make with Ranged weapons."
+                    )
+                    if name == "Archery"
+                    else f"{name} effect.",
+                    "parentId": "page-0088",
+                    "sourceBlocks": [f"{name}-effect"],
+                },
+            ]
+        )
+    nodes.append(
+        {
+            "kind": "HeadingNode",
+            "normalizedText": "Epic Boon Feats",
+            "parentId": "page-0088",
+            "sourceBlocks": ["boons"],
+        }
+    )
+    styles = extract_fighting_styles({"nodes": nodes})
+    assert len(styles) == 4
+    assert styles[0]["body"]["weaponAttackModifiers"] == [{"attackType": "ranged", "bonus": 2}]
+    assert all(style["source"][0]["page"] == 88 for style in styles)
+    assert styles[-1]["body"]["text"]["nodes"][-1]["text"] == "Two-Weapon Fighting effect."
+    with pytest.raises(ValueError, match="incomplete"):
+        extract_fighting_styles({"nodes": nodes[3:]})
 
 
 def test_fighter_starting_equipment_preserves_all_three_source_packages() -> None:

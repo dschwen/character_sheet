@@ -19,6 +19,7 @@ import {
   featureChoiceCount,
   featureChoiceOptionsForLevel,
   featureSpellbookChoices,
+  featureFeatOptionAlreadySelected,
   magicInitiateFeatIds,
   masteryCount,
   spellSelectionCounts,
@@ -523,9 +524,10 @@ export function CharacterLevelUp({
                       );
                       const unavailable = option.minimumClassLevel > targetLevel;
                       const alreadyGranted =
-                        !selected &&
-                        choice.spellSelection?.spellbookAddition === true &&
-                        featureSpellbookChoices(draft, catalog).includes(option.id);
+                        featureFeatOptionAlreadySelected(draft, catalog, choice.id, option.id) ||
+                        (!selected &&
+                          choice.spellSelection?.spellbookAddition === true &&
+                          featureSpellbookChoices(draft, catalog).includes(option.id));
                       const maximumReached =
                         !selected && selectedIds.length >= featureChoiceCount(choice, targetLevel);
                       return (
@@ -555,7 +557,7 @@ export function CharacterLevelUp({
                             {selected
                               ? "Selected"
                               : alreadyGranted
-                                ? "Already selected for another spellbook grant"
+                                ? "Already selected for another feature grant"
                                 : unavailable
                                   ? `Requires level ${String(option.minimumClassLevel)}`
                                   : missingPrerequisite === undefined

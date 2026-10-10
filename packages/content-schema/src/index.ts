@@ -334,6 +334,10 @@ export const classFeatureChoiceSchema = z
     defaultOptionIds: z.array(entityIdSchema).optional(),
     changeOn: z.array(z.enum(["level-up", "short-rest", "long-rest"])).optional(),
     replacementMaximum: z.number().int().positive().optional(),
+    featSelection: z
+      .object({ sourceFeatureId: entityIdSchema, exclusiveGroup: z.string().min(1) })
+      .strict()
+      .optional(),
     spellSelection: z
       .object({
         sourceFeatureId: entityIdSchema,
@@ -432,6 +436,12 @@ export const savingThrowAuraRecipientSchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    requiresAnyFeatureIds: z.array(entityIdSchema).default([]),
+    weaponAttackModifiers: z
+      .array(
+        z.object({ attackType: z.enum(["melee", "ranged"]), bonus: z.number().int() }).strict(),
+      )
+      .default([]),
     spellProtection: z
       .object({
         school: z.string().min(1),
