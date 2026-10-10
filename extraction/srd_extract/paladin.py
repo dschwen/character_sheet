@@ -477,7 +477,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 6)},
+                "countByLevel": {str(level): 2 for level in range(1, 7)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple", "martial"],
@@ -486,7 +486,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 15,
                     "dexterity": 8,
@@ -823,13 +823,60 @@ def generate_paladin_content(
         *_subclass_entities(class_document, devotion_features),
         *spell_entities,
     ]
-    replacement_ids = {entity["id"] for entity in paladin_entities}
-    existing = [
+    aura = next(
         entity
-        for entity in read_json(output / "entities.json")
-        if entity["id"] not in replacement_ids
-    ]
-    all_entities = [*existing, *paladin_entities]
+        for entity in paladin_entities
+        if entity["id"] == "srd521.class-feature.paladin.aura-of-protection"
+    )
+    status_id = "srd521.status.feature.aura-of-protection"
+    aura_id = "srd521.aura.protection"
+    aura["body"]["savingThrowAura"] = {
+        "auraId": aura_id,
+        "ability": "charisma",
+        "minimumBonus": 1,
+        "radiusFeet": 10,
+        "recipientStatusId": status_id,
+        "inactiveConditionIds": ["srd521.condition.incapacitated"],
+    }
+    aura["body"]["automationLevel"] = "sheet-automated"
+    paladin_entities.append(
+        {
+            "id": status_id,
+            "kind": "status",
+            "name": {"en": "Aura of Protection (chosen other Paladin)"},
+            "tags": ["status", "aura", "paladin"],
+            "source": aura["source"],
+            "body": {
+                "sourceFeatureId": aura["id"],
+                "description": aura["body"]["text"],
+                "duration": "While inside the chosen conscious Paladin's aura",
+                "concentration": False,
+                "savingThrowAuraRecipient": {
+                    "auraId": aura_id,
+                    "selectionLabel": "Chosen Paladin's save bonus (Charisma modifier, minimum +1)",
+                    "minimum": 1,
+                    "maximum": 10,
+                },
+                "assistedInstructions": [
+                    "Set the chosen Paladin's bonus and stay within their aura's range.",
+                    "Remove this status when leaving the aura or when its Paladin "
+                    "is Incapacitated.",
+                    "Only one Aura of Protection applies; this selection replaces "
+                    "your own aura's bonus.",
+                ],
+                "automationLevel": "sheet-automated",
+            },
+            "rules": [],
+            "review": _review("Source-linked recipient toggle for Aura of Protection."),
+        }
+    )
+    existing = read_json(output / "entities.json")
+    replacements = {
+        entity["id"]: entity for entity in paladin_entities if entity["kind"] != "spell"
+    }
+    existing_ids = {entity["id"] for entity in existing}
+    all_entities = [replacements.get(entity["id"], entity) for entity in existing]
+    all_entities.extend(entity for entity in paladin_entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "paladin.json", paladin_entities)
     write_json(output / "entities.json", all_entities)
     by_name = {feature["name"]: feature for feature in features}
@@ -852,11 +899,6 @@ def generate_paladin_content(
         write_json(output / "authoring-ir" / filename, ir)
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
-    coverage["note"] = (
-        "Barbarian, Cleric through level 5, Druid through level 5, Fighter through level 5, "
-        "Monk through level 5, Paladin through level 5, Wizard through level 5, Human, Soldier, "
-        "equipment, and representative spells."
-    )
     write_json(output / "coverage.json", coverage)
     report = {
         "classId": CLASS_ID,

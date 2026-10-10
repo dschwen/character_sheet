@@ -721,10 +721,10 @@ describe("guided character builder", () => {
   it("builds Oath of Devotion Paladins with level-gated Fighting Style and magic", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [12, 20, 28, 36, 44];
-    const expectedAlwaysPrepared = [0, 1, 3, 3, 6];
+    const expectedHitPoints = [12, 20, 28, 36, 44, 52];
+    const expectedAlwaysPrepared = [0, 1, 3, 3, 6, 6];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(
         paladinId,
         catalog,
@@ -758,6 +758,7 @@ describe("guided character builder", () => {
       ]);
       expect(layOnHands?.maximum).toBe(level * 5);
       expect(channelDivinity?.maximum).toBe(level >= 3 ? 2 : undefined);
+      expect(evaluation.savingThrowAuras?.length).toBe(level >= 6 ? 1 : 0);
       expect(evaluation.values.armorClass?.value).toBe(level >= 2 ? 19 : 18);
       expect(evaluation.values["attackAction.attacks"]?.value).toBe(level >= 5 ? 2 : 1);
       if (level === 1) {

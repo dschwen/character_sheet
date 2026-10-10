@@ -42,7 +42,7 @@
       "name": "Monk"
     },
     {
-      "builderMaximum": 5,
+      "builderMaximum": 6,
       "builderMinimum": 1,
       "id": "srd521.class.paladin",
       "name": "Paladin"
@@ -80,7 +80,7 @@
   ],
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 602,
+    "STRUCTURED": 603,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
@@ -101,7 +101,7 @@
     "rule-table": 14,
     "species": 9,
     "spell": 87,
-    "status": 14,
+    "status": 15,
     "subclass": 12,
     "subclass-feature": 58,
     "subclass-option": 6

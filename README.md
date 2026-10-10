@@ -77,8 +77,11 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Barbarian, Cleric, Fighter, Monk, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
-Druid, Paladin, Warlock, and Wizard advancement through level 5. Life Domain Clerics gain Blessed Healer:
+same-class Barbarian, Cleric, Fighter, Monk, Paladin, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
+Druid, Warlock, and Wizard advancement through level 5. Paladins gain Aura of Protection:
+it adds Charisma (minimum +1) to saves and is inactive while Incapacitated. Allies can toggle
+the chosen Paladin's aura on their sheets and select its bonus; overlapping auras never stack.
+Life Domain Clerics gain Blessed Healer:
 confirm that a healing spell restores HP to another creature to heal the caster by 2 + the slot level.
 Healing-roll buttons support Cure Wounds, Healing Word, Mass Healing Word, and Prayer of Healing,
 including upcast dice and Disciple of Life on slotted casts; apply the rolled healing to the target's sheet.

@@ -384,6 +384,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           const bonusDice = Array.isArray(body?.d20BonusDice) ? body.d20BonusDice : [];
           const hitPointBonusBody = objectValue(body?.hitPointBonus);
           const temporaryHitPointsBody = objectValue(body?.turnStartTemporaryHitPoints);
+          const auraBody = objectValue(body?.savingThrowAuraRecipient);
+          const savingThrowAuraRecipient =
+            typeof auraBody?.selectionLabel === "string" &&
+            typeof auraBody.minimum === "number" &&
+            typeof auraBody.maximum === "number"
+              ? {
+                  selectionLabel: auraBody.selectionLabel,
+                  minimum: auraBody.minimum,
+                  maximum: auraBody.maximum,
+                }
+              : undefined;
           const protectionBody = objectValue(body?.situationalProtection);
           const grantedActionBody = objectValue(body?.grantedAction);
           const grantedActionDamageBody = objectValue(grantedActionBody?.damage);
@@ -464,6 +475,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             ),
             hitPointBonus,
             turnStartTemporaryHitPoints,
+            savingThrowAuraRecipient,
             situationalProtection,
             grantedAction,
             sourceSpellId: typeof body?.sourceSpellId === "string" ? body.sourceSpellId : undefined,
@@ -1415,6 +1427,26 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     </div>
                   </div>
                   <div className="condition-controls">
+                    {(evaluation.savingThrowAuras ?? []).map((aura) => (
+                      <div key={aura.sourceId}>
+                        <strong>
+                          {aura.name} · {aura.active ? "Active" : "Inactive while Incapacitated"}
+                        </strong>
+                        <TraceButton
+                          traceId={aura.traceId}
+                          onSelect={setSelectedTraceId}
+                          inspectOnClick
+                        >
+                          Save bonus {signed(aura.bonus)} · {String(aura.radiusFeet)} ft.
+                        </TraceButton>
+                        <small>
+                          Allies in range: set “
+                          {names.get(aura.recipientStatusId) ??
+                            shortEntityName(aura.recipientStatusId)}
+                          ” on their sheets with bonus {signed(aura.bonus)}. Only one aura applies.
+                        </small>
+                      </div>
+                    ))}
                     <span>
                       <strong>Conditions</strong>
                       <small>Click to apply or remove</small>
@@ -1458,7 +1490,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     <div className="condition-controls">
                       <span>
                         <strong>Beneficial statuses</strong>
-                        <small>Set spell effects on this sheet</small>
+                        <small>Set spell and feature effects on this sheet</small>
                       </span>
                       <div className="condition-grid">
                         {statusOptions.map((status) => {
@@ -1497,6 +1529,47 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           );
                         })}
                       </div>
+                      {statusOptions
+                        .filter(
+                          (status) =>
+                            status.savingThrowAuraRecipient !== undefined &&
+                            character.state.activeEffectIds.includes(status.id),
+                        )
+                        .map((status) => {
+                          const definition = status.savingThrowAuraRecipient;
+                          if (definition === undefined) return null;
+                          return (
+                            <label key={status.id}>
+                              {definition.selectionLabel}
+                              <select
+                                aria-label={`${status.name} bonus`}
+                                value={character.state.activeEffectSelections[status.id] ?? ""}
+                                onChange={(event) => {
+                                  savePlayState(
+                                    setActiveEffectSelection(
+                                      character,
+                                      status.id,
+                                      event.target.value,
+                                    ),
+                                    `${status.name} bonus selected.`,
+                                  );
+                                }}
+                              >
+                                <option value="" disabled>
+                                  Choose caster's bonus
+                                </option>
+                                {Array.from(
+                                  { length: definition.maximum - definition.minimum + 1 },
+                                  (_, index) => definition.minimum + index,
+                                ).map((bonus) => (
+                                  <option key={bonus} value={String(bonus)}>
+                                    {signed(bonus)}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          );
+                        })}
                       {statusOptions
                         .filter(
                           (status) =>

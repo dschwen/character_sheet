@@ -37,6 +37,32 @@ const initialOptions = {
 };
 
 describe("guided character level up", () => {
+  it("advances a Paladin to level 6 with a traced saving-throw aura", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const character = buildCharacter(
+      defaultBuilderDraft(paladinId, catalog, 5, "Protective Paladin"),
+      rulesPackage,
+      initialOptions,
+    );
+    character.state.currentHitPoints = 10;
+    const original = evaluateCharacter({ character, packages: [rulesPackage] });
+    const advanced = levelUpCharacter(
+      character,
+      createLevelUpDraft(character, catalog),
+      rulesPackage,
+      initialOptions,
+    );
+    const evaluation = evaluateCharacter({ character: advanced, packages: [rulesPackage] });
+    expect(evaluation.validations).toEqual([]);
+    expect(advanced.state.currentHitPoints).toBe(10);
+    expect(evaluation.values["hitPoints.maximum"]?.value).toBe(52);
+    expect(evaluation.savingThrowAuras?.[0]).toMatchObject({ active: true, bonus: 3 });
+    expect(evaluation.d20Tests["savingThrow.dexterity"]?.modifier).toBe(
+      (original.d20Tests["savingThrow.dexterity"]?.modifier ?? 0) + 3,
+    );
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: false });
+  });
   it("advances an Open Hand Monk to level 6 and rolls Wholeness of Body", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);

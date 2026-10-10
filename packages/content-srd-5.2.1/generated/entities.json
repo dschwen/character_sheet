@@ -13710,7 +13710,7 @@
           "srd521.skill.persuasion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 5,
+        "supportedLevelMaximum": 6,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -14129,7 +14129,8 @@
           "2": 2,
           "3": 2,
           "4": 2,
-          "5": 2
+          "5": 2,
+          "6": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -14674,7 +14675,18 @@
   },
   {
     "body": {
+      "automationLevel": "sheet-automated",
       "level": 6,
+      "savingThrowAura": {
+        "ability": "charisma",
+        "auraId": "srd521.aura.protection",
+        "inactiveConditionIds": [
+          "srd521.condition.incapacitated"
+        ],
+        "minimumBonus": 1,
+        "radiusFeet": 10,
+        "recipientStatusId": "srd521.status.feature.aura-of-protection"
+      },
       "text": "You radiate a protective, unseeable aura in a 10-foot Emanation that originates from you. The aura is inactive while you have the Incapacitated condition. You and your allies in the aura gain a bonus to saving throws equal to your Charisma modifier (minimum bonus of +1). If another Paladin is present, a creature can benefit from only one Aura of Protection at a time; the creature chooses which aura while in them."
     },
     "id": "srd521.class-feature.paladin.aura-of-protection",
@@ -35264,6 +35276,54 @@
       "status",
       "beneficial",
       "spell"
+    ]
+  },
+  {
+    "body": {
+      "assistedInstructions": [
+        "Set the chosen Paladin's bonus and stay within their aura's range.",
+        "Remove this status when leaving the aura or when its Paladin is Incapacitated.",
+        "Only one Aura of Protection applies; this selection replaces your own aura's bonus."
+      ],
+      "automationLevel": "sheet-automated",
+      "concentration": false,
+      "description": "You radiate a protective, unseeable aura in a 10-foot Emanation that originates from you. The aura is inactive while you have the Incapacitated condition. You and your allies in the aura gain a bonus to saving throws equal to your Charisma modifier (minimum bonus of +1). If another Paladin is present, a creature can benefit from only one Aura of Protection at a time; the creature chooses which aura while in them.",
+      "duration": "While inside the chosen conscious Paladin's aura",
+      "savingThrowAuraRecipient": {
+        "auraId": "srd521.aura.protection",
+        "maximum": 10,
+        "minimum": 1,
+        "selectionLabel": "Chosen Paladin's save bonus (Charisma modifier, minimum +1)"
+      },
+      "sourceFeatureId": "srd521.class-feature.paladin.aura-of-protection"
+    },
+    "id": "srd521.status.feature.aura-of-protection",
+    "kind": "status",
+    "name": {
+      "en": "Aura of Protection (chosen other Paladin)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Source-linked recipient toggle for Aura of Protection.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0055-b007"
+        ],
+        "page": 55,
+        "quoteHash": "0c257dc0a55e2124e69a1402088cd9e27d781162dad61def1f531d9c63489b5d",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "aura",
+      "paladin"
     ]
   }
 ]

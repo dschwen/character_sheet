@@ -23,7 +23,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(602);
+    expect(parsedEntities).toHaveLength(603);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -354,7 +354,7 @@ describe("bootstrap content package", () => {
       ),
     ).toMatchObject({ unarmedStrikeDamageTypes: ["force"] });
     expect(metadata.find(({ id }) => id === "srd521.class.paladin")?.builder).toMatchObject({
-      supportedLevelMaximum: 5,
+      supportedLevelMaximum: 6,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: ["srd521.skill.insight", "srd521.skill.persuasion"],
     });

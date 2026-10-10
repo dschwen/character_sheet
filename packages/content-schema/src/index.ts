@@ -379,8 +379,37 @@ export const classFeatureChoiceSchema = z
     }
   });
 
+export const savingThrowAuraSchema = z
+  .object({
+    auraId: entityIdSchema,
+    ability: z.enum([
+      "strength",
+      "dexterity",
+      "constitution",
+      "intelligence",
+      "wisdom",
+      "charisma",
+    ]),
+    minimumBonus: z.number().int().nonnegative(),
+    radiusFeet: z.number().positive(),
+    recipientStatusId: entityIdSchema,
+    inactiveConditionIds: z.array(entityIdSchema),
+  })
+  .strict();
+
+export const savingThrowAuraRecipientSchema = z
+  .object({
+    auraId: entityIdSchema,
+    selectionLabel: z.string().min(1),
+    minimum: z.number().int(),
+    maximum: z.number().int(),
+  })
+  .strict()
+  .refine((value) => value.maximum >= value.minimum);
+
 export const featureAutomationBodySchema = z
   .object({
+    savingThrowAura: savingThrowAuraSchema.optional(),
     unarmedStrikeDamageTypes: z.array(z.string().min(1)).default([]),
     spellHealingEffects: z
       .array(

@@ -309,7 +309,18 @@ export interface SpellCastTransitionProposal {
   traces: Readonly<Record<string, CalculationTrace>>;
 }
 
+export interface SavingThrowAuraSummary {
+  sourceId: string;
+  name: string;
+  bonus: number;
+  radiusFeet: number;
+  active: boolean;
+  recipientStatusId: string;
+  traceId: string;
+}
+
 export interface CharacterEvaluation {
+  savingThrowAuras?: SavingThrowAuraSummary[];
   facts: Readonly<Record<string, JsonValue>>;
   values: Readonly<Record<StatId, DerivedValue>>;
   proficiencies: ProficiencySummary;

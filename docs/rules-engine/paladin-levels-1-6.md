@@ -1,4 +1,4 @@
-# Paladin level 5 vertical slice
+# Paladin levels 1–6 vertical slice
 
 The reviewed `paladin-5.json` fixture is a Human Soldier Oath of Devotion Paladin. It wears Chain
 Mail with a Shield, uses the Defense Fighting Style, masters Longswords and Javelins, prepares six
@@ -10,7 +10,22 @@ free uses of Divine Smite and Find Steed. Lay On Hands accepts an explicit amoun
 that amount atomically, and rejects spending beyond the remaining pool.
 
 The generated content retains every Paladin and Oath of Devotion feature through level 20 as
-source-linked structured text. Through level 5, these limits remain intentionally assisted:
+source-linked structured text. Creation and same-class advancement support level 6, with a 30-point
+Lay On Hands pool and Aura of Protection.
+
+Aura of Protection adds Charisma's modifier (minimum +1) to all six saving throws, not ability
+checks, skills, attacks, or Initiative. It becomes inactive when the Paladin is Incapacitated,
+including when another condition grants Incapacitated. The aura's bonus, radius, and each saving
+throw contribution have source-linked traces. The Play UI explains the 10-foot radius and tells
+allies which status and bonus to set.
+
+The recipient status requires an explicit caster bonus. It can benefit an incapacitated recipient
+as long as the source Paladin's aura is active. On a Paladin's own sheet, choosing another Paladin's
+aura replaces the own-aura contribution even when the chosen bonus is lower; the bonuses never
+stack. Removing the other aura returns to the Paladin's own eligible bonus. Target positions,
+source consciousness, and entry/exit from the aura are player-tracked, not automatically inferred.
+
+These limits remain intentionally assisted:
 
 - Lay On Hands healing is automated; its alternative five-point Poisoned-condition removal remains
   descriptive.

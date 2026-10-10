@@ -43,7 +43,127 @@ function loadCharacter(): CharacterDocument {
   );
 }
 
-describe("evaluateCharacter Paladin level-5 vertical slice", () => {
+describe("evaluateCharacter Paladin levels 1–6 vertical slice", () => {
+  const statusId = "srd521.status.feature.aura-of-protection";
+  const savingThrows = [
+    "strength",
+    "dexterity",
+    "constitution",
+    "intelligence",
+    "wisdom",
+    "charisma",
+  ] as const;
+
+  function levelSixCharacter(): CharacterDocument {
+    const character = loadCharacter();
+    character.build.levels.push({
+      characterLevel: 6,
+      classId: "srd521.class.paladin",
+      hitPointChoice: "fixed",
+      selectedFeatureChoices: [],
+    });
+    return character;
+  }
+
+  it("adds the Paladin's Aura of Protection to every saving throw, with source traces", () => {
+    const packages = [loadRulesPackage()];
+    const baseline = evaluateCharacter({ character: loadCharacter(), packages });
+    const evaluation = evaluateCharacter({ character: levelSixCharacter(), packages });
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.values["hitPoints.maximum"]?.value).toBe(52);
+    expect(evaluation.savingThrowAuras).toEqual([
+      expect.objectContaining({
+        active: true,
+        bonus: 3,
+        radiusFeet: 10,
+        recipientStatusId: statusId,
+      }),
+    ]);
+    for (const ability of savingThrows) {
+      expect(evaluation.d20Tests[`savingThrow.${ability}`]?.modifier).toBe(
+        (baseline.d20Tests[`savingThrow.${ability}`]?.modifier ?? 0) + 3,
+      );
+      expect(evaluation.traces[`savingThrow.${ability}`]?.sourceReferences).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ entityId: "srd521.class-feature.paladin.aura-of-protection" }),
+        ]),
+      );
+    }
+    expect(evaluation.d20Tests["skill.athletics"]?.modifier).toBe(
+      baseline.d20Tests["skill.athletics"]?.modifier,
+    );
+    expect(evaluation.d20Tests.initiative?.modifier).toBe(baseline.d20Tests.initiative?.modifier);
+    expect(baseline.savingThrowAuras).toEqual([]);
+  });
+
+  it.each(["incapacitated", "unconscious", "stunned", "paralyzed"])(
+    "suppresses the source aura while %s, including inherited Incapacitated",
+    (condition) => {
+      const character = levelSixCharacter();
+      character.state.conditionIds.push(`srd521.condition.${condition}`);
+      const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+      expect(evaluation.savingThrowAuras?.[0]?.active).toBe(false);
+      const baseline = evaluateCharacter({
+        character: loadCharacter(),
+        packages: [loadRulesPackage()],
+      });
+      expect(evaluation.d20Tests["savingThrow.wisdom"]?.modifier).toBe(
+        baseline.d20Tests["savingThrow.wisdom"]?.modifier,
+      );
+    },
+  );
+
+  it("floors the source aura bonus at +1", () => {
+    const character = levelSixCharacter();
+    character.build.abilityScores.charisma = 6;
+    const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+    expect(evaluation.savingThrowAuras?.[0]?.bonus).toBe(1);
+  });
+
+  it("uses only the chosen other aura, even if lower, and removes it when toggled off", () => {
+    const character = levelSixCharacter();
+    const packages = [loadRulesPackage()];
+    const baseline = evaluateCharacter({ character: loadCharacter(), packages });
+    character.state.activeEffectIds.push(statusId);
+    character.state.activeEffectSelections[statusId] = "1";
+    const evaluation = evaluateCharacter({ character, packages });
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.d20Tests["savingThrow.wisdom"]?.modifier).toBe(
+      (baseline.d20Tests["savingThrow.wisdom"]?.modifier ?? 0) + 1,
+    );
+    character.state.activeEffectIds = [];
+    const removed = evaluateCharacter({ character, packages });
+    expect(removed.d20Tests["savingThrow.wisdom"]?.modifier).toBe(
+      (baseline.d20Tests["savingThrow.wisdom"]?.modifier ?? 0) + 3,
+    );
+  });
+
+  it("lets an incapacitated recipient benefit from another conscious Paladin's aura", () => {
+    const character = levelSixCharacter();
+    character.state.conditionIds.push("srd521.condition.incapacitated");
+    character.state.activeEffectIds.push(statusId);
+    character.state.activeEffectSelections[statusId] = "4";
+    const packages = [loadRulesPackage()];
+    const baseline = evaluateCharacter({ character: loadCharacter(), packages });
+    const evaluation = evaluateCharacter({ character, packages });
+    expect(evaluation.savingThrowAuras?.[0]?.active).toBe(false);
+    expect(evaluation.d20Tests["savingThrow.wisdom"]?.modifier).toBe(
+      (baseline.d20Tests["savingThrow.wisdom"]?.modifier ?? 0) + 4,
+    );
+  });
+
+  it.each([undefined, " ", "0", "11", "2.5", "bad"])(
+    "validates the recipient's selected caster bonus: %s",
+    (selection) => {
+      const character = loadCharacter();
+      character.state.activeEffectIds.push(statusId);
+      if (selection !== undefined) character.state.activeEffectSelections[statusId] = selection;
+      const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+      expect(evaluation.validations.map(({ code }) => code)).toContain(
+        "AURA_BONUS_SELECTION_REQUIRED",
+      );
+    },
+  );
   it("evaluates Oath spellcasting, defenses, weapon mastery, and feature resources", () => {
     const evaluation = evaluateCharacter({
       character: loadCharacter(),

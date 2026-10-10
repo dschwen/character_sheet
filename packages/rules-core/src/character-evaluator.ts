@@ -15,6 +15,7 @@ import {
 } from "@dnd/character-model";
 import {
   featureAutomationBodySchema,
+  savingThrowAuraRecipientSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -122,7 +123,9 @@ interface ActiveCondition {
 const statusBodySchema = z
   .object({
     description: z.string(),
-    sourceSpellId: z.string(),
+    sourceSpellId: z.string().optional(),
+    sourceFeatureId: z.string().optional(),
+    savingThrowAuraRecipient: savingThrowAuraRecipientSchema.optional(),
     duration: z.string(),
     concentration: z.boolean(),
     speedBonus: z.number().optional(),
@@ -1227,6 +1230,100 @@ function statusD20Modifiers(statuses: readonly ActiveStatus[]): D20TestModifier[
       sourceReferences: entitySourceReferences(entity),
     })),
   );
+}
+
+function evaluateSavingThrowAuras(
+  character: CharacterDocument,
+  statuses: readonly ActiveStatus[],
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): { auras: NonNullable<CharacterEvaluation["savingThrowAuras"]>; modifiers: D20TestModifier[] } {
+  const chosen = new Map<string, { bonus: number; entity: ContentEntity }>();
+  const auras: NonNullable<CharacterEvaluation["savingThrowAuras"]> = [];
+  for (const id of granted) {
+    const entity = index.entities.get(id);
+    const body = featureAutomationBodySchema.safeParse(entity?.body);
+    const aura = body.success ? body.data.savingThrowAura : undefined;
+    if (entity === undefined || aura === undefined) continue;
+    const modifier = requireNumber(
+      state.facts[`ability.${aura.ability}.modifier`] ?? null,
+      "Aura ability modifier",
+    );
+    const bonus = Math.max(aura.minimumBonus, modifier);
+    const active = !aura.inactiveConditionIds.some(
+      (conditionId) =>
+        state.facts[`condition.${conditionId.slice(conditionId.lastIndexOf(".") + 1)}.active`] ===
+        true,
+    );
+    const traceId = `${aura.auraId}.bonus`;
+    state.traces[traceId] = {
+      id: traceId,
+      result: bonus,
+      nodes: [
+        {
+          id: `${traceId}.minimum`,
+          operation: "apply-aura-minimum-bonus",
+          inputs: [modifier, aura.minimumBonus],
+          output: bonus,
+        },
+      ],
+      sourceReferences: entitySourceReferences(entity),
+    };
+    auras.push({
+      sourceId: id,
+      name: entity.name.en ?? id,
+      bonus,
+      active,
+      radiusFeet: aura.radiusFeet,
+      recipientStatusId: aura.recipientStatusId,
+      traceId,
+    });
+    if (active) chosen.set(aura.auraId, { bonus, entity });
+  }
+  // An explicitly selected other caster's aura replaces this character's own
+  // contribution, even when it is lower: the creature chooses, rather than stacks.
+  const recipientAuraIds = new Set<string>();
+  for (const { entity, body } of statuses) {
+    const recipient = body.savingThrowAuraRecipient;
+    if (recipient === undefined) continue;
+    if (recipientAuraIds.has(recipient.auraId)) {
+      addValidation(state, "AURA_SELECTION_CONFLICT", "Choose only one aura of this type.", [
+        "state.activeEffectIds",
+      ]);
+      continue;
+    }
+    recipientAuraIds.add(recipient.auraId);
+    const selection = character.state.activeEffectSelections[entity.id];
+    const bonus = Number(selection);
+    if (
+      selection === undefined ||
+      selection.trim() === "" ||
+      !Number.isInteger(bonus) ||
+      bonus < recipient.minimum ||
+      bonus > recipient.maximum
+    ) {
+      addValidation(
+        state,
+        "AURA_BONUS_SELECTION_REQUIRED",
+        `Set ${entity.name.en ?? entity.id}'s chosen caster bonus (${String(recipient.minimum)}–${String(recipient.maximum)}).`,
+        ["state.activeEffectSelections"],
+      );
+      continue;
+    }
+    chosen.set(recipient.auraId, { bonus, entity });
+  }
+  return {
+    auras,
+    modifiers: [...chosen.values()].flatMap(({ bonus, entity }) =>
+      abilities.map((ability) => ({
+        target: `savingThrow.${ability}`,
+        bonus,
+        sourceId: entity.id,
+        sourceReferences: entitySourceReferences(entity),
+      })),
+    ),
+  };
 }
 
 function evaluateConditionMechanics(
@@ -6061,6 +6158,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateStatusMovement(statuses, state);
   evaluateStatusActions(character, statuses, state);
   const d20BonusDice = statusBonusDice(character, statuses);
+  const savingThrowAuras = evaluateSavingThrowAuras(character, statuses, granted, index, state);
   evaluateD20Tests(
     character,
     origins,
@@ -6078,6 +6176,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
       ...ruleD20TestModifiers(rules, state, index, granted),
       ...conditionD20Modifiers(character, conditions),
       ...statusD20Modifiers(statuses),
+      ...savingThrowAuras.modifiers,
     ],
     d20BonusDice.tests,
   );
@@ -6105,6 +6204,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     }));
   return {
     facts: state.facts,
+    savingThrowAuras: savingThrowAuras.auras,
     values: state.values,
     proficiencies: state.proficiencies,
     d20Tests: state.d20Tests,
