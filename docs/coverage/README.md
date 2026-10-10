@@ -8,7 +8,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | --- | ---: |
 | UNCLASSIFIED | 0 |
 | TEXT_ONLY | 0 |
-| STRUCTURED | 861 |
+| STRUCTURED | 863 |
 | EXECUTABLE | 0 |
 | TESTED | 0 |
 | VERIFIED | 0 |
@@ -24,7 +24,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | Fighter | 1 | 7 |
 | Monk | 1 | 7 |
 | Paladin | 1 | 6 |
-| Ranger | 1 | 6 |
+| Ranger | 1 | 7 |
 | Rogue | 1 | 7 |
 | Sorcerer | 1 | 6 |
 | Warlock | 1 | 6 |
@@ -61,7 +61,7 @@ See `docs/rules-engine` for class-specific assisted mechanics and limits.
 | status | 15 |
 | subclass | 12 |
 | subclass-feature | 58 |
-| subclass-option | 6 |
+| subclass-option | 8 |
 | weapon-property | 3 |
 
 Regenerate after content changes:

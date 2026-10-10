@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { validateFeatureOptionChoices } from "./feature-option-choices.js";
 
 import type {
   CalculationTrace,
@@ -6800,6 +6801,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   validatePackagePins(character, index, state);
   const origins = resolveOrigins(character, index, state);
   validateProgressionSelections(character, index, state);
+  state.validations.push(...validateFeatureOptionChoices(character, input.packages));
   const classLevels = materializeFacts(character, state);
   const statuses = resolveActiveStatuses(character, index, state);
   const granted = grantedFeatureIds(classLevels, index);

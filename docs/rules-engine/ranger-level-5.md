@@ -21,3 +21,24 @@ structured text. Through level 5, these limits remain intentionally assisted:
   descriptive pending a general language-choice model.
 - Defense is the reviewed Fighting Style path. Druidic Warrior remains structured text pending a
   generic cross-class cantrip choice model.
+
+## Level 7 and rest-time choices
+
+Creation and guided advancement now reach level 7. Hunters select Escape the Horde or Multiattack
+Defense from source-linked options on SRD page 61. These are assisted incoming-attack rules:
+Escape the Horde imposes Disadvantage on Opportunity Attacks against the Ranger; Multiattack
+Defense imposes Disadvantage on a creature’s further attacks against the Ranger in the same turn
+after it hits. The first attack is unaffected. Enemy hits and turn boundaries are not tracked, and
+neither option modifies the Ranger’s AC or outgoing attacks.
+
+Play → Rest shows the current options and permits replacement of both Defensive Tactics and
+Hunter’s Prey during either rest. Selecting an option does not immediately change the sheet.
+The shared rest proposal validates ownership, acquisition level, counts, option membership, and
+the content-defined rest event, then returns the replacement build alongside recovered state.
+Illegal replacements or failed rests return neither build changes nor resource recovery. Changes
+retain the acquisition record and source-linked transition traces; unrelated choices are preserved.
+Feat, spell, and other specialized choices cannot use this ordinary-option replacement path.
+
+Ranger level 7 prepares seven spells and has four level-1 and three level-2 spell slots. Advancement
+preserves existing prepared spells, adding the new selection through the existing preparation
+workflow. Browser interaction verification remains outstanding because no browser was connected.

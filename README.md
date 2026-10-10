@@ -118,6 +118,10 @@ Rogues reach level 7 with Evasion and Reliable Talent. Proficient skill and fixe
 automatically treat d20 results below 10 as 10, preserving the animated faces and explaining the
 adjustment. Fixed tool grants appear with ability-specific roll buttons; unresolved tool choices
 and tool-use requirements remain manual.
+Rangers reach level 7 and choose Escape the Horde or Multiattack Defense. Play → Rest lets
+Hunters change Defensive Tactics and Hunter’s Prey when completing a Short or Long Rest.
+Incoming enemy attacks and turn boundaries are adjudicated manually; the selected option’s
+guidance explains when the attacker should apply Disadvantage.
 At Ranger level 6,
 Roving automatically increases walking Speed when eligible and grants matching Climb and Swim
 Speeds. Bard advancement permits one cantrip and one prepared-spell
@@ -125,7 +129,8 @@ replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
 replacement; Warlock advancement supports growing and replacing Eldritch Invocations plus its
 one prepared-spell and cantrip replacement when gaining a level. Magic Initiate permits one
 same-level feat spell replacement while preserving its original casting ability. Multiclassing,
-levels 7–20 for the classes listed above, and levels 6–20 for the other classes remain future work.
+levels 8–20 for Fighter, Barbarian, Monk, Rogue, and Ranger, and levels 7–20 for the other
+classes remain future work.
 
 The CLI remains useful for automation and does not require the web interface. Build once, then pass
 a character JSON document to it:
@@ -156,7 +161,7 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-level 1–6 vertical slices for all twelve SRD classes, plus level 7 for Fighter, Barbarian, Monk, and Rogue, with
+level 1–6 vertical slices for all twelve SRD classes, plus level 7 for Fighter, Barbarian, Monk, Rogue, and Ranger, with
 every standard SRD background and species. Higher levels and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 

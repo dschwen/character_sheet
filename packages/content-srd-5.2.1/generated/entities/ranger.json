@@ -52,7 +52,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.ranger.deft-explorer"
         },
-        "supportedLevelMaximum": 6,
+        "supportedLevelMaximum": 7,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -474,7 +474,8 @@
           "3": 3,
           "4": 3,
           "5": 3,
-          "6": 3
+          "6": 3,
+          "7": 3
         },
         "maximum": 3,
         "minimum": 3,
@@ -1371,6 +1372,26 @@
   {
     "body": {
       "alwaysPreparedSpells": {},
+      "defensiveTacticsChoice": {
+        "changeOn": [
+          "short-rest",
+          "long-rest"
+        ],
+        "defaultOptionIds": [
+          "srd521.option.ranger.defensive-tactics.escape-the-horde"
+        ],
+        "id": "srd521.choice.ranger.defensive-tactics",
+        "level": 7,
+        "maximum": 1,
+        "minimum": 1,
+        "optionSelection": {
+          "sourceFeatureId": "srd521.subclass-feature.ranger.hunter.defensive-tactics"
+        },
+        "options": [
+          "srd521.option.ranger.defensive-tactics.escape-the-horde",
+          "srd521.option.ranger.defensive-tactics.multiattack-defense"
+        ]
+      },
       "description": "You stalk prey in the wilds and elsewhere, using your abilities as a Hunter to protect nature and people everywhere from forces that would destroy them.",
       "huntersPreyChoice": {
         "changeOn": [
@@ -1381,6 +1402,9 @@
         "level": 3,
         "maximum": 1,
         "minimum": 1,
+        "optionSelection": {
+          "sourceFeatureId": "srd521.subclass-feature.ranger.hunter.hunter-s-prey"
+        },
         "options": [
           "srd521.option.ranger.hunters-prey.colossus-slayer",
           "srd521.option.ranger.hunters-prey.horde-breaker"
@@ -1443,6 +1467,78 @@
       "subclass",
       "ranger",
       "hunter"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "assisted",
+      "choiceId": "srd521.choice.ranger.defensive-tactics",
+      "description": "Opportunity Attacks have Disadvantage against you. Ask the attacker to apply this; enemy rolls are not tracked here."
+    },
+    "id": "srd521.option.ranger.defensive-tactics.escape-the-horde",
+    "kind": "subclass-option",
+    "name": {
+      "en": "Escape the Horde"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Escape the Horde: incoming attacks are adjudicated manually.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0061-b007"
+        ],
+        "page": 61,
+        "quoteHash": "dc0c7689ca8a205975fa1eba608484eff8262b9970a69cb689395f408295cc7c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-option",
+      "ranger",
+      "hunter",
+      "defensive-tactics"
+    ]
+  },
+  {
+    "body": {
+      "automationLevel": "assisted",
+      "choiceId": "srd521.choice.ranger.defensive-tactics",
+      "description": "When a creature hits you with an attack roll, that creature has Disadvantage on all other attack rolls against you this turn. Track the creature and end of turn manually; the first attack is unaffected."
+    },
+    "id": "srd521.option.ranger.defensive-tactics.multiattack-defense",
+    "kind": "subclass-option",
+    "name": {
+      "en": "Multiattack Defense"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Multiattack Defense: incoming attacks are adjudicated manually.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0061-b007"
+        ],
+        "page": 61,
+        "quoteHash": "dc0c7689ca8a205975fa1eba608484eff8262b9970a69cb689395f408295cc7c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "subclass-option",
+      "ranger",
+      "hunter",
+      "defensive-tactics"
     ]
   },
   {
@@ -1878,6 +1974,13 @@
   },
   {
     "body": {
+      "appliedStatuses": [
+        {
+          "statusId": "srd521.status.spell.longstrider",
+          "statusName": "Longstrider",
+          "target": "target"
+        }
+      ],
       "attackType": null,
       "castingTime": "Action",
       "classes": [

@@ -2,6 +2,8 @@ import pytest
 
 from srd_extract.ranger import (
     RangerProgressionRow,
+    _hunter_entities,
+    _preserve_spell_annotations,
     _roving_ir,
     _starting_equipment,
     parse_core_traits,
@@ -45,9 +47,64 @@ def test_ranger_progression_row_accepts_level_five_values() -> None:
     assert row.spell_slots == (4, 2, 0, 0, 0)
 
 
+def test_regeneration_preserves_spell_annotations_but_refreshes_parsed_fields() -> None:
+    entities = [{"id": "longstrider", "kind": "spell", "body": {"range": "Touch"}}]
+    previous = [
+        {
+            "id": "longstrider",
+            "body": {"range": "old", "appliedStatuses": [{"statusName": "Longstrider"}]},
+        }
+    ]
+    _preserve_spell_annotations(entities, previous)
+    assert entities[0]["body"] == {
+        "range": "Touch",
+        "appliedStatuses": [{"statusName": "Longstrider"}],
+    }
+
+
 def test_ranger_progression_row_rejects_wrong_proficiency_bonus() -> None:
     with pytest.raises(ValueError, match="expected 3"):
         RangerProgressionRow(5, 2, ("Extra Attack",), 3, 6, (4, 2, 0, 0, 0))
+
+
+def test_hunter_defensive_tactics_are_source_linked_rest_replaceable_options() -> None:
+    source = [{"sourceId": "wotc-srd-5.2.1-en", "page": 61, "blocks": ["tactics"]}]
+    nodes = [
+        {
+            "kind": "HeadingNode",
+            "normalizedText": "Ranger Subclass: Hunter",
+            "parentId": "page-61",
+            "sourceBlocks": ["heading"],
+        },
+        {
+            "kind": "ParagraphNode",
+            "normalizedText": "Protect Nature and People from Destruction",
+            "parentId": "page-61",
+            "sourceBlocks": ["intro"],
+        },
+    ]
+    features = tuple(
+        {
+            "id": f"feature-{level}",
+            "name": name,
+            "level": level,
+            "source": source,
+            "bodyNodes": [],
+        }
+        for level, name in [(3, "Hunter’s Prey"), (7, "Defensive Tactics")]
+    )
+    entities = _hunter_entities({"nodes": nodes}, features)
+    choice = entities[0]["body"]["defensiveTacticsChoice"]
+    assert choice["level"] == 7
+    assert choice["minimum"] == choice["maximum"] == 1
+    assert choice["changeOn"] == ["short-rest", "long-rest"]
+    assert choice["optionSelection"] == {"sourceFeatureId": "feature-7"}
+    options = [entity for entity in entities if entity["id"] in choice["options"]]
+    assert len(options) == 2
+    assert all(entity["source"] == source for entity in options)
+    assert all(entity["body"]["automationLevel"] == "assisted" for entity in options)
+    assert "Opportunity Attacks" in options[0]["body"]["description"]
+    assert "this turn" in options[1]["body"]["description"]
 
 
 def test_roving_ir_increases_speed_without_heavy_armor_and_grants_movement_modes() -> None:

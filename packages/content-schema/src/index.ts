@@ -334,6 +334,7 @@ export const classFeatureChoiceSchema = z
     defaultOptionIds: z.array(entityIdSchema).optional(),
     changeOn: z.array(z.enum(["level-up", "short-rest", "long-rest"])).optional(),
     replacementMaximum: z.number().int().positive().optional(),
+    optionSelection: z.object({ sourceFeatureId: entityIdSchema }).strict().optional(),
     featSelection: z
       .object({ sourceFeatureId: entityIdSchema, exclusiveGroup: z.string().min(1) })
       .strict()
@@ -354,6 +355,16 @@ export const classFeatureChoiceSchema = z
   })
   .strict()
   .superRefine((choice, context) => {
+    if (
+      choice.optionSelection !== undefined &&
+      (choice.featSelection !== undefined || choice.spellSelection !== undefined)
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Ordinary option choices cannot also grant feats or spells",
+        path: ["optionSelection"],
+      });
+    }
     if (
       choice.spellSelection?.alwaysPrepared !== undefined &&
       choice.spellSelection.alwaysPrepared === (choice.spellSelection.spellbookAddition === true)

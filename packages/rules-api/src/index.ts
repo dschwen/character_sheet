@@ -268,6 +268,7 @@ export interface HitDieSpend {
 
 export interface RestRequest {
   event: RestEvent;
+  featureChoiceReplacements?: { choiceId: string; optionIds: string[] }[];
   hitDice?: HitDieSpend[];
   spellSlotRecoveries?: { sourceId: string; slots: { level: number; count: number }[] }[];
 }
@@ -286,6 +287,7 @@ export interface StateTransitionProposal {
   applicable: boolean;
   changes: StateChange[];
   nextState: CharacterState;
+  nextBuild?: CharacterDocument["build"];
   validations: ValidationMessage[];
   traces: Readonly<Record<string, CalculationTrace>>;
 }

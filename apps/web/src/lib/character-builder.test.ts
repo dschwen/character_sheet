@@ -94,6 +94,7 @@ describe("guided character builder", () => {
     ).toEqual([
       ["srd521.choice.ranger.fighting-style", 2],
       ["srd521.choice.ranger.hunters-prey", 3],
+      ["srd521.choice.ranger.defensive-tactics", 7],
     ]);
     expect(catalog.classes[rangerId].featureChoices[1]?.changeOn).toEqual([
       "short-rest",

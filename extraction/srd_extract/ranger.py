@@ -26,6 +26,9 @@ FAVORED_ENEMY_ID = "srd521.resource.ranger.favored-enemy"
 HUNTERS_PREY_CHOICE_ID = "srd521.choice.ranger.hunters-prey"
 COLOSSUS_SLAYER_ID = "srd521.option.ranger.hunters-prey.colossus-slayer"
 HORDE_BREAKER_ID = "srd521.option.ranger.hunters-prey.horde-breaker"
+DEFENSIVE_TACTICS_CHOICE_ID = "srd521.choice.ranger.defensive-tactics"
+ESCAPE_THE_HORDE_ID = "srd521.option.ranger.defensive-tactics.escape-the-horde"
+MULTIATTACK_DEFENSE_ID = "srd521.option.ranger.defensive-tactics.multiattack-defense"
 DEFENSE_ID = "srd521.feat.fighting-style.defense"
 HEADING_PATTERN = re.compile(r"^Level (?P<level>\d+): (?P<name>.+)$")
 REPRESENTATIVE_SPELLS = (
@@ -406,6 +409,17 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     }
 
 
+def _preserve_spell_annotations(
+    entities: list[dict[str, Any]], existing: list[dict[str, Any]]
+) -> None:
+    """Refresh parsed fields without dropping independently authored spell metadata."""
+    by_id = {entity["id"]: entity for entity in existing}
+    for entity in entities:
+        previous = by_id.get(entity["id"])
+        if entity["kind"] == "spell" and previous is not None:
+            entity["body"] = {**previous["body"], **entity["body"]}
+
+
 def _starting_equipment() -> dict[str, Any]:
     return {
         "id": "srd521.choice.class.ranger.starting-equipment",
@@ -494,7 +508,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 3 for level in range(1, 7)},
+                "countByLevel": {str(level): 3 for level in range(1, 8)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple", "martial"],
@@ -503,7 +517,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 6,
+                "supportedLevelMaximum": 7,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 15,
@@ -598,6 +612,7 @@ def _hunter_entities(
     )
     intro = nodes[nodes.index(heading) + 1]
     prey = next(feature for feature in features if feature["name"] == "Hunter’s Prey")
+    tactics = next(feature for feature in features if feature["name"] == "Defensive Tactics")
     by_level: dict[int, list[str]] = {}
     for feature in features:
         by_level.setdefault(feature["level"], []).append(feature["id"])
@@ -620,6 +635,17 @@ def _hunter_entities(
                 "maximum": 1,
                 "options": [COLOSSUS_SLAYER_ID, HORDE_BREAKER_ID],
                 "changeOn": ["short-rest", "long-rest"],
+                "optionSelection": {"sourceFeatureId": prey["id"]},
+            },
+            "defensiveTacticsChoice": {
+                "id": DEFENSIVE_TACTICS_CHOICE_ID,
+                "level": 7,
+                "minimum": 1,
+                "maximum": 1,
+                "options": [ESCAPE_THE_HORDE_ID, MULTIATTACK_DEFENSE_ID],
+                "defaultOptionIds": [ESCAPE_THE_HORDE_ID],
+                "changeOn": ["short-rest", "long-rest"],
+                "optionSelection": {"sourceFeatureId": tactics["id"]},
             },
             "alwaysPreparedSpells": {},
             "description": intro["normalizedText"],
@@ -629,6 +655,37 @@ def _hunter_entities(
     }
     common = {"source": prey["source"], "rules": []}
     options = [
+        *[
+            {
+                "id": option_id,
+                "kind": "subclass-option",
+                "name": {"en": name},
+                "tags": ["subclass-option", "ranger", "hunter", "defensive-tactics"],
+                "source": tactics["source"],
+                "body": {
+                    "choiceId": DEFENSIVE_TACTICS_CHOICE_ID,
+                    "automationLevel": "assisted",
+                    "description": description,
+                },
+                "rules": [],
+                "review": _review(f"{name}: incoming attacks are adjudicated manually."),
+            }
+            for option_id, name, description in [
+                (
+                    ESCAPE_THE_HORDE_ID,
+                    "Escape the Horde",
+                    "Opportunity Attacks have Disadvantage against you. "
+                    "Ask the attacker to apply this; enemy rolls are not tracked here.",
+                ),
+                (
+                    MULTIATTACK_DEFENSE_ID,
+                    "Multiattack Defense",
+                    "When a creature hits you with an attack roll, that creature has "
+                    "Disadvantage on all other attack rolls against you this turn. "
+                    "Track the creature and end of turn manually; the first attack is unaffected.",
+                ),
+            ]
+        ],
         {
             **common,
             "id": COLOSSUS_SLAYER_ID,
@@ -851,6 +908,7 @@ def generate_ranger_content(
     ]
     replacement_ids = {entity["id"] for entity in ranger_entities}
     current_entities = read_json(output / "entities.json")
+    _preserve_spell_annotations(ranger_entities, current_entities)
     replacement_positions = [
         index for index, entity in enumerate(current_entities) if entity["id"] in replacement_ids
     ]

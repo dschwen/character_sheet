@@ -897,9 +897,8 @@ describe("guided character level up", () => {
     expect(advanced.state).toEqual(original.state);
     expect(advanced.build.levels).toHaveLength(6);
     expect(levelUpEligibility(advanced, catalog)).toMatchObject({
-      eligible: false,
+      eligible: true,
       currentLevel: 6,
-      reason: "Ranger advancement is currently reviewed through level 6.",
     });
   });
 

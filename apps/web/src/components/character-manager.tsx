@@ -364,6 +364,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     Readonly<Record<string, Readonly<Record<string, string>>>>
   >({});
   const [preparedSpellDraft, setPreparedSpellDraft] = useState<string[]>();
+  const [restChoiceDraft, setRestChoiceDraft] = useState<{
+    character: CharacterDocument;
+    selections: Record<string, string>;
+  }>();
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
   const [useD20Minimums, setUseD20Minimums] = useState(true);
   const [diceRolling, setDiceRolling] = useState(false);
@@ -569,6 +573,22 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     [character, rulesPackage],
   );
   const builderCatalog = useMemo(() => characterBuilderCatalog(rulesPackage), [rulesPackage]);
+  const restChoices = Object.values(builderCatalog.classes)
+    .flatMap((entry) =>
+      entry.featureChoices.filter(
+        (choice) =>
+          choice.optionSelection !== undefined &&
+          choice.changeOn?.some((event) => event === "short-rest" || event === "long-rest"),
+      ),
+    )
+    .flatMap((choice) => {
+      const selection = character.build.levels
+        .flatMap((level) => level.selectedFeatureChoices)
+        .find((selection) => selection.choiceId === choice.id);
+      return selection === undefined ? [] : [{ choice, selection }];
+    });
+  const restChoiceSelections =
+    restChoiceDraft?.character === character ? restChoiceDraft.selections : {};
   const advancement = useMemo(
     () => levelUpEligibility(character, builderCatalog),
     [builderCatalog, character],
@@ -972,9 +992,29 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     try {
       const proposal = proposeRest(
         { character, packages: [rulesPackage] },
-        { event, ...(recovery === undefined ? {} : { spellSlotRecoveries: [recovery] }) },
+        {
+          event,
+          ...(recovery === undefined ? {} : { spellSlotRecoveries: [recovery] }),
+          featureChoiceReplacements: restChoices
+            .filter(
+              ({ choice }) =>
+                choice.changeOn?.includes(event) && restChoiceSelections[choice.id] !== undefined,
+            )
+            .map(({ choice }) => ({
+              choiceId: choice.id,
+              optionIds: [restChoiceSelections[choice.id] ?? ""],
+            })),
+        },
       );
       if (proposal.applicable) setSpellRecoverySelections({});
+      if (proposal.applicable && proposal.nextBuild !== undefined) {
+        savePlayState(
+          commitCharacterState({ ...character, build: proposal.nextBuild }, proposal.nextState),
+          `${event === "short-rest" ? "Short" : "Long"} Rest applied, including selected feature options. Enemy attacks and turn boundaries remain manual.`,
+        );
+        setRestChoiceDraft(undefined);
+        return;
+      }
       applyTransition(
         proposal,
         `${event === "short-rest" ? "Short" : "Long"} Rest applied (${String(proposal.changes.length)} changes).`,
@@ -2135,6 +2175,44 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     Rests apply all modeled recovery rules together. A Short Rest without Hit Dice
                     still recharges eligible resources.
                   </p>
+                  {restChoices.map(({ choice, selection }) => {
+                    const selectedId = restChoiceSelections[choice.id] ?? selection.optionIds[0];
+                    const selected = choice.options.find((option) => option.id === selectedId);
+                    return (
+                      <div key={choice.id} className="effect-selection">
+                        <label>
+                          {shortEntityName(choice.id)} · choose for your next rest
+                          <select
+                            value={selectedId}
+                            onChange={(event) => {
+                              setRestChoiceDraft({
+                                character,
+                                selections: {
+                                  ...restChoiceSelections,
+                                  [choice.id]: event.target.value,
+                                },
+                              });
+                            }}
+                          >
+                            {choice.options.map((option) => (
+                              <option key={option.id} value={option.id}>
+                                {option.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <p>
+                          Current:{" "}
+                          {
+                            choice.options.find((option) => option.id === selection.optionIds[0])
+                              ?.name
+                          }
+                          . Changes apply only when you complete an eligible rest.
+                        </p>
+                        <p>{selected?.description}</p>
+                      </div>
+                    );
+                  })}
                   <div className="rest-buttons">
                     <button
                       className="rest-card"

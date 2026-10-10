@@ -16,10 +16,18 @@ import type {
 } from "@dnd/rules-api";
 
 import { evaluateCharacter } from "./character-evaluator.js";
+import { featureOptionChoices, validateFeatureOptionChoices } from "./feature-option-choices.js";
 
 const restRequestSchema = z
   .object({
     event: z.enum(["short-rest", "long-rest"]),
+    featureChoiceReplacements: z
+      .array(
+        z
+          .object({ choiceId: z.string().min(1), optionIds: z.array(z.string().min(1)).min(1) })
+          .strict(),
+      )
+      .default([]),
     hitDice: z
       .array(
         z
@@ -643,6 +651,48 @@ export function proposeRest(
   const request = restRequestSchema.parse(unparsedRequest);
   const originalState = cloneState(character.state);
   const validations: ValidationMessage[] = [];
+  const nextBuild = structuredClone(character.build);
+  const choiceChanges: { path: string; before: string[]; after: string[]; sourceId: string }[] = [];
+  const seen = new Set<string>();
+  for (const replacement of request.featureChoiceReplacements) {
+    const definition = featureOptionChoices(input.packages).find(
+      ({ choice }) => choice.id === replacement.choiceId,
+    );
+    const records = nextBuild.levels.flatMap((level, index) =>
+      level.selectedFeatureChoices.flatMap((choice, selectionIndex) =>
+        choice.choiceId === replacement.choiceId ? [{ choice, index, selectionIndex }] : [],
+      ),
+    );
+    if (
+      seen.has(replacement.choiceId) ||
+      !definition?.choice.changeOn?.includes(request.event) ||
+      records.length !== 1
+    ) {
+      validation(
+        validations,
+        "REST_FEATURE_CHOICE_INVALID",
+        "Only an acquired, rest-replaceable feature option can be changed once per rest.",
+        ["request.featureChoiceReplacements"],
+      );
+      continue;
+    }
+    seen.add(replacement.choiceId);
+    const record = records[0];
+    if (record === undefined || definition.choice.optionSelection === undefined) continue;
+    choiceChanges.push({
+      path: `build.levels.${String(record.index)}.selectedFeatureChoices.${String(record.selectionIndex)}.optionIds`,
+      before: [...record.choice.optionIds],
+      after: [...replacement.optionIds],
+      sourceId: definition.choice.optionSelection.sourceFeatureId,
+    });
+    record.choice.optionIds = [...replacement.optionIds];
+  }
+  if (request.featureChoiceReplacements.length > 0) {
+    validations.push(...validateFeatureOptionChoices(character, input.packages));
+    validations.push(
+      ...validateFeatureOptionChoices({ ...character, build: nextBuild }, input.packages),
+    );
+  }
   if (character.state.currentHitPoints < 1) {
     validation(
       validations,
@@ -669,6 +719,26 @@ export function proposeRest(
   const nextState = cloneState(character.state);
   const changes: StateChange[] = [];
   const traces: Record<string, CalculationTrace> = {};
+  for (const change of choiceChanges) {
+    const source = input.packages
+      .flatMap((pack) => pack.entities)
+      .find((entity) => entity.id === change.sourceId);
+    recordChange(
+      changes,
+      traces,
+      change.path,
+      change.before,
+      change.after,
+      "Replace a feature option after completing the rest.",
+      "replace-feature-option-on-rest",
+      [request.event, ...change.before],
+      source?.source.map((span) => ({
+        entityId: source.id,
+        sourceId: span.sourceId,
+        page: span.page,
+      })) ?? [],
+    );
+  }
   if (request.event === "short-rest") {
     proposeShortRest(character, request, spending, evaluation, nextState, changes, traces);
     applySpellSlotRecovery(request, evaluation, nextState, changes, traces);
@@ -681,6 +751,7 @@ export function proposeRest(
     applicable: true,
     changes,
     nextState,
+    ...(request.featureChoiceReplacements.length > 0 ? { nextBuild } : {}),
     validations,
     traces,
   };

@@ -32,24 +32,27 @@ because some of its functionality exists or tests pass.
   using final adjusted Speed. Monk reaches level 7 with condition-aware Evasion and a shared,
   opt-in saving-throw damage resolver in Play. Rogue reaches level 7 with the same Evasion resolver
   and traced Reliable Talent minima for proficient skills and fixed tool grants. Tool-choice
-  persistence/catalog completeness and tool-use adjudication remain outstanding. Other class
+  persistence/catalog completeness and tool-use adjudication remain outstanding. Ranger reaches
+  level 7 with source-linked Hunter Defensive Tactics choices. Play → Rest supports atomic
+  replacement of both Defensive Tactics and Hunter’s Prey. Incoming attacks, creature hits, and
+  turn boundaries remain manually adjudicated; no outgoing roll modes or AC are changed. Other class
   builders remain capped at 6.
 
 ## Remaining milestone gates
 
-| Milestone                        | Current evidence and required remaining work                                                                                                                                                                                   |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0: Decisions and skeleton        | Monorepo, schemas, CI, acquisition, and ADRs exist. Fresh-clone installation and every initial exit criterion still need a recorded completion audit.                                                                          |
-| 1: Extraction foundation         | Layout, normalization, document nodes, and overlays exist. The full section-spanning visual audit and source-span resolution gates still need verification.                                                                    |
-| 2: Schemas and parsers           | Class, origin, equipment, spell, and condition parsers exist. Complete character-relevant segmentation, glossary cross-references, magic-item parsing, manifests, and the full review queue remain to be completed/audited.    |
-| 3: Engine kernel                 | Expressions, predicates, calculations, proficiencies, resources, validations, and traces exist. All declared effect, conflict, and cycle/error guarantees require a gate-by-gate audit.                                        |
-| 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                              |
-| 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                                |
-| 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                   |
-| 7: Levels 6–20                   | In progress. All twelve builders reach level 6; Fighter, Barbarian, Monk, and Rogue reach 7. Finish higher-level features, repeat choices, Epic Boons, spell progression, interactions, and twelve reviewed level-20 fixtures. |
-| 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                       |
-| 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.                 |
-| 10: Beta hardening               | Complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit.                                   |
+| Milestone                        | Current evidence and required remaining work                                                                                                                                                                                           |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0: Decisions and skeleton        | Monorepo, schemas, CI, acquisition, and ADRs exist. Fresh-clone installation and every initial exit criterion still need a recorded completion audit.                                                                                  |
+| 1: Extraction foundation         | Layout, normalization, document nodes, and overlays exist. The full section-spanning visual audit and source-span resolution gates still need verification.                                                                            |
+| 2: Schemas and parsers           | Class, origin, equipment, spell, and condition parsers exist. Complete character-relevant segmentation, glossary cross-references, magic-item parsing, manifests, and the full review queue remain to be completed/audited.            |
+| 3: Engine kernel                 | Expressions, predicates, calculations, proficiencies, resources, validations, and traces exist. All declared effect, conflict, and cycle/error guarantees require a gate-by-gate audit.                                                |
+| 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                                      |
+| 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                                        |
+| 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                           |
+| 7: Levels 6–20                   | In progress. All twelve builders reach level 6; Fighter, Barbarian, Monk, Rogue, and Ranger reach 7. Finish higher-level features, repeat choices, Epic Boons, spell progression, interactions, and twelve reviewed level-20 fixtures. |
+| 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                               |
+| 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.                         |
+| 10: Beta hardening               | Complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit.                                           |
 
 Optional cloud persistence and later homebrew/source-version upgrades retain their original plan
 scope; they have not been silently substituted for the local-first implementation. Monsters remain
@@ -64,6 +67,6 @@ the plan's explicit deferred work, not a character-sheet completion gate.
 4. Audit each requirement and exit criterion in the original plan against authoritative artifacts,
    commands, tests, and rendered behavior before marking the overall goal complete.
 
-Browser verification is currently outstanding for the latest healing, aura, recovery, post-roll bonus, and spell-choice controls: no browser connection
+Browser verification is currently outstanding for the latest healing, aura, recovery, post-roll bonus, spell-choice, and rest-time feature-option controls: no browser connection
 was available in the session. Engine/roll-helper tests, type checks, and a production build passed;
 these are not a substitute for rendered interaction verification.

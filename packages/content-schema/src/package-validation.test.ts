@@ -67,7 +67,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(861);
+    expect(parsedEntities).toHaveLength(863);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -418,7 +418,7 @@ describe("bootstrap content package", () => {
       options: ["srd521.feat.fighting-style.defense"],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.ranger")?.builder).toMatchObject({
-      supportedLevelMaximum: 6,
+      supportedLevelMaximum: 7,
       defaultAbilityScoreImprovementAbility: "wisdom",
       expertiseChoice: {
         sourceId: "srd521.class-feature.ranger.deft-explorer",
