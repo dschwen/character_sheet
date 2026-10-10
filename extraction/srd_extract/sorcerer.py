@@ -582,9 +582,7 @@ def _draconic_entities(
                     f"srd521.option.sorcerer.draconic.elemental-affinity.{damage_type}"
                     for damage_type in ELEMENTAL_AFFINITY_DAMAGE_TYPES
                 ],
-                "defaultOptionIds": [
-                    "srd521.option.sorcerer.draconic.elemental-affinity.fire"
-                ],
+                "defaultOptionIds": ["srd521.option.sorcerer.draconic.elemental-affinity.fire"],
             },
             "description": intro["normalizedText"],
         },

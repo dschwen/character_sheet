@@ -8,11 +8,11 @@ from srd_extract.origins import (
     parse_gnome,
     parse_goliath,
     parse_halfling,
-    parse_orc,
-    parse_tiefling,
     parse_human,
+    parse_orc,
     parse_origin_feat,
     parse_soldier,
+    parse_tiefling,
 )
 
 

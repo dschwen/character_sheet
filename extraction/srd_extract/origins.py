@@ -750,7 +750,9 @@ def parse_goliath(text: str) -> dict[str, Any]:
                 "resourceId": ancestry_resource_id,
                 "spends": 1,
                 "requiredWhen": ancestry_requirement("hill"),
-                "requirement": "Hit a Large or smaller creature with an attack roll and deal damage",
+                "requirement": (
+                    "Hit a Large or smaller creature with an attack roll and deal damage"
+                ),
                 "effect": "Give the target the Prone condition",
             },
             {
@@ -990,7 +992,9 @@ def parse_tiefling(text: str) -> dict[str, Any]:
                         "id": f"srd521.species.tiefling.legacy.{slug}",
                         "name": name,
                         "damageType": resistance,
-                        "summary": f"{resistance.title()} resistance; legacy spells at levels 1, 3, and 5",
+                        "summary": (
+                            f"{resistance.title()} resistance; legacy spells at levels 1, 3, and 5"
+                        ),
                         "spellGrants": [cantrip, level_three, level_five, thaumaturgy],
                     }
                     for slug, name, resistance, cantrip, level_three, level_five in legacies
@@ -1398,7 +1402,8 @@ def generate_origin_content(extraction_root: Path, output: Path) -> dict[str, An
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
         "Ranger through level 6; Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Rogue, "
-        "Sorcerer, Warlock, and Wizard through level 5; all four SRD backgrounds; Human, Dwarf, Dragonborn, "
+        "Sorcerer, Warlock, and Wizard through level 5; all four SRD backgrounds; "
+        "Human, Dwarf, Dragonborn, "
         "Elf, Gnome, Goliath, Halfling, Orc, and Tiefling; equipment; "
         "representative spells; and all fifteen standard conditions."
     )

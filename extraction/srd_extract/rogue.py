@@ -795,11 +795,7 @@ def generate_rogue_content(extraction_root: Path, output: Path) -> dict[str, Any
         if entity["id"] not in replacement_ids
     ]
     insertion_index = next(
-        (
-            index
-            for index, entity in enumerate(existing)
-            if entity["id"] == "srd521.class.sorcerer"
-        ),
+        (index for index, entity in enumerate(existing) if entity["id"] == "srd521.class.sorcerer"),
         len(existing),
     )
     all_entities = [

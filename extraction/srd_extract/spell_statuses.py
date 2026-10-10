@@ -74,9 +74,7 @@ SPELL_STATUS_MECHANICS: dict[str, dict[str, Any]] = {
     "srd521.spell.haste": {
         "speedMultiplier": 2,
         "armorClassBonus": 2,
-        "d20RollEffects": [
-            {"scope": "saving-throw", "ability": "dexterity", "kind": "advantage"}
-        ],
+        "d20RollEffects": [{"scope": "saving-throw", "ability": "dexterity", "kind": "advantage"}],
     },
     "srd521.spell.guidance": {
         "d20BonusDice": [
