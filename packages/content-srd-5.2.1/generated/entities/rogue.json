@@ -29,7 +29,8 @@
             "4": 2,
             "5": 2,
             "6": 4,
-            "7": 4
+            "7": 4,
+            "8": 4
           },
           "eligibleSkillIds": [
             "srd521.skill.acrobatics",
@@ -55,7 +56,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.rogue.expertise"
         },
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "conditionalWeaponProficiencies": [
@@ -212,7 +213,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -242,7 +243,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -272,7 +273,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -332,7 +333,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -417,7 +418,8 @@
           "4": 4,
           "5": 4,
           "6": 4,
-          "7": 4
+          "7": 4,
+          "8": 4
         },
         "maximum": 4,
         "minimum": 4,

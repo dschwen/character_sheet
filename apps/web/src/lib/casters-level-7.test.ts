@@ -69,8 +69,9 @@ describe("Wizard and Warlock level 7", () => {
       optionIds: grant,
     });
     expect(levelUpEligibility(advanced, catalog)).toMatchObject({
-      eligible: false,
+      eligible: true,
       currentLevel: 7,
+      targetLevel: 8,
     });
   });
 
@@ -155,7 +156,10 @@ describe("Wizard and Warlock level 7", () => {
         cantripsKnown: 3,
         slots: [{ level: 4, maximum: 2, expended: spent, current: 2 - spent }],
       });
-      expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: false });
+      expect(levelUpEligibility(advanced, catalog)).toMatchObject({
+        eligible: true,
+        targetLevel: 8,
+      });
       const cast = proposeSpellCast(input, { spellId: "srd521.spell.wall-of-fire", slotLevel: 4 });
       expect(cast.applicable).toBe(spent < 2);
       if (spent < 2) expect(cast.nextState.expendedSpellSlots["4"]).toBe(spent + 1);

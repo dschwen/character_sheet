@@ -25,7 +25,7 @@
           "srd521.skill.nature"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "elementalFuryChoice": {
@@ -196,7 +196,7 @@
           "cantrips": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.druid.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -266,7 +266,7 @@
           "cantrips": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.druid.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -349,7 +349,7 @@
           "cantrips": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.druid.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -472,7 +472,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,

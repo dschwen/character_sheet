@@ -43,8 +43,9 @@ def test_barbarian_pages_28_to_30_audit(tmp_path: Path) -> None:
     assert reconciliation["valid"] is True
     assert reconciliation["counts"]["unresolved"] == 0
     barbarian = next(entity for entity in entities if entity["id"] == "srd521.class.barbarian")
-    assert barbarian["body"]["builder"]["supportedLevelMaximum"] == 7
+    assert barbarian["body"]["builder"]["supportedLevelMaximum"] == 8
     assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["7"] == 3
+    assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["8"] == 3
     pounce = next(entity for entity in entities if entity["name"]["en"] == "Instinctive Pounce")
     assert pounce["body"]["actionEnhancements"] == [
         {

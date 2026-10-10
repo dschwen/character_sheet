@@ -30,7 +30,7 @@
           "srd521.skill.persuasion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -195,7 +195,7 @@
           "channelDivinity": 2,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.paladin.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -270,7 +270,7 @@
           "channelDivinity": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.paladin.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -344,7 +344,7 @@
           "channelDivinity": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.paladin.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -451,7 +451,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,

@@ -61,22 +61,31 @@ because some of its functionality exists or tests pass.
   grant levels, feat prerequisites, counts, patterns, and consistency with aggregate bonuses.
   Advancement locks earlier choices and preserves legacy totals without inventing acquisition
   history. Grappler and the full General/Epic Boon selection workflow remain outstanding.
+- All twelve builders and same-class advancement workflows now reach level 8. Repeated ASI
+  table entries resolve to their original source-linked feature. Bard and Rogue retain their
+  existing Expertise counts. Full casters gain twelve selected prepared spells and 4/3/3/2
+  slots; Wizard gains two ordinary spellbook additions but no new Savant grant. Warlock gains
+  nine selected prepared spells while retaining six invocations and two fourth-level Pact slots.
+  Half casters retain seven selected preparations and 4/3 slots. Monk Focus and Sorcerer Sorcery
+  Points rise to eight; spent resources and slots are not restored by advancement. Druid's
+  level-8 Beast form limits (eight known forms, CR 1, flying permitted) remain source-text-assisted,
+  with form selection, stat replacement, equipment, duration, and temporary HP manually resolved.
 
 ## Remaining milestone gates
 
-| Milestone                        | Current evidence and required remaining work                                                                                                                                                                                                 |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0: Decisions and skeleton        | Monorepo, schemas, CI, acquisition, and ADRs exist. Fresh-clone installation and every initial exit criterion still need a recorded completion audit.                                                                                        |
-| 1: Extraction foundation         | Layout, normalization, document nodes, and overlays exist. The full section-spanning visual audit and source-span resolution gates still need verification.                                                                                  |
-| 2: Schemas and parsers           | Class, origin, equipment, spell, and condition parsers exist. Complete character-relevant segmentation, glossary cross-references, magic-item parsing, manifests, and the full review queue remain to be completed/audited.                  |
-| 3: Engine kernel                 | Expressions, predicates, calculations, proficiencies, resources, validations, and traces exist. All declared effect, conflict, and cycle/error guarantees require a gate-by-gate audit.                                                      |
-| 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                                            |
-| 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                                              |
-| 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                                 |
-| 7: Levels 6–20                   | In progress. All twelve builders reach level 7; Fighter reaches 8. Finish other level-8 workflows and levels 9–20, General feats, Epic Boons, higher-level features, spell progression, interactions, and twelve reviewed level-20 fixtures. |
-| 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                                     |
-| 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.                               |
-| 10: Beta hardening               | Complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit.                                                 |
+| Milestone                        | Current evidence and required remaining work                                                                                                                                                                                |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0: Decisions and skeleton        | Monorepo, schemas, CI, acquisition, and ADRs exist. Fresh-clone installation and every initial exit criterion still need a recorded completion audit.                                                                       |
+| 1: Extraction foundation         | Layout, normalization, document nodes, and overlays exist. The full section-spanning visual audit and source-span resolution gates still need verification.                                                                 |
+| 2: Schemas and parsers           | Class, origin, equipment, spell, and condition parsers exist. Complete character-relevant segmentation, glossary cross-references, magic-item parsing, manifests, and the full review queue remain to be completed/audited. |
+| 3: Engine kernel                 | Expressions, predicates, calculations, proficiencies, resources, validations, and traces exist. All declared effect, conflict, and cycle/error guarantees require a gate-by-gate audit.                                     |
+| 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                           |
+| 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                             |
+| 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                |
+| 7: Levels 6–20                   | In progress. All twelve builders reach level 8. Finish levels 9–20, General feats, Epic Boons, higher-level features, spell progression, interactions, and twelve reviewed level-20 fixtures.                               |
+| 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                    |
+| 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.              |
+| 10: Beta hardening               | Complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit.                                |
 
 Optional cloud persistence and later homebrew/source-version upgrades retain their original plan
 scope; they have not been silently substituted for the local-first implementation. Monsters remain

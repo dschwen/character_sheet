@@ -216,6 +216,6 @@ describe("Barbarian level 7 and action movement enhancements", () => {
     expect(result.d20Tests.initiative?.rollMode).toBe("advantage");
     expect(result.values["hitPoints.maximum"]?.value).toBe(68);
     expect(result.validations.filter(({ severity }) => severity === "error")).toEqual([]);
-    expect(levelUpEligibility(advanced, catalog).eligible).toBe(false);
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: true, targetLevel: 8 });
   });
 });

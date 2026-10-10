@@ -20,7 +20,7 @@ SPELL_EXTRACTION = ROOT / "generated/extraction/srd-5.2.1-spells"
     or not (SPELL_EXTRACTION / "normalized/document.json").exists(),
     reason="Pinned local extraction inputs are unavailable",
 )
-def test_level_seven_generation_is_source_linked_and_idempotent(tmp_path: Path) -> None:
+def test_level_eight_generation_is_source_linked_and_idempotent(tmp_path: Path) -> None:
     content = ROOT / "packages/content-srd-5.2.1/generated"
     write_json(tmp_path / "entities.json", read_json(content / "entities.json"))
     write_json(tmp_path / "coverage.json", read_json(content / "coverage.json"))
@@ -28,7 +28,7 @@ def test_level_seven_generation_is_source_linked_and_idempotent(tmp_path: Path) 
     first = (tmp_path / "entities.json").read_bytes()
     entities = read_json(tmp_path / "entities/paladin.json")
     by_id = {entity["id"]: entity for entity in entities}
-    assert by_id["srd521.class.paladin"]["body"]["builder"]["supportedLevelMaximum"] == 7
+    assert by_id["srd521.class.paladin"]["body"]["builder"]["supportedLevelMaximum"] == 8
     feature = by_id["srd521.subclass-feature.paladin.oath-of-devotion.aura-of-devotion"]
     status = by_id["srd521.status.feature.aura-of-devotion"]
     assert feature["body"]["auraConditionImmunities"] == [

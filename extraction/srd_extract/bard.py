@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from srd_extract.io import read_json, write_json
+from srd_extract.progression import progression_feature_ids
 from srd_extract.ranger import _level_features
 from srd_extract.wizard import (
     ABILITIES,
@@ -404,7 +405,7 @@ def _class_entity(
     spell_list: dict[str, dict[str, Any]],
     source: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    ids = {(feature["level"], feature["name"]): feature["id"] for feature in features}
+    ids = progression_feature_ids(features, ((row.level, row.feature_names) for row in progression))
     all_skills = [
         f"srd521.skill.{value}"
         for value in (
@@ -438,12 +439,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 8)},
+                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 9)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 7,
+                "supportedLevelMaximum": 8,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -467,7 +468,7 @@ def _class_entity(
                     "minimumLevel": 2,
                     "requireClassProficiency": False,
                     "eligibleSkillIds": all_skills,
-                    "countByLevel": {str(level): 2 for level in range(2, 8)},
+                    "countByLevel": {str(level): 2 for level in range(2, 9)},
                 },
             },
             "spellcastingAbility": "charisma",

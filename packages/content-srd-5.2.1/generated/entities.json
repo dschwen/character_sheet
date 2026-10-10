@@ -22,7 +22,7 @@
           "srd521.skill.animal-handling"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 12,
@@ -347,7 +347,8 @@
           "4": 3,
           "5": 3,
           "6": 3,
-          "7": 3
+          "7": 3,
+          "8": 3
         },
         "maximum": 2,
         "minimum": 2,
@@ -3635,7 +3636,7 @@
           "requireClassProficiency": true,
           "sourceId": "srd521.class-feature.wizard.scholar"
         },
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 6,
@@ -3764,7 +3765,7 @@
           "cantrips": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.wizard.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -3830,7 +3831,7 @@
           "cantrips": 5,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.wizard.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -3904,7 +3905,7 @@
           "cantrips": 5,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.wizard.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -4022,7 +4023,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -7008,7 +7010,7 @@
           "srd521.skill.religion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "divineOrderChoice": {
@@ -7156,7 +7158,7 @@
           "channelDivinity": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.cleric.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -7226,7 +7228,7 @@
           "channelDivinity": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.cleric.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -7304,7 +7306,7 @@
           "channelDivinity": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.cleric.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -7426,7 +7428,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -9467,7 +9470,7 @@
           "srd521.skill.nature"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "elementalFuryChoice": {
@@ -9638,7 +9641,7 @@
           "cantrips": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.druid.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -9708,7 +9711,7 @@
           "cantrips": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.druid.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -9791,7 +9794,7 @@
           "cantrips": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.druid.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -9914,7 +9917,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -12412,7 +12416,7 @@
           "srd521.skill.insight"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "conditionalWeaponProficiencies": [
@@ -12591,7 +12595,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.monk.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -12659,7 +12663,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.monk.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -12723,7 +12727,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.monk.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -12813,7 +12817,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -14188,7 +14193,7 @@
           "srd521.skill.persuasion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -14353,7 +14358,7 @@
           "channelDivinity": 2,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.paladin.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -14428,7 +14433,7 @@
           "channelDivinity": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.paladin.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -14502,7 +14507,7 @@
           "channelDivinity": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.paladin.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -14609,7 +14614,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -16219,7 +16225,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.ranger.deft-explorer"
         },
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -16376,7 +16382,7 @@
           "favoredEnemy": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.ranger.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -16451,7 +16457,7 @@
           "favoredEnemy": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.ranger.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -16530,7 +16536,7 @@
           "favoredEnemy": 5,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.ranger.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -16642,7 +16648,8 @@
           "4": 3,
           "5": 3,
           "6": 3,
-          "7": 3
+          "7": 3,
+          "8": 3
         },
         "maximum": 3,
         "minimum": 3,
@@ -18302,7 +18309,8 @@
             "4": 2,
             "5": 2,
             "6": 4,
-            "7": 4
+            "7": 4,
+            "8": 4
           },
           "eligibleSkillIds": [
             "srd521.skill.acrobatics",
@@ -18328,7 +18336,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.rogue.expertise"
         },
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "conditionalWeaponProficiencies": [
@@ -18485,7 +18493,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -18515,7 +18523,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -18545,7 +18553,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -18605,7 +18613,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -18690,7 +18698,8 @@
           "4": 4,
           "5": 4,
           "6": 4,
-          "7": 4
+          "7": 4,
+          "8": 4
         },
         "maximum": 4,
         "minimum": 4,
@@ -19936,7 +19945,7 @@
           "srd521.skill.persuasion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 6,
@@ -20103,7 +20112,7 @@
           "cantrips": 5,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.sorcerer.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -20173,7 +20182,7 @@
           "cantrips": 6,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.sorcerer.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -20251,7 +20260,7 @@
           "cantrips": 6,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.sorcerer.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -20379,7 +20388,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -22378,7 +22388,7 @@
           "srd521.skill.deception"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "cantripChange": {
@@ -22572,7 +22582,7 @@
           "eldritchInvocations": 6,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.warlock.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -22644,7 +22654,7 @@
           "eldritchInvocations": 8,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.warlock.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -22716,7 +22726,7 @@
           "eldritchInvocations": 9,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.warlock.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -22809,7 +22819,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -32767,7 +32778,8 @@
             "4": 2,
             "5": 2,
             "6": 2,
-            "7": 2
+            "7": 2,
+            "8": 2
           },
           "eligibleSkillIds": [
             "srd521.skill.acrobatics",
@@ -32793,7 +32805,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.bard.expertise"
         },
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "cantripChange": {
@@ -32963,7 +32975,7 @@
           "cantrips": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.bard.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -33050,7 +33062,7 @@
           "cantrips": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.bard.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -33140,7 +33152,7 @@
           "cantrips": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.bard.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -33274,7 +33286,8 @@
           "4": 6,
           "5": 6,
           "6": 6,
-          "7": 6
+          "7": 6,
+          "8": 6
         },
         "maximum": 3,
         "minimum": 3,

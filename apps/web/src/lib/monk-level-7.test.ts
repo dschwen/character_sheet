@@ -219,6 +219,6 @@ describe("Monk level 7 and shared saving-throw damage resolution", () => {
       evaluation.attacks.find(({ id }) => id === "attack.unarmed-strike")?.damage.diceSize,
     ).toBe(8);
     expect(resolveSavingThrowDamage(evaluation, request("success")).damage).toBe(0);
-    expect(levelUpEligibility(advanced, catalog).eligible).toBe(false);
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: true, targetLevel: 8 });
   });
 });

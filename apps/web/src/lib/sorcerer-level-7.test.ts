@@ -83,7 +83,11 @@ describe("Sorcerer level 7 and class-scoped Innate Sorcery", () => {
           .applicable,
       ).toBe(false);
     }
-    expect(levelUpEligibility(next, catalog)).toMatchObject({ eligible: false, currentLevel: 7 });
+    expect(levelUpEligibility(next, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 7,
+      targetLevel: 8,
+    });
   });
 
   it.each([1, 6, 7])(

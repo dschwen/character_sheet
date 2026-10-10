@@ -82,7 +82,7 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class advancement for all twelve SRD classes through level 7, and Fighters through level 8.
+same-class advancement for all twelve SRD classes through level 8.
 Ability Score Improvement offers +2 to one ability or +1 to two abilities, with the 20-point cap
 validated before saving. New sheets record each allocation at its acquisition level. Advancement
 locks earlier allocations and preserves legacy aggregate-only bonuses without inventing history.
@@ -188,7 +188,7 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
 reports rules-invalid choices without changing the input. The builder currently covers the complete
-level 1–7 builder and advancement slices for all twelve SRD classes, with
+level 1–8 builder and advancement slices for all twelve SRD classes, with
 every standard SRD background and species. Higher levels and multiclassing are the next builder increments.
 Direct JSON import remains available in the meantime.
 
@@ -554,7 +554,7 @@ Generate the fifteen source-linked standard conditions from Rules Glossary pages
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
 Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite; the
-web integration suite also covers creation and advancement through level 7 for all twelve classes. Results
+web integration suite also covers creation and advancement through level 8 for all twelve classes. Results
 include origin and feat ability increases, subclass features, species size, speed, senses, traits,
 typed skill and saving-throw proficiencies, d20-test roll states, Initiative, Passive Perception,
 inventory, armor and Shield

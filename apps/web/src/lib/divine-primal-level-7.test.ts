@@ -90,7 +90,11 @@ describe.each(definitions)("$slug level 7 and shared battle blessings", (definit
           { level: 4, maximum: 1 },
         ],
       });
-      expect(levelUpEligibility(next, catalog)).toMatchObject({ eligible: false, currentLevel: 7 });
+      expect(levelUpEligibility(next, catalog)).toMatchObject({
+        eligible: true,
+        currentLevel: 7,
+        targetLevel: 8,
+      });
     },
   );
 

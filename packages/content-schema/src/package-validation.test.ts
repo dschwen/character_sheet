@@ -341,7 +341,7 @@ describe("bootstrap content package", () => {
       supportedLevelMaximum: 8,
     });
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
       defaultAbilityScoreImprovementAbility: "strength",
     });
     const mindlessRage = entities.find(
@@ -363,7 +363,7 @@ describe("bootstrap content package", () => {
       ],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.bard")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: [
         "srd521.skill.performance",
@@ -381,15 +381,15 @@ describe("bootstrap content package", () => {
       },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.monk")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
       defaultAbilityScoreImprovementAbility: "dexterity",
       defaultClassSkillIds: ["srd521.skill.acrobatics", "srd521.skill.insight"],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.cleric")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
     });
     expect(metadata.find(({ id }) => id === "srd521.class.druid")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
     });
     expect(
       featureAutomationBodySchema.parse(
@@ -404,7 +404,7 @@ describe("bootstrap content package", () => {
       ),
     ).toMatchObject({ unarmedStrikeDamageTypes: ["force"] });
     expect(metadata.find(({ id }) => id === "srd521.class.paladin")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: ["srd521.skill.insight", "srd521.skill.persuasion"],
     });
@@ -421,7 +421,7 @@ describe("bootstrap content package", () => {
       options: ["srd521.feat.fighting-style.defense"],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.ranger")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
       defaultAbilityScoreImprovementAbility: "wisdom",
       expertiseChoice: {
         sourceId: "srd521.class-feature.ranger.deft-explorer",
@@ -441,7 +441,7 @@ describe("bootstrap content package", () => {
       ]),
     );
     expect(metadata.find(({ id }) => id === "srd521.class.rogue")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
       defaultAbilityScoreImprovementAbility: "dexterity",
       expertiseChoice: {
         sourceId: "srd521.class-feature.rogue.expertise",
@@ -451,7 +451,7 @@ describe("bootstrap content package", () => {
       },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.sorcerer")?.builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: ["srd521.skill.arcana", "srd521.skill.persuasion"],
     });
@@ -498,7 +498,7 @@ describe("bootstrap content package", () => {
     });
     const warlock = entities.find((entity) => entity.id === "srd521.class.warlock");
     const warlockBody = z.record(z.unknown()).parse(warlock?.body);
-    expect(warlockBody.builder).toMatchObject({ supportedLevelMaximum: 7 });
+    expect(warlockBody.builder).toMatchObject({ supportedLevelMaximum: 8 });
     expect(warlockBody.spellPreparationChange).toEqual({
       event: "level-up",
       replacementMaximum: 1,
@@ -648,7 +648,7 @@ describe("bootstrap content package", () => {
       .parse(JSON.parse(readFileSync(new URL("entities/wizard.json", root), "utf8")));
     const wizard = entities.find((entity) => entity.id === "srd521.class.wizard");
     expect(z.record(z.unknown()).parse(wizard?.body).builder).toMatchObject({
-      supportedLevelMaximum: 7,
+      supportedLevelMaximum: 8,
     });
     const spells = entities.filter((entity) => entity.kind === "spell");
     const wizardBody = z

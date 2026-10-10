@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from srd_extract.io import read_json, write_json
+from srd_extract.progression import progression_feature_ids
 from srd_extract.wizard import _slug, _source_spans
 
 CLASS_ID = "srd521.class.monk"
@@ -325,7 +326,9 @@ def _class_entity(
     features: tuple[dict[str, Any], ...],
     source: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    feature_ids = {(feature["level"], feature["name"]): feature["id"] for feature in features}
+    feature_ids = progression_feature_ids(
+        features, ((row.level, row.feature_names) for row in progression)
+    )
     return {
         "id": CLASS_ID,
         "kind": "class",
@@ -336,12 +339,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 8)},
+                "countByLevel": {str(level): 2 for level in range(1, 9)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 7,
+                "supportedLevelMaximum": 8,
                 "defaultAbilityScores": {
                     "strength": 8,
                     "dexterity": 15,

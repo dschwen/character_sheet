@@ -6,25 +6,25 @@
   },
   "classes": [
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.barbarian",
       "name": "Barbarian"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.bard",
       "name": "Bard"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.cleric",
       "name": "Cleric"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.druid",
       "name": "Druid"
@@ -36,43 +36,43 @@
       "name": "Fighter"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.monk",
       "name": "Monk"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.paladin",
       "name": "Paladin"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.ranger",
       "name": "Ranger"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.rogue",
       "name": "Rogue"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.sorcerer",
       "name": "Sorcerer"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.warlock",
       "name": "Warlock"
     },
     {
-      "builderMaximum": 7,
+      "builderMaximum": 8,
       "builderMinimum": 1,
       "id": "srd521.class.wizard",
       "name": "Wizard"

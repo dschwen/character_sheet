@@ -63,7 +63,11 @@ describe("Hunter level 7 and shared rest-replaceable feature options", () => {
         { level: 2, maximum: 3 },
       ],
     });
-    expect(levelUpEligibility(next, catalog)).toMatchObject({ eligible: false, currentLevel: 7 });
+    expect(levelUpEligibility(next, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 7,
+      targetLevel: 8,
+    });
   });
 
   it.each(["short-rest", "long-rest"] as const)(

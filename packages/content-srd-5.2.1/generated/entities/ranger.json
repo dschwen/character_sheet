@@ -52,7 +52,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.ranger.deft-explorer"
         },
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -209,7 +209,7 @@
           "favoredEnemy": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.ranger.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -284,7 +284,7 @@
           "favoredEnemy": 4,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.ranger.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -363,7 +363,7 @@
           "favoredEnemy": 5,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.ranger.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -475,7 +475,8 @@
           "4": 3,
           "5": 3,
           "6": 3,
-          "7": 3
+          "7": 3,
+          "8": 3
         },
         "maximum": 3,
         "minimum": 3,

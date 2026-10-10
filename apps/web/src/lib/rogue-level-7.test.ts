@@ -309,7 +309,7 @@ describe("Rogue level 7, Reliable Talent, and fixed tool checks", () => {
     expect(
       result.actions.find(({ id }) => id === "action.sneak-attack")?.parameters?.extraDamage,
     ).toMatchObject({ diceCount: 4, diceSize: 6 });
-    expect(levelUpEligibility(advanced, catalog).eligible).toBe(false);
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: true, targetLevel: 8 });
   });
 
   it.each([0, 21, 1.5, NaN])("rejects malformed d20 minimum %s", (value) => {

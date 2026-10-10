@@ -452,7 +452,7 @@ def _class_entity(
                 "minimum": traits.skill_choice_count,
                 "maximum": traits.skill_choice_count,
                 "options": list(traits.skill_options),
-                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 8)},
+                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 9)},
             },
             "weaponProficiencies": list(traits.weapon_proficiencies),
             "weaponMasteryChoice": {
@@ -464,7 +464,7 @@ def _class_entity(
             "startingEquipmentText": traits.starting_equipment_text,
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 7,
+                "supportedLevelMaximum": 8,
                 "defaultAbilityScores": {
                     "strength": 15,
                     "dexterity": 13,

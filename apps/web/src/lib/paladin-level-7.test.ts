@@ -60,7 +60,11 @@ describe("Paladin level 7 and source-driven aura condition immunity", () => {
         (resource) => resource.id === "srd521.resource.paladin.lay-on-hands",
       ),
     ).toMatchObject({ maximum: 35, current: 25 });
-    expect(levelUpEligibility(next, catalog)).toMatchObject({ eligible: false, currentLevel: 7 });
+    expect(levelUpEligibility(next, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 7,
+      targetLevel: 8,
+    });
   });
 
   it("suppresses Charmed without modifying the source document", () => {

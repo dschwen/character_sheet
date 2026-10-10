@@ -80,7 +80,11 @@ describe("Bard level 7 Countercharm and shared saving-throw rerolls", () => {
     expect(evaluation.traces[action.traceId]?.sourceReferences).toEqual(
       expect.arrayContaining([expect.objectContaining({ entityId: featureId, page: 33 })]),
     );
-    expect(levelUpEligibility(next, catalog)).toMatchObject({ eligible: false, currentLevel: 7 });
+    expect(levelUpEligibility(next, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 7,
+      targetLevel: 8,
+    });
   });
 
   it.each(["charmed", "frightened"])(

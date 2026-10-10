@@ -18,7 +18,7 @@
           "srd521.skill.persuasion"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 6,
@@ -185,7 +185,7 @@
           "cantrips": 5,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.sorcerer.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -255,7 +255,7 @@
           "cantrips": 6,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.sorcerer.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -333,7 +333,7 @@
           "cantrips": 6,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.sorcerer.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -461,7 +461,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,

@@ -20,7 +20,7 @@
           "srd521.skill.deception"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 7,
+        "supportedLevelMaximum": 8,
         "supportedLevelMinimum": 1
       },
       "cantripChange": {
@@ -214,7 +214,7 @@
           "eldritchInvocations": 6,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.warlock.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -286,7 +286,7 @@
           "eldritchInvocations": 8,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.warlock.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -358,7 +358,7 @@
           "eldritchInvocations": 9,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.warlock.ability-score-improvement",
               "name": "Ability Score Improvement"
             }
           ],
@@ -451,7 +451,8 @@
           "4": 2,
           "5": 2,
           "6": 2,
-          "7": 2
+          "7": 2,
+          "8": 2
         },
         "maximum": 2,
         "minimum": 2,
