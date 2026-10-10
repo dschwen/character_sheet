@@ -1,4 +1,83 @@
 {
+  "authoringIr": {
+    "semanticsApproved": 0,
+    "testsApproved": 0,
+    "total": 51
+  },
+  "classes": [
+    {
+      "builderMaximum": 6,
+      "builderMinimum": 1,
+      "id": "srd521.class.barbarian",
+      "name": "Barbarian"
+    },
+    {
+      "builderMaximum": 5,
+      "builderMinimum": 1,
+      "id": "srd521.class.bard",
+      "name": "Bard"
+    },
+    {
+      "builderMaximum": 6,
+      "builderMinimum": 1,
+      "id": "srd521.class.cleric",
+      "name": "Cleric"
+    },
+    {
+      "builderMaximum": 5,
+      "builderMinimum": 1,
+      "id": "srd521.class.druid",
+      "name": "Druid"
+    },
+    {
+      "builderMaximum": 6,
+      "builderMinimum": 1,
+      "id": "srd521.class.fighter",
+      "name": "Fighter"
+    },
+    {
+      "builderMaximum": 6,
+      "builderMinimum": 1,
+      "id": "srd521.class.monk",
+      "name": "Monk"
+    },
+    {
+      "builderMaximum": 5,
+      "builderMinimum": 1,
+      "id": "srd521.class.paladin",
+      "name": "Paladin"
+    },
+    {
+      "builderMaximum": 6,
+      "builderMinimum": 1,
+      "id": "srd521.class.ranger",
+      "name": "Ranger"
+    },
+    {
+      "builderMaximum": 6,
+      "builderMinimum": 1,
+      "id": "srd521.class.rogue",
+      "name": "Rogue"
+    },
+    {
+      "builderMaximum": 6,
+      "builderMinimum": 1,
+      "id": "srd521.class.sorcerer",
+      "name": "Sorcerer"
+    },
+    {
+      "builderMaximum": 5,
+      "builderMinimum": 1,
+      "id": "srd521.class.warlock",
+      "name": "Warlock"
+    },
+    {
+      "builderMaximum": 5,
+      "builderMinimum": 1,
+      "id": "srd521.class.wizard",
+      "name": "Wizard"
+    }
+  ],
   "counts": {
     "EXECUTABLE": 0,
     "STRUCTURED": 602,
@@ -7,7 +86,27 @@
     "UNCLASSIFIED": 0,
     "VERIFIED": 0
   },
+  "entityKinds": {
+    "background": 4,
+    "class": 12,
+    "class-feature": 174,
+    "class-option": 50,
+    "condition": 15,
+    "equipment-ammunition": 5,
+    "equipment-armor": 12,
+    "equipment-gear": 83,
+    "equipment-shield": 1,
+    "equipment-weapon": 38,
+    "feat": 8,
+    "rule-table": 14,
+    "species": 9,
+    "spell": 87,
+    "status": 14,
+    "subclass": 12,
+    "subclass-feature": 58,
+    "subclass-option": 6
+  },
   "generatedAt": null,
-  "note": "Barbarian and Sorcerer through level 6; other reviewed classes through their documented limits; Human, Soldier, equipment, and representative spells.",
+  "note": "Counts describe loaded entities, not completeness of SRD extraction. Builder limits describe implemented workflows, not semantic review approval. Proposed rules remain unverified until separately reviewed.",
   "package": "srd-5.2.1"
 }

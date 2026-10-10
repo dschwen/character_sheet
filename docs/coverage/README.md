@@ -1,27 +1,72 @@
 # Rules coverage
 
-The `srd-5.2.1` package currently contains structured Barbarian, Cleric, Druid, Fighter, Monk,
-Paladin, Ranger, Rogue, Sorcerer, Warlock, Wizard, Human, Soldier, Origin Feat, Fighting Style,
-spell, weapon, and armor proof-of-concept content.
+Generated from the current package by `python -m srd_extract.coverage`.
 
-| Status | Count |
-|---|---:|
+Counts describe loaded entities, not completeness of SRD extraction. Builder limits describe implemented workflows, not semantic review approval. Proposed rules remain unverified until separately reviewed.
+
+| Status | Loaded entities |
+| --- | ---: |
 | UNCLASSIFIED | 0 |
 | TEXT_ONLY | 0 |
-| STRUCTURED | 426 |
+| STRUCTURED | 602 |
 | EXECUTABLE | 0 |
 | TESTED | 0 |
 | VERIFIED | 0 |
 
-The package contains the Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer,
-Warlock, and Wizard class progressions; their extracted class features and scaling tables; Champion; Life
-Domain; Circle of the Land; Warrior of the Open Hand; Oath of Devotion; Hunter; Thief; Draconic
-Sorcery; Fiend Patron; Evoker; Human; Soldier; relevant feats; the equipment tables needed by the reviewed
-fixtures; complete Cleric, Druid, Paladin, Ranger, Sorcerer, Warlock, and Wizard spell lists; and 72
-source-linked structured spell descriptions. Rage, Unarmored Defense, Fighter level 1–5, Champion
-level-3 features, Channel Divinity, Preserve Life, Wild Shape, Wild Companion, Land’s Aid, Monk
-level 1–5, Paladin level 1–5, Ranger level 1–5, Rogue level 1–5, Sorcerer level 1–5, Warlock level
-1–5, Defense, and Savage Attacker have schema-valid proposed rules with integration tests. Cleric,
-Druid, Paladin, Ranger, Sorcerer, Warlock, and Wizard spellcasting is evaluated from structured
-class, subclass, and spell fields. All entities remain `STRUCTURED` until their semantics and tests
-are reviewed and approved.
+## Implemented single-class builder and advancement limits
+
+| Class | Minimum level | Maximum level |
+| --- | ---: | ---: |
+| Barbarian | 1 | 6 |
+| Bard | 1 | 5 |
+| Cleric | 1 | 6 |
+| Druid | 1 | 5 |
+| Fighter | 1 | 6 |
+| Monk | 1 | 6 |
+| Paladin | 1 | 5 |
+| Ranger | 1 | 6 |
+| Rogue | 1 | 6 |
+| Sorcerer | 1 | 6 |
+| Warlock | 1 | 5 |
+| Wizard | 1 | 5 |
+
+## Review evidence
+
+- Authoring IR records: 51.
+- Semantics approved: 0.
+- Tests approved: 0.
+
+Passing automated tests is not independent semantic or test-review approval.
+Level-20 progression tables do not imply automated level-20 support.
+See `docs/rules-engine` for class-specific assisted mechanics and limits.
+
+## Loaded entity families
+
+| Kind | Count |
+| --- | ---: |
+| background | 4 |
+| class | 12 |
+| class-feature | 174 |
+| class-option | 50 |
+| condition | 15 |
+| equipment-ammunition | 5 |
+| equipment-armor | 12 |
+| equipment-gear | 83 |
+| equipment-shield | 1 |
+| equipment-weapon | 38 |
+| feat | 8 |
+| rule-table | 14 |
+| species | 9 |
+| spell | 87 |
+| status | 14 |
+| subclass | 12 |
+| subclass-feature | 58 |
+| subclass-option | 6 |
+
+Regenerate after content changes:
+
+```bash
+PYTHONPATH=extraction .venv/bin/python -m srd_extract.coverage \
+  --output packages/content-srd-5.2.1/generated \
+  --markdown docs/coverage/README.md
+```
