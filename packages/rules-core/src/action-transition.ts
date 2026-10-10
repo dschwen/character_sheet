@@ -43,6 +43,7 @@ const stateActionParametersSchema = z
             diceCount: z.number().int().positive(),
             diceSize: z.number().int().positive(),
             bonusFact: z.string().min(1),
+            minimum: z.number().int().nonnegative().optional(),
           })
           .strict(),
         z.object({ perResourcePoint: z.number().positive() }).strict(),
@@ -310,7 +311,7 @@ export function proposeAction(
         : spend * perResourcePoint;
     healedHitPoints = Math.min(
       maximumHitPoints,
-      character.state.currentHitPoints + Math.max(0, healing),
+      character.state.currentHitPoints + Math.max(diceHealing?.minimum ?? 0, healing),
     );
     nextState.currentHitPoints = healedHitPoints;
     recordChange(

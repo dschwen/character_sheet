@@ -37,6 +37,40 @@ const initialOptions = {
 };
 
 describe("guided character level up", () => {
+  it("advances an Open Hand Monk to level 6 and rolls Wholeness of Body", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const original = buildCharacter(
+      defaultBuilderDraft(monkId, catalog, 5, "Healing Monk"),
+      rulesPackage,
+      initialOptions,
+    );
+    original.state.currentHitPoints = 10;
+    const advanced = levelUpCharacter(
+      original,
+      createLevelUpDraft(original, catalog),
+      rulesPackage,
+      initialOptions,
+    );
+    expect(advanced.state.currentHitPoints).toBe(10);
+    const evaluation = evaluateCharacter({ character: advanced, packages: [rulesPackage] });
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.values["hitPoints.maximum"]?.value).toBe(45);
+    expect(
+      evaluation.resources.find(({ id }) => id === "srd521.resource.monk.focus-points")?.maximum,
+    ).toBe(6);
+    expect(
+      evaluation.attacks.find(({ id }) => id === "attack.unarmed-strike")?.damage.alternativeTypes,
+    ).toEqual(["force"]);
+    const proposal = proposeAction(
+      { character: advanced, packages: [rulesPackage] },
+      { actionId: "action.wholeness-of-body", rolls: [8] },
+    );
+    expect(proposal.applicable).toBe(true);
+    expect(proposal.nextState.currentHitPoints).toBe(20);
+    expect(proposal.nextState.expendedResources["srd521.resource.monk.wholeness-of-body"]).toBe(1);
+    expect(levelUpEligibility(advanced, catalog)).toMatchObject({ eligible: false });
+  });
   it.each([
     barbarianId,
     bardId,

@@ -675,9 +675,9 @@ describe("guided character builder", () => {
   it("builds Open Hand Monks with Martial Arts and Focus at every supported level", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [10, 17, 24, 31, 38];
+    const expectedHitPoints = [10, 17, 24, 31, 38, 45];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(monkId, catalog, level, `Level ${String(level)} Monk`);
       const character = buildCharacter(draft, rulesPackage, options);
       const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
@@ -691,10 +691,20 @@ describe("guided character builder", () => {
       expect(character.build.subclassId).toBe(
         level >= 3 ? "srd521.subclass.monk.warrior-of-the-open-hand" : undefined,
       );
-      expect(evaluation.values["speed.walking"]?.value).toBe(level >= 2 ? 40 : 30);
+      expect(evaluation.values["speed.walking"]?.value).toBe(
+        level >= 6 ? 45 : level >= 2 ? 40 : 30,
+      );
       expect(evaluation.values["attackAction.attacks"]?.value).toBe(level >= 5 ? 2 : 1);
       expect(spear?.damage).toMatchObject({ diceCount: 1, diceSize: level >= 5 ? 8 : 6 });
       expect(focus?.maximum).toBe(level >= 2 ? level : undefined);
+      expect(
+        evaluation.resources.find(({ id }) => id === "srd521.resource.monk.wholeness-of-body")
+          ?.maximum,
+      ).toBe(level >= 6 ? 2 : undefined);
+      expect(
+        evaluation.attacks.find(({ id }) => id === "attack.unarmed-strike")?.damage
+          .alternativeTypes,
+      ).toEqual(level >= 6 ? ["force"] : undefined);
       if (level === 1) {
         expect(character.loadout.inventory).toHaveLength(7);
         expect(character.loadout.equippedItemIds).toEqual(["spear-1"]);

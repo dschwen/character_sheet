@@ -4,7 +4,8 @@
     "monk.focus.json",
     "monk.deflect-attacks.json",
     "monk.extra-attack.json",
-    "monk.stunning-strike.json"
+    "monk.stunning-strike.json",
+    "monk.wholeness-of-body.json"
   ],
   "classId": "srd521.class.monk",
   "coreTraits": {

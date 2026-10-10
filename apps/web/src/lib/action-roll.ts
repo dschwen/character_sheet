@@ -28,7 +28,7 @@ export function actionDiceRequest(
     throw new TypeError(`${action.id} is missing its ${bonusFact} roll modifier.`);
   }
   return {
-    label: `${actionName} · Healing`,
+    label: `${actionName} · Healing${typeof healing.minimum === "number" ? ` (minimum ${String(healing.minimum)} HP)` : ""}`,
     diceCount: healing.diceCount,
     diceSize: healing.diceSize,
     modifier: typeof modifier === "number" ? modifier : 0,

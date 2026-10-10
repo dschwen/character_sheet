@@ -744,8 +744,9 @@ const actionParametersSchema = z
         z
           .object({
             diceCount: z.number().int().positive(),
-            diceSize: z.number().int().positive(),
+            diceSize: z.number().int().positive().optional(),
             bonusFact: z.string().min(1),
+            minimum: z.number().int().nonnegative().optional(),
           })
           .strict(),
         z.object({ perResourcePoint: z.number().positive() }).strict(),
@@ -943,6 +944,24 @@ function evaluateGrantedActionEnhancements(
         endsConditionIds: enhancement.endsConditionIds,
       };
     }
+  }
+}
+
+function evaluateGrantedAttackEnhancements(
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  const unarmed = state.attacks.find((attack) => attack.id === "attack.unarmed-strike");
+  if (unarmed === undefined) return;
+  const alternatives = [...granted].flatMap((id) => {
+    const body = featureAutomationBodySchema.safeParse(index.entities.get(id)?.body);
+    return body.success ? body.data.unarmedStrikeDamageTypes : [];
+  });
+  if (alternatives.length > 0) {
+    unarmed.damage.alternativeTypes = [...new Set(alternatives)].filter(
+      (type) => type !== unarmed.damage.type,
+    );
   }
 }
 
@@ -5757,7 +5776,38 @@ function evaluateConditionalRules(
         actionParameters.variableSpend = parameters.variableSpend;
       }
       if (parameters.healing !== undefined) {
-        actionParameters.healing = parameters.healing;
+        const healing = parameters.healing;
+        if ("diceCount" in healing && healing.diceSize === undefined) {
+          if (rule.expression === undefined) {
+            throw new TypeError(`${rule.target ?? rule.id} has no healing die size.`);
+          }
+          const traceId = `${rule.target ?? rule.id}.healing.diceSize`;
+          const trace = evaluateExpression(
+            rule.expression,
+            traceId,
+            state,
+            index,
+            granted,
+            resourceAmounts,
+          );
+          state.traces[traceId] = withRuleSource(trace, ir);
+          actionParameters.healing = {
+            diceCount: healing.diceCount,
+            bonusFact: healing.bonusFact,
+            ...(healing.minimum === undefined ? {} : { minimum: healing.minimum }),
+            diceSize: requireNumber(trace.result as JsonScalar, traceId),
+          };
+        } else {
+          actionParameters.healing =
+            "perResourcePoint" in healing
+              ? { perResourcePoint: healing.perResourcePoint }
+              : {
+                  diceCount: healing.diceCount,
+                  bonusFact: healing.bonusFact,
+                  ...(healing.minimum === undefined ? {} : { minimum: healing.minimum }),
+                  ...(healing.diceSize === undefined ? {} : { diceSize: healing.diceSize }),
+                };
+        }
       }
       if (parameters.damageReroll !== undefined) {
         actionParameters.damageReroll = parameters.damageReroll;
@@ -6030,6 +6080,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateGrantedActionEnhancements(granted, index, state);
   const attackRules = evaluateAttackRules(rules, granted, index, state);
   evaluateAttacks(character, equipment, attackRules, index, state);
+  evaluateGrantedAttackEnhancements(granted, index, state);
   evaluateConditionMechanics(character, conditions, state);
   validateConcentration(character, index, state);
   validateActiveState(character, state);

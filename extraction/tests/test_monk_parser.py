@@ -1,6 +1,35 @@
 import pytest
 
-from srd_extract.monk import MonkProgressionRow, _starting_equipment, parse_core_traits
+from srd_extract.monk import (
+    MonkProgressionRow,
+    _starting_equipment,
+    _wholeness_ir,
+    parse_core_traits,
+)
+
+
+def test_wholeness_uses_progression_die_and_separate_long_rest_resource() -> None:
+    ir = _wholeness_ir(
+        {
+            "id": "srd521.subclass-feature.monk.warrior-of-the-open-hand.wholeness-of-body",
+            "level": 6,
+            "name": "Wholeness of Body",
+            "source": [],
+            "bodyNodes": [],
+        }
+    )
+    resource, action = ir["proposedRules"]
+    assert ir["kind"] == "subclass-feature"
+    assert ir["parentId"] == "srd521.subclass.monk.warrior-of-the-open-hand"
+    assert resource["expression"]["kind"] == "max"
+    assert resource["parameters"]["recharge"] == [{"event": "long-rest", "amount": "all"}]
+    assert action["expression"]["table"] == "srd521.table.monk.martial-arts-die"
+    assert action["parameters"]["resourceId"] == resource["target"]
+    assert action["parameters"]["healing"] == {
+        "diceCount": 1,
+        "bonusFact": "ability.wisdom.modifier",
+        "minimum": 1,
+    }
 
 
 def test_parse_core_monk_traits() -> None:

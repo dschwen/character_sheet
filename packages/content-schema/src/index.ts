@@ -381,6 +381,7 @@ export const classFeatureChoiceSchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    unarmedStrikeDamageTypes: z.array(z.string().min(1)).default([]),
     activeEffectConditionImmunities: z
       .array(
         z

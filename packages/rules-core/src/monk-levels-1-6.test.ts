@@ -18,6 +18,7 @@ const authoringIrFiles = [
   "monk.deflect-attacks.json",
   "monk.extra-attack.json",
   "monk.stunning-strike.json",
+  "monk.wholeness-of-body.json",
 ] as const;
 
 function readJson(url: URL): unknown {
@@ -38,7 +39,120 @@ function loadCharacter(): CharacterDocument {
   return characterDocumentSchema.parse(readJson(new URL("characters/monk-5.json", fixturesRoot)));
 }
 
-describe("evaluateCharacter Monk level-5 vertical slice", () => {
+describe("evaluateCharacter Monk levels 1–6 vertical slice", () => {
+  function levelSixCharacter(): CharacterDocument {
+    const character = loadCharacter();
+    character.build.levels.push({
+      characterLevel: 6,
+      classId: "srd521.class.monk",
+      hitPointChoice: "fixed",
+      selectedFeatureChoices: [],
+    });
+    character.state.currentHitPoints = 10;
+    return character;
+  }
+
+  it("grants level-6 healing and optional Force damage only for Unarmed Strikes", () => {
+    const character = levelSixCharacter();
+    const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+    expect(evaluation.validations).toEqual([]);
+    expect(
+      evaluation.resources.find(({ id }) => id === "srd521.resource.monk.wholeness-of-body"),
+    ).toMatchObject({ maximum: 2, current: 2 });
+    expect(
+      evaluation.attacks.find(({ id }) => id === "attack.unarmed-strike")?.damage,
+    ).toMatchObject({ type: "bludgeoning", alternativeTypes: ["force"] });
+    expect(
+      evaluation.attacks.find(({ id }) => id === "attack.spear-1")?.damage.alternativeTypes,
+    ).toBeUndefined();
+    const proposal = proposeAction(
+      { character, packages: [loadRulesPackage()] },
+      { actionId: "action.wholeness-of-body", rolls: [8] },
+    );
+    expect(proposal.applicable).toBe(true);
+    expect(proposal.nextState.currentHitPoints).toBe(20);
+    expect(proposal.nextState.expendedResources["srd521.resource.monk.wholeness-of-body"]).toBe(1);
+    expect(proposal.nextState.expendedResources["srd521.resource.monk.focus-points"]).toBe(2);
+  });
+
+  it("validates healing rolls, exhaustion, and the conscious-use requirement atomically", () => {
+    const character = levelSixCharacter();
+    for (const rolls of [[], [9], [1, 1]]) {
+      const proposal = proposeAction(
+        { character, packages: [loadRulesPackage()] },
+        { actionId: "action.wholeness-of-body", rolls },
+      );
+      expect(proposal.applicable).toBe(false);
+      expect(proposal.nextState).toEqual(character.state);
+    }
+    character.state.expendedResources["srd521.resource.monk.wholeness-of-body"] = 2;
+    expect(
+      proposeAction(
+        { character, packages: [loadRulesPackage()] },
+        { actionId: "action.wholeness-of-body", rolls: [1] },
+      ).applicable,
+    ).toBe(false);
+    character.state.expendedResources["srd521.resource.monk.wholeness-of-body"] = 0;
+    character.state.currentHitPoints = 0;
+    expect(
+      proposeAction(
+        { character, packages: [loadRulesPackage()] },
+        { actionId: "action.wholeness-of-body", rolls: [1] },
+      ).applicable,
+    ).toBe(false);
+  });
+
+  it("caps healing at maximum HP and recharges uses only on Long Rest", () => {
+    const character = levelSixCharacter();
+    character.state.currentHitPoints = 44;
+    character.state.expendedResources["srd521.resource.monk.wholeness-of-body"] = 1;
+    const input = { character, packages: [loadRulesPackage()] };
+    expect(
+      proposeAction(input, { actionId: "action.wholeness-of-body", rolls: [8] }).nextState
+        .currentHitPoints,
+    ).toBe(45);
+    expect(
+      proposeRest(input, { event: "short-rest" }).nextState.expendedResources[
+        "srd521.resource.monk.wholeness-of-body"
+      ],
+    ).toBe(1);
+    expect(
+      proposeRest(input, { event: "long-rest" }).nextState.expendedResources[
+        "srd521.resource.monk.wholeness-of-body"
+      ],
+    ).toBe(0);
+  });
+
+  it("guarantees one use and at least one healed HP with a negative Wisdom modifier", () => {
+    const character = levelSixCharacter();
+    character.build.abilityScores.wisdom = 8;
+    const input = { character, packages: [loadRulesPackage()] };
+    const evaluation = evaluateCharacter(input);
+    expect(
+      evaluation.resources.find(({ id }) => id === "srd521.resource.monk.wholeness-of-body")
+        ?.maximum,
+    ).toBe(1);
+    const proposal = proposeAction(input, { actionId: "action.wholeness-of-body", rolls: [1] });
+    expect(proposal.applicable).toBe(true);
+    expect(proposal.nextState.currentHitPoints).toBe(11);
+  });
+
+  it("retains Empowered Strikes when armor disables Martial Arts", () => {
+    const character = levelSixCharacter();
+    character.loadout.inventory.push({
+      id: "leather-1",
+      entityId: "srd521.equipment.armor.light.leather-armor",
+      quantity: 1,
+    });
+    character.loadout.equippedItemIds.push("leather-1");
+    const evaluation = evaluateCharacter({ character, packages: [loadRulesPackage()] });
+    expect(
+      evaluation.attacks.find(({ id }) => id === "attack.unarmed-strike")?.damage,
+    ).toMatchObject({ flat: 1, type: "bludgeoning", alternativeTypes: ["force"] });
+    expect(
+      evaluation.actions.find(({ id }) => id === "action.wholeness-of-body")?.parameters?.healing,
+    ).toMatchObject({ diceCount: 1, diceSize: 8 });
+  });
   it("evaluates Martial Arts, Unarmored Defense, movement, Focus, and Extra Attack", () => {
     const evaluation = evaluateCharacter({
       character: loadCharacter(),

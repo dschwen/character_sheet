@@ -334,10 +334,15 @@ describe("bootstrap content package", () => {
       },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.monk")?.builder).toMatchObject({
-      supportedLevelMaximum: 5,
+      supportedLevelMaximum: 6,
       defaultAbilityScoreImprovementAbility: "dexterity",
       defaultClassSkillIds: ["srd521.skill.acrobatics", "srd521.skill.insight"],
     });
+    expect(
+      featureAutomationBodySchema.parse(
+        entities.find(({ id }) => id === "srd521.class-feature.monk.empowered-strikes")?.body,
+      ),
+    ).toMatchObject({ unarmedStrikeDamageTypes: ["force"] });
     expect(metadata.find(({ id }) => id === "srd521.class.paladin")?.builder).toMatchObject({
       supportedLevelMaximum: 5,
       defaultAbilityScoreImprovementAbility: "charisma",

@@ -593,14 +593,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
   }
 
-  function rollAttackDamage(attack: AttackSummary, critical = false): void {
+  function rollAttackDamage(
+    attack: AttackSummary,
+    critical = false,
+    damageType = attack.damage.type,
+  ): void {
     const { diceCount, diceSize, bonus, flat = 0 } = attack.damage;
     if (diceCount === undefined || diceSize === undefined) {
       setNotice(`${attack.name} has no structured damage dice to roll.`);
       return;
     }
     void performDicePoolRoll({
-      label: `${attack.name}${critical ? " critical" : ""} damage · ${titleCase(attack.damage.type)}`,
+      label: `${attack.name}${critical ? " critical" : ""} damage · ${titleCase(damageType)}`,
       diceCount: critical ? diceCount * 2 : diceCount,
       diceSize,
       modifier: bonus + flat,
@@ -2267,6 +2271,27 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   >
                                     Crit
                                   </button>
+                                  {attack.damage.alternativeTypes?.map((type) => (
+                                    <span key={type}>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          rollAttackDamage(attack, false, type);
+                                        }}
+                                      >
+                                        {titleCase(type)} damage
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="critical-roll"
+                                        onClick={() => {
+                                          rollAttackDamage(attack, true, type);
+                                        }}
+                                      >
+                                        {titleCase(type)} crit
+                                      </button>
+                                    </span>
+                                  ))}
                                 </div>
                               </td>
                               <td>

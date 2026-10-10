@@ -77,8 +77,11 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Barbarian, Fighter, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
-Cleric, Druid, Monk, Paladin, Warlock, and Wizard advancement through level 5. At Ranger level 6,
+same-class Barbarian, Fighter, Monk, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
+Cleric, Druid, Paladin, Warlock, and Wizard advancement through level 5. At Monk level 6,
+Wholeness of Body rolls the Martial Arts die, heals with Wisdom (minimum 1 HP), and tracks
+Long Rest uses; Empowered Strikes offers Force-damage and critical-damage buttons for Unarmed Strikes.
+At Ranger level 6,
 Roving automatically increases walking Speed when eligible and grants matching Climb and Swim
 Speeds. Bard advancement permits one cantrip and one prepared-spell
 replacement; Sorcerer advancement permits its one prepared-spell and Metamagic
@@ -306,7 +309,7 @@ Generate Monk content from pages 49–53:
 
 The Monk parser validates all 20 progression rows, captures Martial Arts, Focus Point, and
 Unarmored Movement scaling, extracts the Warrior of the Open Hand, and generates source-linked
-authoring IR for the supported level-1–5 resource, defense, attack, and action mechanics.
+authoring IR for the supported level-1–6 resource, defense, attack, and action mechanics.
 
 Generate Paladin content from pages 53–57 using the shared spell-description extraction:
 
@@ -467,7 +470,7 @@ Generate the fifteen source-linked standard conditions from Rules Glossary pages
 
 The rules kernel evaluates reviewed level-1 Barbarian and level-5 Bard, Fighter, Cleric, Druid,
 Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, and Wizard fixtures in its integration suite; the
-web integration suite also covers Barbarian, Fighter, Ranger, Rogue, and Sorcerer creation and
+web integration suite also covers Barbarian, Fighter, Monk, Ranger, Rogue, and Sorcerer creation and
 advancement through level 6. Results
 include origin and feat ability increases, subclass features, species size, speed, senses, traits,
 typed skill and saving-throw proficiencies, d20-test roll states, Initiative, Passive Perception,

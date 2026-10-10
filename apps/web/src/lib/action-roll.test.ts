@@ -4,8 +4,35 @@ import { evaluateCharacter, proposeAction } from "@dnd/rules-core";
 
 import { actionDiceRequest, rollActionDice } from "./action-roll";
 import { loadWebData } from "./server-data";
+import {
+  buildCharacter,
+  characterBuilderCatalog,
+  defaultBuilderDraft,
+  monkId,
+} from "./character-builder";
 
 describe("rules-driven action dice", () => {
+  it("uses the Martial Arts die and Wisdom modifier for Wholeness of Body", () => {
+    const { rulesPackage } = loadWebData();
+    const character = buildCharacter(
+      defaultBuilderDraft(monkId, characterBuilderCatalog(rulesPackage), 6, "Healing Monk"),
+      rulesPackage,
+      { id: "healing-monk", now: new Date("2026-10-09T12:00:00Z") },
+    );
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+    const action = evaluation.actions.find(({ id }) => id === "action.wholeness-of-body");
+    if (action === undefined) throw new Error("Missing Wholeness of Body.");
+    expect(actionDiceRequest(action, evaluation, "Wholeness of Body")).toEqual({
+      label: "Wholeness of Body · Healing (minimum 1 HP)",
+      diceCount: 1,
+      diceSize: 8,
+      modifier: 2,
+    });
+    expect(rollActionDice(action, evaluation, "Wholeness of Body", () => 0.99)).toMatchObject({
+      dice: [8],
+      total: 10,
+    });
+  });
   it("derives and rolls Second Wind's 1d10 plus Fighter-level healing", () => {
     const { fixtures, rulesPackage } = loadWebData();
     const fixture = fixtures.find(({ filename }) => filename === "fighter-5.json");

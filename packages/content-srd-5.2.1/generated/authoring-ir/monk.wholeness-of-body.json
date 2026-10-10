@@ -1,0 +1,108 @@
+{
+  "id": "srd521.subclass-feature.monk.warrior-of-the-open-hand.wholeness-of-body",
+  "kind": "subclass-feature",
+  "level": 6,
+  "parentId": "srd521.subclass.monk.warrior-of-the-open-hand",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "args": [
+          {
+            "kind": "literal",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "path": "ability.wisdom.modifier"
+          }
+        ],
+        "kind": "max"
+      },
+      "id": "wholeness-of-body-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.monk.wholeness-of-body",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "key": {
+          "kind": "ref",
+          "path": "classLevel.monk"
+        },
+        "kind": "tableLookup",
+        "table": "srd521.table.monk.martial-arts-die"
+      },
+      "id": "use-wholeness-of-body",
+      "parameters": {
+        "actionEconomy": "bonus-action",
+        "healing": {
+          "bonusFact": "ability.wisdom.modifier",
+          "diceCount": 1,
+          "minimum": 1
+        },
+        "resourceId": "srd521.resource.monk.wholeness-of-body",
+        "spends": 1
+      },
+      "target": "action.wholeness-of-body",
+      "type": "grant-action",
+      "when": {
+        "args": [
+          {
+            "kind": "resourceAvailable",
+            "resourceId": "srd521.resource.monk.wholeness-of-body"
+          },
+          {
+            "kind": "compare",
+            "left": {
+              "kind": "ref",
+              "path": "hitPoints.current"
+            },
+            "op": "gt",
+            "right": {
+              "kind": "literal",
+              "value": 0
+            }
+          }
+        ],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Healing requires an explicit Martial Arts die roll."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0052-b014"
+      ],
+      "page": 52,
+      "quoteHash": "9d03873062088ac1609a7ffd063c8afb91e796b70da2ecc6b26d386880e18f54",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You gain the ability to heal yourself. As a Bonus Action, you can roll your Martial Arts die. You regain a number of Hit Points equal to the number rolled plus your Wisdom modifier (minimum of 1 Hit Point regained). You can use this feature a number of times equal to your Wisdom modifier (minimum of once), and you regain all expended uses when you finish a Long Rest."
+      }
+    ],
+    "title": "Wholeness of Body"
+  }
+}

@@ -11916,7 +11916,7 @@
           "srd521.skill.insight"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 5,
+        "supportedLevelMaximum": 6,
         "supportedLevelMinimum": 1
       },
       "conditionalWeaponProficiencies": [
@@ -12315,7 +12315,8 @@
           "2": 2,
           "3": 2,
           "4": 2,
-          "5": 2
+          "5": 2,
+          "6": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -12829,8 +12830,12 @@
   },
   {
     "body": {
+      "automationLevel": "roll-assisted",
       "level": 6,
-      "text": "Whenever you deal damage with your Unarmed Strike, it can deal your choice of Force damage or its normal damage type."
+      "text": "Whenever you deal damage with your Unarmed Strike, it can deal your choice of Force damage or its normal damage type.",
+      "unarmedStrikeDamageTypes": [
+        "force"
+      ]
     },
     "id": "srd521.class-feature.monk.empowered-strikes",
     "kind": "class-feature",

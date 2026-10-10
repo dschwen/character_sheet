@@ -320,12 +320,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 6)},
+                "countByLevel": {str(level): 2 for level in range(1, 7)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 8,
                     "dexterity": 15,
@@ -567,6 +567,66 @@ def _extra_attack_ir(feature: dict[str, Any]) -> dict[str, Any]:
     )
 
 
+def _wholeness_ir(feature: dict[str, Any]) -> dict[str, Any]:
+    resource_id = "srd521.resource.monk.wholeness-of-body"
+    ir = _feature_ir(
+        feature,
+        [
+            {
+                "id": "wholeness-of-body-resource",
+                "type": "grant-resource",
+                "target": resource_id,
+                "expression": {
+                    "kind": "max",
+                    "args": [
+                        {"kind": "literal", "value": 1},
+                        {"kind": "ref", "path": "ability.wisdom.modifier"},
+                    ],
+                },
+                "parameters": {"recharge": [{"event": "long-rest", "amount": "all"}]},
+                "automationLevel": "state-automated",
+            },
+            {
+                "id": "use-wholeness-of-body",
+                "type": "grant-action",
+                "target": "action.wholeness-of-body",
+                "expression": {
+                    "kind": "tableLookup",
+                    "table": "srd521.table.monk.martial-arts-die",
+                    "key": {"kind": "ref", "path": "classLevel.monk"},
+                },
+                "when": {
+                    "kind": "all",
+                    "args": [
+                        {"kind": "resourceAvailable", "resourceId": resource_id},
+                        {
+                            "kind": "compare",
+                            "op": "gt",
+                            "left": {"kind": "ref", "path": "hitPoints.current"},
+                            "right": {"kind": "literal", "value": 0},
+                        },
+                    ],
+                },
+                "parameters": {
+                    "actionEconomy": "bonus-action",
+                    "spends": 1,
+                    "resourceId": resource_id,
+                    "healing": {
+                        "diceCount": 1,
+                        "bonusFact": "ability.wisdom.modifier",
+                        "minimum": 1,
+                    },
+                },
+                "automationLevel": "state-automated",
+            },
+        ],
+    )
+    ir["kind"] = "subclass-feature"
+    ir["parentId"] = SUBCLASS_ID
+    ir["review"]["notes"] = ["Healing requires an explicit Martial Arts die roll."]
+    return ir
+
+
 def generate_monk_content(extraction_root: Path, output: Path) -> dict[str, Any]:
     document = read_json(extraction_root / "normalized" / "document.json")
     raw_page = read_json(extraction_root / "raw" / "pages" / "0050.json")
@@ -607,13 +667,15 @@ def generate_monk_content(extraction_root: Path, output: Path) -> dict[str, Any]
         ),
         *_subclass_entities(document, open_hand_features),
     ]
-    replacement_ids = {entity["id"] for entity in monk_entities}
-    existing = [
-        entity
-        for entity in read_json(output / "entities.json")
-        if entity["id"] not in replacement_ids
-    ]
-    all_entities = [*existing, *monk_entities]
+    for entity in monk_entities:
+        if entity["id"] == "srd521.class-feature.monk.empowered-strikes":
+            entity["body"]["unarmedStrikeDamageTypes"] = ["force"]
+            entity["body"]["automationLevel"] = "roll-assisted"
+    replacements = {entity["id"]: entity for entity in monk_entities}
+    existing = read_json(output / "entities.json")
+    existing_ids = {entity["id"] for entity in existing}
+    all_entities = [replacements.get(entity["id"], entity) for entity in existing]
+    all_entities.extend(entity for entity in monk_entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "monk.json", monk_entities)
     write_json(output / "entities.json", all_entities)
     by_name = {feature["name"]: feature for feature in features}
@@ -627,16 +689,16 @@ def generate_monk_content(extraction_root: Path, output: Path) -> dict[str, Any]
         "monk.stunning-strike.json": _focus_action_ir(
             by_name["Stunning Strike"], "stunning-strike", "once-per-turn-on-hit"
         ),
+        "monk.wholeness-of-body.json": _wholeness_ir(
+            next(
+                feature for feature in open_hand_features if feature["name"] == "Wholeness of Body"
+            )
+        ),
     }
     for filename, ir in authoring.items():
         write_json(output / "authoring-ir" / filename, ir)
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
-    coverage["note"] = (
-        "Barbarian, Cleric through level 5, Druid through level 5, Fighter through level 5, "
-        "Monk through level 5, Wizard through level 5, Human, Soldier, equipment, and "
-        "representative spells."
-    )
     write_json(output / "coverage.json", coverage)
     report = {
         "classId": CLASS_ID,

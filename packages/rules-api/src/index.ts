@@ -123,6 +123,7 @@ export interface InventoryItemSummary {
 }
 
 export interface DamageSummary {
+  alternativeTypes?: string[];
   diceCount?: number;
   diceSize?: number;
   flat?: number;
