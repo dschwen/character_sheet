@@ -32,6 +32,8 @@ export interface D20Reroll {
 }
 
 export interface DicePoolRollRequest {
+  dieMinimum?: { value: number; sourceName: string; traceId?: string };
+  minimumTotal?: number;
   label: string;
   diceCount: number;
   diceSize: number;
@@ -39,6 +41,9 @@ export interface DicePoolRollRequest {
 }
 
 export interface DicePoolRollResult {
+  dieMinimum?: DicePoolRollRequest["dieMinimum"];
+  effectiveDice?: readonly number[];
+  minimumTotal?: number;
   kind: "dice-pool";
   label: string;
   diceCount: number;
@@ -169,6 +174,18 @@ export function resolveDicePoolRoll(
     validateDieValue(value, request.diceSize);
   });
   const modifier = request.modifier ?? 0;
+  if (!Number.isFinite(modifier)) throw new RangeError("A dice modifier must be finite.");
+  if (
+    request.dieMinimum !== undefined &&
+    (!Number.isInteger(request.dieMinimum.value) ||
+      request.dieMinimum.value < 1 ||
+      request.dieMinimum.value > request.diceSize)
+  )
+    throw new RangeError("A die minimum must be a whole number within the die's range.");
+  if (request.minimumTotal !== undefined && !Number.isFinite(request.minimumTotal))
+    throw new RangeError("A dice total minimum must be finite.");
+  const effectiveDice = dice.map((value) => Math.max(value, request.dieMinimum?.value ?? 1));
+  const subtotal = effectiveDice.reduce((total, die) => total + die, modifier);
   return {
     kind: "dice-pool",
     label: request.label,
@@ -176,8 +193,31 @@ export function resolveDicePoolRoll(
     diceSize: request.diceSize,
     modifier,
     dice: [...dice],
-    total: dice.reduce((total, die) => total + die, modifier),
+    ...(request.dieMinimum === undefined ? {} : { dieMinimum: request.dieMinimum, effectiveDice }),
+    ...(request.minimumTotal === undefined ? {} : { minimumTotal: request.minimumTotal }),
+    total: request.minimumTotal === undefined ? subtotal : Math.max(request.minimumTotal, subtotal),
   };
+}
+
+export function dicePoolRollExpression(result: DicePoolRollResult): string {
+  const subtotal = (result.effectiveDice ?? result.dice).reduce((total, die) => total + die, 0);
+  const expression = `${String(subtotal)} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))}`;
+  return result.minimumTotal !== undefined && subtotal + result.modifier < result.minimumTotal
+    ? `max(${String(result.minimumTotal)}, ${expression}) = ${String(result.total)}`
+    : `${expression} = ${String(result.total)}`;
+}
+
+export function dicePoolRollDetail(result: DicePoolRollResult): string {
+  const physical = `${String(result.diceCount)}d${String(result.diceSize)} rolled: ${result.dice.map(String).join(", ")}`;
+  if (result.effectiveDice === undefined || result.dieMinimum === undefined) return physical;
+  const adjustments = result.dice.flatMap((original, index) =>
+    result.effectiveDice?.[index] === original
+      ? []
+      : [`${String(original)} → ${String(result.effectiveDice?.[index])}`],
+  );
+  return adjustments.length === 0
+    ? physical
+    : `${physical} · ${result.dieMinimum.sourceName}: ${adjustments.join(", ")} (treated, not rerolled)`;
 }
 
 export function rollD20(

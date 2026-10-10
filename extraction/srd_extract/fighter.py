@@ -1071,6 +1071,19 @@ def extract_fighting_styles(document: dict[str, Any]) -> list[dict[str, Any]]:
                 raise ValueError("Archery attack bonus could not be extracted")
             body["weaponAttackModifiers"] = [{"attackType": "ranged", "bonus": int(bonus.group(1))}]
             body["automationLevel"] = "sheet-automated"
+        elif name == "Great Weapon Fighting":
+            body["weaponDamageDieMinimums"] = [
+                {
+                    "attackType": "melee",
+                    "anyProperties": ["two-handed", "versatile"],
+                    "requiresTwoHands": True,
+                    "minimum": 3,
+                }
+            ]
+            body["automationLevel"] = "roll-automated"
+        elif name == "Two-Weapon Fighting":
+            body["extraAttackAbilityModifiers"] = [{"weaponProperty": "light"}]
+            body["automationLevel"] = "roll-automated"
         entities.append(
             {
                 "id": f"srd521.feat.fighting-style.{_slug(name)}",

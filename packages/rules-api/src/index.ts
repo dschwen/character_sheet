@@ -123,6 +123,7 @@ export interface InventoryItemSummary {
 }
 
 export interface DamageSummary {
+  dieMinimum?: { value: number; sourceName: string; traceId: string };
   alternativeTypes?: string[];
   diceCount?: number;
   diceSize?: number;
@@ -133,6 +134,7 @@ export interface DamageSummary {
 }
 
 export interface AttackSummary {
+  damageModes?: WeaponDamageModeSummary[];
   id: string;
   itemId: string;
   weaponId: string;
@@ -154,6 +156,16 @@ export interface AttackSummary {
   criticalHitThreshold: number;
   criticalHitTraceId: string;
   traceId: string;
+}
+
+export interface WeaponDamageModeSummary {
+  id: string;
+  name: string;
+  damage: DamageSummary;
+  available: boolean;
+  reasons: string[];
+  instructions: string;
+  requiresTwoHands: boolean;
 }
 
 export interface SpellSlotSummary {

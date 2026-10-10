@@ -1,0 +1,125 @@
+[
+  {
+    "body": {
+      "damageMode": {
+        "id": "light-extra-attack",
+        "instructions": "Declare an extra attack after attacking with a different Light weapon in the Attack action on this turn. One extra attack per turn, normally a Bonus Action; Nick timing must be adjudicated separately. Turn and action usage are not tracked automatically.",
+        "name": "Light extra attack",
+        "omitPositiveAbilityModifier": true,
+        "requiresDifferentWeapon": true,
+        "requiresTwoHands": false,
+        "useVersatileDamage": false
+      },
+      "property": "light",
+      "text": "When you take the Attack action on your turn and attack with a Light weapon, you can make one extra attack as a Bonus Action later on the same turn. That extra attack must be made with a different Light weapon, and you don’t add your ability modifier to the extra attack’s damage unless that modifier is negative. For example, you can attack with a Shortsword in one hand and a Dagger in the other using the Attack action and a Bonus Action, but you don’t add your Strength or Dexterity modifier to the damage roll of the Bonus Action unless that modifier is negative."
+    },
+    "id": "srd521.weapon-property.light",
+    "kind": "weapon-property",
+    "name": {
+      "en": "Light"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Conditional damage-mode semantics require independent review.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0089-b027"
+        ],
+        "page": 89,
+        "quoteHash": "b687746b81a28f68e3da699ffbf1e096a8079fdebd8faa8a97dc2da687802f15",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "weapon-property"
+    ]
+  },
+  {
+    "body": {
+      "damageMode": {
+        "id": "two-handed",
+        "instructions": "Declare that this attack uses the weapon in two hands. Resolve other hand usage and mounted exceptions manually.",
+        "name": "Two-handed",
+        "omitPositiveAbilityModifier": false,
+        "requiresDifferentWeapon": false,
+        "requiresTwoHands": true,
+        "useVersatileDamage": false
+      },
+      "property": "two-handed",
+      "text": "A Two-Handed weapon requires two hands when you attack with it."
+    },
+    "id": "srd521.weapon-property.two-handed",
+    "kind": "weapon-property",
+    "name": {
+      "en": "Two-Handed"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Conditional damage-mode semantics require independent review.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0090-b009"
+        ],
+        "page": 90,
+        "quoteHash": "d4fa99633a83a1154336fa0279570021cfb29bb7b4fd34b8da831acb58f3285c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "weapon-property"
+    ]
+  },
+  {
+    "body": {
+      "damageMode": {
+        "id": "two-handed",
+        "instructions": "Declare that this melee attack uses the weapon in two hands. Resolve other hand usage manually.",
+        "name": "Two-handed",
+        "omitPositiveAbilityModifier": false,
+        "requiresDifferentWeapon": false,
+        "requiresTwoHands": true,
+        "useVersatileDamage": true
+      },
+      "property": "versatile",
+      "text": "A Versatile weapon can be used with one or two hands. A damage value in parentheses appears with the property. The weapon deals that damage when used with two hands to make a melee attack."
+    },
+    "id": "srd521.weapon-property.versatile",
+    "kind": "weapon-property",
+    "name": {
+      "en": "Versatile"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Conditional damage-mode semantics require independent review.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0090-b010"
+        ],
+        "page": 90,
+        "quoteHash": "bed3307f918d85fb6505eb18d3771535a9b0d1d5adfde59e5f0bf03062394a76",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "weapon-property"
+    ]
+  }
+]

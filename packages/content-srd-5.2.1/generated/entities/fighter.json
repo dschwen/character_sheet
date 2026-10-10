@@ -1382,7 +1382,7 @@
   },
   {
     "body": {
-      "automationLevel": "assisted",
+      "automationLevel": "roll-automated",
       "category": "fighting-style",
       "requiresAnyFeatureIds": [
         "srd521.class-feature.fighter.fighting-style",
@@ -1401,7 +1401,18 @@
           }
         ],
         "title": "Great Weapon Fighting"
-      }
+      },
+      "weaponDamageDieMinimums": [
+        {
+          "anyProperties": [
+            "two-handed",
+            "versatile"
+          ],
+          "attackType": "melee",
+          "minimum": 3,
+          "requiresTwoHands": true
+        }
+      ]
     },
     "id": "srd521.feat.fighting-style.great-weapon-fighting",
     "kind": "feat",
@@ -1434,8 +1445,13 @@
   },
   {
     "body": {
-      "automationLevel": "assisted",
+      "automationLevel": "roll-automated",
       "category": "fighting-style",
+      "extraAttackAbilityModifiers": [
+        {
+          "weaponProperty": "light"
+        }
+      ],
       "requiresAnyFeatureIds": [
         "srd521.class-feature.fighter.fighting-style",
         "srd521.class-feature.paladin.fighting-style",

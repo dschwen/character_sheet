@@ -16,6 +16,7 @@ import {
 import {
   classFeatureChoiceSchema,
   featureAutomationBodySchema,
+  weaponPropertyBodySchema,
   savingThrowAuraRecipientSchema,
   type AuthoringIr,
   type ContentEntity,
@@ -312,6 +313,10 @@ const weaponBodySchema = z
     category: z.enum(["simple", "martial"]),
     attackType: z.enum(["melee", "ranged"]),
     damage: damageBodySchema,
+    versatileDamage: z
+      .object({ diceCount: z.number().int().positive(), diceSize: z.number().int().positive() })
+      .strict()
+      .optional(),
     properties: z.array(z.string()),
     mastery: z.string().min(1),
     range: z
@@ -6035,6 +6040,158 @@ function evaluateAttacks(
             diceSize: martialArtsDie.diceSize,
           }
         : weapon.damage;
+    const baseDamage: AttackSummary["damage"] = {
+      ...(damage.diceCount === null ? {} : { diceCount: damage.diceCount }),
+      ...(damage.diceSize === null ? {} : { diceSize: damage.diceSize }),
+      ...(damage.flat === null ? {} : { flat: damage.flat }),
+      bonus: damageBonus,
+      type: damage.type,
+      traceId: damageTraceId,
+    };
+    const damageModes: NonNullable<AttackSummary["damageModes"]> = [
+      {
+        id: "normal",
+        name: "Normal / manual exception",
+        damage: baseDamage,
+        available: true,
+        reasons: [],
+        instructions:
+          "Ordinary damage. Select a conditional mode to declare two-handed use or an extra Light-weapon attack.",
+        requiresTwoHands: false,
+      },
+    ];
+    const damageEffects = [...new Set(character.build.featIds)].flatMap((id) => {
+      const entity = index.entities.get(id);
+      const body = featureAutomationBodySchema.safeParse(entity?.body);
+      return entity?.kind === "feat" && body.success ? [{ entity, body: body.data }] : [];
+    });
+    for (const propertyEntity of index.entities.values()) {
+      if (propertyEntity.kind !== "weapon-property") continue;
+      const parsed = weaponPropertyBodySchema.safeParse(propertyEntity.body);
+      if (!parsed.success || !weapon.properties.includes(parsed.data.property)) continue;
+      const definition = parsed.data.damageMode;
+      if (
+        damageModes.some((mode) => mode.id === definition.id) ||
+        (definition.useVersatileDamage && weapon.attackType !== "melee")
+      )
+        continue;
+      const abilityEffects = definition.omitPositiveAbilityModifier
+        ? damageEffects.filter((effect) =>
+            effect.body.extraAttackAbilityModifiers.some(
+              (modifier) => modifier.weaponProperty === parsed.data.property,
+            ),
+          )
+        : [];
+      const appliedAbility =
+        definition.omitPositiveAbilityModifier && abilityEffects.length === 0
+          ? Math.min(0, abilityModifier)
+          : abilityModifier;
+      const bonus = appliedAbility + rageBonus;
+      const modeTraceId = `${attackId}.damage-mode.${definition.id}`;
+      const modeDamage = { ...baseDamage, bonus, traceId: modeTraceId };
+      if (
+        definition.useVersatileDamage &&
+        weapon.versatileDamage !== undefined &&
+        weapon.versatileDamage.diceSize > (modeDamage.diceSize ?? 0)
+      )
+        Object.assign(modeDamage, weapon.versatileDamage);
+      const minima = damageEffects.flatMap((effect) =>
+        effect.body.weaponDamageDieMinimums
+          .filter(
+            (minimum) =>
+              minimum.attackType === weapon.attackType &&
+              minimum.anyProperties.some((property) => weapon.properties.includes(property)) &&
+              (!minimum.requiresTwoHands || definition.requiresTwoHands),
+          )
+          .map((minimum) => ({ ...minimum, entity: effect.entity })),
+      );
+      const minimum = minima.sort((a, b) => b.minimum - a.minimum)[0];
+      if (minimum !== undefined) {
+        const minimumTraceId = `${modeTraceId}.dieMinimum`;
+        modeDamage.dieMinimum = {
+          value: minimum.minimum,
+          sourceName: minimum.entity.name.en ?? minimum.entity.id,
+          traceId: minimumTraceId,
+        };
+        state.traces[minimumTraceId] = {
+          id: minimumTraceId,
+          result: minimum.minimum,
+          nodes: [
+            {
+              id: `${minimumTraceId}.apply`,
+              operation: "minimum-weapon-damage-die-result",
+              inputs: [
+                weapon.attackType,
+                ...weapon.properties,
+                definition.requiresTwoHands,
+                minimum.minimum,
+              ],
+              output: minimum.minimum,
+            },
+          ],
+          sourceReferences: entitySourceReferences(minimum.entity),
+        };
+      }
+      const differentWeaponAvailable = equipment.items.some(
+        (other) =>
+          other.entity?.kind === "equipment-weapon" &&
+          weaponBodySchema.parse(other.entity.body).properties.includes(parsed.data.property) &&
+          (other.item.id !== resolved.item.id || other.item.quantity > 1),
+      );
+      const reasons = [
+        ...(definition.requiresTwoHands && state.facts["equipment.wieldingShield"] === true
+          ? ["Unequip your shield before declaring two-handed use."]
+          : []),
+        ...(definition.requiresDifferentWeapon && !differentWeaponAvailable
+          ? ["Requires a different owned Light weapon; confirm it was used for the earlier attack."]
+          : []),
+      ];
+      state.traces[modeTraceId] = {
+        id: modeTraceId,
+        result: bonus,
+        nodes: [
+          {
+            id: `${modeTraceId}.ability`,
+            operation: definition.omitPositiveAbilityModifier
+              ? "light-extra-attack-ability-modifier"
+              : "weapon-damage-ability-modifier",
+            inputs: [abilityModifier, abilityEffects.length > 0],
+            output: appliedAbility,
+          },
+          {
+            id: `${modeTraceId}.dice`,
+            operation: "select-weapon-damage-dice",
+            inputs: [
+              definition.useVersatileDamage,
+              modeDamage.diceCount ?? null,
+              modeDamage.diceSize ?? null,
+            ],
+            output: [modeDamage.diceCount ?? null, modeDamage.diceSize ?? null],
+          },
+          {
+            id: `${modeTraceId}.total`,
+            operation: "add",
+            inputs: [appliedAbility, rageBonus],
+            output: bonus,
+          },
+        ],
+        sourceReferences: [
+          ...entitySourceReferences(entity),
+          ...entitySourceReferences(propertyEntity),
+          ...abilityEffects.flatMap((effect) => entitySourceReferences(effect.entity)),
+          ...state.traces[damageTraceId].sourceReferences,
+        ],
+      };
+      damageModes.push({
+        id: definition.id,
+        name: definition.name,
+        damage: modeDamage,
+        requiresTwoHands: definition.requiresTwoHands,
+        available: reasons.length === 0,
+        reasons,
+        instructions: definition.instructions,
+      });
+    }
     state.attacks.push({
       id: attackId,
       itemId: resolved.item.id,
@@ -6043,14 +6200,8 @@ function evaluateAttacks(
       ability,
       attackBonus,
       proficient,
-      damage: {
-        ...(damage.diceCount === null ? {} : { diceCount: damage.diceCount }),
-        ...(damage.diceSize === null ? {} : { diceSize: damage.diceSize }),
-        ...(damage.flat === null ? {} : { flat: damage.flat }),
-        bonus: damageBonus,
-        type: damage.type,
-        traceId: damageTraceId,
-      },
+      damage: baseDamage,
+      damageModes,
       attackType: weapon.attackType,
       properties: weapon.properties,
       ...(weapon.range === undefined

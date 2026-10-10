@@ -434,8 +434,40 @@ export const savingThrowAuraRecipientSchema = z
   .strict()
   .refine((value) => value.maximum >= value.minimum);
 
+export const weaponPropertyBodySchema = z
+  .object({
+    property: z.string().min(1),
+    damageMode: z
+      .object({
+        id: z.string().min(1),
+        name: z.string().min(1),
+        omitPositiveAbilityModifier: z.boolean(),
+        requiresDifferentWeapon: z.boolean(),
+        requiresTwoHands: z.boolean(),
+        useVersatileDamage: z.boolean(),
+        instructions: z.string().min(1),
+      })
+      .strict(),
+  })
+  .passthrough();
+
 export const featureAutomationBodySchema = z
   .object({
+    weaponDamageDieMinimums: z
+      .array(
+        z
+          .object({
+            attackType: z.enum(["melee", "ranged"]),
+            anyProperties: z.array(z.string().min(1)).min(1),
+            requiresTwoHands: z.boolean(),
+            minimum: z.number().int().positive(),
+          })
+          .strict(),
+      )
+      .default([]),
+    extraAttackAbilityModifiers: z
+      .array(z.object({ weaponProperty: z.string().min(1) }).strict())
+      .default([]),
     requiresAnyFeatureIds: z.array(entityIdSchema).default([]),
     weaponAttackModifiers: z
       .array(

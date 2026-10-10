@@ -80,7 +80,7 @@
   ],
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 858,
+    "STRUCTURED": 861,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
@@ -104,7 +104,8 @@
     "status": 15,
     "subclass": 12,
     "subclass-feature": 58,
-    "subclass-option": 6
+    "subclass-option": 6,
+    "weapon-property": 3
   },
   "generatedAt": null,
   "note": "Counts describe loaded entities, not completeness of SRD extraction. Builder limits describe implemented workflows, not semantic review approval. Proposed rules remain unverified until separately reviewed.",

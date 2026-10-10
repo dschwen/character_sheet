@@ -78,8 +78,9 @@ Expertise, spell and preparation additions, the reviewed level-3 subclass, and t
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
 same-class advancement for all twelve SRD classes through level 6, plus Champion Fighters through
-level 7 with distinct Fighting Style choices. Archery and Defense are calculated; the two conditional
-damage styles are labeled assisted. Evokers select separate
+level 7 with distinct Fighting Style choices. Archery and Defense are calculated; Great Weapon
+Fighting and Two-Weapon Fighting use explicit conditional weapon-damage modes. Turn eligibility
+and action usage remain manually adjudicated. Evokers select separate
 Evocation Savant spellbook additions and can declare Sculpt Spells protection while casting,
 with conditional save/damage guidance for manually adjudicated targets.
 Lore Bards select two Magical Discoveries from the Cleric,
@@ -238,8 +239,8 @@ College of Lore feature, and the level-5 Inspiration die and recharge changes. I
 source-linked representative spells plus authoring IR for Bardic Inspiration, Jack of All Trades,
 and Cutting Words.
 
-Generate the typed Fighter-through-level-6 content from class pages 47–49, Ability Score
-Improvement on page 87, and the Defense Fighting Style on page 88:
+Generate the typed Fighter-through-level-7 content from class pages 47–49, Ability Score
+Improvement and Fighting Styles on pages 87–88:
 
 ```bash
 .venv/bin/python -m srd_extract.pipeline \
@@ -256,6 +257,17 @@ Improvement on page 87, and the Defense Fighting Style on page 88:
 This parser validates all 20 progression rows, reconciles every feature reference, extracts the
 Champion subclass and all four SRD Fighting Styles, and generates draft authoring IR for the
 supported Fighter features. Fighter choices and progression currently reach level 7.
+
+Generate the source-linked Light, Two-Handed, and Versatile damage modes:
+
+```bash
+.venv/bin/python -m srd_extract.pipeline \
+  --source sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf \
+  --out generated/extraction/srd-5.2.1-weapon-properties --pages 89-90
+.venv/bin/python -m srd_extract.weapon_properties \
+  --extraction generated/extraction/srd-5.2.1-weapon-properties \
+  --output packages/content-srd-5.2.1/generated
+```
 
 Generate Wizard content from pages 77–82 and representative spell descriptions from pages
 107–175:

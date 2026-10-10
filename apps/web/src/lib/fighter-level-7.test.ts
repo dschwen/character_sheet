@@ -193,13 +193,13 @@ describe("Fighter level 7 and shared feature feat selections", () => {
     expect(migrateFeatureFeatChoices(character, catalog)).toBe(character);
   });
 
-  it("labels conditional damage styles assisted instead of applying their bonus to every attack", () => {
+  it("offers conditional damage styles with their source descriptions", () => {
     const { catalog } = setup();
     const choice = catalog.classes[fighterId].featureChoices.find(
       (choice) => choice.id === baseChoice,
     );
     for (const style of ["great-weapon-fighting", "two-weapon-fighting"])
-      expect(choice?.options.find(({ id }) => id === prefix + style)?.description).toContain(
+      expect(choice?.options.find(({ id }) => id === prefix + style)?.description).not.toContain(
         "Assisted",
       );
   });

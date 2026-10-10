@@ -8,7 +8,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | --- | ---: |
 | UNCLASSIFIED | 0 |
 | TEXT_ONLY | 0 |
-| STRUCTURED | 858 |
+| STRUCTURED | 861 |
 | EXECUTABLE | 0 |
 | TESTED | 0 |
 | VERIFIED | 0 |
@@ -62,6 +62,7 @@ See `docs/rules-engine` for class-specific assisted mechanics and limits.
 | subclass | 12 |
 | subclass-feature | 58 |
 | subclass-option | 6 |
+| weapon-property | 3 |
 
 Regenerate after content changes:
 

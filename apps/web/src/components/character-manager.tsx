@@ -81,9 +81,12 @@ import {
 } from "../lib/play-state";
 import { proposePreparedSpellLoadout, spellPreparationEditor } from "../lib/spell-preparation";
 import { spellStatusInstructions, spellStatusMessage } from "../lib/spell-status";
+import { selectedWeaponDamageMode, weaponDamageRollRequest } from "../lib/weapon-damage-roll";
 import {
   rollD20,
   rollDice,
+  dicePoolRollExpression,
+  dicePoolRollDetail,
   type D20RollRequest,
   type DicePoolRollRequest,
   type DicePoolRollResult,
@@ -228,9 +231,7 @@ function rollExpression(result: DiceRollResult): string {
       .reduce((total, die) => total + die, 0);
     return `${String(result.kept)}${bonusTotal === 0 ? "" : ` + ${String(bonusTotal)}`} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))} = ${String(result.total)}`;
   }
-  if (result.modifier === 0) return `Total ${String(result.total)}`;
-  const diceTotal = result.dice.reduce((total, die) => total + die, 0);
-  return `${String(diceTotal)} ${result.modifier >= 0 ? "+" : "−"} ${String(Math.abs(result.modifier))} = ${String(result.total)}`;
+  return dicePoolRollExpression(result);
 }
 
 function rollDetail(result: DiceRollResult): string {
@@ -252,7 +253,7 @@ function rollDetail(result: DiceRollResult): string {
       ...(bonusDice === undefined ? [] : [bonusDice]),
     ].join(" · ");
   }
-  return `${String(result.diceCount)}d${String(result.diceSize)} rolled: ${result.dice.map(String).join(", ")}`;
+  return dicePoolRollDetail(result);
 }
 
 function d20RerollRequest(
@@ -351,6 +352,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
+  const [weaponDamageModes, setWeaponDamageModes] = useState<Readonly<Record<string, string>>>({});
   const [spellHealsOther, setSpellHealsOther] = useState<Readonly<Record<string, boolean>>>({});
   const [protectedCreatureCounts, setProtectedCreatureCounts] = useState<
     Readonly<Record<string, string>>
@@ -642,17 +644,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     critical = false,
     damageType = attack.damage.type,
   ): void {
-    const { diceCount, diceSize, bonus, flat = 0 } = attack.damage;
-    if (diceCount === undefined || diceSize === undefined) {
-      setNotice(`${attack.name} has no structured damage dice to roll.`);
-      return;
+    try {
+      void performDicePoolRoll(
+        weaponDamageRollRequest(attack, weaponDamageModes[attack.id], critical, damageType),
+      );
+    } catch (error) {
+      setNotice(errorMessage(error));
     }
-    void performDicePoolRoll({
-      label: `${attack.name}${critical ? " critical" : ""} damage · ${titleCase(damageType)}`,
-      diceCount: critical ? diceCount * 2 : diceCount,
-      diceSize,
-      modifier: bonus + flat,
-    });
   }
 
   function rollSpellDamage(spell: SpellSummary, damage: SpellSummary["damage"][number]): void {
@@ -764,6 +762,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setSpellLevels({});
     setSpellHealsOther({});
     setProtectedCreatureCounts({});
+    setWeaponDamageModes({});
     setSpellRecoverySelections({});
     setCastFeedback(undefined);
     setPreparedSpellDraft(undefined);
@@ -790,6 +789,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setSpellLevels({});
       setSpellHealsOther({});
       setProtectedCreatureCounts({});
+      setWeaponDamageModes({});
       setSpellRecoverySelections({});
       setCastFeedback(undefined);
       setPreparedSpellDraft(undefined);
@@ -2624,92 +2624,141 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           </tr>
                         </thead>
                         <tbody>
-                          {evaluation.attacks.map((attack) => (
-                            <tr key={attack.id}>
-                              <td>
-                                <strong>{attack.name}</strong>
-                                <small>
-                                  {titleCase(attack.attackType)} ·{" "}
-                                  {attack.properties.map(titleCase).join(", ")}
-                                </small>
-                              </td>
-                              <td>
-                                <TraceButton
-                                  className="roll-cell"
-                                  traceId={attack.traceId}
-                                  onSelect={setSelectedTraceId}
-                                  roll={{
-                                    label: `${attack.name} attack`,
-                                    modifier: attack.attackBonus,
-                                    mode: attackRollMode,
-                                    criticalThreshold: attack.criticalHitThreshold,
-                                    ...d20RerollRequest(
-                                      universalD20Test,
-                                      evaluation.attackRollBonusDice,
-                                    ),
-                                  }}
-                                  onRoll={performRoll}
-                                >
-                                  <strong>{signed(attack.attackBonus)}</strong>
-                                  <small>Roll attack</small>
-                                </TraceButton>
-                              </td>
-                              <td>
-                                <div className="damage-rolls">
-                                  <button
-                                    type="button"
-                                    onClick={(event) => {
-                                      if (event.shiftKey) {
-                                        setSelectedTraceId(attack.damage.traceId);
-                                      } else {
-                                        rollAttackDamage(attack);
-                                      }
+                          {evaluation.attacks.map((attack) => {
+                            const mode = selectedWeaponDamageMode(
+                              attack,
+                              weaponDamageModes[attack.id],
+                            );
+                            const damage = mode?.damage ?? attack.damage;
+                            return (
+                              <tr key={attack.id}>
+                                <td>
+                                  <strong>{attack.name}</strong>
+                                  <small>
+                                    {titleCase(attack.attackType)} ·{" "}
+                                    {attack.properties.map(titleCase).join(", ")}
+                                  </small>
+                                </td>
+                                <td>
+                                  <TraceButton
+                                    className="roll-cell"
+                                    traceId={attack.traceId}
+                                    onSelect={setSelectedTraceId}
+                                    roll={{
+                                      label: `${attack.name} attack`,
+                                      modifier: attack.attackBonus,
+                                      mode: attackRollMode,
+                                      criticalThreshold: attack.criticalHitThreshold,
+                                      ...d20RerollRequest(
+                                        universalD20Test,
+                                        evaluation.attackRollBonusDice,
+                                      ),
                                     }}
-                                    title="Roll damage · Shift-click to inspect calculation"
+                                    onRoll={performRoll}
                                   >
-                                    <strong>{damageText(attack.damage)}</strong>
-                                    <small>Roll damage</small>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="critical-roll"
-                                    onClick={() => {
-                                      rollAttackDamage(attack, true);
-                                    }}
-                                    title="Roll critical-hit damage"
-                                  >
-                                    Crit
-                                  </button>
-                                  {attack.damage.alternativeTypes?.map((type) => (
-                                    <span key={type}>
+                                    <strong>{signed(attack.attackBonus)}</strong>
+                                    <small>Roll attack</small>
+                                  </TraceButton>
+                                </td>
+                                <td>
+                                  <div className="damage-rolls">
+                                    {(attack.damageModes?.length ?? 0) > 1 ? (
+                                      <label>
+                                        Damage mode
+                                        <select
+                                          aria-label={`Damage mode for ${attack.name}`}
+                                          value={mode?.id ?? "normal"}
+                                          onChange={(event) => {
+                                            const id = event.target.value;
+                                            setWeaponDamageModes((current) => ({
+                                              ...current,
+                                              [attack.id]: id,
+                                            }));
+                                          }}
+                                        >
+                                          {attack.damageModes?.map((option) => (
+                                            <option key={option.id} value={option.id}>
+                                              {option.name}
+                                              {option.available ? "" : " · Unavailable"}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        <small>
+                                          {mode?.instructions} {mode?.reasons.join(" ")}
+                                        </small>
+                                      </label>
+                                    ) : null}
+                                    {damage.dieMinimum === undefined ? null : (
                                       <button
                                         type="button"
+                                        className="button secondary compact"
                                         onClick={() => {
-                                          rollAttackDamage(attack, false, type);
+                                          setSelectedTraceId(damage.dieMinimum?.traceId);
                                         }}
                                       >
-                                        {titleCase(type)} damage
+                                        {damage.dieMinimum.sourceName}: die minimum{" "}
+                                        {String(damage.dieMinimum.value)} · Explain
                                       </button>
-                                      <button
-                                        type="button"
-                                        className="critical-roll"
-                                        onClick={() => {
-                                          rollAttackDamage(attack, true, type);
-                                        }}
-                                      >
-                                        {titleCase(type)} crit
-                                      </button>
-                                    </span>
-                                  ))}
-                                </div>
-                              </td>
-                              <td>
-                                {attack.range === undefined
-                                  ? "Reach"
-                                  : `${String(attack.range.normal)}/${String(attack.range.long)} ft.`}
-                              </td>
-                            </tr>
-                          ))}
+                                    )}
+                                    <button
+                                      type="button"
+                                      disabled={mode?.available === false || diceRolling}
+                                      onClick={(event) => {
+                                        if (event.shiftKey) {
+                                          setSelectedTraceId(damage.traceId);
+                                        } else {
+                                          rollAttackDamage(attack);
+                                        }
+                                      }}
+                                      title="Roll damage · Shift-click to inspect calculation"
+                                    >
+                                      <strong>{damageText(damage)}</strong>
+                                      <small>Roll damage</small>
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="critical-roll"
+                                      disabled={mode?.available === false || diceRolling}
+                                      onClick={() => {
+                                        rollAttackDamage(attack, true);
+                                      }}
+                                      title="Roll critical-hit damage"
+                                    >
+                                      Crit
+                                    </button>
+                                    {damage.alternativeTypes?.map((type) => (
+                                      <span key={type}>
+                                        <button
+                                          type="button"
+                                          disabled={mode?.available === false || diceRolling}
+                                          onClick={() => {
+                                            rollAttackDamage(attack, false, type);
+                                          }}
+                                        >
+                                          {titleCase(type)} damage
+                                        </button>
+                                        <button
+                                          type="button"
+                                          className="critical-roll"
+                                          disabled={mode?.available === false || diceRolling}
+                                          onClick={() => {
+                                            rollAttackDamage(attack, true, type);
+                                          }}
+                                        >
+                                          {titleCase(type)} crit
+                                        </button>
+                                      </span>
+                                    ))}
+                                  </div>
+                                </td>
+                                <td>
+                                  {attack.range === undefined
+                                    ? "Reach"
+                                    : `${String(attack.range.normal)}/${String(attack.range.long)} ft.`}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
@@ -3348,6 +3397,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSpellLevels({});
             setSpellHealsOther({});
             setProtectedCreatureCounts({});
+            setWeaponDamageModes({});
             setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
@@ -3374,6 +3424,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSpellLevels({});
             setSpellHealsOther({});
             setProtectedCreatureCounts({});
+            setWeaponDamageModes({});
             setSpellRecoverySelections({});
             setCastFeedback(undefined);
             setPreparedSpellDraft(undefined);
