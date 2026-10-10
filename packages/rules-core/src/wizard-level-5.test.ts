@@ -45,14 +45,14 @@ describe("evaluateCharacter Wizard level-5 vertical slice", () => {
       cantripsKnown: 4,
       preparedSpellLimit: 9,
       alwaysPreparedSpells: 0,
-      spellbookMinimum: 14,
+      spellbookMinimum: 17,
       slots: [
         { level: 1, maximum: 4, expended: 2, current: 2 },
         { level: 2, maximum: 3, expended: 1, current: 2 },
         { level: 3, maximum: 2, expended: 1, current: 1 },
       ],
     });
-    expect(evaluation.spells).toHaveLength(18);
+    expect(evaluation.spells).toHaveLength(21);
     expect(evaluation.spells.filter((spell) => spell.level === 0)).toHaveLength(4);
     expect(evaluation.spells.filter((spell) => spell.prepared)).toHaveLength(9);
     expect(evaluation.spells.find((spell) => spell.id === "srd521.spell.fireball")).toMatchObject({

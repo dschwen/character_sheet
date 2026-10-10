@@ -26,7 +26,11 @@ describe("prepared spell loadouts", () => {
       mode: "spellbook",
       requiredSelections: 9,
     });
-    expect(editor?.options).toHaveLength(14);
+    expect(editor?.options).toHaveLength(17);
+    expect(editor?.alwaysPreparedSpellIds).toEqual([]);
+    expect(
+      editor?.options.find((spell) => spell.id === "srd521.spell.lightning-bolt"),
+    ).toMatchObject({ alwaysPrepared: false, selected: false });
     expect(editor?.options.every((spell) => wizard.build.learnedSpellIds.includes(spell.id))).toBe(
       true,
     );

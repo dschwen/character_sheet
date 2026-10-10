@@ -761,6 +761,46 @@ def generate_wizard_content(
         recovery_resource_ir(arcane_recovery, CLASS_ID, [recovery_id]),
     )
     current_entities = read_json(output / "entities.json")
+    evocations = [
+        entity
+        for entity in current_entities
+        if entity["kind"] == "spell"
+        and entity["body"]["school"] == "evocation"
+        and entity["id"] in wizard_entities[0]["body"]["spellList"]
+        and entity["body"]["level"] > 0
+    ]
+    savant = next(feature for feature in evoker_features if feature["name"] == "Evocation Savant")
+    choices = [(3, 2, 2, ["srd521.spell.magic-missile", "srd521.spell.scorching-ray"])]
+    first_levels: dict[int, int] = {}
+    for row in wizard_entities[0]["body"]["progression"]:
+        for slot_level in row["spellSlots"]:
+            if int(slot_level) > 2:
+                first_levels.setdefault(int(slot_level), row["level"])
+    choices.extend((level, 1, slot_level, []) for slot_level, level in sorted(first_levels.items()))
+    for entity in wizard_entities:
+        if entity["id"] != SUBCLASS_ID:
+            continue
+        for level, count, maximum, defaults in choices:
+            entity["body"][f"evocationSavantLevel{level}Choice"] = {
+                "id": f"srd521.choice.wizard.evocation-savant.level-{level}",
+                "level": level,
+                "minimum": count,
+                "maximum": count,
+                "options": sorted(
+                    spell["id"] for spell in evocations if spell["body"]["level"] <= maximum
+                ),
+                **({"defaultOptionIds": defaults} if defaults else {}),
+                "spellSelection": {
+                    "sourceFeatureId": savant["id"],
+                    "castingClassId": CLASS_ID,
+                    "sourceClassIds": [CLASS_ID],
+                    "alwaysPrepared": False,
+                    "spellbookAddition": True,
+                    "allowCantrips": False,
+                    "school": "evocation",
+                    "maximumSpellLevel": maximum,
+                },
+            }
     replacements = {entity["id"]: entity for entity in wizard_entities if entity["kind"] != "spell"}
     existing_ids = {entity["id"] for entity in current_entities}
     all_entities = [replacements.get(entity["id"], entity) for entity in current_entities]

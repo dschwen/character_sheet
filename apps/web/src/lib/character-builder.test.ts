@@ -17,6 +17,7 @@ import {
   expertiseCount,
   monkId,
   migrateMagicInitiateChoices,
+  migrateFeatureSpellbookChoices,
   paladinId,
   rangerId,
   rogueId,
@@ -1210,7 +1211,9 @@ describe("guided character builder", () => {
       expect(evaluation.validations, `level ${String(level)}`).toEqual([]);
       expect(character.state.currentHitPoints).toBe(expectedHitPoints[level - 1]);
       expect(character.build.learnedSpellIds).toHaveLength(
-        (counts?.cantrips ?? 0) + (counts?.learnedLeveledSpells ?? 0),
+        (counts?.cantrips ?? 0) +
+          (counts?.learnedLeveledSpells ?? 0) +
+          (level >= 5 ? 3 : level >= 3 ? 2 : 0),
       );
       expect(character.loadout.preparedSpellIds).toHaveLength(counts?.preparedSpells ?? 0);
       expect(character.build.subclassId).toBe(
@@ -1218,6 +1221,127 @@ describe("guided character builder", () => {
       );
       expect(character.build.proficiencyChoices.expertise).toHaveLength(level >= 2 ? 1 : 0);
     }
+  });
+
+  it("grants source-driven Evocation Savant book additions without free preparation", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const draft = defaultBuilderDraft(wizardId, catalog, 5, "Savant");
+    const character = buildCharacter(draft, rulesPackage, options);
+    const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+    expect(evaluation.validations).toEqual([]);
+    expect(evaluation.spellcasting).toMatchObject({
+      spellbookMinimum: 17,
+      alwaysPreparedSpells: 0,
+      preparedSpellLimit: 9,
+    });
+    const choices = catalog.classes[wizardId].featureChoices.filter(
+      (choice) => choice.spellSelection?.spellbookAddition,
+    );
+    expect(choices.map((choice) => choice.level)).toEqual([3, 5, 7, 9, 11, 13, 15, 17]);
+    const initial = choices[0];
+    const later = choices[1];
+    if (!initial || !later) throw new Error("Expected Savant choices");
+    expect(initial.options.some((option) => option.id === "srd521.spell.fireball")).toBe(false);
+    expect(initial.options.some((option) => option.id === "srd521.spell.shield")).toBe(false);
+    expect(initial.options.some((option) => option.id === "srd521.spell.fire-bolt")).toBe(false);
+    const initialSpell = draft.featureChoiceSelections[initial.id]?.[0];
+    if (initialSpell === undefined) throw new Error("Missing initial spell");
+    expect(updateBuilderFeatureChoice(draft, catalog, later.id, initialSpell)).toBe(draft);
+    for (const choice of choices.filter((choice) => choice.level <= 5)) {
+      expect(evaluation.traces[choice.id]?.nodes[0]?.operation).toBe(
+        "grant-feature-spellbook-spells",
+      );
+      expect(evaluation.traces[choice.id]?.sourceReferences.length).toBeGreaterThan(0);
+    }
+    for (const invalidId of [
+      "srd521.spell.shield",
+      "srd521.spell.fire-bolt",
+      "srd521.spell.fireball",
+    ]) {
+      const invalid = structuredClone(character);
+      const selection = invalid.build.levels[2]?.selectedFeatureChoices.find(
+        (choice) => choice.choiceId === initial.id,
+      );
+      if (!selection) throw new Error("Missing initial Savant choice");
+      selection.optionIds[0] = invalidId;
+      expect(
+        evaluateCharacter({ character: invalid, packages: [rulesPackage] }).validations.map(
+          (issue) => issue.code,
+        ),
+      ).toContain("FEATURE_SPELL_CHOICE_INVALID");
+    }
+    const missing = structuredClone(character);
+    missing.build.learnedSpellIds = missing.build.learnedSpellIds.filter(
+      (id) => id !== initialSpell,
+    );
+    expect(
+      evaluateCharacter({ character: missing, packages: [rulesPackage] }).validations.map(
+        (issue) => issue.code,
+      ),
+    ).toContain("FEATURE_SPELLBOOK_SELECTION_INVALID");
+    const duplicate = structuredClone(character);
+    const duplicateSelection = duplicate.build.levels[4]?.selectedFeatureChoices.find(
+      (choice) => choice.choiceId === later.id,
+    );
+    if (!duplicateSelection) throw new Error("Missing later Savant choice");
+    duplicateSelection.optionIds = [initialSpell];
+    expect(
+      evaluateCharacter({ character: duplicate, packages: [rulesPackage] }).validations.map(
+        (issue) => issue.code,
+      ),
+    ).toContain("FEATURE_SPELLBOOK_SELECTION_INVALID");
+  });
+
+  it("migrates missing Savant grants without changing existing spells, preparation, or play state", () => {
+    const { rulesPackage } = loadWebData();
+    const catalog = characterBuilderCatalog(rulesPackage);
+    const character = buildCharacter(
+      defaultBuilderDraft(wizardId, catalog, 5, "Legacy Savant"),
+      rulesPackage,
+      options,
+    );
+    const grantIds = character.build.levels.flatMap((level) =>
+      level.selectedFeatureChoices
+        .filter((choice) => choice.choiceId.includes("evocation-savant"))
+        .flatMap((choice) => choice.optionIds),
+    );
+    character.build.levels.forEach((level) => {
+      level.selectedFeatureChoices = level.selectedFeatureChoices.filter(
+        (choice) => !choice.choiceId.includes("evocation-savant"),
+      );
+    });
+    character.build.learnedSpellIds = character.build.learnedSpellIds.filter(
+      (id) => !grantIds.includes(id),
+    );
+    character.loadout.preparedSpellIds = character.build.learnedSpellIds
+      .filter((id) =>
+        catalog.classes[wizardId].spellcasting?.spells.some(
+          (spell) => spell.id === id && spell.level > 0,
+        ),
+      )
+      .slice(0, 9);
+    const original = structuredClone(character);
+    const migrated = migrateFeatureSpellbookChoices(character, catalog);
+    expect(character).toEqual(original);
+    expect(migrated.build.learnedSpellIds).toEqual(
+      expect.arrayContaining(original.build.learnedSpellIds),
+    );
+    expect(migrated.build.learnedSpellIds).toHaveLength(original.build.learnedSpellIds.length + 3);
+    expect(migrated.state).toEqual(original.state);
+    expect(migrated.loadout).toEqual(original.loadout);
+    expect(migrated.metadata).toEqual(original.metadata);
+    expect(
+      evaluateCharacter({ character: migrated, packages: [rulesPackage] }).validations,
+    ).toEqual([]);
+    expect(migrateFeatureSpellbookChoices(migrated, catalog)).toBe(migrated);
+    const explicit = structuredClone(migrated);
+    const explicitSelection = explicit.build.levels[2]?.selectedFeatureChoices.find((choice) =>
+      choice.choiceId.includes("evocation-savant"),
+    );
+    if (!explicitSelection) throw new Error("Missing explicit Savant choice");
+    explicitSelection.optionIds = [];
+    expect(migrateFeatureSpellbookChoices(explicit, catalog)).toBe(explicit);
   });
 
   it("builds, evaluates, casts, and recharges Magic Initiate spells", () => {
@@ -2022,7 +2146,7 @@ describe("guided character builder", () => {
     const levelFive = updateBuilderLevel(levelOne, catalog, 5);
     const returnedToOne = updateBuilderLevel(levelFive, catalog, 1);
 
-    expect(levelFive.learnedSpellIds).toHaveLength(18);
+    expect(levelFive.learnedSpellIds).toHaveLength(21);
     expect(levelFive.preparedSpellIds).toHaveLength(9);
     expect(levelFive.expertiseSkillIds).toEqual(["srd521.skill.arcana"]);
     expect(validateBuilderDraft(levelFive, catalog)).toEqual([]);
@@ -2065,7 +2189,7 @@ describe("guided character builder", () => {
     wizard.preparedSpellIds = [];
     expect(validateBuilderDraft(wizard, catalog)).toEqual(
       expect.arrayContaining([
-        "Choose 4 cantrips and 14 spellbook spells available at this level.",
+        "Choose 4 cantrips and 17 spellbook spells available at this level.",
         "Prepare exactly 9 Wizard spells.",
       ]),
     );

@@ -28,7 +28,13 @@
       {
         "characterLevel": 3,
         "classId": "srd521.class.wizard",
-        "hitPointChoice": "fixed"
+        "hitPointChoice": "fixed",
+        "selectedFeatureChoices": [
+          {
+            "choiceId": "srd521.choice.wizard.evocation-savant.level-3",
+            "optionIds": ["srd521.spell.continual-flame", "srd521.spell.gust-of-wind"]
+          }
+        ]
       },
       {
         "characterLevel": 4,
@@ -38,7 +44,13 @@
       {
         "characterLevel": 5,
         "classId": "srd521.class.wizard",
-        "hitPointChoice": "fixed"
+        "hitPointChoice": "fixed",
+        "selectedFeatureChoices": [
+          {
+            "choiceId": "srd521.choice.wizard.evocation-savant.level-5",
+            "optionIds": ["srd521.spell.lightning-bolt"]
+          }
+        ]
       }
     ],
     "abilityScores": {
@@ -84,7 +96,10 @@
       "srd521.spell.scorching-ray",
       "srd521.spell.shatter",
       "srd521.spell.web",
-      "srd521.spell.fireball"
+      "srd521.spell.fireball",
+      "srd521.spell.continual-flame",
+      "srd521.spell.gust-of-wind",
+      "srd521.spell.lightning-bolt"
     ],
     "proficiencyChoices": {
       "skills": [

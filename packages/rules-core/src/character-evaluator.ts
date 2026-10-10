@@ -3656,8 +3656,10 @@ function resolveFeatureSpellSelections(
   classLevel: number,
   index: PackageIndex,
   state: EngineState,
-): Set<string> {
+): { alwaysPrepared: Set<string>; spellbookBonusCount: number } {
   const grantedSpells = new Set<string>();
+  const bookSpells = new Set<string>();
+  let spellbookBonusCount = 0;
   const classLevels = new Map([[classId, classLevel]]);
   const grantedFeatures = grantedFeatureIds(classLevels, index);
   grantSubclassFeatures(character, classLevels, index, grantedFeatures);
@@ -3689,6 +3691,7 @@ function resolveFeatureSpellSelections(
       });
       const required =
         ownerValid && classLevel >= choice.level && grantedFeatures.has(definition.sourceFeatureId);
+      if (required && definition.spellbookAddition === true) spellbookBonusCount += choice.minimum;
       if (
         (!required && selections.length > 0) ||
         (required && (selections.length < choice.minimum || selections.length > choice.maximum)) ||
@@ -3723,6 +3726,8 @@ function resolveFeatureSpellSelections(
           !pool.has(selection.id) ||
           !body?.success ||
           body.data.level > maximum ||
+          body.data.level > (definition.maximumSpellLevel ?? 9) ||
+          (definition.school !== undefined && body.data.school !== definition.school) ||
           (body.data.level === 0 && !definition.allowCantrips)
         ) {
           addValidation(
@@ -3734,7 +3739,20 @@ function resolveFeatureSpellSelections(
           continue;
         }
         valid.push(selection.id);
-        grantedSpells.add(selection.id);
+        if (definition.alwaysPrepared) grantedSpells.add(selection.id);
+        if (definition.spellbookAddition === true) {
+          if (
+            bookSpells.has(selection.id) ||
+            !character.build.learnedSpellIds.includes(selection.id)
+          )
+            addValidation(
+              state,
+              "FEATURE_SPELLBOOK_SELECTION_INVALID",
+              "Feature spellbook additions must be distinct and present in the spellbook.",
+              ["build.learnedSpellIds", "build.levels"],
+            );
+          bookSpells.add(selection.id);
+        }
       }
       if (required) {
         state.traces[choice.id] = {
@@ -3743,7 +3761,9 @@ function resolveFeatureSpellSelections(
           nodes: [
             {
               id: `${choice.id}.grant`,
-              operation: "grant-always-prepared-feature-spells",
+              operation: definition.alwaysPrepared
+                ? "grant-always-prepared-feature-spells"
+                : "grant-feature-spellbook-spells",
               inputs: [classLevel, ...valid],
               output: valid,
             },
@@ -3755,7 +3775,7 @@ function resolveFeatureSpellSelections(
       }
     }
   }
-  return grantedSpells;
+  return { alwaysPrepared: grantedSpells, spellbookBonusCount };
 }
 
 function evaluateSpellcasting(
@@ -3904,8 +3924,9 @@ function evaluateSpellcasting(
       .flatMap((level) => level.selectedFeatureChoices)
       .flatMap((choice) => choice.optionIds),
   );
+  const featureSpells = resolveFeatureSpellSelections(character, classId, classLevel, index, state);
   const alwaysPrepared = new Set([
-    ...resolveFeatureSpellSelections(character, classId, classLevel, index, state),
+    ...featureSpells.alwaysPrepared,
     ...Object.entries(classBody.alwaysPreparedSpells).flatMap(([level, spellIds]) =>
       Number(level) <= classLevel ? spellIds : [],
     ),
@@ -4063,7 +4084,8 @@ function evaluateSpellcasting(
     classBody.spellbookStartingSpells !== undefined &&
     classBody.spellbookSpellsPerLevel !== undefined
       ? classBody.spellbookStartingSpells +
-        classBody.spellbookSpellsPerLevel * Math.max(0, classLevel - 1)
+        classBody.spellbookSpellsPerLevel * Math.max(0, classLevel - 1) +
+        featureSpells.spellbookBonusCount
       : undefined;
   if (spellbookMinimum !== undefined && learnedLeveledSpells < spellbookMinimum) {
     addValidation(

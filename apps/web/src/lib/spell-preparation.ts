@@ -117,6 +117,7 @@ export function spellPreparationEditor(
         if (
           !choice.success ||
           choice.data.spellSelection?.castingClassId !== classEntity.id ||
+          !choice.data.spellSelection.alwaysPrepared ||
           choice.data.level > classLevel
         )
           return [];

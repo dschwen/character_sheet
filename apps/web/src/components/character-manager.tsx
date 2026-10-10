@@ -23,7 +23,11 @@ import type {
 import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
-import { characterBuilderCatalog, migrateMagicInitiateChoices } from "../lib/character-builder";
+import {
+  characterBuilderCatalog,
+  migrateMagicInitiateChoices,
+  migrateFeatureSpellbookChoices,
+} from "../lib/character-builder";
 import {
   actionDiceRequest,
   applyPostRollBonus,
@@ -511,13 +515,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
     try {
       const parsed = characterDocumentSchema.parse(JSON.parse(saved) as unknown);
-      const restored = migrateMagicInitiateChoices(parsed, characterBuilderCatalog(rulesPackage));
+      const catalog = characterBuilderCatalog(rulesPackage);
+      const restored = migrateFeatureSpellbookChoices(
+        migrateMagicInitiateChoices(parsed, catalog),
+        catalog,
+      );
       setCharacter(restored);
       setSource("browser-save");
       setNotice(
         restored === parsed
           ? "Restored your last browser-local character."
-          : "Restored your character and added default choices for Magic Initiate; review them on the Spells tab.",
+          : "Restored your character and added missing default spell choices, including feature spellbook additions; review them before play.",
       );
     } catch {
       window.localStorage.removeItem(storageKey);
@@ -754,7 +762,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     if (file === undefined) return;
     try {
       const parsed = characterDocumentSchema.parse(JSON.parse(await file.text()) as unknown);
-      const imported = migrateMagicInitiateChoices(parsed, builderCatalog);
+      const imported = migrateFeatureSpellbookChoices(
+        migrateMagicInitiateChoices(parsed, builderCatalog),
+        builderCatalog,
+      );
       setCharacter(imported);
       setLatestRoll(undefined);
       setPreviousCharacter(undefined);
@@ -769,7 +780,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setNotice(
         imported === parsed
           ? `Imported ${parsed.name}; it is saved only in this browser.`
-          : `Imported ${parsed.name} and added default choices for Magic Initiate; review them on the Spells tab.`,
+          : `Imported ${parsed.name} and added missing default spell choices, including feature spellbook additions; review them before play.`,
       );
     } catch (error) {
       setNotice(`Import failed: ${errorMessage(error)}`);

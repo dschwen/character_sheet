@@ -18,6 +18,7 @@ import {
   expertiseSkillCandidates,
   featureChoiceCount,
   featureChoiceOptionsForLevel,
+  featureSpellbookChoices,
   fighterId,
   masteryCount,
   magicInitiateFeatIds,
@@ -645,7 +646,10 @@ export function CharacterBuilder({
                           }}
                         />
                         <small>
-                          Always prepared; these do not use your normal spell selections. Selected:{" "}
+                          {choice.spellSelection.alwaysPrepared
+                            ? "Always prepared; these do not use your normal spell selections."
+                            : "Added to your spellbook in addition to normal growth; prepare them normally."}{" "}
+                          Selected:{" "}
                           {(draft.featureChoiceSelections[choice.id] ?? [])
                             .map(
                               (id) => choice.options.find((option) => option.id === id)?.name ?? id,
@@ -669,6 +673,10 @@ export function CharacterBuilder({
                         (optionId) => !selectedIds.includes(optionId),
                       );
                       const unavailable = option.minimumClassLevel > draft.level;
+                      const alreadyGranted =
+                        !selected &&
+                        choice.spellSelection?.spellbookAddition === true &&
+                        featureSpellbookChoices(draft, catalog).includes(option.id);
                       const maximumReached =
                         !selected && selectedIds.length >= featureChoiceCount(choice, draft.level);
                       return (
@@ -677,7 +685,10 @@ export function CharacterBuilder({
                           type="button"
                           className={selected ? "builder-choice selected" : "builder-choice"}
                           disabled={
-                            unavailable || missingPrerequisite !== undefined || maximumReached
+                            alreadyGranted ||
+                            unavailable ||
+                            missingPrerequisite !== undefined ||
+                            maximumReached
                           }
                           onClick={() => {
                             setDraft((value) =>
@@ -691,11 +702,13 @@ export function CharacterBuilder({
                           <small>
                             {selected
                               ? "Selected"
-                              : unavailable
-                                ? `Requires level ${String(option.minimumClassLevel)}`
-                                : missingPrerequisite === undefined
-                                  ? "Choose option"
-                                  : `Requires ${choice.options.find((candidate) => candidate.id === missingPrerequisite)?.name ?? shortEntityName(missingPrerequisite)}`}
+                              : alreadyGranted
+                                ? "Already selected for another spellbook grant"
+                                : unavailable
+                                  ? `Requires level ${String(option.minimumClassLevel)}`
+                                  : missingPrerequisite === undefined
+                                    ? "Choose option"
+                                    : `Requires ${choice.options.find((candidate) => candidate.id === missingPrerequisite)?.name ?? shortEntityName(missingPrerequisite)}`}
                           </small>
                         </button>
                       );
@@ -1057,7 +1070,10 @@ export function CharacterBuilder({
                             key={spell.id}
                             type="button"
                             className={selected ? "selected" : undefined}
-                            disabled={!selected && selectedCount >= group.count}
+                            disabled={
+                              featureSpellbookChoices(draft, catalog).includes(spell.id) ||
+                              (!selected && selectedCount >= group.count)
+                            }
                             onClick={() => {
                               toggleLearnedSpell(spell.id, groupIds, group.count);
                             }}
@@ -1068,6 +1084,9 @@ export function CharacterBuilder({
                               <small>
                                 {spell.level === 0 ? "Cantrip" : `Level ${String(spell.level)}`} ·{" "}
                                 {titleCase(spell.school)}
+                                {featureSpellbookChoices(draft, catalog).includes(spell.id)
+                                  ? " · Feature spellbook addition"
+                                  : ""}
                               </small>
                             </span>
                           </button>

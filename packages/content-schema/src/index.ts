@@ -339,14 +339,27 @@ export const classFeatureChoiceSchema = z
         sourceFeatureId: entityIdSchema,
         castingClassId: entityIdSchema,
         sourceClassIds: z.array(entityIdSchema).min(1),
-        alwaysPrepared: z.literal(true),
+        alwaysPrepared: z.boolean(),
+        spellbookAddition: z.literal(true).optional(),
         allowCantrips: z.boolean(),
+        school: z.string().min(1).optional(),
+        maximumSpellLevel: z.number().int().min(0).max(9).optional(),
       })
       .strict()
       .optional(),
   })
   .strict()
   .superRefine((choice, context) => {
+    if (
+      choice.spellSelection?.alwaysPrepared !== undefined &&
+      choice.spellSelection.alwaysPrepared === (choice.spellSelection.spellbookAddition === true)
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Spell choices must grant either preparation or spellbook additions, not both",
+        path: ["spellSelection"],
+      });
+    }
     if (choice.minimum > choice.maximum || choice.maximum > choice.options.length) {
       context.addIssue({
         code: z.ZodIssueCode.custom,

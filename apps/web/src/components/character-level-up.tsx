@@ -18,6 +18,7 @@ import {
   expertiseSkillCandidates,
   featureChoiceCount,
   featureChoiceOptionsForLevel,
+  featureSpellbookChoices,
   magicInitiateFeatIds,
   masteryCount,
   spellSelectionCounts,
@@ -479,7 +480,10 @@ export function CharacterLevelUp({
                           }}
                         />
                         <small>
-                          Always prepared; these do not use your normal spell selections. Selected:{" "}
+                          {choice.spellSelection.alwaysPrepared
+                            ? "Always prepared; these do not use your normal spell selections."
+                            : "Added to your spellbook in addition to normal growth; prepare them normally."}{" "}
+                          Selected:{" "}
                           {(draft.featureChoiceSelections[choice.id] ?? [])
                             .map(
                               (id) => choice.options.find((option) => option.id === id)?.name ?? id,
@@ -518,6 +522,10 @@ export function CharacterLevelUp({
                         (optionId) => !selectedIds.includes(optionId),
                       );
                       const unavailable = option.minimumClassLevel > targetLevel;
+                      const alreadyGranted =
+                        !selected &&
+                        choice.spellSelection?.spellbookAddition === true &&
+                        featureSpellbookChoices(draft, catalog).includes(option.id);
                       const maximumReached =
                         !selected && selectedIds.length >= featureChoiceCount(choice, targetLevel);
                       return (
@@ -527,6 +535,7 @@ export function CharacterLevelUp({
                           className={selected ? "builder-choice selected" : "builder-choice"}
                           disabled={
                             replacementBlocked ||
+                            alreadyGranted ||
                             unavailable ||
                             missingPrerequisite !== undefined ||
                             maximumReached
@@ -545,11 +554,13 @@ export function CharacterLevelUp({
                           <small>
                             {selected
                               ? "Selected"
-                              : unavailable
-                                ? `Requires level ${String(option.minimumClassLevel)}`
-                                : missingPrerequisite === undefined
-                                  ? "Choose option"
-                                  : `Requires ${choice.options.find((candidate) => candidate.id === missingPrerequisite)?.name ?? shortEntityName(missingPrerequisite)}`}
+                              : alreadyGranted
+                                ? "Already selected for another spellbook grant"
+                                : unavailable
+                                  ? `Requires level ${String(option.minimumClassLevel)}`
+                                  : missingPrerequisite === undefined
+                                    ? "Choose option"
+                                    : `Requires ${choice.options.find((candidate) => candidate.id === missingPrerequisite)?.name ?? shortEntityName(missingPrerequisite)}`}
                           </small>
                         </button>
                       );
@@ -797,6 +808,7 @@ export function CharacterLevelUp({
                                 type="button"
                                 className={selected ? "selected" : undefined}
                                 disabled={
+                                  featureSpellbookChoices(draft, catalog).includes(spell.id) ||
                                   locked ||
                                   (group.replacementMaximum > 0 && replacementBlocked) ||
                                   (!selected && selectedCount >= group.count)

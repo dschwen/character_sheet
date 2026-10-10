@@ -480,6 +480,7 @@ function classCatalog(
         for (const option of choiceOptions) {
           const spell = rulesPackage.entities.find((entity) => entity.id === option.id);
           const spellLevel = numericValue(objectValue(spell?.body)?.level, 99);
+          const school = objectValue(spell?.body)?.school;
           option.minimumClassLevel =
             spellLevel === 0
               ? parsed.data.spellSelection.allowCantrips
@@ -497,7 +498,13 @@ function classCatalog(
                     }),
                   ),
                 );
-          option.description = `${spellLevel === 0 ? "Cantrip" : `Level ${String(spellLevel)}`} · Always prepared · ${parsed.data.spellSelection.sourceClassIds.map(shortEntityName).join(" / ")}`;
+          if (
+            spellLevel > (parsed.data.spellSelection.maximumSpellLevel ?? 9) ||
+            (parsed.data.spellSelection.school !== undefined &&
+              school !== parsed.data.spellSelection.school)
+          )
+            option.minimumClassLevel = 99;
+          option.description = `${spellLevel === 0 ? "Cantrip" : `Level ${String(spellLevel)}`} · ${parsed.data.spellSelection.alwaysPrepared ? "Always prepared" : "Added to spellbook; prepare normally"} · ${parsed.data.spellSelection.sourceClassIds.map(shortEntityName).join(" / ")}`;
         }
       }
       return [{ ...parsed.data, options: choiceOptions }];
@@ -1300,6 +1307,67 @@ export function migrateMagicInitiateChoices(
   });
 }
 
+export function migrateFeatureSpellbookChoices(
+  character: CharacterDocument,
+  catalog: BuilderCatalog,
+): CharacterDocument {
+  const classId = character.build.levels[0]?.classId;
+  if (classId === undefined || character.build.levels.some((level) => level.classId !== classId))
+    return character;
+  const selectedClass = Object.values(catalog.classes).find(
+    (candidate) => candidate.id === classId,
+  );
+  if (selectedClass === undefined || character.build.subclassId !== selectedClass.subclassId)
+    return character;
+  const existingIds = new Set(
+    character.build.levels
+      .flatMap((level) => level.selectedFeatureChoices)
+      .map((choice) => choice.choiceId),
+  );
+  const learned = new Set(character.build.learnedSpellIds);
+  const used = new Set(
+    character.build.levels
+      .flatMap((level) => level.selectedFeatureChoices)
+      .flatMap((choice) => choice.optionIds),
+  );
+  const levels = character.build.levels.map((level) => ({
+    ...level,
+    selectedFeatureChoices: [...level.selectedFeatureChoices],
+  }));
+  let changed = false;
+  for (const choice of selectedClass.featureChoices) {
+    if (
+      choice.spellSelection?.spellbookAddition !== true ||
+      choice.level > levels.length ||
+      existingIds.has(choice.id)
+    )
+      continue;
+    const candidates = featureChoiceOptionsForLevel(choice, choice.level)
+      .map((option) => option.id)
+      .filter((id) => !used.has(id));
+    const selected = fillSelections(
+      [],
+      candidates.filter((id) => !learned.has(id)),
+      choice.minimum,
+    );
+    if (selected.length !== choice.minimum) continue;
+    const entry = levels[choice.level - 1];
+    if (entry === undefined) continue;
+    entry.selectedFeatureChoices.push({ choiceId: choice.id, optionIds: selected });
+    selected.forEach((id) => {
+      learned.add(id);
+      used.add(id);
+    });
+    changed = true;
+  }
+  return changed
+    ? characterDocumentSchema.parse({
+        ...character,
+        build: { ...character.build, levels, learnedSpellIds: [...learned] },
+      })
+    : character;
+}
+
 export function updateBuilderBackground(
   draft: CharacterBuilderDraft,
   catalog: BuilderCatalog,
@@ -1575,22 +1643,27 @@ function reconciledFeatureChoiceSelections(
   current: Readonly<Record<string, string[]>>,
   level: number,
 ): Readonly<Record<string, string[]>> {
+  const usedBookSpells = new Set<string>();
   return Object.fromEntries(
     selectedClass.featureChoices
       .filter((choice) => choice.level <= level)
-      .map((choice) => [
-        choice.id,
-        fillSelections(
+      .map((choice) => {
+        const selected = fillSelections(
           current[choice.id] ?? [],
           [...(choice.defaultOptionIds ?? []), ...choice.options.map((option) => option.id)].filter(
             (optionId, index, optionIds) =>
               optionIds.indexOf(optionId) === index &&
+              (choice.spellSelection?.spellbookAddition !== true ||
+                !usedBookSpells.has(optionId)) &&
               (choice.options.find((option) => option.id === optionId)?.minimumClassLevel ?? 1) <=
                 level,
           ),
           choice.countByLevel === undefined ? choice.minimum : featureChoiceCount(choice, level),
-        ),
-      ]),
+        );
+        if (choice.spellSelection?.spellbookAddition === true)
+          selected.forEach((id) => usedBookSpells.add(id));
+        return [choice.id, selected];
+      }),
   );
 }
 
@@ -1642,11 +1715,30 @@ export function spellSelectionCounts(
     .flatMap((choice) => draft.featureChoiceSelections[choice.id] ?? []);
   return {
     ...counts,
+    learnedLeveledSpells:
+      counts.learnedLeveledSpells +
+      selectedClass.featureChoices
+        .filter(
+          (choice) =>
+            choice.spellSelection?.spellbookAddition === true && choice.level <= draft.level,
+        )
+        .reduce((total, choice) => total + choice.minimum, 0),
     cantrips: counts.cantrips + additionalCantrips,
     alwaysPreparedSpellIds: [
       ...new Set([...counts.alwaysPreparedSpellIds, ...choiceGrantedSpells, ...chosenSpells]),
     ],
   };
+}
+
+export function featureSpellbookChoices(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): string[] {
+  return catalog.classes[draft.classId].featureChoices
+    .filter(
+      (choice) => choice.spellSelection?.spellbookAddition === true && choice.level <= draft.level,
+    )
+    .flatMap((choice) => draft.featureChoiceSelections[choice.id] ?? []);
 }
 
 function spellSelections(
@@ -1673,7 +1765,12 @@ function spellSelections(
   const leveled =
     spellcasting.preparation === "spellbook"
       ? fillSelections(
-          draft.learnedSpellIds.filter((id) => leveledCandidates.includes(id)),
+          [
+            ...new Set([
+              ...featureSpellbookChoices(draft, catalog),
+              ...draft.learnedSpellIds.filter((id) => leveledCandidates.includes(id)),
+            ]),
+          ],
           leveledCandidates,
           counts.learnedLeveledSpells,
         )
@@ -1873,6 +1970,12 @@ export function updateBuilderFeatureChoice(
     return draft;
   }
   const maximum = featureChoiceCount(choice, draft.level);
+  if (
+    choice.spellSelection?.spellbookAddition === true &&
+    !current.includes(optionId) &&
+    featureSpellbookChoices(draft, catalog).includes(optionId)
+  )
+    return draft;
   const withoutOptionAndDependents = (removedId: string): string[] => {
     const removed = new Set([removedId]);
     let changed = true;
@@ -2139,6 +2242,12 @@ export function validateBuilderDraft(
   }
   const spellcasting = selectedClass.spellcasting;
   const counts = spellSelectionCounts(draft, catalog);
+  const bookChoices = featureSpellbookChoices(draft, catalog);
+  if (
+    new Set(bookChoices).size !== bookChoices.length ||
+    bookChoices.some((id) => !draft.learnedSpellIds.includes(id))
+  )
+    issues.push("Keep distinct feature-granted spells in the spellbook.");
   if (spellcasting !== undefined && counts !== undefined) {
     const spellById = new Map(spellcasting.spells.map((spell) => [spell.id, spell]));
     const learned = draft.learnedSpellIds.map((id) => spellById.get(id));

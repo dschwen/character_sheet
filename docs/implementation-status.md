@@ -14,6 +14,9 @@ because some of its functionality exists or tests pass.
   lower. The exact current limits and review counts are generated in [Rules coverage](coverage/README.md).
 - All 339 spell descriptions are loaded, and every class spell-list reference resolves. Newly
   extracted spell effects are display-only and explicitly assisted, not complete rules automation.
+- Evocation Savant has source-linked, level-gated spellbook additions, separate from preparation.
+  Saved Evokers receive missing defaults with a review notice; historical choice editing still
+  requires character export/import. Wizard level 6 and Sculpt Spells remain the next slice.
 - Acquisition, layout extraction, normalization, repeated parsers, and reviewed-formula annotation
   commands are in `extraction/srd_extract`. Generation is incremental; end-to-end clean regeneration
   of every artifact still needs a single verified workflow.

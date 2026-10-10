@@ -1161,6 +1161,346 @@
   {
     "body": {
       "description": "Your studies focus on magic that creates powerful elemental effects such as bitter cold, searing flame, rolling thunder, crackling lightning, and burning acid. Some Evokers find employment in military forces, serving as artillery to blast armies from afar. Others use their power to protect others, while some seek their own gain.",
+      "evocationSavantLevel11Choice": {
+        "id": "srd521.choice.wizard.evocation-savant.level-11",
+        "level": 11,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.spell.acid-arrow",
+          "srd521.spell.arcane-hand",
+          "srd521.spell.burning-hands",
+          "srd521.spell.chain-lightning",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.cone-of-cold",
+          "srd521.spell.continual-flame",
+          "srd521.spell.darkness",
+          "srd521.spell.fire-shield",
+          "srd521.spell.fireball",
+          "srd521.spell.freezing-sphere",
+          "srd521.spell.gust-of-wind",
+          "srd521.spell.ice-storm",
+          "srd521.spell.lightning-bolt",
+          "srd521.spell.magic-missile",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.shatter",
+          "srd521.spell.sunbeam",
+          "srd521.spell.thunderwave",
+          "srd521.spell.tiny-hut",
+          "srd521.spell.vitriolic-sphere",
+          "srd521.spell.wall-of-fire",
+          "srd521.spell.wall-of-force",
+          "srd521.spell.wall-of-ice",
+          "srd521.spell.wall-of-stone"
+        ],
+        "spellSelection": {
+          "allowCantrips": false,
+          "alwaysPrepared": false,
+          "castingClassId": "srd521.class.wizard",
+          "maximumSpellLevel": 6,
+          "school": "evocation",
+          "sourceClassIds": [
+            "srd521.class.wizard"
+          ],
+          "sourceFeatureId": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+          "spellbookAddition": true
+        }
+      },
+      "evocationSavantLevel13Choice": {
+        "id": "srd521.choice.wizard.evocation-savant.level-13",
+        "level": 13,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.spell.acid-arrow",
+          "srd521.spell.arcane-hand",
+          "srd521.spell.arcane-sword",
+          "srd521.spell.burning-hands",
+          "srd521.spell.chain-lightning",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.cone-of-cold",
+          "srd521.spell.continual-flame",
+          "srd521.spell.darkness",
+          "srd521.spell.delayed-blast-fireball",
+          "srd521.spell.fire-shield",
+          "srd521.spell.fireball",
+          "srd521.spell.forcecage",
+          "srd521.spell.freezing-sphere",
+          "srd521.spell.gust-of-wind",
+          "srd521.spell.ice-storm",
+          "srd521.spell.lightning-bolt",
+          "srd521.spell.magic-missile",
+          "srd521.spell.prismatic-spray",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.shatter",
+          "srd521.spell.sunbeam",
+          "srd521.spell.thunderwave",
+          "srd521.spell.tiny-hut",
+          "srd521.spell.vitriolic-sphere",
+          "srd521.spell.wall-of-fire",
+          "srd521.spell.wall-of-force",
+          "srd521.spell.wall-of-ice",
+          "srd521.spell.wall-of-stone"
+        ],
+        "spellSelection": {
+          "allowCantrips": false,
+          "alwaysPrepared": false,
+          "castingClassId": "srd521.class.wizard",
+          "maximumSpellLevel": 7,
+          "school": "evocation",
+          "sourceClassIds": [
+            "srd521.class.wizard"
+          ],
+          "sourceFeatureId": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+          "spellbookAddition": true
+        }
+      },
+      "evocationSavantLevel15Choice": {
+        "id": "srd521.choice.wizard.evocation-savant.level-15",
+        "level": 15,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.spell.acid-arrow",
+          "srd521.spell.arcane-hand",
+          "srd521.spell.arcane-sword",
+          "srd521.spell.burning-hands",
+          "srd521.spell.chain-lightning",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.cone-of-cold",
+          "srd521.spell.continual-flame",
+          "srd521.spell.darkness",
+          "srd521.spell.delayed-blast-fireball",
+          "srd521.spell.fire-shield",
+          "srd521.spell.fireball",
+          "srd521.spell.forcecage",
+          "srd521.spell.freezing-sphere",
+          "srd521.spell.gust-of-wind",
+          "srd521.spell.ice-storm",
+          "srd521.spell.lightning-bolt",
+          "srd521.spell.magic-missile",
+          "srd521.spell.prismatic-spray",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.shatter",
+          "srd521.spell.sunbeam",
+          "srd521.spell.sunburst",
+          "srd521.spell.thunderwave",
+          "srd521.spell.tiny-hut",
+          "srd521.spell.vitriolic-sphere",
+          "srd521.spell.wall-of-fire",
+          "srd521.spell.wall-of-force",
+          "srd521.spell.wall-of-ice",
+          "srd521.spell.wall-of-stone"
+        ],
+        "spellSelection": {
+          "allowCantrips": false,
+          "alwaysPrepared": false,
+          "castingClassId": "srd521.class.wizard",
+          "maximumSpellLevel": 8,
+          "school": "evocation",
+          "sourceClassIds": [
+            "srd521.class.wizard"
+          ],
+          "sourceFeatureId": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+          "spellbookAddition": true
+        }
+      },
+      "evocationSavantLevel17Choice": {
+        "id": "srd521.choice.wizard.evocation-savant.level-17",
+        "level": 17,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.spell.acid-arrow",
+          "srd521.spell.arcane-hand",
+          "srd521.spell.arcane-sword",
+          "srd521.spell.burning-hands",
+          "srd521.spell.chain-lightning",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.cone-of-cold",
+          "srd521.spell.continual-flame",
+          "srd521.spell.darkness",
+          "srd521.spell.delayed-blast-fireball",
+          "srd521.spell.fire-shield",
+          "srd521.spell.fireball",
+          "srd521.spell.forcecage",
+          "srd521.spell.freezing-sphere",
+          "srd521.spell.gust-of-wind",
+          "srd521.spell.ice-storm",
+          "srd521.spell.lightning-bolt",
+          "srd521.spell.magic-missile",
+          "srd521.spell.meteor-swarm",
+          "srd521.spell.prismatic-spray",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.shatter",
+          "srd521.spell.sunbeam",
+          "srd521.spell.sunburst",
+          "srd521.spell.thunderwave",
+          "srd521.spell.tiny-hut",
+          "srd521.spell.vitriolic-sphere",
+          "srd521.spell.wall-of-fire",
+          "srd521.spell.wall-of-force",
+          "srd521.spell.wall-of-ice",
+          "srd521.spell.wall-of-stone"
+        ],
+        "spellSelection": {
+          "allowCantrips": false,
+          "alwaysPrepared": false,
+          "castingClassId": "srd521.class.wizard",
+          "maximumSpellLevel": 9,
+          "school": "evocation",
+          "sourceClassIds": [
+            "srd521.class.wizard"
+          ],
+          "sourceFeatureId": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+          "spellbookAddition": true
+        }
+      },
+      "evocationSavantLevel3Choice": {
+        "defaultOptionIds": [
+          "srd521.spell.magic-missile",
+          "srd521.spell.scorching-ray"
+        ],
+        "id": "srd521.choice.wizard.evocation-savant.level-3",
+        "level": 3,
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "srd521.spell.acid-arrow",
+          "srd521.spell.burning-hands",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.continual-flame",
+          "srd521.spell.darkness",
+          "srd521.spell.gust-of-wind",
+          "srd521.spell.magic-missile",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.shatter",
+          "srd521.spell.thunderwave"
+        ],
+        "spellSelection": {
+          "allowCantrips": false,
+          "alwaysPrepared": false,
+          "castingClassId": "srd521.class.wizard",
+          "maximumSpellLevel": 2,
+          "school": "evocation",
+          "sourceClassIds": [
+            "srd521.class.wizard"
+          ],
+          "sourceFeatureId": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+          "spellbookAddition": true
+        }
+      },
+      "evocationSavantLevel5Choice": {
+        "id": "srd521.choice.wizard.evocation-savant.level-5",
+        "level": 5,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.spell.acid-arrow",
+          "srd521.spell.burning-hands",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.continual-flame",
+          "srd521.spell.darkness",
+          "srd521.spell.fireball",
+          "srd521.spell.gust-of-wind",
+          "srd521.spell.lightning-bolt",
+          "srd521.spell.magic-missile",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.shatter",
+          "srd521.spell.thunderwave",
+          "srd521.spell.tiny-hut"
+        ],
+        "spellSelection": {
+          "allowCantrips": false,
+          "alwaysPrepared": false,
+          "castingClassId": "srd521.class.wizard",
+          "maximumSpellLevel": 3,
+          "school": "evocation",
+          "sourceClassIds": [
+            "srd521.class.wizard"
+          ],
+          "sourceFeatureId": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+          "spellbookAddition": true
+        }
+      },
+      "evocationSavantLevel7Choice": {
+        "id": "srd521.choice.wizard.evocation-savant.level-7",
+        "level": 7,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.spell.acid-arrow",
+          "srd521.spell.burning-hands",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.continual-flame",
+          "srd521.spell.darkness",
+          "srd521.spell.fire-shield",
+          "srd521.spell.fireball",
+          "srd521.spell.gust-of-wind",
+          "srd521.spell.ice-storm",
+          "srd521.spell.lightning-bolt",
+          "srd521.spell.magic-missile",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.shatter",
+          "srd521.spell.thunderwave",
+          "srd521.spell.tiny-hut",
+          "srd521.spell.vitriolic-sphere",
+          "srd521.spell.wall-of-fire"
+        ],
+        "spellSelection": {
+          "allowCantrips": false,
+          "alwaysPrepared": false,
+          "castingClassId": "srd521.class.wizard",
+          "maximumSpellLevel": 4,
+          "school": "evocation",
+          "sourceClassIds": [
+            "srd521.class.wizard"
+          ],
+          "sourceFeatureId": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+          "spellbookAddition": true
+        }
+      },
+      "evocationSavantLevel9Choice": {
+        "id": "srd521.choice.wizard.evocation-savant.level-9",
+        "level": 9,
+        "maximum": 1,
+        "minimum": 1,
+        "options": [
+          "srd521.spell.acid-arrow",
+          "srd521.spell.arcane-hand",
+          "srd521.spell.burning-hands",
+          "srd521.spell.chromatic-orb",
+          "srd521.spell.cone-of-cold",
+          "srd521.spell.continual-flame",
+          "srd521.spell.darkness",
+          "srd521.spell.fire-shield",
+          "srd521.spell.fireball",
+          "srd521.spell.gust-of-wind",
+          "srd521.spell.ice-storm",
+          "srd521.spell.lightning-bolt",
+          "srd521.spell.magic-missile",
+          "srd521.spell.scorching-ray",
+          "srd521.spell.shatter",
+          "srd521.spell.thunderwave",
+          "srd521.spell.tiny-hut",
+          "srd521.spell.vitriolic-sphere",
+          "srd521.spell.wall-of-fire",
+          "srd521.spell.wall-of-force",
+          "srd521.spell.wall-of-stone"
+        ],
+        "spellSelection": {
+          "allowCantrips": false,
+          "alwaysPrepared": false,
+          "castingClassId": "srd521.class.wizard",
+          "maximumSpellLevel": 5,
+          "school": "evocation",
+          "sourceClassIds": [
+            "srd521.class.wizard"
+          ],
+          "sourceFeatureId": "srd521.subclass-feature.wizard.evoker.evocation-savant",
+          "spellbookAddition": true
+        }
+      },
       "parentClassId": "srd521.class.wizard",
       "progression": [
         {
