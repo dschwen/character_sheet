@@ -782,6 +782,7 @@ const actionParametersSchema = z
         diceSizeFromExpression: z.literal(true).optional(),
         mode: z.enum(["add", "subtract"]).default("add"),
         appliesTo: z.array(z.string().min(1)).default([]),
+        afterRoll: z.literal(true).optional(),
       })
       .strict()
       .superRefine((bonus, context) => {
@@ -6034,6 +6035,7 @@ function evaluateConditionalRules(
           diceSize,
           mode: parameters.checkBonus.mode,
           appliesTo: parameters.checkBonus.appliesTo,
+          ...(parameters.checkBonus.afterRoll === undefined ? {} : { afterRoll: true }),
         };
       }
       if (parameters.refundIfCheckStillFails !== undefined) {

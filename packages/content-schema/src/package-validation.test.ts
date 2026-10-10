@@ -451,6 +451,7 @@ describe("bootstrap content package", () => {
     });
     const warlock = entities.find((entity) => entity.id === "srd521.class.warlock");
     const warlockBody = z.record(z.unknown()).parse(warlock?.body);
+    expect(warlockBody.builder).toMatchObject({ supportedLevelMaximum: 6 });
     expect(warlockBody.spellPreparationChange).toEqual({
       event: "level-up",
       replacementMaximum: 1,

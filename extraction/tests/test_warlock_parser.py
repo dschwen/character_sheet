@@ -1,6 +1,11 @@
 import pytest
 
-from srd_extract.warlock import WarlockProgressionRow, _starting_equipment, parse_core_traits
+from srd_extract.warlock import (
+    WarlockProgressionRow,
+    _dark_ones_own_luck_ir,
+    _starting_equipment,
+    parse_core_traits,
+)
 
 
 def test_parse_core_warlock_traits() -> None:
@@ -45,3 +50,28 @@ def test_warlock_starting_equipment_preserves_package_and_gold_choices() -> None
         "srd521.equipment.gear.book",
         "srd521.equipment.gear.scholars-pack",
     ]
+
+
+def test_dark_ones_own_luck_preserves_source_and_post_roll_constraints() -> None:
+    source = [{"sourceId": "test-source", "page": 76, "blocks": ["p0076-b029"]}]
+    feature = {
+        "id": "srd521.subclass-feature.warlock.fiend.dark-one-s-own-luck",
+        "name": "Dark One’s Own Luck",
+        "level": 6,
+        "source": source,
+        "bodyNodes": [{"kind": "ParagraphNode", "normalizedText": "Source-linked luck text."}],
+    }
+    ir = _dark_ones_own_luck_ir(feature)
+    resource, action = ir["proposedRules"]
+    assert ir["source"] == source
+    assert ir["parentId"] == "srd521.subclass.warlock.fiend-patron"
+    assert ir["text"]["nodes"][0]["text"] == "Source-linked luck text."
+    assert resource["expression"]["kind"] == "max"
+    assert resource["parameters"]["recharge"] == [{"event": "long-rest", "amount": "all"}]
+    assert action["parameters"]["checkBonus"] == {
+        "diceCount": 1,
+        "diceSize": 10,
+        "mode": "add",
+        "appliesTo": ["ability-check", "saving-throw"],
+        "afterRoll": True,
+    }

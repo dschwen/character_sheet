@@ -1,0 +1,89 @@
+{
+  "id": "srd521.subclass-feature.warlock.fiend.dark-one-s-own-luck",
+  "kind": "subclass-feature",
+  "level": 6,
+  "parentId": "srd521.subclass.warlock.fiend-patron",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "args": [
+          {
+            "kind": "literal",
+            "value": 1
+          },
+          {
+            "kind": "ref",
+            "path": "ability.charisma.modifier"
+          }
+        ],
+        "kind": "max"
+      },
+      "id": "dark-ones-own-luck-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.warlock.dark-ones-own-luck",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-dark-ones-own-luck",
+      "parameters": {
+        "actionEconomy": "no-action",
+        "checkBonus": {
+          "afterRoll": true,
+          "appliesTo": [
+            "ability-check",
+            "saving-throw"
+          ],
+          "diceCount": 1,
+          "diceSize": 10,
+          "mode": "add"
+        },
+        "resourceId": "srd521.resource.warlock.dark-ones-own-luck",
+        "spends": 1
+      },
+      "target": "action.dark-ones-own-luck",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.warlock.dark-ones-own-luck"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Apply after seeing an ability check or save, before its effects; once per roll.",
+      "Completed-roll context is caller-owned, not persisted encounter history."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0076-b029"
+      ],
+      "page": 76,
+      "quoteHash": "af8dc484795c578e517738d6781398aadfd7939bcfa22af6436088c1a1b5c1c1",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You can call on your fiendish patron to alter fate in your favor. When you make an ability check or a saving throw, you can use this feature to add 1d10 to your roll. You can do so after seeing the roll but before any of the roll’s effects occur. You can use this feature a number of times equal to your Charisma modifier (minimum of once), but you can use it no more than once per roll. You regain all expended uses when you finish a Long Rest."
+      }
+    ],
+    "title": "Dark One’s Own Luck"
+  }
+}

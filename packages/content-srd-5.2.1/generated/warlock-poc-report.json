@@ -1,6 +1,7 @@
 {
   "authoringIr": [
-    "warlock.magical-cunning.json"
+    "warlock.magical-cunning.json",
+    "fiend.dark-ones-own-luck.json"
   ],
   "classId": "srd521.class.warlock",
   "coreTraits": {

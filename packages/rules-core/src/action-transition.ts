@@ -17,6 +17,13 @@ const actionUseRequestSchema = z
     actionId: z.string().min(1),
     rolls: z.array(z.number().int().positive()).default([]),
     amount: z.number().int().positive().optional(),
+    completedD20Test: z
+      .object({
+        testId: z.string().min(1),
+        appliedActionIds: z.array(z.string().min(1)),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 
@@ -51,6 +58,16 @@ const stateActionParametersSchema = z
       .optional(),
     temporaryHitPoints: z.number().int().nonnegative().optional(),
     minimumCurrentHitPoints: z.number().int().positive().optional(),
+    checkBonus: z
+      .object({
+        diceCount: z.number().int().positive(),
+        diceSize: z.number().int().positive(),
+        mode: z.enum(["add", "subtract"]),
+        appliesTo: z.array(z.string().min(1)),
+        afterRoll: z.literal(true).optional(),
+      })
+      .strict()
+      .optional(),
   })
   .passthrough()
   .refine(
@@ -153,27 +170,72 @@ export function proposeAction(
   if (parsedParameters.success) {
     const healing = parsedParameters.data.healing;
     const diceHealing = healing !== undefined && "diceCount" in healing ? healing : undefined;
-    if (diceHealing === undefined && request.rolls.length > 0) {
+    const checkBonus = parsedParameters.data.checkBonus;
+    const diceDefinition = diceHealing ?? checkBonus;
+    const rollsRequired = diceHealing !== undefined || checkBonus?.afterRoll === true;
+    if (checkBonus?.afterRoll === true) {
+      const context = request.completedD20Test;
+      const testId = context?.testId ?? "";
+      const kind = testId.startsWith("savingThrow.")
+        ? "saving-throw"
+        : testId === "initiative" ||
+            testId.startsWith("skill.") ||
+            testId.startsWith("abilityCheck.")
+          ? "ability-check"
+          : undefined;
+      if (
+        context === undefined ||
+        evaluation.d20Tests[testId] === undefined ||
+        kind === undefined ||
+        !checkBonus.appliesTo.includes(kind)
+      ) {
+        addValidation(
+          validations,
+          "ACTION_COMPLETED_TEST_REQUIRED",
+          "Choose a completed ability check or saving throw before its effects occur.",
+          ["request.completedD20Test"],
+        );
+      } else if (context.appliedActionIds.includes(request.actionId)) {
+        addValidation(
+          validations,
+          "ACTION_ALREADY_APPLIED_TO_ROLL",
+          "This feature can be used only once per roll.",
+          ["request.completedD20Test.appliedActionIds"],
+        );
+      }
+    } else if (request.completedD20Test !== undefined) {
+      addValidation(
+        validations,
+        "ACTION_COMPLETED_TEST_NOT_EXPECTED",
+        "This action does not accept a completed d20 test.",
+        ["request.completedD20Test"],
+      );
+    }
+    if (diceDefinition === undefined && request.rolls.length > 0) {
       addValidation(
         validations,
         "ACTION_ROLLS_NOT_EXPECTED",
         `${request.actionId} does not accept dice rolls.`,
         ["request.rolls"],
       );
-    } else if (diceHealing !== undefined && request.rolls.length !== diceHealing.diceCount) {
+    } else if (
+      diceDefinition !== undefined &&
+      (rollsRequired || request.rolls.length > 0) &&
+      request.rolls.length !== diceDefinition.diceCount
+    ) {
       addValidation(
         validations,
         "ACTION_ROLL_COUNT_INVALID",
-        `${request.actionId} requires ${String(diceHealing.diceCount)} d${String(diceHealing.diceSize)} roll.`,
+        `${request.actionId} requires ${String(diceDefinition.diceCount)} d${String(diceDefinition.diceSize)} roll.`,
         ["request.rolls"],
       );
     }
     for (const [index, roll] of request.rolls.entries()) {
-      if (diceHealing !== undefined && roll > diceHealing.diceSize) {
+      if (diceDefinition !== undefined && roll > diceDefinition.diceSize) {
         addValidation(
           validations,
           "ACTION_ROLL_OUT_OF_RANGE",
-          `A d${String(diceHealing.diceSize)} roll cannot be ${String(roll)}.`,
+          `A d${String(diceDefinition.diceSize)} roll cannot be ${String(roll)}.`,
           [`request.rolls.${String(index)}`],
         );
       }

@@ -1,6 +1,7 @@
 import type { D20BonusDice, RollMode } from "@dnd/rules-api";
 
 export interface D20RollRequest {
+  testId?: string;
   label: string;
   modifier: number;
   mode: RollMode;
@@ -17,6 +18,7 @@ export interface D20RollResult extends D20RollRequest {
   total: number;
   rerolls?: readonly D20Reroll[];
   bonusDiceRolls?: readonly D20BonusDiceRoll[];
+  appliedActionIds?: readonly string[];
 }
 
 export interface D20BonusDiceRoll extends D20BonusDice {

@@ -491,12 +491,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 6)},
+                "countByLevel": {str(level): 2 for level in range(1, 7)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 5,
+                "supportedLevelMaximum": 6,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -692,6 +692,52 @@ def _magical_cunning_ir(feature: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _dark_ones_own_luck_ir(feature: dict[str, Any]) -> dict[str, Any]:
+    resource_id = "srd521.resource.warlock.dark-ones-own-luck"
+    ir = _magical_cunning_ir(feature)
+    ir.update(kind="subclass-feature", parentId=SUBCLASS_ID)
+    ir["proposedRules"] = [
+        {
+            "id": "dark-ones-own-luck-resource",
+            "type": "grant-resource",
+            "target": resource_id,
+            "expression": {
+                "kind": "max",
+                "args": [
+                    {"kind": "literal", "value": 1},
+                    {"kind": "ref", "path": "ability.charisma.modifier"},
+                ],
+            },
+            "parameters": {"recharge": [{"event": "long-rest", "amount": "all"}]},
+            "automationLevel": "state-automated",
+        },
+        {
+            "id": "use-dark-ones-own-luck",
+            "type": "grant-action",
+            "target": "action.dark-ones-own-luck",
+            "when": {"kind": "resourceAvailable", "resourceId": resource_id},
+            "parameters": {
+                "actionEconomy": "no-action",
+                "spends": 1,
+                "resourceId": resource_id,
+                "checkBonus": {
+                    "diceCount": 1,
+                    "diceSize": 10,
+                    "mode": "add",
+                    "appliesTo": ["ability-check", "saving-throw"],
+                    "afterRoll": True,
+                },
+            },
+            "automationLevel": "roll-assisted",
+        },
+    ]
+    ir["review"]["notes"] = [
+        "Apply after seeing an ability check or save, before its effects; once per roll.",
+        "Completed-roll context is caller-owned, not persisted encounter history.",
+    ]
+    return ir
+
+
 def generate_warlock_content(class_root: Path, spell_root: Path, output: Path) -> dict[str, Any]:
     document = read_json(class_root / "normalized" / "document.json")
     spell_document = read_json(spell_root / "normalized" / "document.json")
@@ -724,27 +770,23 @@ def generate_warlock_content(class_root: Path, spell_root: Path, output: Path) -
         *_fiend_entities(document, fiend),
         *spells,
     ]
-    replacement = {entity["id"] for entity in entities}
-    all_entities = [
-        *[
-            entity
-            for entity in read_json(output / "entities.json")
-            if entity["id"] not in replacement
-        ],
-        *entities,
-    ]
+    existing = read_json(output / "entities.json")
+    replacements = {entity["id"]: entity for entity in entities if entity["kind"] != "spell"}
+    existing_ids = {entity["id"] for entity in existing}
+    all_entities = [replacements.get(entity["id"], entity) for entity in existing]
+    all_entities.extend(entity for entity in entities if entity["id"] not in existing_ids)
     write_json(output / "entities" / "warlock.json", entities)
     write_json(output / "entities.json", all_entities)
     magical_cunning = next(feature for feature in features if feature["name"] == "Magical Cunning")
-    authoring = {"warlock.magical-cunning.json": _magical_cunning_ir(magical_cunning)}
+    luck = next(feature for feature in fiend if feature["name"] == "Dark One’s Own Luck")
+    authoring = {
+        "warlock.magical-cunning.json": _magical_cunning_ir(magical_cunning),
+        "fiend.dark-ones-own-luck.json": _dark_ones_own_luck_ir(luck),
+    }
     for filename, ir in authoring.items():
         write_json(output / "authoring-ir" / filename, ir)
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
-    coverage["note"] = (
-        "Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, "
-        "and Wizard through level 5, Human, Soldier, equipment, and representative spells."
-    )
     write_json(output / "coverage.json", coverage)
     report = {
         "classId": CLASS_ID,

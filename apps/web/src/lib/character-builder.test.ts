@@ -1033,16 +1033,16 @@ describe("guided character builder", () => {
     }
   });
 
-  it("builds Fiend Warlocks with Pact Magic and level-legal invocations through level 5", () => {
+  it("builds Fiend Warlocks with Pact Magic and level-legal invocations through level 6", () => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
-    const expectedHitPoints = [10, 17, 24, 31, 38];
-    const expectedCantrips = [2, 2, 2, 3, 3];
-    const expectedPrepared = [2, 3, 4, 5, 6];
-    const expectedAlwaysPrepared = [0, 0, 4, 4, 6];
-    const expectedInvocations = [1, 3, 3, 3, 5];
+    const expectedHitPoints = [10, 17, 24, 31, 38, 45];
+    const expectedCantrips = [2, 2, 2, 3, 3, 3];
+    const expectedPrepared = [2, 3, 4, 5, 6, 7];
+    const expectedAlwaysPrepared = [0, 0, 4, 4, 6, 6];
+    const expectedInvocations = [1, 3, 3, 3, 5, 5];
 
-    for (let level = 1; level <= 5; level += 1) {
+    for (let level = 1; level <= 6; level += 1) {
       const draft = defaultBuilderDraft(
         warlockId,
         catalog,
@@ -1070,6 +1070,9 @@ describe("guided character builder", () => {
       );
       expect(evaluation.actions.some((action) => action.id === "action.magical-cunning")).toBe(
         level >= 2,
+      );
+      expect(evaluation.actions.some((action) => action.id === "action.dark-ones-own-luck")).toBe(
+        level >= 6,
       );
       if (level === 5) {
         expect(character.build.levels.map((entry) => entry.selectedFeatureChoices)).toEqual([

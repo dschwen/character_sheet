@@ -77,8 +77,12 @@ level in its existing class. The advancement flow presents only newly introduced
 Expertise, spell and preparation additions, the reviewed level-3 subclass, and the level-4 Ability
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
-same-class Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, and Sorcerer advancement through level 6 and Bard,
-Warlock, and Wizard advancement through level 5. Circle of the Land Druids gain Natural Recovery:
+same-class Barbarian, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, and Warlock advancement through level 6 and Bard
+and Wizard advancement through level 5. Fiend Warlocks gain Dark One's Own Luck: after rolling a
+check or saving throw, use the button beside the result to roll and add 1d10, once per roll.
+Uses equal Charisma modifier (minimum one) and recharge on Long Rest. Saving throws are now
+clickable on the Overview tab; Shift-click still opens the calculation explanation.
+Circle of the Land Druids gain Natural Recovery:
 one free leveled Circle spell casting per Long Rest, plus a separate once-per-Long-Rest spell-slot
 recovery during a Short Rest. The Rest panel lets you select slots within the recovery budget;
 ordinary Short Rests do not spend this benefit. Wizards use the same controls for Arcane Recovery.

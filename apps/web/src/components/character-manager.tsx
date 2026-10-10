@@ -24,7 +24,12 @@ import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from 
 
 import { levelUpEligibility } from "../lib/character-level-up";
 import { characterBuilderCatalog, migrateMagicInitiateChoices } from "../lib/character-builder";
-import { actionDiceRequest } from "../lib/action-roll";
+import {
+  actionDiceRequest,
+  applyPostRollBonus,
+  canApplyPostRollBonus,
+  requiresCompletedD20Test,
+} from "../lib/action-roll";
 import { spellHealingRequests } from "../lib/spell-healing";
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
@@ -732,6 +737,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     const fixture = fixtures.find((option) => option.filename === filename);
     if (fixture === undefined) return;
     setCharacter(fixture.character);
+    setLatestRoll(undefined);
     setPreviousCharacter(undefined);
     setSource(filename);
     setSelectedTraceId(undefined);
@@ -750,6 +756,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       const parsed = characterDocumentSchema.parse(JSON.parse(await file.text()) as unknown);
       const imported = migrateMagicInitiateChoices(parsed, builderCatalog);
       setCharacter(imported);
+      setLatestRoll(undefined);
       setPreviousCharacter(undefined);
       setSource("imported");
       setSelectedTraceId(undefined);
@@ -785,6 +792,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   }
 
   function savePlayState(nextCharacter: CharacterDocument, message: string): void {
+    setLatestRoll(undefined);
     setPreviousCharacter(character);
     setCharacter(nextCharacter);
     setSource("browser-save");
@@ -794,6 +802,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   function undoPlayState(): void {
     if (previousCharacter === undefined) return;
     setCharacter(previousCharacter);
+    setLatestRoll(undefined);
     setPreviousCharacter(undefined);
     setSource("browser-save");
     setNotice("Undid the last character change.");
@@ -930,8 +939,25 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
   async function useAction(action: ActionSummary): Promise<void> {
     if (evaluation === undefined) return;
+    const previousRoll = latestRoll;
+    if (requiresCompletedD20Test(action) && !canApplyPostRollBonus(action, previousRoll)) {
+      setNotice(
+        "Roll an ability check or saving throw first. This feature can be used only once per roll, before its effects occur.",
+      );
+      return;
+    }
     const draft = actionDrafts[action.id] ?? { amount: "" };
     const request: ActionUseRequest = { actionId: action.id };
+    if (
+      requiresCompletedD20Test(action) &&
+      previousRoll?.kind === "d20" &&
+      previousRoll.testId !== undefined
+    ) {
+      request.completedD20Test = {
+        testId: previousRoll.testId,
+        appliedActionIds: [...(previousRoll.appliedActionIds ?? [])],
+      };
+    }
     if (draft.amount.trim().length > 0) {
       const amount = Number(draft.amount);
       if (!Number.isInteger(amount) || amount < 1) {
@@ -952,6 +978,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         proposal,
         `${actionName} applied (${String(proposal.changes.length)} changes).`,
       );
+      if (
+        requiresCompletedD20Test(action) &&
+        previousRoll !== undefined &&
+        actionRoll !== undefined
+      ) {
+        setLatestRoll(
+          proposal.applicable
+            ? applyPostRollBonus(action, previousRoll, actionRoll.dice, actionName)
+            : previousRoll,
+        );
+      }
     } catch (error) {
       setNotice(`Action failed: ${errorMessage(error)}`);
     }
@@ -1165,6 +1202,22 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
               </span>
               <strong>{rollExpression(latestRoll)}</strong>
               <small>{rollDetail(latestRoll)}</small>
+              {playActions
+                .filter((action) => action.available && canApplyPostRollBonus(action, latestRoll))
+                .map((action) => (
+                  <button
+                    key={action.id}
+                    type="button"
+                    title="Use before this roll's effects occur; once per roll."
+                    className="button secondary compact"
+                    disabled={diceRolling}
+                    onClick={() => {
+                      void useAction(action);
+                    }}
+                  >
+                    {actionDisplayName(action, names)} · Use &amp; add bonus
+                  </button>
+                ))}
             </div>
             <button
               type="button"
@@ -1235,6 +1288,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   onSelect={setSelectedTraceId}
                   roll={{
                     label: "Initiative",
+                    testId: "initiative",
                     modifier: numericFact(evaluation, "initiative"),
                     mode: evaluation.d20Tests.initiative?.rollMode ?? "normal",
                     ...d20RerollRequest(evaluation.d20Tests.initiative),
@@ -2085,7 +2139,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               requirements.damageDiceSize === undefined ? null : (
                                 <button
                                   type="button"
-                                  disabled={!action.available}
+                                  disabled={!action.available || diceRolling}
                                   onClick={() => {
                                     void performDicePoolRoll({
                                       label: `${actionName} · ${titleCase(requirements.damageType ?? "damage")}`,
@@ -2117,7 +2171,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               )}
                               {transitionDice === undefined ? null : (
                                 <span className="action-roll-preview">
-                                  Heals {String(transitionDice.diceCount)}d
+                                  {action.parameters?.checkBonus === undefined ? "Heals" : "Rolls"}{" "}
+                                  {String(transitionDice.diceCount)}d
                                   {String(transitionDice.diceSize)}
                                   {(transitionDice.modifier ?? 0) === 0
                                     ? ""
@@ -2143,7 +2198,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 <button
                                   className="button primary compact"
                                   type="button"
-                                  disabled={!action.available}
+                                  disabled={
+                                    !action.available ||
+                                    diceRolling ||
+                                    (requiresCompletedD20Test(action) &&
+                                      !canApplyPostRollBonus(action, latestRoll))
+                                  }
                                   onClick={() => {
                                     void useAction(action);
                                   }}
@@ -2346,6 +2406,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           onSelect={setSelectedTraceId}
                           roll={{
                             label: `${titleCase(ability)} check`,
+                            testId: `abilityCheck.${ability}`,
                             modifier,
                             mode: check?.rollMode ?? "normal",
                             ...d20RerollRequest(check),
@@ -2365,6 +2426,34 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   </div>
                 </Section>
 
+                <Section title="Saving throws" eyebrow="Defenses">
+                  <div className="skill-list">
+                    {abilities.map((ability) => {
+                      const save = evaluation.d20Tests[`savingThrow.${ability}`];
+                      if (save === undefined) return null;
+                      return (
+                        <TraceButton
+                          key={save.id}
+                          traceId={save.traceId}
+                          onSelect={setSelectedTraceId}
+                          roll={{
+                            label: `${titleCase(ability)} saving throw`,
+                            testId: save.id,
+                            modifier: save.modifier,
+                            mode: save.rollMode,
+                            ...d20RerollRequest(save),
+                          }}
+                          onRoll={performRoll}
+                        >
+                          <i className={`prof-dot ${save.proficiency.level}`} aria-hidden="true" />
+                          <span>{titleCase(ability)}</span>
+                          <strong>{signed(save.modifier)}</strong>
+                        </TraceButton>
+                      );
+                    })}
+                  </div>
+                </Section>
+
                 <Section title="Skills" eyebrow="Checks & proficiencies">
                   <div className="skill-list">
                     {Object.values(evaluation.d20Tests)
@@ -2377,6 +2466,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           onSelect={setSelectedTraceId}
                           roll={{
                             label: titleCase(skill.id.replace("skill.", "")),
+                            testId: skill.id,
                             modifier: skill.modifier,
                             mode: skill.rollMode,
                             ...d20RerollRequest(skill),
@@ -3162,6 +3252,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           }}
           onComplete={(builtCharacter) => {
             setCharacter(builtCharacter);
+            setLatestRoll(undefined);
             setPreviousCharacter(undefined);
             setSource("builder");
             setTab("overview");

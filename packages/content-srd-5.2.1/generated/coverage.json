@@ -2,7 +2,7 @@
   "authoringIr": {
     "semanticsApproved": 0,
     "testsApproved": 0,
-    "total": 53
+    "total": 54
   },
   "classes": [
     {
@@ -66,7 +66,7 @@
       "name": "Sorcerer"
     },
     {
-      "builderMaximum": 5,
+      "builderMaximum": 6,
       "builderMinimum": 1,
       "id": "srd521.class.warlock",
       "name": "Warlock"

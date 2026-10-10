@@ -279,6 +279,7 @@ export interface ActionUseRequest {
   actionId: string;
   rolls?: number[];
   amount?: number;
+  completedD20Test?: { testId: string; appliedActionIds: string[] };
 }
 
 export interface ActionTransitionProposal {
