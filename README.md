@@ -94,6 +94,8 @@ Evoker gains a separate Savant spellbook addition; Draconic Sorcery gains its le
 spells. Newly available spell effects may still require manual adjudication.
 Cleric and Druid likewise reach level 9, with fifth-level slots, fourteen ordinary preparations,
 automatic domain/land spells, and fifth-level Natural Recovery for Circle of the Land.
+Bard also reaches level 9, adding two Expertise choices, fifth-level slots, and fourteen
+regular preparations while preserving its separate College of Lore Discoveries.
 Play also supports fullscreen Death Saving Throws. Apply the final result only after any reroll
 decision; natural 1/20 results, successes/failures, stabilization, and regained HP are resolved on
 the sheet. Declare first aid and turn timing manually. Ordinary healing cannot revive the dead.

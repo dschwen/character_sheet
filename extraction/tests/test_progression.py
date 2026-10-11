@@ -23,3 +23,14 @@ def test_does_not_invent_asi_without_an_extracted_feature_or_before_its_level() 
         [(2, ["Ability Score Improvement"])],
     )
     assert (2, "Ability Score Improvement") not in result
+
+
+def test_repeated_expertise_resolves_bard_and_rogue_source_without_inventing_early_grants() -> None:
+    for first_level, later_level in [(2, 9), (1, 6)]:
+        result = progression_feature_ids(
+            [{"id": "source.expertise", "level": first_level, "name": "Expertise"}],
+            [(0, ["Expertise"]), (later_level, ["Expertise"])],
+        )
+        assert result[(later_level, "Expertise")] == "source.expertise"
+        assert (0, "Expertise") not in result
+    assert progression_feature_ids([], [(9, ["Expertise"])]) == {}

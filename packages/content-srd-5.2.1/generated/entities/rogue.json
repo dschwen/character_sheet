@@ -179,7 +179,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.expertise",
               "name": "Expertise"
             }
           ],

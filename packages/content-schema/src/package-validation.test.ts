@@ -363,7 +363,7 @@ describe("bootstrap content package", () => {
       ],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.bard")?.builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: [
         "srd521.skill.performance",
@@ -377,7 +377,7 @@ describe("bootstrap content package", () => {
         sourceId: "srd521.class-feature.bard.expertise",
         minimumLevel: 2,
         requireClassProficiency: false,
-        countByLevel: { 2: 2, 3: 2, 4: 2, 5: 2 },
+        countByLevel: { 2: 2, 3: 2, 4: 2, 5: 2, 8: 2, 9: 4 },
       },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.monk")?.builder).toMatchObject({

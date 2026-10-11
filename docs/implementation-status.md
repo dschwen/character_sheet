@@ -96,7 +96,10 @@ Draconic Sorcery adds Legend Lore and Summon Dragon without consuming ordinary p
 Arcane Recovery supports the new fifth-level slot. See `docs/rules-engine/arcane-level-9.md`.
 Cleric and Druid also reach level 9, with fifth-level slots, fourteen ordinary preparations,
 Life Domain and terrain-specific Circle spells, and a five-level Natural Recovery budget.
-See `docs/rules-engine/divine-primal-level-9.md`. Other classes remain at level 8. See
+See `docs/rules-engine/divine-primal-level-9.md`. Bard also reaches level 9 with four Expertise
+selections, fifth-level slots, and fourteen regular preparations. Earlier Expertise is locked
+by shared advancement validation; repeated Bard/Rogue Expertise table entries retain source
+links. See `docs/rules-engine/bard-level-9.md`. Other classes remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside

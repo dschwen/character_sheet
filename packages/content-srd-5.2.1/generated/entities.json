@@ -18508,7 +18508,7 @@
         {
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.rogue.expertise",
               "name": "Expertise"
             }
           ],
@@ -32829,7 +32829,8 @@
             "5": 2,
             "6": 2,
             "7": 2,
-            "8": 2
+            "8": 2,
+            "9": 4
           },
           "eligibleSkillIds": [
             "srd521.skill.acrobatics",
@@ -32855,7 +32856,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.bard.expertise"
         },
-        "supportedLevelMaximum": 8,
+        "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
       "cantripChange": {
@@ -33047,7 +33048,7 @@
           "cantrips": 3,
           "features": [
             {
-              "entityId": null,
+              "entityId": "srd521.class-feature.bard.expertise",
               "name": "Expertise"
             }
           ],
@@ -33337,7 +33338,8 @@
           "5": 6,
           "6": 6,
           "7": 6,
-          "8": 6
+          "8": 6,
+          "9": 6
         },
         "maximum": 3,
         "minimum": 3,

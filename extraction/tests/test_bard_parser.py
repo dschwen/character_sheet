@@ -2,6 +2,7 @@ import pytest
 
 from srd_extract.bard import (
     BardProgressionRow,
+    _class_entity,
     _countercharm_ir,
     _starting_equipment,
     parse_core_traits,
@@ -65,6 +66,17 @@ def test_bard_progression_row_accepts_level_five_values() -> None:
 def test_bard_progression_row_rejects_wrong_inspiration_die() -> None:
     with pytest.raises(ValueError, match="Bardic Inspiration die"):
         BardProgressionRow(5, 3, (), 6, 3, 9, (4, 3, 2, 0, 0, 0, 0, 0, 0))
+
+
+def test_level_nine_builder_adds_two_more_expertise_selections() -> None:
+    row = BardProgressionRow(9, 4, (), 8, 3, 14, (4, 3, 3, 3, 1, 0, 0, 0, 0))
+    body = _class_entity({"skillProficiencyChoice": {}}, (row,), (), {}, [])["body"]
+    assert body["builder"]["supportedLevelMaximum"] == 9
+    assert body["builder"]["expertiseChoice"]["countByLevel"]["8"] == 2
+    assert body["builder"]["expertiseChoice"]["countByLevel"]["9"] == 4
+    assert body["skillProficiencyChoice"]["countByLevel"]["9"] == 6
+    assert body["progression"][0]["preparedSpells"] == 14
+    assert body["progression"][0]["spellSlots"]["5"] == 1
 
 
 def test_bard_starting_equipment_preserves_package_and_gold_choices() -> None:

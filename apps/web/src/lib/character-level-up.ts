@@ -283,6 +283,15 @@ function advancementIssues(
   }
   const selectedClass = catalog.classes[eligibility.classId];
   const targetLevel = eligibility.targetLevel;
+  const expertiseSource = selectedClass.builder.expertiseChoice?.sourceId;
+  if (
+    character.build.proficiencyChoices.expertise.some(
+      (choice) =>
+        choice.sourceId === expertiseSource && !draft.expertiseSkillIds.includes(choice.skillId),
+    )
+  ) {
+    issues.push("Earlier Expertise selections cannot change during level up.");
+  }
   const previousAsiLevels = selectedClass.abilityScoreImprovementLevels.filter(
     (level) => level < targetLevel,
   );
