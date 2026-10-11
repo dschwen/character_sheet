@@ -87,6 +87,9 @@ blocks the tradeoff, and hit-confirmed extra damage has normal/critical fullscre
 Forceful Blow uses final adjusted Speed; Hamstring Blow includes non-stacking/expiry guidance.
 Standard Unarmed Strike damage attacks are available beyond Monk. Turn timing and target effects
 remain manually declared; see `docs/rules-engine/barbarian-level-9.md`.
+Exhaustion now also penalizes weapon, Unarmed Strike, and all modeled spell attack sources.
+Shared spellcasting traces are adjusted once, without changing damage, save DCs, slots, or
+Advantage. See `docs/rules-engine/attack-condition-modifiers.md`.
 Other classes remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 

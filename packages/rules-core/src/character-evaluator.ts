@@ -1390,6 +1390,52 @@ function statusD20Modifiers(statuses: readonly ActiveStatus[]): D20TestModifier[
   );
 }
 
+function evaluateConditionAttackModifiers(
+  character: CharacterDocument,
+  conditions: readonly ActiveCondition[],
+  state: EngineState,
+): void {
+  const modifiers = conditionD20Modifiers(character, conditions);
+  const penalty = modifiers.reduce((total, modifier) => total + modifier.bonus, 0);
+  if (penalty === 0) return;
+  // A class/feat/species casting trace is shared by many spells and free-cast options.
+  // Adjust each trace once, then project that same result to every presentation.
+  const adjusted = new Map<string, number>();
+  const adjust = (traceId: string, before: number): number => {
+    const cached = adjusted.get(traceId);
+    if (cached !== undefined) return cached;
+    const value = before + penalty;
+    const trace = state.traces[traceId];
+    if (trace === undefined) throw new TypeError(`Missing attack trace: ${traceId}`);
+    trace.result = value;
+    trace.nodes.push({
+      id: `${traceId}.condition-d20-modifiers`,
+      operation: "apply-condition-d20-modifiers-to-attack",
+      inputs: [before, character.state.exhaustion, ...modifiers.map(({ bonus }) => bonus)],
+      output: value,
+    });
+    trace.sourceReferences.push(...modifiers.flatMap(({ sourceReferences }) => sourceReferences));
+    state.facts[traceId] = value;
+    state.values[traceId] = { value, traceId };
+    adjusted.set(traceId, value);
+    return value;
+  };
+  for (const attack of state.attacks)
+    attack.attackBonus = adjust(attack.traceId, attack.attackBonus);
+  if (state.spellcasting !== undefined)
+    state.spellcasting.attackBonus = adjust(
+      state.spellcasting.attackTraceId,
+      state.spellcasting.attackBonus,
+    );
+  for (const spell of state.spells) {
+    if (spell.castingOptions === undefined) continue;
+    spell.castingOptions = spell.castingOptions.map((option) => ({
+      ...option,
+      attackBonus: adjust(option.attackTraceId, option.attackBonus),
+    }));
+  }
+}
+
 function evaluateSavingThrowAuras(
   character: CharacterDocument,
   statuses: readonly ActiveStatus[],
@@ -7447,6 +7493,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     });
   }
   evaluateStatusSpellcastingEnhancements(statuses, conditions, granted, index, state);
+  evaluateConditionAttackModifiers(character, conditions, state);
   const attackDamageRiders = evaluateBattleBlessings(character, input.packages, index, state);
   evaluateD20Minimums(granted, index, state);
   evaluateGrantedActionEnhancements(granted, index, state);

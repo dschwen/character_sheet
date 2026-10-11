@@ -55,5 +55,5 @@ extra-damage roll once, but does not prove an external hit or dice history.
 Target movement, incoming Reckless Advantage, Hamstring expiry, Frenzy extra damage,
 and other target-specific benefits remain assisted/manual. Higher Barbarian levels,
 independent semantic review, and rendered browser verification remain unfinished.
-The broader attack-modifier audit also remains open: Exhaustion penalties currently
-cover the shared saving-throw/check pipeline but still need weapon/spell attack coverage.
+The numeric Exhaustion attack gap is now fixed; see
+`docs/rules-engine/attack-condition-modifiers.md`. Broader attack auditing remains open.
