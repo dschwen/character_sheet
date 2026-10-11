@@ -5,6 +5,7 @@ import pytest
 from srd_extract.io import read_json, write_json
 from srd_extract.paladin import (
     PaladinProgressionRow,
+    _class_entity,
     _starting_equipment,
     generate_paladin_content,
     parse_core_traits,
@@ -20,7 +21,7 @@ SPELL_EXTRACTION = ROOT / "generated/extraction/srd-5.2.1-spells"
     or not (SPELL_EXTRACTION / "normalized/document.json").exists(),
     reason="Pinned local extraction inputs are unavailable",
 )
-def test_level_eight_generation_is_source_linked_and_idempotent(tmp_path: Path) -> None:
+def test_level_nine_generation_is_source_linked_and_idempotent(tmp_path: Path) -> None:
     content = ROOT / "packages/content-srd-5.2.1/generated"
     write_json(tmp_path / "entities.json", read_json(content / "entities.json"))
     write_json(tmp_path / "coverage.json", read_json(content / "coverage.json"))
@@ -28,7 +29,24 @@ def test_level_eight_generation_is_source_linked_and_idempotent(tmp_path: Path) 
     first = (tmp_path / "entities.json").read_bytes()
     entities = read_json(tmp_path / "entities/paladin.json")
     by_id = {entity["id"]: entity for entity in entities}
-    assert by_id["srd521.class.paladin"]["body"]["builder"]["supportedLevelMaximum"] == 8
+    assert by_id["srd521.class.paladin"]["body"]["builder"]["supportedLevelMaximum"] == 9
+    abjure = read_json(tmp_path / "authoring-ir/paladin.abjure-foes.json")
+    assert abjure["level"] == 9
+    assert {span["page"] for span in abjure["source"]} == {55}
+    action = abjure["proposedRules"][0]
+    assert action["target"] == "action.abjure-foes"
+    assert action["parameters"]["spends"] == 1
+    assert action["parameters"]["resourceId"] == "srd521.resource.paladin.channel-divinity"
+    assert action["parameters"]["targeting"] == {
+        "maximumFact": "ability.charisma.modifier",
+        "minimumMaximum": 1,
+        "rangeFeet": 60,
+        "requiresSight": True,
+    }
+    assert action["parameters"]["savingThrow"] == {
+        "ability": "wisdom",
+        "difficultyClassFact": "spellcasting.paladin.saveDifficultyClass",
+    }
     feature = by_id["srd521.subclass-feature.paladin.oath-of-devotion.aura-of-devotion"]
     status = by_id["srd521.status.feature.aura-of-devotion"]
     assert feature["body"]["auraConditionImmunities"] == [
@@ -76,6 +94,15 @@ def test_paladin_progression_accepts_level_five_row() -> None:
     assert row.channel_divinity == 2
     assert row.prepared_spells == 6
     assert row.spell_slots[:2] == (4, 2)
+
+
+def test_level_nine_progression_and_ordinary_preparations() -> None:
+    row = PaladinProgressionRow(9, 4, ("Abjure Foes",), 2, 9, (4, 3, 2, 0, 0))
+    body = _class_entity({"skillProficiencyChoice": {}}, (row,), (), {}, [])["body"]
+    assert body["builder"]["supportedLevelMaximum"] == 9
+    assert body["skillProficiencyChoice"]["countByLevel"]["9"] == 2
+    assert body["progression"][0]["preparedSpells"] == 9
+    assert body["progression"][0]["spellSlots"] == {"1": 4, "2": 3, "3": 2}
 
 
 def test_paladin_starting_equipment_preserves_both_source_packages() -> None:

@@ -1,0 +1,71 @@
+{
+  "id": "srd521.class-feature.paladin.abjure-foes",
+  "kind": "class-feature",
+  "level": 9,
+  "parentId": "srd521.class.paladin",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-abjure-foes",
+      "parameters": {
+        "actionEconomy": "magic-action",
+        "assistedInstructions": [
+          "Present your Holy Symbol or weapon. Each chosen creature makes the displayed Wisdom saving throw on its own sheet.",
+          "On a failed save, set Frightened on that target's sheet for 1 minute or until it takes any damage; this effect does not require Concentration.",
+          "While Frightened by Abjure Foes, the target can do only one of these on its turn: move, take an action, or take a Bonus Action. Resolve this additional restriction and the effect's expiration manually."
+        ],
+        "resourceId": "srd521.resource.paladin.channel-divinity",
+        "savingThrow": {
+          "ability": "wisdom",
+          "difficultyClassFact": "spellcasting.paladin.saveDifficultyClass"
+        },
+        "spends": 1,
+        "targeting": {
+          "maximumFact": "ability.charisma.modifier",
+          "minimumMaximum": 1,
+          "rangeFeet": 60,
+          "requiresSight": true
+        }
+      },
+      "target": "action.abjure-foes",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.paladin.channel-divinity"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, attack triggers, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0055-b008",
+        "p0055-b009"
+      ],
+      "page": 55,
+      "quoteHash": "ba813c433c5229ddfcc731895bd9e99e244da787461dc0050a3c5621e596c207",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "As a Magic action, you can expend one use of this class’s Channel Divinity to overwhelm foes with awe. As you present your Holy Symbol or weapon, you can target a number of creatures equal to your"
+      },
+      {
+        "kind": "ParagraphNode",
+        "text": "Charisma modifier (minimum of one creature) that you can see within 60 feet of yourself. Each target must succeed on a Wisdom saving throw or have the Frightened condition for 1 minute or until it takes any damage. While Frightened in this way, a target can do only one of the following on its turns: move, take an action, or take a Bonus Action."
+      }
+    ],
+    "title": "Abjure Foes"
+  }
+}

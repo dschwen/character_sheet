@@ -465,6 +465,19 @@ export const classFeatureChoiceSchema = z
 
 export const failedSaveRerollSchema = z.object({ bonusFact: z.string().min(1) }).strict();
 
+export const actionTargetingSchema = z
+  .object({
+    maximumFact: factPathSchema,
+    minimumMaximum: z.number().int().positive().default(1),
+    rangeFeet: z.number().finite().nonnegative(),
+    requiresSight: z.boolean().default(false),
+  })
+  .strict();
+
+export const resolvedActionTargetingSchema = actionTargetingSchema
+  .omit({ maximumFact: true, minimumMaximum: true })
+  .extend({ maximum: z.number().int().positive(), traceId: z.string().min(1) });
+
 export const savingThrowRerollSchema = z
   .object({
     mode: z.literal("advantage"),

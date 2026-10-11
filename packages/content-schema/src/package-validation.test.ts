@@ -404,7 +404,7 @@ describe("bootstrap content package", () => {
       ),
     ).toMatchObject({ unarmedStrikeDamageTypes: ["force"] });
     expect(metadata.find(({ id }) => id === "srd521.class.paladin")?.builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: ["srd521.skill.insight", "srd521.skill.persuasion"],
     });

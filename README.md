@@ -101,6 +101,11 @@ free-cast button and automatic-save guidance, and at-will Arcane Eye through Vis
 Ranger also reaches level 9 with third-level slots, nine ordinary preparations, and two additional
 Expertise choices. Earlier Deft Explorer Expertise is preserved with its own source link.
 Ranger's one-spell preparation replacement limit per Long Rest is not yet enforced by the editor.
+Paladin also reaches level 9 with third-level slots, nine ordinary preparations, and Devotion's
+Beacon of Hope and Dispel Magic. Play → Use a feature offers Abjure Foes: declare visible targets
+within 60 feet, spend one shared Channel Divinity use, and resolve their Wisdom saves on their
+own sheets. Its target limit and save DC use current Charisma. Paladin's one-spell preparation
+replacement limit per Long Rest is also not yet enforced.
 Play also supports fullscreen Death Saving Throws. Apply the final result only after any reroll
 decision; natural 1/20 results, successes/failures, stabilization, and regained HP are resolved on
 the sheet. Declare first aid and turn timing manually. Ordinary healing cannot revive the dead.

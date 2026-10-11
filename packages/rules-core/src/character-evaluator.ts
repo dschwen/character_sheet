@@ -21,6 +21,7 @@ import {
   savingThrowAuraRecipientSchema,
   savingThrowRerollSchema,
   failedSaveRerollSchema,
+  actionTargetingSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -739,6 +740,8 @@ const resourceParametersSchema = z
 const actionParametersSchema = z
   .object({
     actionEconomy: z.string().optional(),
+    targeting: actionTargetingSchema.optional(),
+    assistedInstructions: z.array(z.string().min(1)).optional(),
     savingThrowReroll: savingThrowRerollSchema.optional(),
     failedSaveReroll: failedSaveRerollSchema.optional(),
     spends: z.number().int().positive().optional(),
@@ -7022,6 +7025,34 @@ function evaluateConditionalRules(
       const available = trace.result === true;
       const parameters = actionParametersSchema.parse(rule.parameters);
       const actionParameters: Record<string, JsonValue> = {};
+      if (parameters.assistedInstructions !== undefined)
+        actionParameters.assistedInstructions = parameters.assistedInstructions;
+      if (parameters.targeting !== undefined) {
+        const targetingTraceId = `${rule.target ?? rule.id}.targeting.maximum`;
+        const targetingTrace = evaluateExpression(
+          {
+            kind: "max",
+            args: [
+              { kind: "literal", value: parameters.targeting.minimumMaximum },
+              { kind: "ref", path: parameters.targeting.maximumFact },
+            ],
+          },
+          targetingTraceId,
+          state,
+          index,
+          granted,
+          resourceAmounts,
+        );
+        const maximum = requireNumber(targetingTrace.result as JsonScalar, targetingTraceId);
+        state.traces[targetingTraceId] = withRuleSource(targetingTrace, ir);
+        state.values[targetingTraceId] = { value: maximum, traceId: targetingTraceId };
+        actionParameters.targeting = {
+          maximum,
+          rangeFeet: parameters.targeting.rangeFeet,
+          requiresSight: parameters.targeting.requiresSight,
+          traceId: targetingTraceId,
+        };
+      }
       if (parameters.savingThrowReroll !== undefined)
         actionParameters.savingThrowReroll = parameters.savingThrowReroll;
       if (parameters.failedSaveReroll !== undefined)

@@ -31,6 +31,11 @@ import {
 } from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
+import {
+  actionTargeting,
+  actionTargetingRequest,
+  actionInstructions,
+} from "../lib/action-targeting";
 import { DamageRiderControls } from "./damage-rider-controls";
 import { spellDamageRollRequest } from "../lib/feature-damage-roll";
 import { spellProtectionInstructions } from "../lib/spell-protection";
@@ -152,6 +157,8 @@ interface TransitionResult {
 
 interface ActionDraft {
   amount: string;
+  targetCount?: string;
+  targetsConfirmed?: boolean;
 }
 
 interface ActionRequirements {
@@ -1205,6 +1212,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
     try {
       const actionName = actionDisplayName(action, names);
+      const targeting = actionTargetingRequest(
+        action,
+        draft.targetCount ?? "1",
+        draft.targetsConfirmed ?? false,
+      );
+      if (targeting !== undefined) request.targeting = targeting;
       const actionRollRequest = actionDiceRequest(action, evaluation, actionName);
       const actionRoll =
         actionRollRequest === undefined ? undefined : await performDicePoolRoll(actionRollRequest);
@@ -1217,7 +1230,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       const effectDescription = objectValue(activatedEffect?.body)?.description;
       applyTransition(
         proposal,
-        `${actionName} applied (${String(proposal.changes.length)} changes). ${actionMovementMessage(action) ?? ""} ${typeof effectDescription === "string" ? effectDescription : ""}`.trim(),
+        `${actionName} applied (${String(proposal.changes.length)} changes). ${actionMovementMessage(action) ?? ""} ${typeof effectDescription === "string" ? effectDescription : ""} ${(proposal.guidance ?? []).join(" ")}`.trim(),
       );
       if (
         requiresCompletedD20Test(action) &&
@@ -2552,13 +2565,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         const draft = actionDrafts[action.id] ?? { amount: "" };
                         const actionName = actionDisplayName(action, names);
                         const transitionDice = actionDiceRequest(action, evaluation, actionName);
+                        const targeting = actionTargeting(action);
                         return (
                           <div
                             key={action.id}
                             className={
                               savingThrowRerollDefinition(action)
                                 ? "saving-throw-reroll-card"
-                                : undefined
+                                : targeting === undefined
+                                  ? undefined
+                                  : "targeted-action-card"
                             }
                           >
                             <span>
@@ -2579,6 +2595,60 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   : ` · ${actionMovementMessage(action) ?? ""}`}
                               </small>
                             </span>
+                            {actionInstructions(action).length === 0 ? null : (
+                              <details className="action-guidance">
+                                <summary>Target effects and timing (manual)</summary>
+                                {actionInstructions(action).map((instruction) => (
+                                  <p
+                                    className="builder-callout"
+                                    key={`${action.id}:${instruction}`}
+                                  >
+                                    {instruction}
+                                  </p>
+                                ))}
+                              </details>
+                            )}
+                            {targeting === undefined ? null : (
+                              <div className="action-inputs action-targeting-controls">
+                                <label>
+                                  Targets (maximum {String(targeting.maximum)})
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    max={targeting.maximum}
+                                    step="1"
+                                    value={draft.targetCount ?? "1"}
+                                    onChange={(event) => {
+                                      updateActionDraft(action.id, {
+                                        targetCount: event.target.value,
+                                      });
+                                    }}
+                                  />
+                                </label>
+                                <label className="target-eligibility">
+                                  <input
+                                    type="checkbox"
+                                    checked={draft.targetsConfirmed ?? false}
+                                    onChange={(event) => {
+                                      updateActionDraft(action.id, {
+                                        targetsConfirmed: event.target.checked,
+                                      });
+                                    }}
+                                  />
+                                  Targets are within {String(targeting.rangeFeet)} feet
+                                  {targeting.requiresSight ? " and visible" : ""}.
+                                </label>
+                                <button
+                                  className="button secondary compact"
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedTraceId(targeting.traceId);
+                                  }}
+                                >
+                                  Explain target limit
+                                </button>
+                              </div>
+                            )}
                             <SavingThrowRerollControls
                               key={`${character.id}:${character.metadata.updatedAt}:${action.id}`}
                               action={action}

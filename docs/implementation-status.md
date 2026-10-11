@@ -107,7 +107,16 @@ slots, nine ordinary preparations, and two additional Expertise selections. Shar
 metadata now supports separate acquisition sources, preserving Deft Explorer's earlier selection
 and rejecting duplicate skills across grants. Ranger's one-spell preparation replacement limit
 per Long Rest remains unenforced. See `docs/rules-engine/ranger-level-9.md`.
-Monk, Paladin, and Rogue remain at level 8. See
+Paladin also reaches level 9 with third-level slots, nine regular preparations, and Devotion's
+Beacon of Hope/Dispel Magic. Abjure Foes checks a declared target count against current Charisma
+(minimum one), requires range/sight confirmation, and atomically spends shared Channel Divinity.
+The UI shows its current Wisdom-save DC and instructions for Frightened and its extra turn
+restriction. External target resolution and preparation replacement timing remain manual or
+unfinished. See `docs/rules-engine/paladin-level-9.md`.
+The production-export smoke check passed creation, target declarations, spending/exhaustion,
+reload persistence, and desktop/narrow layouts for this Paladin flow. It does not establish
+the broader browser/accessibility or independent semantic review gates.
+Monk and Rogue remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside

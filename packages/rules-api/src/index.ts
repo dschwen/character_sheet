@@ -343,6 +343,7 @@ export interface StateTransitionProposal {
 
 export interface ActionUseRequest {
   actionId: string;
+  targeting?: { count: number; eligibilityConfirmed: boolean };
   rolls?: number[];
   amount?: number;
   failedSave?: boolean;
@@ -377,6 +378,14 @@ export interface ActionTransitionProposal {
   applicable: boolean;
   changes: StateChange[];
   nextState: CharacterState;
+  targeting?: {
+    count: number;
+    maximum: number;
+    rangeFeet: number;
+    requiresSight: boolean;
+    traceId: string;
+  };
+  guidance?: string[];
   failedSaveReroll?: { testId: string; bonus: number; traceId: string };
   savingThrowReroll?: {
     target: "self" | "other";

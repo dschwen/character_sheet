@@ -936,7 +936,8 @@ button.vital-card:hover {
   color: var(--muted);
   font-size: 10px;
 }
-.play-action-list > .saving-throw-reroll-card {
+.play-action-list > .saving-throw-reroll-card,
+.play-action-list > .targeted-action-card {
   display: grid;
   align-items: start;
 }
@@ -1016,6 +1017,29 @@ button.vital-card:hover {
 .action-inputs input {
   width: 82px;
   height: 34px;
+}
+.action-targeting-controls {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.action-guidance summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--green);
+}
+.action-guidance .builder-callout {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.action-targeting-controls .target-eligibility {
+  display: flex;
+  align-items: center;
+  max-width: 340px;
+}
+.action-targeting-controls input[type="checkbox"] {
+  width: auto;
+  height: auto;
 }
 .action-roll-preview {
   align-self: center;

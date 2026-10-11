@@ -2,6 +2,7 @@
   "authoringIr": [
     "paladin.lay-on-hands.json",
     "paladin.channel-divinity.json",
+    "paladin.abjure-foes.json",
     "oath-of-devotion.sacred-weapon.json",
     "paladin.smite.json",
     "paladin.extra-attack.json",

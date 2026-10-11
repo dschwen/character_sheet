@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { failedSaveRerollSchema, savingThrowRerollSchema } from "@dnd/content-schema";
+import {
+  failedSaveRerollSchema,
+  savingThrowRerollSchema,
+  resolvedActionTargetingSchema,
+} from "@dnd/content-schema";
 
 import type { CalculationTrace, JsonValue } from "@dnd/calculation-trace";
 import { characterDocumentSchema, type CharacterState } from "@dnd/character-model";
@@ -17,6 +21,10 @@ import { deathSaveStatus } from "./death-saving-throws.js";
 const actionUseRequestSchema = z
   .object({
     actionId: z.string().min(1),
+    targeting: z
+      .object({ count: z.number().int().positive(), eligibilityConfirmed: z.boolean() })
+      .strict()
+      .optional(),
     rolls: z.array(z.number().int().positive()).default([]),
     amount: z.number().int().positive().optional(),
     failedSave: z.boolean().optional(),
@@ -51,6 +59,16 @@ const actionUseRequestSchema = z
 const stateActionParametersSchema = z
   .object({
     spends: z.number().int().positive().optional(),
+    targeting: resolvedActionTargetingSchema.optional(),
+    assistedInstructions: z.array(z.string().min(1)).default([]),
+    savingThrow: z
+      .object({
+        ability: z.string().min(1),
+        difficultyClass: z.number().int().positive(),
+        traceId: z.string().min(1).optional(),
+      })
+      .strict()
+      .optional(),
     failedSaveReroll: failedSaveRerollSchema.optional(),
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     resourceId: z.string().min(1),
@@ -188,6 +206,13 @@ export function proposeAction(
   }
 
   const reroll = savingThrowRerollSchema.safeParse(action?.parameters?.savingThrowReroll);
+  if (request.targeting !== undefined && action?.parameters?.targeting === undefined)
+    addValidation(
+      validations,
+      "ACTION_TARGETING_NOT_EXPECTED",
+      "This action does not accept a target declaration.",
+      ["request.targeting"],
+    );
   if (action !== undefined && reroll.success) {
     if (request.failedSave !== undefined)
       addValidation(
@@ -319,6 +344,19 @@ export function proposeAction(
     );
   }
   if (parsedParameters.success) {
+    const targeting = parsedParameters.data.targeting;
+    if (
+      targeting !== undefined &&
+      (request.targeting === undefined ||
+        !request.targeting.eligibilityConfirmed ||
+        request.targeting.count > targeting.maximum)
+    )
+      addValidation(
+        validations,
+        "ACTION_TARGETING_INVALID",
+        `Choose 1–${String(targeting.maximum)} eligible creatures within ${String(targeting.rangeFeet)} feet${targeting.requiresSight ? " that you can see" : ""}, and confirm their eligibility.`,
+        ["request.targeting"],
+      );
     const healing = parsedParameters.data.healing;
     const diceHealing = healing !== undefined && "diceCount" in healing ? healing : undefined;
     const checkBonus = parsedParameters.data.checkBonus;
@@ -753,6 +791,33 @@ export function proposeAction(
     }
   }
   const rerollTraceId = `${action.traceId}.failed-save-reroll`;
+  const targetingTraceId = `${action.traceId}.targeting`;
+  const targeting = parameters.targeting;
+  const targetDeclaration = request.targeting;
+  if (targeting !== undefined && targetDeclaration !== undefined) {
+    traces[targetingTraceId] = {
+      id: targetingTraceId,
+      result: targetDeclaration.count,
+      nodes: [
+        {
+          id: `${targetingTraceId}.authorize`,
+          operation: "authorize-declared-action-targets",
+          inputs: [
+            targetDeclaration.count,
+            targeting.maximum,
+            targeting.rangeFeet,
+            targeting.requiresSight,
+            targetDeclaration.eligibilityConfirmed,
+          ],
+          output: targetDeclaration.count,
+        },
+      ],
+      sourceReferences: [
+        ...(sourceTrace?.sourceReferences ?? []),
+        ...(evaluation.traces[targeting.traceId]?.sourceReferences ?? []),
+      ],
+    };
+  }
   if (parameters.failedSaveReroll !== undefined) {
     const rerollBonus = Number(evaluation.facts[parameters.failedSaveReroll.bonusFact]);
     traces[rerollTraceId] = {
@@ -780,6 +845,19 @@ export function proposeAction(
     applicable: true,
     changes,
     nextState,
+    ...(targeting === undefined || targetDeclaration === undefined
+      ? {}
+      : {
+          targeting: { ...targeting, count: targetDeclaration.count, traceId: targetingTraceId },
+        }),
+    guidance: [
+      ...(targeting === undefined || targetDeclaration === undefined
+        ? []
+        : [
+            `${String(targetDeclaration.count)} target(s) declared within ${String(targeting.rangeFeet)} feet${targeting.requiresSight ? " and visible" : ""}.${parameters.savingThrow === undefined ? "" : ` Each makes a ${parameters.savingThrow.ability} saving throw against DC ${String(parameters.savingThrow.difficultyClass)}.`}`,
+          ]),
+      ...parameters.assistedInstructions,
+    ],
     ...(parameters.failedSaveReroll === undefined
       ? {}
       : {

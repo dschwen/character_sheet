@@ -480,7 +480,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 9)},
+                "countByLevel": {str(level): 2 for level in range(1, 10)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple", "martial"],
@@ -489,7 +489,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 8,
+                "supportedLevelMaximum": 9,
                 "defaultAbilityScores": {
                     "strength": 15,
                     "dexterity": 8,
@@ -718,6 +718,45 @@ def _channel_divinity_ir(feature: dict[str, Any]) -> dict[str, Any]:
     )
 
 
+def _abjure_foes_ir(feature: dict[str, Any]) -> dict[str, Any]:
+    return _feature_ir(
+        feature,
+        [
+            {
+                "id": "use-abjure-foes",
+                "type": "grant-action",
+                "target": "action.abjure-foes",
+                "when": {"kind": "resourceAvailable", "resourceId": CHANNEL_DIVINITY_ID},
+                "parameters": {
+                    "actionEconomy": "magic-action",
+                    "spends": 1,
+                    "resourceId": CHANNEL_DIVINITY_ID,
+                    "targeting": {
+                        "maximumFact": "ability.charisma.modifier",
+                        "minimumMaximum": 1,
+                        "rangeFeet": 60,
+                        "requiresSight": True,
+                    },
+                    "savingThrow": {
+                        "ability": "wisdom",
+                        "difficultyClassFact": "spellcasting.paladin.saveDifficultyClass",
+                    },
+                    "assistedInstructions": [
+                        "Present your Holy Symbol or weapon. Each chosen creature makes "
+                        "the displayed Wisdom saving throw on its own sheet.",
+                        "On a failed save, set Frightened on that target's sheet for 1 minute "
+                        "or until it takes any damage; this effect does not require Concentration.",
+                        "While Frightened by Abjure Foes, the target can do only one of these "
+                        "on its turn: move, take an action, or take a Bonus Action. "
+                        "Resolve this additional restriction and the effect's expiration manually.",
+                    ],
+                },
+                "automationLevel": "roll-assisted",
+            }
+        ],
+    )
+
+
 def _sacred_weapon_ir(feature: dict[str, Any]) -> dict[str, Any]:
     return _feature_ir(
         feature,
@@ -935,6 +974,7 @@ def generate_paladin_content(
     authoring = {
         "paladin.lay-on-hands.json": _lay_on_hands_ir(by_name["Lay On Hands"]),
         "paladin.channel-divinity.json": _channel_divinity_ir(by_name["Channel Divinity"]),
+        "paladin.abjure-foes.json": _abjure_foes_ir(by_name["Abjure Foes"]),
         "oath-of-devotion.sacred-weapon.json": _sacred_weapon_ir(sacred_weapon),
         "paladin.smite.json": _free_spell_ir(
             by_name["Paladin’s Smite"], SMITE_USE_ID, "free-divine-smite", "on-hit"

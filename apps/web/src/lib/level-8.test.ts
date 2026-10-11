@@ -60,6 +60,7 @@ describe.each(builderClassIds)("%s level-8 progression", (classId) => {
         bardId,
         warlockId,
         rangerId,
+        paladinId,
       ].some((id) => id === classId),
       currentLevel: 8,
     });
