@@ -81,6 +81,12 @@ Target effects remain assisted. Death Saving Throw rolls, deferred result resolu
 Indomitable integration are now implemented alongside the six ability-based saves. Stable/dead
 state, natural 1/20 results, declared first aid, damage at zero, massive damage, and healing resets
 are covered. Zero HP derives Unconscious without erasing unrelated explicitly toggled conditions.
+Barbarian creation and advancement also reach level 9. Shared, source-driven attack options
+support declared Reckless Attack and Brutal Strike: all Advantage is forgone, any Disadvantage
+blocks the tradeoff, and hit-confirmed extra damage has normal/critical fullscreen rolls.
+Forceful Blow uses final adjusted Speed; Hamstring Blow includes non-stacking/expiry guidance.
+Standard Unarmed Strike damage attacks are available beyond Monk. Turn timing and target effects
+remain manually declared; see `docs/rules-engine/barbarian-level-9.md`.
 Other classes remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 

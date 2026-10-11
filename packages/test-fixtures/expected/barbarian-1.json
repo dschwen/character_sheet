@@ -88,6 +88,12 @@
         "property": "vex",
         "enabled": true
       }
+    },
+    {
+      "id": "attack.unarmed-strike",
+      "attackBonus": 5,
+      "ability": "strength",
+      "damage": { "flat": 1, "bonus": 5, "type": "bludgeoning" }
     }
   ],
   "validationCodes": []

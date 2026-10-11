@@ -86,6 +86,9 @@ same-class advancement for all twelve SRD classes through level 8.
 Fighter additionally reaches level 9: Indomitable spends a Long Rest use to reroll a declared
 failed save with a Fighter-level bonus, and Tactical Master offers per-attack mastery replacement
 guidance. Save results and target effects remain manually adjudicated.
+Barbarian also reaches level 9. Combat → Attacks → Attack options offers Reckless Attack
+declarations and Brutal Strike, with Advantage tradeoff checks, hit-confirmed extra damage
+rolls, and Forceful/Hamstring Blow guidance. Turn timing and target effects are manual.
 Play also supports fullscreen Death Saving Throws. Apply the final result only after any reroll
 decision; natural 1/20 results, successes/failures, stabilization, and regained HP are resolved on
 the sheet. Declare first aid and turn timing manually. Ordinary healing cannot revive the dead.

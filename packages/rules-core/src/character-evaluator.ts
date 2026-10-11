@@ -6809,14 +6809,19 @@ function evaluateAttacks(
         ),
       };
   }
-  if (martialArts !== undefined && classProgression?.martialArtsDie !== undefined) {
+  {
     const ability: Ability =
       martialArtsActive && dexterityModifier > strengthModifier ? martialArts.ability : "strength";
     const abilityModifier = ability === "dexterity" ? dexterityModifier : strengthModifier;
     const attackBonus = abilityModifier + proficiencyBonus;
     const attackId = "attack.unarmed-strike";
     const traceId = `${attackId}.bonus`;
-    const sources = classEntity === undefined ? [] : entitySourceReferences(classEntity);
+    const sources: SourceReference[] = [
+      { entityId: "srd521.rule.unarmed-strike", sourceId: "wotc-srd-5.2.1-en", page: 190 },
+      ...(martialArtsActive && classEntity !== undefined
+        ? entitySourceReferences(classEntity)
+        : []),
+    ];
     state.traces[traceId] = {
       id: traceId,
       result: attackBonus,
@@ -6848,9 +6853,15 @@ function evaluateAttacks(
     state.facts[traceId] = attackBonus;
     state.values[traceId] = { value: attackBonus, traceId };
     const damageBonusTraceId = `${attackId}.damageBonus`;
+    const rageBonusValue =
+      state.facts["state.rage.active"] === true && ability === "strength"
+        ? state.values["rage.damageBonus"]?.value
+        : 0;
+    const rageBonus = typeof rageBonusValue === "number" ? rageBonusValue : 0;
+    const damageBonus = abilityModifier + rageBonus;
     state.traces[damageBonusTraceId] = {
       id: damageBonusTraceId,
-      result: abilityModifier,
+      result: damageBonus,
       nodes: [
         {
           id: `${damageBonusTraceId}.ability`,
@@ -6858,11 +6869,20 @@ function evaluateAttacks(
           inputs: [ability, abilityModifier],
           output: abilityModifier,
         },
+        {
+          id: `${damageBonusTraceId}.rage`,
+          operation: "add-rage-damage",
+          inputs: [abilityModifier, rageBonus],
+          output: damageBonus,
+        },
       ],
-      sourceReferences: sources,
+      sourceReferences: [
+        ...sources,
+        ...(rageBonus === 0 ? [] : (state.traces["rage.damageBonus"]?.sourceReferences ?? [])),
+      ],
     };
-    state.facts[damageBonusTraceId] = abilityModifier;
-    state.values[damageBonusTraceId] = { value: abilityModifier, traceId: damageBonusTraceId };
+    state.facts[damageBonusTraceId] = damageBonus;
+    state.values[damageBonusTraceId] = { value: damageBonus, traceId: damageBonusTraceId };
     state.attacks.push({
       id: attackId,
       itemId: "unarmed-strike",
@@ -6872,13 +6892,13 @@ function evaluateAttacks(
       attackBonus,
       proficient: true,
       damage: {
-        ...(martialArtsActive
+        ...(martialArtsActive && classProgression.martialArtsDie !== undefined
           ? {
               diceCount: classProgression.martialArtsDie.diceCount,
               diceSize: classProgression.martialArtsDie.diceSize,
             }
           : { flat: 1 }),
-        bonus: abilityModifier,
+        bonus: damageBonus,
         type: "bludgeoning",
         traceId: damageBonusTraceId,
       },
@@ -7330,6 +7350,102 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateAttacks(character, equipment, attackRules, index, state);
   evaluateGrantedAttackEnhancements(granted, index, state);
   evaluateConditionMechanics(character, conditions, state);
+  const grantedAttackRollOptions = [...granted].flatMap((sourceId) => {
+    const entity = index.entities.get(sourceId);
+    if (
+      entity === undefined ||
+      entity.body === null ||
+      typeof entity.body !== "object" ||
+      Array.isArray(entity.body) ||
+      !("attackRollOptions" in entity.body)
+    )
+      return [];
+    const parsed = featureAutomationBodySchema.safeParse(entity.body);
+    return parsed.success ? [{ entity, options: parsed.data.attackRollOptions }] : [];
+  });
+  const commonAttackEffects = [...conditions, ...statuses].flatMap(({ entity, body }) =>
+    body.d20RollEffects
+      .filter((effect) => effect.scope === "attack-rolls")
+      .map((effect) => ({ kind: effect.kind, source: entity.id })),
+  );
+  for (const attack of state.attacks) {
+    const effects = [...commonAttackEffects];
+    effects.push(
+      ...(input.context?.d20RollEffects ?? [])
+        .filter((effect) => effect.testId === "attack-rolls" || effect.testId === attack.id)
+        .map(({ kind, source }) => ({ kind, source })),
+    );
+    attack.advantageSources = effects
+      .filter(({ kind }) => kind === "advantage")
+      .map(({ source }) => source);
+    attack.disadvantageSources = effects
+      .filter(({ kind }) => kind === "disadvantage")
+      .map(({ source }) => source);
+    attack.rollOptions = grantedAttackRollOptions.flatMap(({ entity, options }) => {
+      const sourceId = entity.id;
+      return options
+        .filter((option) => option.ability === attack.ability)
+        .map((option, optionIndex) => {
+          const traceId = `${attack.id}.${sourceId}.rollOption.${String(optionIndex)}`;
+          const speed = state.values["speed.walking"]?.value;
+          const effects = option.effects.map(({ movement, ...effect }) => ({
+            ...effect,
+            ...(movement === undefined
+              ? {}
+              : {
+                  movement: {
+                    ...movement,
+                    maximumFeet: Math.floor(
+                      (typeof speed === "number" ? speed : 0) * movement.speedFraction,
+                    ),
+                  },
+                }),
+          }));
+          state.traces[traceId] = {
+            id: traceId,
+            result: option.kind,
+            nodes: [
+              {
+                id: `${traceId}.grant`,
+                operation: "grant-conditional-attack-roll-option",
+                inputs: [
+                  attack.ability,
+                  option.kind,
+                  option.requiredOptionSourceId ?? null,
+                  option.requiresFirstAttackDeclaration,
+                  option.onceOnYourTurn,
+                  option.damage?.diceCount ?? null,
+                  option.damage?.diceSize ?? null,
+                  ...option.effects.map(({ id }) => id),
+                  typeof speed === "number" ? speed : null,
+                ],
+                output: option.kind,
+              },
+              ...effects.flatMap((effect) =>
+                effect.movement === undefined
+                  ? []
+                  : [
+                      {
+                        id: `${traceId}.${effect.id}.movement`,
+                        operation: "fraction-of-final-speed-rounded-down",
+                        inputs: [
+                          typeof speed === "number" ? speed : 0,
+                          effect.movement.speedFraction,
+                        ],
+                        output: effect.movement.maximumFeet,
+                      },
+                    ],
+              ),
+            ],
+            sourceReferences: [
+              ...entitySourceReferences(entity),
+              ...(state.traces["speed.walking"]?.sourceReferences ?? []),
+            ],
+          };
+          return { ...option, effects, sourceId, sourceName: entity.name.en ?? sourceId, traceId };
+        });
+    });
+  }
   evaluateStatusSpellcastingEnhancements(statuses, conditions, granted, index, state);
   const attackDamageRiders = evaluateBattleBlessings(character, input.packages, index, state);
   evaluateD20Minimums(granted, index, state);

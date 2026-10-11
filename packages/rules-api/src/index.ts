@@ -136,6 +136,9 @@ export interface DamageSummary {
 }
 
 export interface AttackSummary {
+  rollOptions?: AttackRollOptionSummary[];
+  advantageSources?: string[];
+  disadvantageSources?: string[];
   damageModes?: WeaponDamageModeSummary[];
   id: string;
   itemId: string;
@@ -160,6 +163,27 @@ export interface AttackSummary {
   criticalHitThreshold: number;
   criticalHitTraceId: string;
   traceId: string;
+}
+
+export interface AttackRollOptionSummary {
+  sourceId: string;
+  sourceName: string;
+  traceId: string;
+  kind: "advantage" | "forgo-advantage";
+  ability: string;
+  requiredOptionSourceId?: string | undefined;
+  requiresFirstAttackDeclaration: boolean;
+  onceOnYourTurn: boolean;
+  instructions: string;
+  damage?: { diceCount: number; diceSize: number } | undefined;
+  effects: {
+    id: string;
+    name: string;
+    instructions: string;
+    movement?:
+      | { speedFraction: number; provokesOpportunityAttacks: boolean; maximumFeet: number }
+      | undefined;
+  }[];
 }
 
 export interface WeaponDamageModeSummary {

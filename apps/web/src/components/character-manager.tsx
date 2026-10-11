@@ -56,8 +56,8 @@ import { savingThrowRerollDefinition, savingThrowRerollRequest } from "../lib/sa
 import { failedSaveRerollDefinition, failedSaveRerollRequest } from "../lib/failed-save-reroll";
 import { FailedSaveRerollControls } from "./failed-save-reroll-controls";
 import { WeaponMasteryControls } from "./weapon-mastery-controls";
-import { selectedAttackMastery } from "../lib/weapon-mastery";
 import { DeathSaveControls } from "./death-save-controls";
+import { AttackRollControls } from "./attack-roll-controls";
 import {
   addInventoryItem,
   adjustInventoryQuantity,
@@ -701,6 +701,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     damageType = attack.damage.type,
   ): void {
     try {
+      const damage =
+        selectedWeaponDamageMode(attack, weaponDamageModes[attack.id])?.damage ?? attack.damage;
+      if (damage.diceCount === undefined && damage.flat !== undefined) {
+        setNotice(
+          `${attack.name}${critical ? " critical hit" : ""}: ${String(Math.max(0, damage.flat + damage.bonus))} ${damageType} fixed damage. Apply to the target manually; there are no base dice to double. Roll any declared extra damage separately.`,
+        );
+        return;
+      }
       void performDicePoolRoll(
         weaponDamageRollRequest(attack, weaponDamageModes[attack.id], critical, damageType),
       );
@@ -3144,19 +3152,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   </small>
                                 </td>
                                 <td>
-                                  <TraceButton
-                                    className="roll-cell"
-                                    traceId={attack.traceId}
-                                    onSelect={setSelectedTraceId}
-                                    roll={{
-                                      label: `${attack.name} attack${selectedAttackMastery(attack, weaponMasterySelections[attack.id]) === undefined ? "" : ` · ${titleCase(selectedAttackMastery(attack, weaponMasterySelections[attack.id]) ?? "")} mastery (target effects manual)`}`,
-                                      modifier: attack.attackBonus,
-                                      mode: attackRollMode,
-                                      criticalThreshold: attack.criticalHitThreshold,
-                                      ...d20RerollRequest(
-                                        universalD20Test,
-                                        evaluation.attackRollBonusDice,
-                                      ),
+                                  <AttackRollControls
+                                    key={`${character.id}:${character.metadata.updatedAt}:${attack.id}`}
+                                    attack={attack}
+                                    evaluation={evaluation}
+                                    damageMode={mode}
+                                    masteryReplacement={weaponMasterySelections[attack.id]}
+                                    busy={diceRolling}
+                                    onExplain={setSelectedTraceId}
+                                    onDamage={(request) => {
+                                      void performDicePoolRoll(request);
                                     }}
                                     onRoll={(request) => {
                                       if (diceRolling) return;
@@ -3166,10 +3171,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                         [attack.id]: "",
                                       }));
                                     }}
-                                  >
-                                    <strong>{signed(attack.attackBonus)}</strong>
-                                    <small>Roll attack</small>
-                                  </TraceButton>
+                                  />
                                 </td>
                                 <td>
                                   <div className="damage-rolls">
@@ -3224,7 +3226,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                       title="Roll damage · Shift-click to inspect calculation"
                                     >
                                       <strong>{damageText(damage)}</strong>
-                                      <small>Roll damage</small>
+                                      <small>
+                                        {damage.diceCount === undefined
+                                          ? "Show fixed damage"
+                                          : "Roll damage"}
+                                      </small>
                                     </button>
                                     <button
                                       type="button"

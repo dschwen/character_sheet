@@ -8,6 +8,7 @@ import {
   characterBuilderCatalog,
   defaultBuilderDraft,
   fighterId,
+  barbarianId,
   wizardId,
   warlockId,
   bardId,
@@ -49,7 +50,7 @@ describe.each(builderClassIds)("%s level-8 progression", (classId) => {
     );
     expect(evaluation.values.proficiencyBonus?.value).toBe(3);
     expect(levelUpEligibility(character, catalog)).toMatchObject({
-      eligible: classId === fighterId,
+      eligible: classId === fighterId || classId === barbarianId,
       currentLevel: 8,
     });
     expect(characterDocumentSchema.parse(JSON.parse(JSON.stringify(character)))).toEqual(character);

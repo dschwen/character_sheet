@@ -17,7 +17,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 
 | Class | Minimum level | Maximum level |
 | --- | ---: | ---: |
-| Barbarian | 1 | 8 |
+| Barbarian | 1 | 9 |
 | Bard | 1 | 8 |
 | Cleric | 1 | 8 |
 | Druid | 1 | 8 |

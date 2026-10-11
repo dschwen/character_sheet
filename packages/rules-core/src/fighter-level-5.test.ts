@@ -87,7 +87,12 @@ describe("evaluateCharacter Fighter level-5 vertical slice", () => {
         }),
       ]),
     );
-    expect(evaluation.attacks).toHaveLength(4);
+    expect(evaluation.attacks).toHaveLength(5);
+    expect(evaluation.attacks.find(({ id }) => id === "attack.unarmed-strike")).toMatchObject({
+      attackBonus: 7,
+      criticalHitThreshold: 19,
+      damage: { flat: 1, bonus: 4, type: "bludgeoning" },
+    });
     expect(evaluation.attacks).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

@@ -43,9 +43,19 @@ def test_barbarian_pages_28_to_30_audit(tmp_path: Path) -> None:
     assert reconciliation["valid"] is True
     assert reconciliation["counts"]["unresolved"] == 0
     barbarian = next(entity for entity in entities if entity["id"] == "srd521.class.barbarian")
-    assert barbarian["body"]["builder"]["supportedLevelMaximum"] == 8
+    assert barbarian["body"]["builder"]["supportedLevelMaximum"] == 9
     assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["7"] == 3
     assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["8"] == 3
+    assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["9"] == 3
+    reckless = next(entity for entity in entities if entity["name"]["en"] == "Reckless Attack")
+    assert reckless["body"]["attackRollOptions"][0]["requiresFirstAttackDeclaration"] is True
+    brutal = next(entity for entity in entities if entity["name"]["en"] == "Brutal Strike")
+    option = brutal["body"]["attackRollOptions"][0]
+    assert option["requiredOptionSourceId"] == reckless["id"]
+    assert option["damage"] == {"diceCount": 1, "diceSize": 10}
+    assert option["onceOnYourTurn"] is True
+    assert [effect["id"] for effect in option["effects"]] == ["forceful-blow", "hamstring-blow"]
+    assert {span["page"] for span in brutal["source"]} == {29, 30}
     pounce = next(entity for entity in entities if entity["name"]["en"] == "Instinctive Pounce")
     assert pounce["body"]["actionEnhancements"] == [
         {

@@ -480,6 +480,40 @@ export const weaponPropertyBodySchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    attackRollOptions: z
+      .array(
+        z
+          .object({
+            kind: z.enum(["advantage", "forgo-advantage"]),
+            ability: characterBuilderAbilitySchema,
+            requiredOptionSourceId: entityIdSchema.optional(),
+            requiresFirstAttackDeclaration: z.boolean(),
+            onceOnYourTurn: z.boolean(),
+            instructions: z.string().min(1),
+            damage: z
+              .object({ diceCount: z.number().int().positive(), diceSize: z.number().int().min(2) })
+              .strict()
+              .optional(),
+            effects: z.array(
+              z
+                .object({
+                  id: z.string().min(1),
+                  name: z.string().min(1),
+                  instructions: z.string().min(1),
+                  movement: z
+                    .object({
+                      speedFraction: z.number().positive().max(1),
+                      provokesOpportunityAttacks: z.boolean(),
+                    })
+                    .strict()
+                    .optional(),
+                })
+                .strict(),
+            ),
+          })
+          .strict(),
+      )
+      .default([]),
     weaponMasteryReplacements: z.array(z.string().min(1)).default([]),
     cantripDamageBonuses: z
       .array(

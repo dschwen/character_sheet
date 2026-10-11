@@ -204,7 +204,17 @@
   },
   {
     "body": {
-      "automationLevel": "structured",
+      "attackRollOptions": [
+        {
+          "ability": "strength",
+          "effects": [],
+          "instructions": "Declare Reckless Attack when making your first attack roll on your turn. Strength attacks gain Advantage until the start of your next turn; attack rolls against you also have Advantage during that time. Keep the declaration for later attacks and eligible off-turn attacks.",
+          "kind": "advantage",
+          "onceOnYourTurn": false,
+          "requiresFirstAttackDeclaration": true
+        }
+      ],
+      "automationLevel": "sheet-automated",
       "level": 2,
       "parentId": "srd521.class.barbarian",
       "text": {
@@ -570,7 +580,37 @@
   },
   {
     "body": {
-      "automationLevel": "structured",
+      "attackRollOptions": [
+        {
+          "ability": "strength",
+          "damage": {
+            "diceCount": 1,
+            "diceSize": 10
+          },
+          "effects": [
+            {
+              "id": "forceful-blow",
+              "instructions": "Push the target 15 feet straight away. You can then move up to half your Speed straight toward it without provoking Opportunity Attacks.",
+              "movement": {
+                "provokesOpportunityAttacks": false,
+                "speedFraction": 0.5
+              },
+              "name": "Forceful Blow"
+            },
+            {
+              "id": "hamstring-blow",
+              "instructions": "Reduce the target's Speed by 15 feet until the start of your next turn. Only the most recent Hamstring Blow applies; do not stack it.",
+              "name": "Hamstring Blow"
+            }
+          ],
+          "instructions": "While using Reckless Attack, forgo all Advantage on one Strength attack on your turn. The attack must not have Disadvantage. On a hit, add the extra damage with the attack's damage type and choose one effect. Only one chosen attack per turn, even if it misses.",
+          "kind": "forgo-advantage",
+          "onceOnYourTurn": true,
+          "requiredOptionSourceId": "srd521.class-feature.barbarian.reckless-attack",
+          "requiresFirstAttackDeclaration": false
+        }
+      ],
+      "automationLevel": "sheet-automated",
       "level": 9,
       "parentId": "srd521.class.barbarian",
       "text": {

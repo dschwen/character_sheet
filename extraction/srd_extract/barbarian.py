@@ -452,7 +452,7 @@ def _class_entity(
                 "minimum": traits.skill_choice_count,
                 "maximum": traits.skill_choice_count,
                 "options": list(traits.skill_options),
-                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 9)},
+                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 10)},
             },
             "weaponProficiencies": list(traits.weapon_proficiencies),
             "weaponMasteryChoice": {
@@ -464,7 +464,7 @@ def _class_entity(
             "startingEquipmentText": traits.starting_equipment_text,
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 8,
+                "supportedLevelMaximum": 9,
                 "defaultAbilityScores": {
                     "strength": 15,
                     "dexterity": 13,
@@ -540,6 +540,75 @@ def _feature_entity(feature: ExtractedFeature) -> dict[str, Any]:
                             "speedFraction": 0.5,
                             "provokesOpportunityAttacks": True,
                         },
+                    }
+                ],
+            }
+        )
+    if feature.name == "Reckless Attack":
+        entity["body"].update(
+            {
+                "automationLevel": "sheet-automated",
+                "attackRollOptions": [
+                    {
+                        "kind": "advantage",
+                        "ability": "strength",
+                        "requiresFirstAttackDeclaration": True,
+                        "onceOnYourTurn": False,
+                        "instructions": (
+                            "Declare Reckless Attack when making your first attack roll "
+                            "on your turn. "
+                            "Strength attacks gain Advantage until the start of your next turn; "
+                            "attack rolls against you also have Advantage during that time. "
+                            "Keep the declaration for later attacks and eligible off-turn attacks."
+                        ),
+                        "effects": [],
+                    }
+                ],
+            }
+        )
+    if feature.name == "Brutal Strike":
+        entity["body"].update(
+            {
+                "automationLevel": "sheet-automated",
+                "attackRollOptions": [
+                    {
+                        "kind": "forgo-advantage",
+                        "ability": "strength",
+                        "requiredOptionSourceId": "srd521.class-feature.barbarian.reckless-attack",
+                        "requiresFirstAttackDeclaration": False,
+                        "onceOnYourTurn": True,
+                        "instructions": (
+                            "While using Reckless Attack, forgo all Advantage on one "
+                            "Strength attack on your turn. The attack must not have "
+                            "Disadvantage. On a hit, add the "
+                            "extra damage with the attack's damage type and choose one effect. "
+                            "Only one chosen attack per turn, even if it misses."
+                        ),
+                        "damage": {"diceCount": 1, "diceSize": 10},
+                        "effects": [
+                            {
+                                "id": "forceful-blow",
+                                "name": "Forceful Blow",
+                                "instructions": (
+                                    "Push the target 15 feet straight away. You can then "
+                                    "move up to half your Speed straight toward it "
+                                    "without provoking Opportunity Attacks."
+                                ),
+                                "movement": {
+                                    "speedFraction": 0.5,
+                                    "provokesOpportunityAttacks": False,
+                                },
+                            },
+                            {
+                                "id": "hamstring-blow",
+                                "name": "Hamstring Blow",
+                                "instructions": (
+                                    "Reduce the target's Speed by 15 feet until the start "
+                                    "of your next turn. "
+                                    "Only the most recent Hamstring Blow applies; do not stack it."
+                                ),
+                            },
+                        ],
                     }
                 ],
             }
@@ -941,7 +1010,7 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
                 "VERIFIED": 0,
             },
             "note": (
-                "Barbarian through level 7 from pages 28–30. Proposed executable rules remain "
+                "Barbarian through level 9 from pages 28–30. Proposed executable rules remain "
                 "in needs-review authoring IR."
             ),
         },
