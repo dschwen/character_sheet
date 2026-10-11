@@ -130,7 +130,9 @@ export function proposeSpellCast(
       ? undefined
       : request.castingSourceId === undefined
         ? request.useFreeCast
-          ? spell.castingOptions?.find((option) => option.freeCastResourceId !== undefined)
+          ? spell.castingOptions?.find(
+              (option) => option.freeCastResourceId !== undefined || option.freeCastAtWill,
+            )
           : spell.castingOptions?.[0]
         : spell.castingOptions?.find((option) => option.sourceId === request.castingSourceId);
   if (evaluation.facts["actions.disabled"] === true) {
@@ -180,14 +182,14 @@ export function proposeSpellCast(
         ["request.slotLevel", "request.useFreeCast"],
       );
     }
-    if (castingOption?.freeCastResourceId === undefined) {
+    if (castingOption?.freeCastResourceId === undefined && !castingOption?.freeCastAtWill) {
       addValidation(
         validations,
         "SPELL_FREE_CAST_UNAVAILABLE",
         `${request.spellId} has no free casting from the selected source.`,
         ["request.useFreeCast"],
       );
-    } else {
+    } else if (castingOption.freeCastResourceId !== undefined) {
       const resource = evaluation.resources.find(
         (candidate) => candidate.id === castingOption.freeCastResourceId,
       );
@@ -296,7 +298,12 @@ export function proposeSpellCast(
       `${request.spellId} expends its free casting.`,
       "expend-free-spell-cast",
       [before, resourceId],
-      spell.sources,
+      [
+        ...spell.sources,
+        ...(evaluation.traces[
+          evaluation.resources.find(({ id }) => id === resourceId)?.traceId ?? ""
+        ]?.sourceReferences ?? []),
+      ],
     );
   } else if (spell.level > 0 && !request.asRitual && request.slotLevel !== undefined) {
     const before = character.state.expendedSpellSlots[String(request.slotLevel)] ?? 0;
@@ -385,6 +392,12 @@ export function proposeSpellCast(
     kind: "spell-cast",
     spellId: request.spellId,
     applicable: true,
+    ...(request.useFreeCast
+      ? {
+          guidance: castingOption?.freeCastGuidance ?? [],
+          freeCastAtWill: castingOption?.freeCastAtWill ?? false,
+        }
+      : {}),
     ...(request.protectedCreatureCount > 0 && protection !== undefined
       ? {
           protection: {

@@ -25,6 +25,7 @@ CLASS_ID = "srd521.class.warlock"
 SUBCLASS_ID = "srd521.subclass.warlock.fiend-patron"
 INVOCATION_CHOICE_ID = "srd521.choice.warlock.eldritch-invocation"
 MAGICAL_CUNNING_ID = "srd521.resource.warlock.magical-cunning"
+CONTACT_PATRON_ID = "srd521.resource.warlock.contact-patron"
 INVOCATION_NAMES = (
     "Agonizing Blast",
     "Armor of Shadows",
@@ -492,12 +493,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 9)},
+                "countByLevel": {str(level): 2 for level in range(1, 10)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 8,
+                "supportedLevelMaximum": 9,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -525,7 +526,7 @@ def _class_entity(
             },
             "spellcastingModel": "pact-magic",
             "slotRecharge": "short-rest",
-            "alwaysPreparedSpells": {},
+            "alwaysPreparedSpells": {"9": ["srd521.spell.contact-other-plane"]},
             "spellList": [
                 entry["id"]
                 for name, entry in sorted(
@@ -536,11 +537,11 @@ def _class_entity(
                 "id": INVOCATION_CHOICE_ID,
                 "level": 1,
                 "minimum": 1,
-                "maximum": 6,
+                "maximum": 7,
                 "countByLevel": {
                     str(row.level): row.eldritch_invocations
                     for row in progression
-                    if row.level <= 7
+                    if row.level <= 9
                 },
                 "options": [invocation["id"] for invocation in invocations],
                 "defaultOptionIds": [
@@ -550,6 +551,7 @@ def _class_entity(
                     "srd521.option.warlock.invocation.ascendant-step",
                     "srd521.option.warlock.invocation.one-with-shadows",
                     "srd521.option.warlock.invocation.eldritch-mind",
+                    "srd521.option.warlock.invocation.visions-of-distant-realms",
                 ],
                 "changeOn": ["level-up"],
                 "replacementMaximum": 1,
@@ -740,6 +742,25 @@ def _dark_ones_own_luck_ir(feature: dict[str, Any]) -> dict[str, Any]:
     return ir
 
 
+def _contact_patron_ir(feature: dict[str, Any]) -> dict[str, Any]:
+    ir = _magical_cunning_ir(feature)
+    ir["proposedRules"] = [
+        {
+            "id": "contact-patron-resource",
+            "type": "grant-resource",
+            "target": CONTACT_PATRON_ID,
+            "expression": {"kind": "literal", "value": 1},
+            "parameters": {"recharge": [{"event": "long-rest", "amount": "all"}]},
+            "automationLevel": "state-automated",
+        }
+    ]
+    ir["review"]["notes"] = [
+        "The free spell-cast workflow spends this use; patron contact and automatic save success "
+        "are explicit casting guidance."
+    ]
+    return ir
+
+
 def generate_warlock_content(class_root: Path, spell_root: Path, output: Path) -> dict[str, Any]:
     document = read_json(class_root / "normalized" / "document.json")
     spell_document = read_json(spell_root / "normalized" / "document.json")
@@ -772,6 +793,34 @@ def generate_warlock_content(class_root: Path, spell_root: Path, output: Path) -
         *_fiend_entities(document, fiend),
         *spells,
     ]
+    contact = next(feature for feature in features if feature["name"] == "Contact Patron")
+    for entity in entities:
+        if entity["id"] == contact["id"]:
+            entity["body"]["freeSpellCasting"] = {
+                "classId": CLASS_ID,
+                "resourceId": CONTACT_PATRON_ID,
+                "spellIds": ["srd521.spell.contact-other-plane"],
+                "guidance": [
+                    "Contact Patron: contact your patron with this casting of Contact Other Plane. "
+                    "You automatically succeed on the spell's saving throw; do not roll that save. "
+                    "This benefit applies only to this feature's free casting. "
+                    "Resolve the patron's answers with the GM."
+                ],
+            }
+            entity["body"]["automationLevel"] = "state-automated"
+        if entity["id"] == "srd521.option.warlock.invocation.visions-of-distant-realms":
+            entity["body"]["alwaysPreparedSpells"] = {"9": ["srd521.spell.arcane-eye"]}
+            entity["body"]["freeSpellCasting"] = {
+                "classId": CLASS_ID,
+                "atWill": True,
+                "spellIds": ["srd521.spell.arcane-eye"],
+                "guidance": [
+                    "Visions of Distant Realms: cast Arcane Eye without a spell slot. "
+                    "Maintain Concentration and adjudicate the eye's movement "
+                    "and perception manually."
+                ],
+            }
+            entity["body"]["automationLevel"] = "state-automated"
     existing = read_json(output / "entities.json")
     replacements = {entity["id"]: entity for entity in entities if entity["kind"] != "spell"}
     existing_ids = {entity["id"] for entity in existing}
@@ -782,6 +831,7 @@ def generate_warlock_content(class_root: Path, spell_root: Path, output: Path) -
     magical_cunning = next(feature for feature in features if feature["name"] == "Magical Cunning")
     luck = next(feature for feature in fiend if feature["name"] == "Dark One’s Own Luck")
     authoring = {
+        "warlock.contact-patron.json": _contact_patron_ir(contact),
         "warlock.magical-cunning.json": _magical_cunning_ir(magical_cunning),
         "fiend.dark-ones-own-luck.json": _dark_ones_own_luck_ir(luck),
     }

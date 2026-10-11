@@ -257,6 +257,8 @@ export interface SpellCastingOptionSummary {
   attackTraceId: string;
   saveTraceId: string;
   freeCastResourceId?: string;
+  freeCastAtWill?: boolean;
+  freeCastGuidance?: string[];
   freeCastAvailable?: boolean;
 }
 
@@ -397,6 +399,8 @@ export interface SpellCastRequest {
 }
 
 export interface SpellCastTransitionProposal {
+  freeCastAtWill?: boolean;
+  guidance?: string[];
   protection?: SpellProtectionApplication;
   kind: "spell-cast";
   spellId: string;

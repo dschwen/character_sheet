@@ -99,7 +99,10 @@ Life Domain and terrain-specific Circle spells, and a five-level Natural Recover
 See `docs/rules-engine/divine-primal-level-9.md`. Bard also reaches level 9 with four Expertise
 selections, fifth-level slots, and fourteen regular preparations. Earlier Expertise is locked
 by shared advancement validation; repeated Bard/Rogue Expertise table entries retain source
-links. See `docs/rules-engine/bard-level-9.md`. Other classes remain at level 8. See
+links. See `docs/rules-engine/bard-level-9.md`. Warlock also reaches level 9 with fifth-level
+Pact slots, seven invocations, Contact Patron's Long Rest free casting and save guidance,
+and Visions of Distant Realms' at-will Arcane Eye casting. Slot upgrades preserve spent
+uses. See `docs/rules-engine/warlock-level-9.md`. Other classes remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside

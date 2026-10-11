@@ -110,6 +110,14 @@ export function spellPreparationEditor(
   const subclassBody = objectValue(subclassEntity?.body);
   const selectedOptions = selectedFeatureOptionIds(character);
   const alwaysPreparedSpellIds = [
+    ...rulesPackage.entities
+      .filter((entity) => selectedOptions.has(entity.id))
+      .flatMap((entity) => {
+        const body = objectValue(entity.body);
+        return objectValue(body?.freeSpellCasting)?.classId === classEntity.id
+          ? grantsThroughLevel(body?.alwaysPreparedSpells, classLevel)
+          : [];
+      }),
     ...[classBody, subclassBody]
       .flatMap((body) => Object.values(body ?? {}))
       .flatMap((value) => {

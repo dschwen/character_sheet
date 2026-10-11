@@ -170,6 +170,8 @@ interface ActionRequirements {
 }
 
 interface CastFeedback {
+  freeCastAtWill?: boolean;
+  guidance?: string[];
   traces: Readonly<Record<string, Trace>>;
   protection?: SpellProtectionApplication;
   spell: SpellSummary;
@@ -1279,6 +1281,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         );
         setCastFeedback({
           traces: proposal.traces,
+          guidance: proposal.guidance ?? [],
+          freeCastAtWill: proposal.freeCastAtWill ?? false,
           ...(proposal.protection === undefined ? {} : { protection: proposal.protection }),
           spell,
           asRitual,
@@ -1300,7 +1304,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       }
       applyTransition(
         proposal,
-        `${spell.name}${asRitual ? " was cast as a ritual" : useFreeCast ? " used its free casting" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.${spellStatusMessage(spell) === "" ? "" : ` ${spellStatusMessage(spell)}`}${proposal.protection === undefined ? "" : ` ${spellProtectionInstructions(proposal.protection)}`}`,
+        `${spell.name}${asRitual ? " was cast as a ritual" : useFreeCast ? " used its free casting" : " was cast"}${slotLevel === undefined ? "" : ` with a level ${String(slotLevel)} slot`}.${spellStatusMessage(spell) === "" ? "" : ` ${spellStatusMessage(spell)}`}${proposal.protection === undefined ? "" : ` ${spellProtectionInstructions(proposal.protection)}`}${proposal.guidance?.length ? ` ${proposal.guidance.join(" ")}` : ""}`,
       );
     } catch (error) {
       setNotice(`Spell cast failed: ${errorMessage(error)}`);
@@ -2720,7 +2724,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             {castFeedback.asRitual
                               ? "Ritual · no spell slot spent"
                               : castFeedback.freeCast === true
-                                ? "Feature · free casting spent"
+                                ? castFeedback.freeCastAtWill
+                                  ? "At-will · no spell slot or resource spent"
+                                  : "Feature · free casting spent"
                                 : castFeedback.slotLevel === undefined
                                   ? "Cantrip · no spell slot spent"
                                   : `Level ${String(castFeedback.slotLevel)} slot spent · ${String(castFeedback.slotsRemaining ?? 0)} remaining`}
@@ -2738,6 +2744,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             </em>
                           ) : null}
                           {spellStatusInstructions(castFeedback.spell).map((instruction) => (
+                            <em key={instruction}>{instruction}</em>
+                          ))}
+                          {castFeedback.guidance?.map((instruction) => (
                             <em key={instruction}>{instruction}</em>
                           ))}
                           {castFeedback.protection === undefined ? null : (
@@ -2785,7 +2794,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         const canCastWithSlot =
                           spell.level === 0 || (spell.prepared && (selectedSlot?.current ?? 0) > 0);
                         const freeCastingOptions = spell.castingOptions?.filter(
-                          (option) => option.freeCastResourceId !== undefined,
+                          (option) =>
+                            option.freeCastResourceId !== undefined || option.freeCastAtWill,
                         );
                         return (
                           <div key={spell.id}>
@@ -2901,9 +2911,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                     castSpell(spell, false, freeCastingOption.sourceId, true);
                                   }}
                                 >
-                                  {freeCastingOption.freeCastAvailable === true
-                                    ? "Free cast"
-                                    : "Free cast spent"}
+                                  {freeCastingOption.freeCastAtWill
+                                    ? "Cast at will"
+                                    : freeCastingOption.freeCastAvailable === true
+                                      ? "Free cast"
+                                      : "Free cast spent"}
                                   {" · "}
                                   {names.get(freeCastingOption.sourceId) ??
                                     shortEntityName(freeCastingOption.sourceId)}

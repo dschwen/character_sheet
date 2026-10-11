@@ -27,12 +27,12 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | Ranger | 1 | 8 |
 | Rogue | 1 | 8 |
 | Sorcerer | 1 | 9 |
-| Warlock | 1 | 8 |
+| Warlock | 1 | 9 |
 | Wizard | 1 | 9 |
 
 ## Review evidence
 
-- Authoring IR records: 58.
+- Authoring IR records: 59.
 - Semantics approved: 0.
 - Tests approved: 0.
 

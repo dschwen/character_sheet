@@ -1,7 +1,11 @@
 [
   {
     "body": {
-      "alwaysPreparedSpells": {},
+      "alwaysPreparedSpells": {
+        "9": [
+          "srd521.spell.contact-other-plane"
+        ]
+      },
       "armorTraining": [
         "light"
       ],
@@ -20,7 +24,7 @@
           "srd521.skill.deception"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 8,
+        "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
       "cantripChange": {
@@ -38,7 +42,9 @@
           "4": 3,
           "5": 5,
           "6": 5,
-          "7": 6
+          "7": 6,
+          "8": 6,
+          "9": 7
         },
         "defaultOptionIds": [
           "srd521.option.warlock.invocation.pact-of-the-chain",
@@ -46,11 +52,12 @@
           "srd521.option.warlock.invocation.fiendish-vigor",
           "srd521.option.warlock.invocation.ascendant-step",
           "srd521.option.warlock.invocation.one-with-shadows",
-          "srd521.option.warlock.invocation.eldritch-mind"
+          "srd521.option.warlock.invocation.eldritch-mind",
+          "srd521.option.warlock.invocation.visions-of-distant-realms"
         ],
         "id": "srd521.choice.warlock.eldritch-invocation",
         "level": 1,
-        "maximum": 6,
+        "maximum": 7,
         "minimum": 1,
         "options": [
           "srd521.option.warlock.invocation.agonizing-blast",
@@ -452,7 +459,8 @@
           "5": 2,
           "6": 2,
           "7": 2,
-          "8": 2
+          "8": 2,
+          "9": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -894,6 +902,17 @@
   },
   {
     "body": {
+      "automationLevel": "state-automated",
+      "freeSpellCasting": {
+        "classId": "srd521.class.warlock",
+        "guidance": [
+          "Contact Patron: contact your patron with this casting of Contact Other Plane. You automatically succeed on the spell's saving throw; do not roll that save. This benefit applies only to this feature's free casting. Resolve the patron's answers with the GM."
+        ],
+        "resourceId": "srd521.resource.warlock.contact-patron",
+        "spellIds": [
+          "srd521.spell.contact-other-plane"
+        ]
+      },
       "level": 9,
       "text": "In the past, you usually contacted your patron through intermediaries. Now you can communicate directly; you always have the Contact Other Plane spell prepared. With this feature, you can cast the spell without expending a spell slot to contact your patron, and you automatically succeed on the spell’s saving throw. Once you cast the spell with this feature, you can’t do so in this way again until you finish a Long Rest."
     },
@@ -2019,7 +2038,23 @@
   },
   {
     "body": {
+      "alwaysPreparedSpells": {
+        "9": [
+          "srd521.spell.arcane-eye"
+        ]
+      },
+      "automationLevel": "state-automated",
       "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "freeSpellCasting": {
+        "atWill": true,
+        "classId": "srd521.class.warlock",
+        "guidance": [
+          "Visions of Distant Realms: cast Arcane Eye without a spell slot. Maintain Concentration and adjudicate the eye's movement and perception manually."
+        ],
+        "spellIds": [
+          "srd521.spell.arcane-eye"
+        ]
+      },
       "minimumWarlockLevel": 9,
       "prerequisiteInvocationIds": [],
       "prerequisiteText": "Level 9+ Warlock",

@@ -607,10 +607,21 @@ export const featureAutomationBodySchema = z
     freeSpellCasting: z
       .object({
         classId: entityIdSchema,
-        resourceId: entityIdSchema,
-        optionChoiceId: entityIdSchema,
+        resourceId: entityIdSchema.optional(),
+        atWill: z.boolean().default(false),
+        optionChoiceId: entityIdSchema.optional(),
+        spellIds: z.array(entityIdSchema).min(1).optional(),
+        guidance: z.array(z.string().min(1)).default([]),
       })
       .strict()
+      .refine(
+        (value) => (value.resourceId !== undefined) !== value.atWill,
+        "Free casting requires either a resource or at-will casting",
+      )
+      .refine(
+        (value) => (value.optionChoiceId !== undefined) !== (value.spellIds !== undefined),
+        "Free casting requires exactly one spell eligibility selector",
+      )
       .optional(),
     savingThrowAura: savingThrowAuraSchema.optional(),
     auraConditionImmunities: z

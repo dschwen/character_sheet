@@ -1601,27 +1601,30 @@ function evaluateSpellRecoveryFeatures(
       });
     }
     const free = body.data.freeSpellCasting;
-    if (free === undefined) continue;
+    // Invalid selections cannot authorize a feature-specific free casting.
+    if (free === undefined || state.validations.some(({ severity }) => severity === "error"))
+      continue;
     const classLevel = requireNumber(
       state.facts[`classLevel.${free.classId.split(".").at(-1) ?? ""}`] ?? null,
       "Free casting class level",
     );
     const eligible = new Set(
-      [...granted].flatMap((optionId) => {
-        const option = index.entities.get(optionId);
-        const parsed = z
-          .object({
-            choiceId: z.string(),
-            alwaysPreparedSpells: z.record(z.array(z.string())).default({}),
-          })
-          .passthrough()
-          .safeParse(option?.body);
-        return parsed.success && parsed.data.choiceId === free.optionChoiceId
-          ? Object.entries(parsed.data.alwaysPreparedSpells).flatMap(([level, ids]) =>
-              Number(level) <= classLevel ? ids : [],
-            )
-          : [];
-      }),
+      free.spellIds ??
+        [...granted].flatMap((optionId) => {
+          const option = index.entities.get(optionId);
+          const parsed = z
+            .object({
+              choiceId: z.string(),
+              alwaysPreparedSpells: z.record(z.array(z.string())).default({}),
+            })
+            .passthrough()
+            .safeParse(option?.body);
+          return parsed.success && parsed.data.choiceId === free.optionChoiceId
+            ? Object.entries(parsed.data.alwaysPreparedSpells).flatMap(([level, ids]) =>
+                Number(level) <= classLevel ? ids : [],
+              )
+            : [];
+        }),
     );
     for (const spell of state.spells) {
       if (spell.level === 0 || !spell.prepared || !eligible.has(spell.id)) continue;
@@ -1632,8 +1635,11 @@ function evaluateSpellRecoveryFeatures(
         {
           ...base,
           sourceId: id,
-          freeCastResourceId: free.resourceId,
+          ...(free.resourceId === undefined ? {} : { freeCastResourceId: free.resourceId }),
+          ...(free.atWill ? { freeCastAtWill: true } : {}),
+          freeCastGuidance: free.guidance,
           freeCastAvailable:
+            free.atWill ||
             (state.resources.find(({ id }) => id === free.resourceId)?.current ?? 0) > 0,
         },
       ];
@@ -4490,6 +4496,7 @@ function evaluateStatusSpellcastingEnhancements(
 function evaluateSpellcasting(
   character: CharacterDocument,
   classLevels: ReadonlyMap<string, number>,
+  granted: ReadonlySet<string>,
   index: PackageIndex,
   state: EngineState,
 ): void {
@@ -4636,6 +4643,29 @@ function evaluateSpellcasting(
   const featureSpells = resolveFeatureSpellSelections(character, classId, classLevel, index, state);
   const alwaysPrepared = new Set([
     ...featureSpells.alwaysPrepared,
+    ...[...granted].flatMap((id) => {
+      const entity = index.entities.get(id);
+      if (
+        typeof entity?.body !== "object" ||
+        entity.body === null ||
+        !("freeSpellCasting" in entity.body)
+      )
+        return [];
+      const automation = featureAutomationBodySchema.safeParse(entity.body);
+      if (
+        !automation.success ||
+        automation.data.freeSpellCasting?.classId !== classId ||
+        state.validations.some(({ severity }) => severity === "error")
+      )
+        return [];
+      const spells = z
+        .object({ alwaysPreparedSpells: z.record(z.array(z.string())).default({}) })
+        .passthrough()
+        .parse(entity.body);
+      return Object.entries(spells.alwaysPreparedSpells).flatMap(([level, ids]) =>
+        Number(level) <= classLevel ? ids : [],
+      );
+    }),
     ...Object.entries(classBody.alwaysPreparedSpells).flatMap(([level, spellIds]) =>
       Number(level) <= classLevel ? spellIds : [],
     ),
@@ -7384,7 +7414,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     d20BonusDice.tests,
   );
   evaluateHitPoints(character, rules, granted, index, state, statuses);
-  evaluateSpellcasting(character, classLevels, index, state);
+  evaluateSpellcasting(character, classLevels, granted, index, state);
   evaluateElementalAffinity(character, classLevels, index, state);
   evaluateMagicInitiate(character, index, state);
   evaluateSpeciesTraits(character, origins, index, state);
