@@ -25,7 +25,7 @@
           "srd521.skill.nature"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 8,
+        "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
       "elementalFuryChoice": {
@@ -473,7 +473,8 @@
           "5": 2,
           "6": 2,
           "7": 2,
-          "8": 2
+          "8": 2,
+          "9": 2
         },
         "maximum": 2,
         "minimum": 2,

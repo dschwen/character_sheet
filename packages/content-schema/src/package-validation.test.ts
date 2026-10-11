@@ -386,10 +386,10 @@ describe("bootstrap content package", () => {
       defaultClassSkillIds: ["srd521.skill.acrobatics", "srd521.skill.insight"],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.cleric")?.builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
     });
     expect(metadata.find(({ id }) => id === "srd521.class.druid")?.builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
     });
     expect(
       featureAutomationBodySchema.parse(

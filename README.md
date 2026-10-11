@@ -92,6 +92,8 @@ rolls, and Forceful/Hamstring Blow guidance. Turn timing and target effects are 
 Wizard and Sorcerer also reach level 9, with fifth-level slots and fourteen regular preparations.
 Evoker gains a separate Savant spellbook addition; Draconic Sorcery gains its level-9 automatic
 spells. Newly available spell effects may still require manual adjudication.
+Cleric and Druid likewise reach level 9, with fifth-level slots, fourteen ordinary preparations,
+automatic domain/land spells, and fifth-level Natural Recovery for Circle of the Land.
 Play also supports fullscreen Death Saving Throws. Apply the final result only after any reroll
 decision; natural 1/20 results, successes/failures, stabilization, and regained HP are resolved on
 the sheet. Declare first aid and turn timing manually. Ordinary healing cannot revive the dead.

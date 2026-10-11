@@ -1,6 +1,11 @@
 import pytest
 
-from srd_extract.cleric import ClericProgressionRow, _starting_equipment, parse_core_traits
+from srd_extract.cleric import (
+    ClericProgressionRow,
+    _class_entity,
+    _starting_equipment,
+    parse_core_traits,
+)
 
 
 def test_parse_core_cleric_traits() -> None:
@@ -31,6 +36,16 @@ def test_cleric_progression_accepts_level_five_row() -> None:
     assert row.channel_divinity == 2
     assert row.prepared_spells == 9
     assert row.spell_slots[:3] == (4, 3, 2)
+
+
+def test_level_nine_builder_and_progression() -> None:
+    row = ClericProgressionRow(9, 4, (), 3, 4, 14, (4, 3, 3, 3, 1, 0, 0, 0, 0))
+    body = _class_entity({}, (row,), (), {}, [])["body"]
+    assert body["builder"]["supportedLevelMaximum"] == 9
+    assert body["skillProficiencyChoice"]["countByLevel"]["9"] == 2
+    assert body["progression"][0]["spellSlots"]["5"] == 1
+    assert body["progression"][0]["preparedSpells"] == 14
+    assert body["progression"][0]["channelDivinity"] == 3
 
 
 def test_cleric_starting_equipment_preserves_package_and_gold_choices() -> None:

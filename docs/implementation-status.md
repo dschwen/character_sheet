@@ -94,7 +94,9 @@ Wizard and Sorcerer creation and advancement also reach level 9: both gain fifth
 slots and fourteen regular preparations. Evoker gains its separate level-9 Savant addition;
 Draconic Sorcery adds Legend Lore and Summon Dragon without consuming ordinary preparations.
 Arcane Recovery supports the new fifth-level slot. See `docs/rules-engine/arcane-level-9.md`.
-Other classes remain at level 8. See
+Cleric and Druid also reach level 9, with fifth-level slots, fourteen ordinary preparations,
+Life Domain and terrain-specific Circle spells, and a five-level Natural Recovery budget.
+See `docs/rules-engine/divine-primal-level-9.md`. Other classes remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside
