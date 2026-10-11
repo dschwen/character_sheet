@@ -4,12 +4,64 @@ import pytest
 
 from srd_extract.fighter import (
     _class_entity,
+    _fighter_authoring_ir,
     _grappler_entity,
     extract_champion_features,
     extract_fighting_styles,
     parse_core_traits,
     parse_progression,
 )
+
+
+def test_indomitable_authoring_and_source_guards() -> None:
+    text = (
+        "If you fail a saving throw, you can reroll it with a bonus equal to your Fighter level. "
+        "You must use the new roll and regain this use after a Long Rest. "
+        "Twice starting at level 13 and three times starting at level 17."
+    )
+
+    def feature(name: str, level: int = 2) -> dict[str, Any]:
+        return {
+            "id": f"srd521.class-feature.fighter.{name.lower().replace(' ', '-')}",
+            "name": name,
+            "level": level,
+            "source": [{"sourceId": "test-source", "page": 48, "blocks": ["feature"]}],
+            "bodyNodes": [{"kind": "ParagraphNode", "normalizedText": text}],
+        }
+
+    features = tuple(
+        feature(name, 9 if name == "Indomitable" else 2)
+        for name in [
+            "Action Surge",
+            "Tactical Mind",
+            "Extra Attack",
+            "Tactical Shift",
+            "Indomitable",
+        ]
+    )
+    champion = tuple(feature(name, 3) for name in ["Improved Critical", "Remarkable Athlete"])
+    ir = _fighter_authoring_ir(features, champion)["fighter.indomitable.json"]
+    assert ir["level"] == 9
+    assert ir["source"][0]["page"] == 48
+    assert ir["review"]["semantics"] == "needs-review"
+    resource, action = ir["proposedRules"]
+    assert resource["parameters"]["recharge"] == [{"event": "long-rest", "amount": "all"}]
+    assert resource["expression"]["then"]["value"] == 3
+    assert resource["expression"]["else"]["then"]["value"] == 2
+    assert resource["expression"]["else"]["else"]["value"] == 1
+    assert action["parameters"]["spends"] == 1
+    assert action["parameters"]["failedSaveReroll"] == {"bonusFact": "classLevel.fighter"}
+    for phrase in [
+        "fail a saving throw",
+        "bonus equal to your Fighter level",
+        "must use the new roll",
+        "Long Rest",
+        "level 13",
+        "level 17",
+    ]:
+        features[-1]["bodyNodes"][0]["normalizedText"] = text.replace(phrase, "missing")
+        with pytest.raises(ValueError, match="Indomitable source is missing"):
+            _fighter_authoring_ir(features, champion)
 
 
 def test_grappler_metadata_and_source_boundaries() -> None:

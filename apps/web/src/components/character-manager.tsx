@@ -51,6 +51,10 @@ import { CharacterBuilder } from "./character-builder";
 import { CharacterLevelUp } from "./character-level-up";
 import { SavingThrowRerollControls } from "./saving-throw-reroll-controls";
 import { savingThrowRerollDefinition, savingThrowRerollRequest } from "../lib/saving-throw-reroll";
+import { failedSaveRerollDefinition, failedSaveRerollRequest } from "../lib/failed-save-reroll";
+import { FailedSaveRerollControls } from "./failed-save-reroll-controls";
+import { WeaponMasteryControls } from "./weapon-mastery-controls";
+import { selectedAttackMastery } from "../lib/weapon-mastery";
 import {
   addInventoryItem,
   adjustInventoryQuantity,
@@ -360,6 +364,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
   const [weaponDamageModes, setWeaponDamageModes] = useState<Readonly<Record<string, string>>>({});
+  const [weaponMasterySelections, setWeaponMasterySelections] = useState<
+    Readonly<Record<string, string>>
+  >({});
   const [spellHealsOther, setSpellHealsOther] = useState<Readonly<Record<string, boolean>>>({});
   const [protectedCreatureCounts, setProtectedCreatureCounts] = useState<
     Readonly<Record<string, string>>
@@ -827,6 +834,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setSpellHealsOther({});
     setProtectedCreatureCounts({});
     setWeaponDamageModes({});
+    setWeaponMasterySelections({});
     setResolveSaveDamage(false);
     setUseD20Minimums(true);
     setSpellRecoverySelections({});
@@ -856,6 +864,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setSpellHealsOther({});
       setProtectedCreatureCounts({});
       setWeaponDamageModes({});
+      setWeaponMasterySelections({});
       setResolveSaveDamage(false);
       setUseD20Minimums(true);
       setSpellRecoverySelections({});
@@ -1101,6 +1110,44 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     } catch (error) {
       setLatestRoll(previous);
       setNotice(`Reroll failed: ${errorMessage(error)}`);
+    }
+  }
+
+  async function useFailedSaveReroll(
+    action: ActionSummary,
+    request: ActionUseRequest,
+  ): Promise<void> {
+    if (evaluation === undefined) return;
+    const previous = latestRoll;
+    try {
+      const proposal = proposeAction({ character, packages: [rulesPackage] }, request);
+      if (!proposal.applicable || proposal.failedSaveReroll === undefined) {
+        applyTransition(proposal, "Failed-save reroll unavailable.");
+        return;
+      }
+      const rollRequest = applyD20MinimumPreference(
+        failedSaveRerollRequest(action, evaluation, previous),
+        useD20Minimums,
+      );
+      if (!beginDiceRoll()) return;
+      try {
+        applyTransition(proposal, "Reroll use spent.");
+        const result = await rollD20Fullscreen(rollRequest).catch(() => rollD20(rollRequest));
+        setLatestRoll({
+          ...result,
+          appliedActionIds: [
+            ...(previous?.kind === "d20" ? (previous.appliedActionIds ?? []) : []),
+            action.id,
+          ],
+        });
+        setNotice(
+          `${actionDisplayName(action, names)}: ${String(result.total)} replaces the failed save, including +${String(proposal.failedSaveReroll.bonus)}. One use spent even if this save fails. No Reaction used. Compare with the DC and resolve effects manually.`,
+        );
+      } finally {
+        finishDiceRoll();
+      }
+    } catch (error) {
+      setNotice(`Failed-save reroll failed: ${errorMessage(error)}`);
     }
   }
 
@@ -2489,6 +2536,19 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 void useSavingThrowReroll(action, request, disadvantage);
                               }}
                             />
+                            <FailedSaveRerollControls
+                              key={`failed-save:${character.id}:${character.metadata.updatedAt}:${action.id}:${latestRoll?.label ?? ""}:${String(latestRoll?.total ?? "")}`}
+                              action={action}
+                              evaluation={evaluation}
+                              previous={latestRoll}
+                              busy={diceRolling}
+                              onExplain={() => {
+                                setSelectedTraceId(action.traceId);
+                              }}
+                              onUse={(request) => {
+                                void useFailedSaveReroll(action, request);
+                              }}
+                            />
                             <div className="action-inputs">
                               {requirements.rollDiceCount === undefined ||
                               requirements.rollDiceSize === undefined ? null : (
@@ -2570,7 +2630,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   />
                                 </label>
                               )}
-                              {supportsStateTransition(action) ? (
+                              {supportsStateTransition(action) &&
+                              failedSaveRerollDefinition(action) === undefined ? (
                                 <button
                                   className="button primary compact"
                                   type="button"
@@ -3020,6 +3081,19 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               <tr key={attack.id}>
                                 <td>
                                   <strong>{attack.name}</strong>
+                                  <WeaponMasteryControls
+                                    key={`${character.id}:${character.metadata.updatedAt}:${attack.id}`}
+                                    attack={attack}
+                                    property={weaponMasterySelections[attack.id] ?? ""}
+                                    busy={diceRolling}
+                                    onChange={(property) => {
+                                      setWeaponMasterySelections((current) => ({
+                                        ...current,
+                                        [attack.id]: property,
+                                      }));
+                                    }}
+                                    onExplain={setSelectedTraceId}
+                                  />
                                   <small>
                                     {titleCase(attack.attackType)} ·{" "}
                                     {attack.properties.map(titleCase).join(", ")}
@@ -3031,7 +3105,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                     traceId={attack.traceId}
                                     onSelect={setSelectedTraceId}
                                     roll={{
-                                      label: `${attack.name} attack`,
+                                      label: `${attack.name} attack${selectedAttackMastery(attack, weaponMasterySelections[attack.id]) === undefined ? "" : ` · ${titleCase(selectedAttackMastery(attack, weaponMasterySelections[attack.id]) ?? "")} mastery (target effects manual)`}`,
                                       modifier: attack.attackBonus,
                                       mode: attackRollMode,
                                       criticalThreshold: attack.criticalHitThreshold,
@@ -3040,7 +3114,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                         evaluation.attackRollBonusDice,
                                       ),
                                     }}
-                                    onRoll={performRoll}
+                                    onRoll={(request) => {
+                                      if (diceRolling) return;
+                                      performRoll(request);
+                                      setWeaponMasterySelections((current) => ({
+                                        ...current,
+                                        [attack.id]: "",
+                                      }));
+                                    }}
                                   >
                                     <strong>{signed(attack.attackBonus)}</strong>
                                     <small>Roll attack</small>
@@ -3787,6 +3868,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSpellHealsOther({});
             setProtectedCreatureCounts({});
             setWeaponDamageModes({});
+            setWeaponMasterySelections({});
             setResolveSaveDamage(false);
             setUseD20Minimums(true);
             setSpellRecoverySelections({});
@@ -3816,6 +3898,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setSpellHealsOther({});
             setProtectedCreatureCounts({});
             setWeaponDamageModes({});
+            setWeaponMasterySelections({});
             setResolveSaveDamage(false);
             setUseD20Minimums(true);
             setSpellRecoverySelections({});

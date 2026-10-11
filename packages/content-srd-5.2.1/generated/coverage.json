@@ -2,7 +2,7 @@
   "authoringIr": {
     "semanticsApproved": 0,
     "testsApproved": 0,
-    "total": 57
+    "total": 58
   },
   "classes": [
     {
@@ -30,7 +30,7 @@
       "name": "Druid"
     },
     {
-      "builderMaximum": 8,
+      "builderMaximum": 9,
       "builderMinimum": 1,
       "id": "srd521.class.fighter",
       "name": "Fighter"

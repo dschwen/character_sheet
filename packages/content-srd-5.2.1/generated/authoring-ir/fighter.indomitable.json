@@ -1,0 +1,110 @@
+{
+  "id": "srd521.class-feature.fighter.indomitable",
+  "kind": "class-feature",
+  "level": 9,
+  "parentId": "srd521.class.fighter",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "expression": {
+        "condition": {
+          "kind": "compare",
+          "left": {
+            "kind": "ref",
+            "path": "classLevel.fighter"
+          },
+          "op": "gte",
+          "right": {
+            "kind": "literal",
+            "value": 17
+          }
+        },
+        "else": {
+          "condition": {
+            "kind": "compare",
+            "left": {
+              "kind": "ref",
+              "path": "classLevel.fighter"
+            },
+            "op": "gte",
+            "right": {
+              "kind": "literal",
+              "value": 13
+            }
+          },
+          "else": {
+            "kind": "literal",
+            "value": 1
+          },
+          "kind": "if",
+          "then": {
+            "kind": "literal",
+            "value": 2
+          }
+        },
+        "kind": "if",
+        "then": {
+          "kind": "literal",
+          "value": 3
+        }
+      },
+      "id": "indomitable-resource",
+      "parameters": {
+        "recharge": [
+          {
+            "amount": "all",
+            "event": "long-rest"
+          }
+        ]
+      },
+      "target": "srd521.resource.fighter.indomitable",
+      "type": "grant-resource"
+    },
+    {
+      "automationLevel": "roll-assisted",
+      "id": "use-indomitable",
+      "parameters": {
+        "actionEconomy": "failed-saving-throw-trigger",
+        "failedSaveReroll": {
+          "bonusFact": "classLevel.fighter"
+        },
+        "resourceId": "srd521.resource.fighter.indomitable",
+        "spends": 1
+      },
+      "target": "action.indomitable",
+      "type": "grant-action",
+      "when": {
+        "kind": "resourceAvailable",
+        "resourceId": "srd521.resource.fighter.indomitable"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Declare a failed save. Spend one use, reroll with Fighter-level bonus, and use the new result. No Reaction is required. Failure resolution is manual."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0048-b010"
+      ],
+      "page": 48,
+      "quoteHash": "0d5b070ff16af94da409dd0c160a3255c2f45818ccaf3271d6cace4262d5e98c",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "If you fail a saving throw, you can reroll it with a bonus equal to your Fighter level. You must use the new roll, and you can’t use this feature again until you finish a Long Rest. You can use this feature twice before a Long Rest starting at level 13 and three times before a Long Rest starting at level 17."
+      }
+    ],
+    "title": "Indomitable"
+  }
+}

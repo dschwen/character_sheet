@@ -154,6 +154,8 @@ export interface AttackSummary {
   mastery?: {
     property: string;
     enabled: boolean;
+    replacements?: string[];
+    replacementTraceId?: string;
   };
   criticalHitThreshold: number;
   criticalHitTraceId: string;
@@ -317,6 +319,7 @@ export interface ActionUseRequest {
   actionId: string;
   rolls?: number[];
   amount?: number;
+  failedSave?: boolean;
   completedD20Test?: { testId: string; appliedActionIds: string[] };
   failedSavingThrow?: {
     target: "self" | "other";
@@ -334,6 +337,7 @@ export interface ActionTransitionProposal {
   applicable: boolean;
   changes: StateChange[];
   nextState: CharacterState;
+  failedSaveReroll?: { testId: string; bonus: number; traceId: string };
   savingThrowReroll?: {
     target: "self" | "other";
     ability: string;

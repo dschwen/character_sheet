@@ -111,7 +111,11 @@ describe("repeatable, per-level Ability Score Improvements", () => {
     expect(next.loadout).toEqual(character.loadout);
     expect(evaluation.values["hitPoints.maximum"]?.value).toBe(76);
     expect(evaluation.values.proficiencyBonus?.value).toBe(3);
-    expect(levelUpEligibility(next, catalog)).toMatchObject({ eligible: false, currentLevel: 8 });
+    expect(levelUpEligibility(next, catalog)).toMatchObject({
+      eligible: true,
+      currentLevel: 8,
+      targetLevel: 9,
+    });
   });
 
   it("does not allow changing earlier choices, even if totals stay legal", () => {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { savingThrowRerollSchema } from "@dnd/content-schema";
+import { failedSaveRerollSchema, savingThrowRerollSchema } from "@dnd/content-schema";
 
 import type { CalculationTrace, JsonValue } from "@dnd/calculation-trace";
 import { characterDocumentSchema, type CharacterState } from "@dnd/character-model";
@@ -18,6 +18,7 @@ const actionUseRequestSchema = z
     actionId: z.string().min(1),
     rolls: z.array(z.number().int().positive()).default([]),
     amount: z.number().int().positive().optional(),
+    failedSave: z.boolean().optional(),
     failedSavingThrow: z
       .object({
         target: z.enum(["self", "other"]),
@@ -49,6 +50,7 @@ const actionUseRequestSchema = z
 const stateActionParametersSchema = z
   .object({
     spends: z.number().int().positive().optional(),
+    failedSaveReroll: failedSaveRerollSchema.optional(),
     variableSpend: z.object({ minimum: z.number().int().positive() }).strict().optional(),
     resourceId: z.string().min(1),
     activatesEffectId: z.string().min(1).optional(),
@@ -179,6 +181,13 @@ export function proposeAction(
 
   const reroll = savingThrowRerollSchema.safeParse(action?.parameters?.savingThrowReroll);
   if (action !== undefined && reroll.success) {
+    if (request.failedSave !== undefined)
+      addValidation(
+        validations,
+        "ACTION_FAILED_SAVE_NOT_EXPECTED",
+        "Use this reaction's failed-saving-throw context, not a resource-reroll declaration.",
+        ["request.failedSave"],
+      );
     const context = request.failedSavingThrow;
     if (
       action.parameters?.resourceId !== undefined ||
@@ -307,7 +316,35 @@ export function proposeAction(
     const checkBonus = parsedParameters.data.checkBonus;
     const diceDefinition = diceHealing ?? checkBonus;
     const rollsRequired = diceHealing !== undefined || checkBonus?.afterRoll === true;
-    if (checkBonus?.afterRoll === true) {
+    if (parsedParameters.data.failedSaveReroll !== undefined) {
+      const context = request.completedD20Test;
+      if (
+        request.failedSave !== true ||
+        context === undefined ||
+        !context.testId.startsWith("savingThrow.") ||
+        evaluation.d20Tests[context.testId] === undefined
+      )
+        addValidation(
+          validations,
+          "ACTION_FAILED_SAVE_REQUIRED",
+          "Choose a completed saving throw and confirm it failed.",
+          ["request.completedD20Test", "request.failedSave"],
+        );
+      if (context?.appliedActionIds.includes(request.actionId))
+        addValidation(
+          validations,
+          "ACTION_ALREADY_APPLIED_TO_ROLL",
+          "This feature has already been applied to this saving throw.",
+          ["request.completedD20Test"],
+        );
+      if (typeof evaluation.facts[parsedParameters.data.failedSaveReroll.bonusFact] !== "number")
+        addValidation(
+          validations,
+          "ACTION_REROLL_BONUS_MISSING",
+          "The reroll bonus fact is unavailable.",
+          ["action.parameters.failedSaveReroll"],
+        );
+    } else if (checkBonus?.afterRoll === true) {
       const context = request.completedD20Test;
       const testId = context?.testId ?? "";
       const kind = testId.startsWith("savingThrow.")
@@ -400,6 +437,16 @@ export function proposeAction(
       );
     }
   }
+  if (
+    request.failedSave !== undefined &&
+    (!parsedParameters.success || parsedParameters.data.failedSaveReroll === undefined)
+  )
+    addValidation(
+      validations,
+      "ACTION_FAILED_SAVE_NOT_EXPECTED",
+      "This action does not accept a failed saving throw declaration.",
+      ["request.failedSave"],
+    );
   if (
     action === undefined ||
     !parsedParameters.success ||
@@ -683,12 +730,43 @@ export function proposeAction(
       );
     }
   }
+  const rerollTraceId = `${action.traceId}.failed-save-reroll`;
+  if (parameters.failedSaveReroll !== undefined) {
+    const rerollBonus = Number(evaluation.facts[parameters.failedSaveReroll.bonusFact]);
+    traces[rerollTraceId] = {
+      id: rerollTraceId,
+      result: rerollBonus,
+      nodes: [
+        {
+          id: `${rerollTraceId}.bonus`,
+          operation: "authorize-failed-save-reroll",
+          inputs: [
+            request.completedD20Test?.testId ?? "",
+            parameters.failedSaveReroll.bonusFact,
+            rerollBonus,
+            spend,
+          ],
+          output: rerollBonus,
+        },
+      ],
+      sourceReferences: sourceTrace?.sourceReferences ?? [],
+    };
+  }
   return {
     kind: "action",
     actionId: request.actionId,
     applicable: true,
     changes,
     nextState,
+    ...(parameters.failedSaveReroll === undefined
+      ? {}
+      : {
+          failedSaveReroll: {
+            testId: request.completedD20Test?.testId ?? "",
+            bonus: Number(evaluation.facts[parameters.failedSaveReroll.bonusFact]),
+            traceId: rerollTraceId,
+          },
+        }),
     validations,
     traces,
   };

@@ -423,6 +423,8 @@ export const classFeatureChoiceSchema = z
     }
   });
 
+export const failedSaveRerollSchema = z.object({ bonusFact: z.string().min(1) }).strict();
+
 export const savingThrowRerollSchema = z
   .object({
     mode: z.literal("advantage"),
@@ -478,6 +480,7 @@ export const weaponPropertyBodySchema = z
 
 export const featureAutomationBodySchema = z
   .object({
+    weaponMasteryReplacements: z.array(z.string().min(1)).default([]),
     cantripDamageBonuses: z
       .array(
         z

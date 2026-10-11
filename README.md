@@ -83,6 +83,9 @@ Expertise, spell and preparation additions, the reviewed level-3 subclass, and t
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
 same-class advancement for all twelve SRD classes through level 8.
+Fighter additionally reaches level 9: Indomitable spends a Long Rest use to reroll a declared
+failed save with a Fighter-level bonus, and Tactical Master offers per-attack mastery replacement
+guidance. Save results and target effects remain manually adjudicated.
 Ability Score Improvement offers +2 to one ability or +1 to two abilities, with the 20-point cap
 validated before saving. New sheets record each allocation at its acquisition level. Advancement
 locks earlier allocations and preserves legacy aggregate-only bonuses without inventing history.

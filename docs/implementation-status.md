@@ -73,6 +73,15 @@ because some of its functionality exists or tests pass.
 
 ## Remaining milestone gates
 
+Fighter creation and advancement now reach level 9. Indomitable has a resource-backed failed-save
+reroll workflow with a Fighter-level bonus, explicit failure declaration, no Reaction requirement,
+atomic spending, and Long Rest recharge. Tactical Master exposes source-driven Push/Sap/Slow
+replacement choices only for mastered weapons; declared attack receipts identify the choice.
+Target effects remain assisted. Death Saving Throw roll/test modeling and its reroll integration
+are still unfinished; the new reroll controls currently cover the six ability-based saves.
+Other classes remain at level 8. See
+`docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
+
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside
 ASI. Per-acquisition records store the feat and ability allocation. The engine enforces its
 Strength-or-Dexterity prerequisite before its own increase, allowed +1 abilities, level, maximum,

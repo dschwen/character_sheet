@@ -20,6 +20,7 @@ import {
   weaponPropertyBodySchema,
   savingThrowAuraRecipientSchema,
   savingThrowRerollSchema,
+  failedSaveRerollSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -739,6 +740,7 @@ const actionParametersSchema = z
   .object({
     actionEconomy: z.string().optional(),
     savingThrowReroll: savingThrowRerollSchema.optional(),
+    failedSaveReroll: failedSaveRerollSchema.optional(),
     spends: z.number().int().positive().optional(),
     resourceId: z.string().min(1).optional(),
     activatesEffectId: z.string().min(1).optional(),
@@ -6322,6 +6324,18 @@ function evaluateAttacks(
     "Dexterity modifier",
   );
   const selectedMasteries = new Set(character.loadout.selectedWeaponMasteryIds);
+  const classLevels = new Map<string, number>();
+  for (const level of character.build.levels)
+    classLevels.set(level.classId, (classLevels.get(level.classId) ?? 0) + 1);
+  const granted = grantedFeatureIds(classLevels, index);
+  grantSubclassFeatures(character, classLevels, index, granted);
+  const masteryReplacements = [...granted].flatMap((id) => {
+    const entity = index.entities.get(id);
+    const body = featureAutomationBodySchema.safeParse(entity?.body);
+    return entity !== undefined && body.success && body.data.weaponMasteryReplacements.length > 0
+      ? [{ entity, properties: body.data.weaponMasteryReplacements }]
+      : [];
+  });
   const classEntity = startingClassEntity(character, index);
   const classBody = classEntity === undefined ? undefined : classBodySchema.parse(classEntity.body);
   const classLevel =
@@ -6723,11 +6737,37 @@ function evaluateAttacks(
       mastery: {
         property: weapon.mastery,
         enabled: selectedMasteries.has(entity.id) && masteryCapacity > 0,
+        ...(selectedMasteries.has(entity.id) &&
+        masteryCapacity > 0 &&
+        masteryReplacements.length > 0
+          ? {
+              replacements: [
+                ...new Set(masteryReplacements.flatMap(({ properties }) => properties)),
+              ],
+              replacementTraceId: `${attackId}.mastery-replacements`,
+            }
+          : {}),
       },
       criticalHitThreshold: attackRules.criticalHitThreshold,
       criticalHitTraceId: attackRules.criticalHitTraceId,
       traceId,
     });
+    if (selectedMasteries.has(entity.id) && masteryCapacity > 0 && masteryReplacements.length > 0)
+      state.traces[`${attackId}.mastery-replacements`] = {
+        id: `${attackId}.mastery-replacements`,
+        result: masteryReplacements.flatMap(({ properties }) => properties),
+        nodes: [
+          {
+            id: `${attackId}.mastery-replacements.grant`,
+            operation: "grant-per-attack-mastery-replacements",
+            inputs: [entity.id],
+            output: masteryReplacements.flatMap(({ properties }) => properties),
+          },
+        ],
+        sourceReferences: masteryReplacements.flatMap(({ entity: feature }) =>
+          entitySourceReferences(feature),
+        ),
+      };
   }
   if (martialArts !== undefined && classProgression?.martialArtsDie !== undefined) {
     const ability: Ability =
@@ -6829,6 +6869,8 @@ function evaluateConditionalRules(
       const actionParameters: Record<string, JsonValue> = {};
       if (parameters.savingThrowReroll !== undefined)
         actionParameters.savingThrowReroll = parameters.savingThrowReroll;
+      if (parameters.failedSaveReroll !== undefined)
+        actionParameters.failedSaveReroll = parameters.failedSaveReroll;
       if (parameters.spends !== undefined) {
         actionParameters.spends = parameters.spends;
       }

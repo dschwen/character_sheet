@@ -607,7 +607,7 @@ def _class_entity(
         },
         "builder": {
             "supportedLevelMinimum": 1,
-            "supportedLevelMaximum": 8,
+            "supportedLevelMaximum": 9,
             "defaultAbilityScores": {
                 "strength": 15,
                 "dexterity": 13,
@@ -786,7 +786,7 @@ def _feature_ir(
     }
 
 
-def _level_five_authoring_ir(
+def _fighter_authoring_ir(
     features: tuple[dict[str, Any], ...],
     champion_features: tuple[dict[str, Any], ...],
 ) -> dict[str, dict[str, Any]]:
@@ -965,7 +965,74 @@ def _level_five_authoring_ir(
         kind="subclass-feature",
         parent_id=CHAMPION_ID,
     )
+    indomitable_text = " ".join(
+        node["normalizedText"] for node in by_name["Indomitable"]["bodyNodes"]
+    )
+    for phrase in [
+        "fail a saving throw",
+        "bonus equal to your Fighter level",
+        "must use the new roll",
+        "Long Rest",
+        "level 13",
+        "level 17",
+    ]:
+        if phrase not in indomitable_text:
+            raise ValueError(f"Indomitable source is missing {phrase}")
+    indomitable = _feature_ir(
+        by_name["Indomitable"],
+        [
+            {
+                "id": "indomitable-resource",
+                "type": "grant-resource",
+                "target": "srd521.resource.fighter.indomitable",
+                "expression": {
+                    "kind": "if",
+                    "condition": {
+                        "kind": "compare",
+                        "op": "gte",
+                        "left": {"kind": "ref", "path": "classLevel.fighter"},
+                        "right": {"kind": "literal", "value": 17},
+                    },
+                    "then": {"kind": "literal", "value": 3},
+                    "else": {
+                        "kind": "if",
+                        "condition": {
+                            "kind": "compare",
+                            "op": "gte",
+                            "left": {"kind": "ref", "path": "classLevel.fighter"},
+                            "right": {"kind": "literal", "value": 13},
+                        },
+                        "then": {"kind": "literal", "value": 2},
+                        "else": {"kind": "literal", "value": 1},
+                    },
+                },
+                "parameters": {"recharge": [{"event": "long-rest", "amount": "all"}]},
+                "automationLevel": "state-automated",
+            },
+            {
+                "id": "use-indomitable",
+                "type": "grant-action",
+                "target": "action.indomitable",
+                "when": {
+                    "kind": "resourceAvailable",
+                    "resourceId": "srd521.resource.fighter.indomitable",
+                },
+                "parameters": {
+                    "actionEconomy": "failed-saving-throw-trigger",
+                    "spends": 1,
+                    "resourceId": "srd521.resource.fighter.indomitable",
+                    "failedSaveReroll": {"bonusFact": "classLevel.fighter"},
+                },
+                "automationLevel": "roll-assisted",
+            },
+        ],
+        [
+            "Declare a failed save. Spend one use, reroll with Fighter-level bonus, and use the "
+            "new result. No Reaction is required. Failure resolution is manual."
+        ],
+    )
     return {
+        "fighter.indomitable.json": indomitable,
         "fighter.action-surge.json": action_surge,
         "fighter.tactical-mind.json": tactical_mind,
         "fighter.extra-attack.json": extra_attack,
@@ -1201,6 +1268,14 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
     progression_source = next(source for source in class_source if source["page"] == 47)
     class_entity = _class_entity(traits, progression, reconciliation, class_source)
     feature_entities = [_feature_entity(feature) for feature in features]
+    tactical_master = next(
+        entity for entity in feature_entities if entity["name"]["en"] == "Tactical Master"
+    )
+    tactical_text = " ".join(node["text"] for node in tactical_master["body"]["text"]["nodes"])
+    if "replace that property" not in tactical_text or "Push, Sap, or Slow" not in tactical_text:
+        raise ValueError("Tactical Master source is incomplete")
+    tactical_master["body"]["weaponMasteryReplacements"] = ["push", "sap", "slow"]
+    tactical_master["body"]["automationLevel"] = "roll-assisted"
     champion_features = extract_champion_features(document)
     champion_entities = _champion_entities(document, champion_features)
     champion_entities[0]["body"]["additionalFightingStyleChoice"] = {
@@ -1243,13 +1318,13 @@ def generate_fighter_content(extraction_root: Path, output: Path) -> dict[str, A
     write_json(output / "authoring-ir" / "fighter.second-wind.json", _second_wind_ir(second_wind))
     write_json(output / "authoring-ir" / "fighting-style.defense.json", defense_ir)
     write_json(output / "authoring-ir" / "feat.ability-score-improvement.json", asi_ir)
-    for filename, ir in _level_five_authoring_ir(features, champion_features).items():
+    for filename, ir in _fighter_authoring_ir(features, champion_features).items():
         write_json(output / "authoring-ir" / filename, ir)
     write_json(output / "indexes" / "fighter-reconciliation.json", reconciliation)
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Barbarian, Fighter through level 8, Human, Soldier, and equipment content. "
+        "Barbarian, Fighter through level 9, Human, Soldier, and equipment content. "
         "Proposed executable rules remain under review."
     )
     write_json(output / "coverage.json", coverage)

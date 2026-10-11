@@ -1874,7 +1874,7 @@
           "srd521.skill.survival"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 8,
+        "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -2815,7 +2815,7 @@
   },
   {
     "body": {
-      "automationLevel": "structured",
+      "automationLevel": "roll-assisted",
       "level": 9,
       "parentId": "srd521.class.fighter",
       "text": {
@@ -2826,7 +2826,12 @@
           }
         ],
         "title": "Tactical Master"
-      }
+      },
+      "weaponMasteryReplacements": [
+        "push",
+        "sap",
+        "slow"
+      ]
     },
     "id": "srd521.class-feature.fighter.tactical-master",
     "kind": "class-feature",
