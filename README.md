@@ -98,6 +98,9 @@ Bard also reaches level 9, adding two Expertise choices, fifth-level slots, and 
 regular preparations while preserving its separate College of Lore Discoveries.
 Warlock reaches level 9 with fifth-level Pact slots, seven invocations, Contact Patron's
 free-cast button and automatic-save guidance, and at-will Arcane Eye through Visions of Distant Realms.
+Ranger also reaches level 9 with third-level slots, nine ordinary preparations, and two additional
+Expertise choices. Earlier Deft Explorer Expertise is preserved with its own source link.
+Ranger's one-spell preparation replacement limit per Long Rest is not yet enforced by the editor.
 Play also supports fullscreen Death Saving Throws. Apply the final result only after any reroll
 decision; natural 1/20 results, successes/failures, stabilization, and regained HP are resolved on
 the sheet. Declare first aid and turn timing manually. Ordinary healing cannot revive the dead.

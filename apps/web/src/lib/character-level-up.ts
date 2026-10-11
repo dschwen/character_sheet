@@ -8,6 +8,7 @@ import {
   builderClassIds,
   characterBuilderCatalog,
   defaultBuilderDraft,
+  expertiseSelectionSources,
   featureChoiceCount,
   magicInitiateFeatIds,
   spellSelectionCounts,
@@ -214,7 +215,10 @@ export function createLevelUpDraft(
     throw new Error(`${selectedClass.name} has no supported starting-equipment package.`);
   }
   const skills = character.build.proficiencyChoices.skills;
-  const expertiseSource = selectedClass.builder.expertiseChoice?.sourceId;
+  const expertiseSources = expertiseSelectionSources(
+    { classId: eligibility.classId, level: eligibility.currentLevel },
+    catalog,
+  );
   const currentDraft: CharacterBuilderDraft = {
     ...defaultBuilderDraft(eligibility.classId, catalog, eligibility.currentLevel, character.name),
     speciesId: species.id,
@@ -243,7 +247,11 @@ export function createLevelUpDraft(
       .map((choice) => choice.skillId),
     magicInitiateChoices: {},
     expertiseSkillIds: character.build.proficiencyChoices.expertise
-      .filter((choice) => choice.sourceId === expertiseSource)
+      .filter((choice) => expertiseSources.includes(choice.sourceId))
+      .sort(
+        (left, right) =>
+          expertiseSources.indexOf(left.sourceId) - expertiseSources.indexOf(right.sourceId),
+      )
       .map((choice) => choice.skillId),
     featureChoiceSelections: choiceSelections(character),
     startingEquipmentOptionId,
@@ -283,11 +291,15 @@ function advancementIssues(
   }
   const selectedClass = catalog.classes[eligibility.classId];
   const targetLevel = eligibility.targetLevel;
-  const expertiseSource = selectedClass.builder.expertiseChoice?.sourceId;
+  const expertiseSources = expertiseSelectionSources(draft, catalog);
   if (
     character.build.proficiencyChoices.expertise.some(
       (choice) =>
-        choice.sourceId === expertiseSource && !draft.expertiseSkillIds.includes(choice.skillId),
+        expertiseSources.includes(choice.sourceId) &&
+        !draft.expertiseSkillIds.some(
+          (skillId, index) =>
+            skillId === choice.skillId && expertiseSources[index] === choice.sourceId,
+        ),
     )
   ) {
     issues.push("Earlier Expertise selections cannot change during level up.");

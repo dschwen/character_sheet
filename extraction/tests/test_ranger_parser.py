@@ -2,6 +2,7 @@ import pytest
 
 from srd_extract.ranger import (
     RangerProgressionRow,
+    _class_entity,
     _hunter_entities,
     _preserve_spell_annotations,
     _roving_ir,
@@ -45,6 +46,19 @@ def test_ranger_progression_row_accepts_level_five_values() -> None:
     assert row.favored_enemy == 3
     assert row.prepared_spells == 6
     assert row.spell_slots == (4, 2, 0, 0, 0)
+
+
+def test_level_nine_progression_and_separate_expertise_sources() -> None:
+    row = RangerProgressionRow(9, 4, (), 4, 9, (4, 3, 2, 0, 0))
+    body = _class_entity({"skillProficiencyChoice": {}}, (row,), (), {}, [])["body"]
+    assert body["builder"]["supportedLevelMaximum"] == 9
+    assert body["skillProficiencyChoice"]["countByLevel"]["9"] == 3
+    assert body["builder"]["expertiseChoice"]["grants"] == [
+        {"level": 2, "count": 1, "sourceId": "srd521.class-feature.ranger.deft-explorer"},
+        {"level": 9, "count": 2, "sourceId": "srd521.class-feature.ranger.expertise"},
+    ]
+    assert body["progression"][0]["preparedSpells"] == 9
+    assert body["progression"][0]["spellSlots"]["3"] == 2
 
 
 def test_regeneration_preserves_spell_annotations_but_refreshes_parsed_fields() -> None:

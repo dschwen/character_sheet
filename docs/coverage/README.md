@@ -24,7 +24,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | Fighter | 1 | 9 |
 | Monk | 1 | 8 |
 | Paladin | 1 | 8 |
-| Ranger | 1 | 8 |
+| Ranger | 1 | 9 |
 | Rogue | 1 | 8 |
 | Sorcerer | 1 | 9 |
 | Warlock | 1 | 9 |

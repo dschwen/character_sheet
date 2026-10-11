@@ -1686,11 +1686,32 @@ export function expertiseSkillCandidates(
   return [...new Set(proficientSkills)].filter((id) => choice.eligibleSkillIds.includes(id));
 }
 
-export function expertiseCount(draft: CharacterBuilderDraft, catalog: BuilderCatalog): number {
+export function expertiseCount(
+  draft: Pick<CharacterBuilderDraft, "classId" | "level">,
+  catalog: BuilderCatalog,
+): number {
   const choice = catalog.classes[draft.classId].builder.expertiseChoice;
   if (choice === undefined || draft.level < choice.minimumLevel) return 0;
+  if (choice.grants !== undefined)
+    return choice.grants
+      .filter(({ level }) => level <= draft.level)
+      .reduce((total, { count }) => total + count, 0);
   const countByLevel = objectValue(objectValue(choice)?.countByLevel);
   return numericValue(countByLevel?.[String(draft.level)], 1);
+}
+
+/** One source per selected skill, in acquisition order; older single-source metadata remains valid. */
+export function expertiseSelectionSources(
+  draft: Pick<CharacterBuilderDraft, "classId" | "level">,
+  catalog: BuilderCatalog,
+): string[] {
+  const choice = catalog.classes[draft.classId].builder.expertiseChoice;
+  if (choice === undefined || draft.level < choice.minimumLevel) return [];
+  return choice.grants === undefined
+    ? Array.from({ length: expertiseCount(draft, catalog) }, () => choice.sourceId)
+    : choice.grants
+        .filter(({ level }) => level <= draft.level)
+        .flatMap(({ count, sourceId }) => Array.from({ length: count }, () => sourceId));
 }
 
 function selectedEquipmentOption(
@@ -2635,9 +2656,9 @@ function assembleCharacter(
         expertise:
           selectedClass.builder.expertiseChoice !== undefined &&
           draft.level >= selectedClass.builder.expertiseChoice.minimumLevel
-            ? draft.expertiseSkillIds.map((skillId) => ({
+            ? draft.expertiseSkillIds.map((skillId, index) => ({
                 skillId,
-                sourceId: selectedClass.builder.expertiseChoice?.sourceId ?? "",
+                sourceId: expertiseSelectionSources(draft, catalog)[index] ?? "",
               }))
             : [],
       },

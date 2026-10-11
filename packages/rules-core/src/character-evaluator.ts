@@ -2520,11 +2520,22 @@ function validateProgressionSelections(
   const deftExplorerExpertise = character.build.proficiencyChoices.expertise.filter(
     (choice) => choice.sourceId === "srd521.class-feature.ranger.deft-explorer",
   );
-  if (rangerLevel >= 2 && deftExplorerExpertise.length !== 1) {
+  if (deftExplorerExpertise.length !== (rangerLevel >= 2 ? 1 : 0)) {
     addValidation(
       state,
       "RANGER_DEFT_EXPLORER_EXPERTISE_COUNT",
       "A Ranger of level 2 or higher selects one proficient skill for Deft Explorer Expertise.",
+      ["build.proficiencyChoices.expertise"],
+    );
+  }
+  const rangerExpertise = character.build.proficiencyChoices.expertise.filter(
+    (choice) => choice.sourceId === "srd521.class-feature.ranger.expertise",
+  );
+  if (rangerExpertise.length !== (rangerLevel >= 9 ? 2 : 0)) {
+    addValidation(
+      state,
+      "RANGER_EXPERTISE_COUNT",
+      "A Ranger gains two additional Expertise selections from its level-9 Expertise feature.",
       ["build.proficiencyChoices.expertise"],
     );
   }
@@ -3634,6 +3645,14 @@ function evaluateD20Tests(
   const expertiseSkillIds = new Set(
     character.build.proficiencyChoices.expertise.map((choice) => choice.skillId),
   );
+  if (expertiseSkillIds.size !== character.build.proficiencyChoices.expertise.length) {
+    addValidation(
+      state,
+      "DUPLICATE_EXPERTISE_SKILL",
+      "A skill cannot be chosen for Expertise more than once, even from different sources.",
+      ["build.proficiencyChoices.expertise"],
+    );
+  }
   const knownSkillIds = new Set(skillDefinitions.map((skill) => `${skillEntityPrefix}${skill.id}`));
   const testSourceReferences = (testId: string, proficiencySources: string[]) =>
     referencesForSources(

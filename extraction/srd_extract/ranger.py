@@ -511,7 +511,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 3 for level in range(1, 9)},
+                "countByLevel": {str(level): 3 for level in range(1, 10)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple", "martial"],
@@ -520,7 +520,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 8,
+                "supportedLevelMaximum": 9,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 15,
@@ -539,6 +539,18 @@ def _class_entity(
                 "expertiseChoice": {
                     "sourceId": "srd521.class-feature.ranger.deft-explorer",
                     "minimumLevel": 2,
+                    "grants": [
+                        {
+                            "level": 2,
+                            "count": 1,
+                            "sourceId": "srd521.class-feature.ranger.deft-explorer",
+                        },
+                        {
+                            "level": 9,
+                            "count": 2,
+                            "sourceId": "srd521.class-feature.ranger.expertise",
+                        },
+                    ],
                     "eligibleSkillIds": [
                         "srd521.skill.acrobatics",
                         "srd521.skill.animal-handling",

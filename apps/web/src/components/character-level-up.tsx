@@ -17,6 +17,7 @@ import {
   characterBuilderCatalog,
   classSkillCount,
   expertiseCount,
+  expertiseSelectionSources,
   expertiseSkillCandidates,
   featureChoiceCount,
   featureChoiceOptionsForLevel,
@@ -161,11 +162,11 @@ export function CharacterLevelUp({
       choice.level === targetLevel ||
       (choice.level < targetLevel && choice.changeOn?.includes("level-up")),
   );
-  const expertiseChoice = selectedClass.builder.expertiseChoice;
+  const expertiseSources = expertiseSelectionSources(draft, catalog);
   const eligibleExpertiseSkills = expertiseSkillCandidates(draft, catalog);
   const requiredExpertise = expertiseCount(draft, catalog);
   const currentExpertiseSkillIds = character.build.proficiencyChoices.expertise
-    .filter((choice) => choice.sourceId === expertiseChoice?.sourceId)
+    .filter((choice) => expertiseSources.includes(choice.sourceId))
     .map((choice) => choice.skillId);
   const newExpertiseCount = Math.max(0, requiredExpertise - currentExpertiseSkillIds.length);
   const introducesExpertise = newExpertiseCount > 0;
@@ -433,7 +434,7 @@ export function CharacterLevelUp({
               {introducesExpertise ? (
                 <div className="skill-choice-section">
                   <div>
-                    <span>{shortEntityName(expertiseChoice?.sourceId ?? "")} Expertise</span>
+                    <span>Additional Expertise</span>
                     <h2>
                       Choose {String(newExpertiseCount)} new skill
                       {newExpertiseCount === 1 ? "" : "s"}

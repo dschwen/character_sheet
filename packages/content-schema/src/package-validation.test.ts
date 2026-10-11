@@ -421,12 +421,16 @@ describe("bootstrap content package", () => {
       options: ["srd521.feat.fighting-style.defense"],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.ranger")?.builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
       defaultAbilityScoreImprovementAbility: "wisdom",
       expertiseChoice: {
         sourceId: "srd521.class-feature.ranger.deft-explorer",
         minimumLevel: 2,
         requireClassProficiency: false,
+        grants: [
+          { level: 2, count: 1, sourceId: "srd521.class-feature.ranger.deft-explorer" },
+          { level: 9, count: 2, sourceId: "srd521.class-feature.ranger.expertise" },
+        ],
       },
     });
     expect(rangerBody.progression).toEqual(

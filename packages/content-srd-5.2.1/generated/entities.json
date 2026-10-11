@@ -16270,11 +16270,23 @@
             "srd521.skill.stealth",
             "srd521.skill.survival"
           ],
+          "grants": [
+            {
+              "count": 1,
+              "level": 2,
+              "sourceId": "srd521.class-feature.ranger.deft-explorer"
+            },
+            {
+              "count": 2,
+              "level": 9,
+              "sourceId": "srd521.class-feature.ranger.expertise"
+            }
+          ],
           "minimumLevel": 2,
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.ranger.deft-explorer"
         },
-        "supportedLevelMaximum": 8,
+        "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -16698,7 +16710,8 @@
           "5": 3,
           "6": 3,
           "7": 3,
-          "8": 3
+          "8": 3,
+          "9": 3
         },
         "maximum": 3,
         "minimum": 3,

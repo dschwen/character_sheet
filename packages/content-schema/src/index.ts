@@ -314,8 +314,48 @@ export const classBuilderMetadataSchema = z
         eligibleSkillIds: z.array(entityIdSchema).min(1),
         requireClassProficiency: z.boolean().default(true),
         countByLevel: z.record(z.string(), z.number().int().nonnegative()).optional(),
+        grants: z
+          .array(
+            z
+              .object({
+                level: z.number().int().min(1).max(20),
+                count: z.number().int().positive(),
+                sourceId: entityIdSchema,
+              })
+              .strict(),
+          )
+          .min(1)
+          .optional(),
       })
       .strict()
+      .superRefine((choice, context) => {
+        const grants = choice.grants;
+        if (grants === undefined) return;
+        if (choice.countByLevel !== undefined)
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["grants"],
+            message: "Expertise grants and countByLevel cannot both define counts",
+          });
+        const initialGrant = grants[0];
+        if (
+          initialGrant?.level !== choice.minimumLevel ||
+          initialGrant.sourceId !== choice.sourceId
+        )
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["grants"],
+            message: "Expertise grants must start with the initial source and minimum level",
+          });
+        if (
+          grants.some((grant, index) => index > 0 && grant.level <= (grants[index - 1]?.level ?? 0))
+        )
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["grants"],
+            message: "Expertise grants must have distinct increasing levels",
+          });
+      })
       .optional(),
   })
   .strict()

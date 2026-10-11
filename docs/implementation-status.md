@@ -102,7 +102,12 @@ by shared advancement validation; repeated Bard/Rogue Expertise table entries re
 links. See `docs/rules-engine/bard-level-9.md`. Warlock also reaches level 9 with fifth-level
 Pact slots, seven invocations, Contact Patron's Long Rest free casting and save guidance,
 and Visions of Distant Realms' at-will Arcane Eye casting. Slot upgrades preserve spent
-uses. See `docs/rules-engine/warlock-level-9.md`. Other classes remain at level 8. See
+uses. See `docs/rules-engine/warlock-level-9.md`. Ranger also reaches level 9 with third-level
+slots, nine ordinary preparations, and two additional Expertise selections. Shared builder
+metadata now supports separate acquisition sources, preserving Deft Explorer's earlier selection
+and rejecting duplicate skills across grants. Ranger's one-spell preparation replacement limit
+per Long Rest remains unenforced. See `docs/rules-engine/ranger-level-9.md`.
+Monk, Paladin, and Rogue remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside

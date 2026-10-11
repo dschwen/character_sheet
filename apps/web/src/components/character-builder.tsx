@@ -17,6 +17,7 @@ import {
   classSkillCount,
   defaultBuilderDraft,
   expertiseCount,
+  expertiseSelectionSources,
   expertiseSkillCandidates,
   featureChoiceCount,
   featureChoiceOptionsForLevel,
@@ -140,6 +141,9 @@ export function CharacterBuilder({
   const expertiseChoice = selectedClass.builder.expertiseChoice;
   const eligibleExpertiseSkills = expertiseSkillCandidates(draft, catalog);
   const requiredExpertise = expertiseCount(draft, catalog);
+  const expertiseSourceNames = [...new Set(expertiseSelectionSources(draft, catalog))]
+    .map(shortEntityName)
+    .join(" / ");
   const supportedLevels = Array.from(
     {
       length:
@@ -856,7 +860,7 @@ export function CharacterBuilder({
                 <div className="skill-choice-section">
                   <div>
                     <span>
-                      {selectedClass.name} · {shortEntityName(expertiseChoice.sourceId)}
+                      {selectedClass.name} · {expertiseSourceNames}
                     </span>
                     <h2>
                       Choose {String(requiredExpertise)} Expertise skill
@@ -1210,7 +1214,7 @@ export function CharacterBuilder({
                   </p>
                   {expertiseChoice !== undefined && draft.level >= expertiseChoice.minimumLevel ? (
                     <small>
-                      {shortEntityName(expertiseChoice.sourceId)} Expertise:{" "}
+                      Expertise ({expertiseSourceNames}):{" "}
                       {draft.expertiseSkillIds.map(skillName).join(", ")}
                     </small>
                   ) : null}
