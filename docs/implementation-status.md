@@ -77,8 +77,10 @@ Fighter creation and advancement now reach level 9. Indomitable has a resource-b
 reroll workflow with a Fighter-level bonus, explicit failure declaration, no Reaction requirement,
 atomic spending, and Long Rest recharge. Tactical Master exposes source-driven Push/Sap/Slow
 replacement choices only for mastered weapons; declared attack receipts identify the choice.
-Target effects remain assisted. Death Saving Throw roll/test modeling and its reroll integration
-are still unfinished; the new reroll controls currently cover the six ability-based saves.
+Target effects remain assisted. Death Saving Throw rolls, deferred result resolution, and
+Indomitable integration are now implemented alongside the six ability-based saves. Stable/dead
+state, natural 1/20 results, declared first aid, damage at zero, massive damage, and healing resets
+are covered. Zero HP derives Unconscious without erasing unrelated explicitly toggled conditions.
 Other classes remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 

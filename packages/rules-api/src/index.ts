@@ -331,6 +331,20 @@ export interface ActionUseRequest {
   };
 }
 
+export type DeathSavingThrowRequest =
+  | { kind: "roll"; naturalRoll: number; total: number; startOfTurnConfirmed: boolean }
+  | { kind: "stabilize"; successfulFirstAidConfirmed: boolean };
+
+export interface DeathSavingThrowProposal {
+  kind: "death-saving-throw";
+  applicable: boolean;
+  outcome?: "success" | "failure" | "two-failures" | "stable" | "dead" | "regain-one-hit-point";
+  changes: StateChange[];
+  nextState: CharacterState;
+  validations: ValidationMessage[];
+  traces: Readonly<Record<string, CalculationTrace>>;
+}
+
 export interface ActionTransitionProposal {
   kind: "action";
   actionId: string;

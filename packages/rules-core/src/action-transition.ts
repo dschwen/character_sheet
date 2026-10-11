@@ -12,6 +12,7 @@ import type {
 } from "@dnd/rules-api";
 
 import { evaluateCharacter } from "./character-evaluator.js";
+import { deathSaveStatus } from "./death-saving-throws.js";
 
 const actionUseRequestSchema = z
   .object({
@@ -163,6 +164,13 @@ export function proposeAction(
   const action = evaluation.actions.find((candidate) => candidate.id === request.actionId);
   const originalState = cloneState(character.state);
   const validations: ValidationMessage[] = [];
+  if (deathSaveStatus(character.state) === "dead")
+    addValidation(
+      validations,
+      "DEAD_CHARACTER_ACTION",
+      "A dead character cannot use ordinary feature actions. Resolve revival explicitly.",
+      ["state.deathSaveFailures"],
+    );
   if (action === undefined) {
     addValidation(
       validations,
@@ -715,6 +723,20 @@ export function proposeAction(
     );
   }
   if (healedHitPoints > character.state.currentHitPoints) {
+    if (character.state.stableAtZeroHitPoints !== undefined) {
+      nextState.stableAtZeroHitPoints = false;
+      recordChange(
+        changes,
+        traces,
+        "state.stableAtZeroHitPoints",
+        character.state.stableAtZeroHitPoints,
+        false,
+        "Regaining Hit Points ends zero-HP stabilization.",
+        "end-stabilization-after-healing",
+        [healedHitPoints],
+        sourceTrace,
+      );
+    }
     for (const field of ["deathSaveSuccesses", "deathSaveFailures"] as const) {
       nextState[field] = 0;
       recordChange(

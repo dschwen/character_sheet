@@ -64,7 +64,7 @@
       "automationLevel": "roll-assisted",
       "id": "use-indomitable",
       "parameters": {
-        "actionEconomy": "failed-saving-throw-trigger",
+        "actionEconomy": "no-action",
         "failedSaveReroll": {
           "bonusFact": "classLevel.fighter"
         },

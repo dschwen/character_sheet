@@ -16,6 +16,7 @@ import type {
 } from "@dnd/rules-api";
 
 import { evaluateCharacter } from "./character-evaluator.js";
+import { deathSaveStatus } from "./death-saving-throws.js";
 import { featureOptionChoices, validateFeatureOptionChoices } from "./feature-option-choices.js";
 
 const restRequestSchema = z
@@ -274,6 +275,20 @@ function resetDeathSavesAfterHealing(
   changes: StateChange[],
   traces: Record<string, CalculationTrace>,
 ): void {
+  if (character.state.stableAtZeroHitPoints !== undefined) {
+    nextState.stableAtZeroHitPoints = false;
+    recordChange(
+      changes,
+      traces,
+      "state.stableAtZeroHitPoints",
+      character.state.stableAtZeroHitPoints,
+      false,
+      "Regaining Hit Points ends zero-HP stabilization.",
+      "end-stabilization-after-healing",
+      [nextState.currentHitPoints],
+      [restSources["death-saves"]],
+    );
+  }
   for (const field of ["deathSaveSuccesses", "deathSaveFailures"] as const) {
     recordChange(
       changes,
@@ -651,6 +666,13 @@ export function proposeRest(
   const request = restRequestSchema.parse(unparsedRequest);
   const originalState = cloneState(character.state);
   const validations: ValidationMessage[] = [];
+  if (deathSaveStatus(character.state) === "dead")
+    validation(
+      validations,
+      "DEAD_CHARACTER_REST",
+      "A rest cannot revive a dead character. Resolve revival explicitly.",
+      ["state.deathSaveFailures"],
+    );
   const nextBuild = structuredClone(character.build);
   const choiceChanges: { path: string; before: string[]; after: string[]; sourceId: string }[] = [];
   const seen = new Set<string>();

@@ -26,6 +26,8 @@ import {
   proposeRest,
   proposeSpellCast,
   resolveSavingThrowDamage,
+  deathSaveStatus,
+  proposeDeathSavingThrow,
 } from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
@@ -55,6 +57,7 @@ import { failedSaveRerollDefinition, failedSaveRerollRequest } from "../lib/fail
 import { FailedSaveRerollControls } from "./failed-save-reroll-controls";
 import { WeaponMasteryControls } from "./weapon-mastery-controls";
 import { selectedAttackMastery } from "../lib/weapon-mastery";
+import { DeathSaveControls } from "./death-save-controls";
 import {
   addInventoryItem,
   adjustInventoryQuantity,
@@ -361,6 +364,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     "half",
   );
   const [temporaryHitPoints, setTemporaryHitPointsInput] = useState("0");
+  const [damageIsCritical, setDamageIsCritical] = useState(false);
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
   const [weaponDamageModes, setWeaponDamageModes] = useState<Readonly<Record<string, string>>>({});
@@ -969,20 +973,29 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
   function damageCharacter(): void {
     const amount = positivePlayAmount();
-    if (amount === undefined) return;
+    if (amount === undefined || evaluation === undefined) return;
     if (resolveSaveDamage && incomingDamage === undefined) {
       setNotice("Enter a valid safe whole-number damage amount before resolving the save.");
       return;
     }
     savePlayState(
-      applyDamage(character, incomingDamage?.damage ?? amount),
+      applyDamage(character, incomingDamage?.damage ?? amount, undefined, {
+        maximumHitPoints: numericFact(evaluation, "hitPoints.maximum"),
+        critical: damageIsCritical,
+        concentrationEffectIds: linkedStatusIds(character.state.concentrationSpellId),
+      }),
       `${character.name} took ${String(incomingDamage?.damage ?? amount)} damage. ${incomingDamage?.explanation ?? ""}`.trim(),
     );
+    setDamageIsCritical(false);
   }
 
   function healCharacter(): void {
     const amount = positivePlayAmount();
     if (amount === undefined || evaluation === undefined) return;
+    if (deathSaveStatus(character.state) === "dead") {
+      setNotice("Ordinary healing cannot revive a dead character. Resolve revival explicitly.");
+      return;
+    }
     const maximum = numericFact(evaluation, "hitPoints.maximum");
     savePlayState(
       applyHealing(character, amount, maximum),
@@ -1562,6 +1575,27 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             {tab === "play" ? (
               <div className="sheet-grid play-grid">
                 <Section title="Hit Points" eyebrow="Live encounter state">
+                  <DeathSaveControls
+                    key={character.id}
+                    state={character.state}
+                    evaluation={evaluation}
+                    previous={latestRoll}
+                    busy={diceRolling}
+                    onRoll={performRoll}
+                    onExplain={() => {
+                      setSelectedTraceId("savingThrow.death");
+                    }}
+                    onResolve={(request) => {
+                      const proposal = proposeDeathSavingThrow(
+                        { character, packages: [rulesPackage] },
+                        request,
+                      );
+                      applyTransition(
+                        proposal,
+                        `Death Saving Throw: ${proposal.outcome ?? "unavailable"}.`,
+                      );
+                    }}
+                  />
                   <div className="health-summary">
                     <div>
                       <span>Current</span>
@@ -1602,6 +1636,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         Heal
                       </button>
                     </div>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={damageIsCritical}
+                        onChange={(event) => {
+                          setDamageIsCritical(event.target.checked);
+                        }}
+                      />{" "}
+                      Damage is from a Critical Hit (two failures if already at 0 HP)
+                    </label>
                   </div>
                   <div className="play-control save-damage-controls">
                     <label>

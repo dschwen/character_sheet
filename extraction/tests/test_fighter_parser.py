@@ -50,6 +50,7 @@ def test_indomitable_authoring_and_source_guards() -> None:
     assert resource["expression"]["else"]["then"]["value"] == 2
     assert resource["expression"]["else"]["else"]["value"] == 1
     assert action["parameters"]["spends"] == 1
+    assert action["parameters"]["actionEconomy"] == "no-action"
     assert action["parameters"]["failedSaveReroll"] == {"bonusFact": "classLevel.fighter"}
     for phrase in [
         "fail a saving throw",

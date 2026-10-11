@@ -230,6 +230,8 @@ const characterStateSchema = z
     heroicInspiration: z.boolean().default(false),
     deathSaveSuccesses: z.number().int().min(0).max(3).default(0),
     deathSaveFailures: z.number().int().min(0).max(3).default(0),
+    stableAtZeroHitPoints: z.boolean().optional(),
+    dead: z.boolean().optional(),
     exhaustion: z.number().int().min(0).max(6).default(0),
   })
   .strict();

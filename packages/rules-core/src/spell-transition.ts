@@ -11,6 +11,7 @@ import type {
 } from "@dnd/rules-api";
 
 import { evaluateCharacter } from "./character-evaluator.js";
+import { deathSaveStatus, deathSavingThrowSources } from "./death-saving-throws.js";
 
 const spellCastRequestSchema = z
   .object({
@@ -92,6 +93,20 @@ export function proposeSpellCast(
   const spell = evaluation.spells.find((candidate) => candidate.id === request.spellId);
   const originalState = cloneState(character.state);
   const validations: ValidationMessage[] = [];
+  if (evaluation.facts["condition.incapacitated.active"] === true)
+    addValidation(
+      validations,
+      "INCAPACITATED_CHARACTER_CAST",
+      "An incapacitated character cannot take the action or Reaction required to cast a spell.",
+      ["state.currentHitPoints", "state.conditionIds"],
+    );
+  if (deathSaveStatus(character.state) === "dead")
+    addValidation(
+      validations,
+      "DEAD_CHARACTER_CAST",
+      "A dead character cannot cast spells. Resolve revival explicitly.",
+      ["state.deathSaveFailures"],
+    );
   const protection = evaluation.spellProtections?.find((effect) => effect.school === spell?.school);
   const castingLevel =
     request.useFreeCast || request.asRitual
@@ -340,6 +355,30 @@ export function proposeSpellCast(
         [before, amount, maximum, request.slotLevel],
         effect.sources,
       );
+      if (after > before) {
+        for (const field of [
+          "deathSaveSuccesses",
+          "deathSaveFailures",
+          "stableAtZeroHitPoints",
+        ] as const) {
+          const previous = nextState[field];
+          if (previous === undefined) continue;
+          const next = field === "stableAtZeroHitPoints" ? false : 0;
+          if (field === "stableAtZeroHitPoints") nextState[field] = false;
+          else nextState[field] = 0;
+          recordChange(
+            changes,
+            traces,
+            `state.${field}`,
+            previous,
+            next,
+            "Regaining Hit Points resets death saving throws and ends stability.",
+            "reset-death-saves-after-healing",
+            [previous, before, after],
+            deathSavingThrowSources,
+          );
+        }
+      }
     }
   }
   return {

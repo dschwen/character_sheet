@@ -94,6 +94,33 @@ describe("evaluateCharacter Cleric levels 1–6 vertical slice", () => {
     ).toBe(10);
   });
 
+  it("resets legacy death-save marks only when Blessed Healer actually restores HP", () => {
+    const input = levelSixInput();
+    input.character.state.deathSaveSuccesses = 1;
+    input.character.state.deathSaveFailures = 2;
+    input.character.state.stableAtZeroHitPoints = true;
+    const request = {
+      spellId: "srd521.spell.healing-word",
+      slotLevel: 1,
+      restoresHitPointsToOther: true,
+    };
+    const cast = proposeSpellCast(input, request);
+    expect(cast.applicable).toBe(true);
+    expect(cast.nextState).toMatchObject({
+      deathSaveSuccesses: 0,
+      deathSaveFailures: 0,
+      stableAtZeroHitPoints: false,
+    });
+    expect(cast.traces["transition.spell-cast.state.deathSaveFailures"]?.sourceReferences).toEqual(
+      expect.arrayContaining([expect.objectContaining({ page: 17 })]),
+    );
+    input.character.state.currentHitPoints = 45;
+    const capped = proposeSpellCast(input, request);
+    expect(capped.applicable).toBe(true);
+    expect(capped.nextState.deathSaveFailures).toBe(2);
+    expect(capped.nextState.stableAtZeroHitPoints).toBe(true);
+  });
+
   it("caps Blessed Healer at maximum HP and never heals on a rejected cast", () => {
     const input = levelSixInput();
     input.character.state.currentHitPoints = 44;

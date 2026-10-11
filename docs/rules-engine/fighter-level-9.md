@@ -24,9 +24,9 @@ species reroll treatment. Consumable post-roll bonus results are not automatical
 new roll. The new result replaces the old one, even if worse; the user compares against the DC and
 resolves the save's effects. A persistent combat log/remote target adjudicator is not implied.
 
-The current roller models the six ability-based saving throws. Death Saving Throw roll/test
-modeling and its Indomitable integration are still unfinished; this slice must not be taken as
-proof that every saving throw type is supported. Death saves remain manually resolved for now.
+The roller now also models Death Saving Throws, with no ability or proficiency bonus. Indomitable
+can reroll a failed death save before its marks are applied; the replacement's natural d20 still
+controls the special 1/20 outcomes. See [Death Saving Throws](death-saving-throws.md).
 
 ## Tactical Master
 

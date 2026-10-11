@@ -1018,7 +1018,7 @@ def _fighter_authoring_ir(
                     "resourceId": "srd521.resource.fighter.indomitable",
                 },
                 "parameters": {
-                    "actionEconomy": "failed-saving-throw-trigger",
+                    "actionEconomy": "no-action",
                     "spends": 1,
                     "resourceId": "srd521.resource.fighter.indomitable",
                     "failedSaveReroll": {"bonusFact": "classLevel.fighter"},

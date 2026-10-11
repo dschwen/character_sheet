@@ -49,7 +49,7 @@ describe("Fighter level 9 and source-driven failed-save rerolls", () => {
     const action = evaluation.actions.find(({ id }) => id === actionId);
     expect(action).toMatchObject({
       available: true,
-      actionEconomy: "failed-saving-throw-trigger",
+      actionEconomy: "no-action",
       parameters: { spends: 1, resourceId, failedSaveReroll: { bonusFact: "classLevel.fighter" } },
     });
     expect(evaluation.traces[action?.traceId ?? ""]?.sourceReferences).toEqual(

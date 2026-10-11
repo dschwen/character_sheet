@@ -1,4 +1,5 @@
 import type { CharacterDocument, CharacterState, CurrencyDenomination } from "@dnd/character-model";
+import { deathSaveStatus } from "@dnd/rules-core";
 
 function nonNegativeInteger(value: number): number {
   return Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
@@ -24,19 +25,52 @@ export function applyDamage(
   character: CharacterDocument,
   amount: number,
   updatedAt?: Date,
+  options: {
+    maximumHitPoints?: number;
+    critical?: boolean;
+    concentrationEffectIds?: readonly string[];
+  } = {},
 ): CharacterDocument {
   const damage = nonNegativeInteger(amount);
   const absorbed = Math.min(character.state.temporaryHitPoints, damage);
   const remaining = damage - absorbed;
-  return commitCharacterState(
-    character,
-    {
-      ...character.state,
-      temporaryHitPoints: character.state.temporaryHitPoints - absorbed,
-      currentHitPoints: Math.max(0, character.state.currentHitPoints - remaining),
-    },
-    updatedAt,
-  );
+  const state = {
+    ...character.state,
+    temporaryHitPoints: character.state.temporaryHitPoints - absorbed,
+    currentHitPoints: Math.max(0, character.state.currentHitPoints - remaining),
+  };
+  const previousStatus = deathSaveStatus(character.state);
+  if (previousStatus === "dead") state.dead = true;
+  else if (character.state.currentHitPoints > 0 && state.currentHitPoints === 0) {
+    // Legacy sheets may retain marks after old healing workflows. A new fall starts afresh.
+    state.deathSaveSuccesses = 0;
+    state.deathSaveFailures = 0;
+  }
+  if (state.currentHitPoints === 0) {
+    Object.assign(state, withoutActiveEffects(state, options.concentrationEffectIds ?? []));
+    delete state.concentrationSpellId;
+    if (character.state.currentHitPoints > 0 && character.state.stableAtZeroHitPoints !== undefined)
+      state.stableAtZeroHitPoints = false;
+  }
+  if (damage > 0 && character.state.currentHitPoints === 0) {
+    state.stableAtZeroHitPoints = false;
+    state.deathSaveSuccesses = previousStatus === "stable" ? 0 : character.state.deathSaveSuccesses;
+    state.deathSaveFailures = Math.min(
+      3,
+      (previousStatus === "stable" ? 0 : state.deathSaveFailures) + (options.critical ? 2 : 1),
+    );
+    if (state.deathSaveFailures >= 3) state.dead = true;
+  }
+  if (
+    options.maximumHitPoints !== undefined &&
+    state.currentHitPoints === 0 &&
+    (options.maximumHitPoints <= 0 ||
+      (character.state.currentHitPoints === 0
+        ? damage
+        : remaining - character.state.currentHitPoints) >= options.maximumHitPoints)
+  )
+    state.dead = true;
+  return commitCharacterState(character, state, updatedAt);
 }
 
 export function applyHealing(
@@ -46,14 +80,27 @@ export function applyHealing(
   updatedAt?: Date,
 ): CharacterDocument {
   const healing = nonNegativeInteger(amount);
+  if (deathSaveStatus(character.state) === "dead")
+    throw new TypeError("Ordinary healing cannot revive a dead character.");
+  const currentHitPoints = Math.min(
+    nonNegativeInteger(maximumHitPoints),
+    character.state.currentHitPoints + healing,
+  );
+  const healed = currentHitPoints > character.state.currentHitPoints;
   return commitCharacterState(
     character,
     {
       ...character.state,
-      currentHitPoints: Math.min(
-        nonNegativeInteger(maximumHitPoints),
-        character.state.currentHitPoints + healing,
-      ),
+      currentHitPoints,
+      ...(healed
+        ? {
+            deathSaveSuccesses: 0,
+            deathSaveFailures: 0,
+            ...(character.state.stableAtZeroHitPoints === undefined
+              ? {}
+              : { stableAtZeroHitPoints: false }),
+          }
+        : {}),
     },
     updatedAt,
   );
@@ -86,7 +133,13 @@ export function setExhaustion(
 ): CharacterDocument {
   return commitCharacterState(
     character,
-    { ...character.state, exhaustion: Math.min(6, nonNegativeInteger(exhaustion)) },
+    {
+      ...character.state,
+      exhaustion: Math.min(6, nonNegativeInteger(exhaustion)),
+      ...(nonNegativeInteger(exhaustion) >= 6 || deathSaveStatus(character.state) === "dead"
+        ? { dead: true }
+        : {}),
+    },
     updatedAt,
   );
 }

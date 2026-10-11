@@ -920,6 +920,13 @@ function resolveActiveConditions(
 ): ActiveCondition[] {
   const active = new Map<string, ActiveCondition>();
   const pending = [...character.state.conditionIds];
+  if (
+    character.state.currentHitPoints === 0 &&
+    character.state.dead !== true &&
+    character.state.deathSaveFailures < 3 &&
+    character.state.exhaustion < 6
+  )
+    pending.push("srd521.condition.unconscious");
   if (character.state.exhaustion > 0) pending.push("srd521.condition.exhaustion");
   while (pending.length > 0) {
     const conditionId = pending.shift();
@@ -1144,6 +1151,7 @@ function resolveActiveStatuses(
 
 function conditionRollEffects(conditions: readonly ActiveCondition[]): D20RollEffect[] {
   const testsByScope: Record<string, readonly string[]> = {
+    "saving-throw": [...abilities.map((ability) => `savingThrow.${ability}`), "savingThrow.death"],
     "ability-checks": [
       ...abilities.map((ability) => `abilityCheck.${ability}`),
       ...skillDefinitions.map((skill) => `skill.${skill.id}`),
@@ -1168,6 +1176,7 @@ function conditionRollEffects(conditions: readonly ActiveCondition[]): D20RollEf
 
 function statusRollEffects(statuses: readonly ActiveStatus[]): D20RollEffect[] {
   const testsByScope: Record<string, readonly string[]> = {
+    "saving-throw": [...abilities.map((ability) => `savingThrow.${ability}`), "savingThrow.death"],
     "ability-checks": [
       ...abilities.map((ability) => `abilityCheck.${ability}`),
       ...skillDefinitions.map((skill) => `skill.${skill.id}`),
@@ -1225,7 +1234,7 @@ function statusBonusDice(
       } else if (bonus.scope === "saving-throw") {
         testIds =
           bonus.ability === undefined
-            ? abilities.map((ability) => `savingThrow.${ability}`)
+            ? [...abilities.map((ability) => `savingThrow.${ability}`), "savingThrow.death"]
             : [`savingThrow.${bonus.ability}`];
       } else {
         testIds = ["initiative"];
@@ -1491,12 +1500,14 @@ function evaluateSavingThrowAuras(
   return {
     auras,
     modifiers: [...chosen.values()].flatMap(({ bonus, entity }) =>
-      abilities.map((ability) => ({
-        target: `savingThrow.${ability}`,
-        bonus,
-        sourceId: entity.id,
-        sourceReferences: entitySourceReferences(entity),
-      })),
+      [...abilities.map((ability) => `savingThrow.${ability}`), "savingThrow.death"].map(
+        (target) => ({
+          target,
+          bonus,
+          sourceId: entity.id,
+          sourceReferences: entitySourceReferences(entity),
+        }),
+      ),
     ),
   };
 }
@@ -1646,6 +1657,7 @@ function evaluateConditionMechanics(
     if (body.disablesActions) {
       state.facts["actions.disabled"] = true;
       for (const action of state.actions) {
+        if (action.actionEconomy === "no-action") continue;
         action.available = false;
         action.reasons = [...action.reasons, `${entity.name.en ?? entity.id} prevents actions.`];
       }
@@ -2927,6 +2939,16 @@ function materializeFacts(character: CharacterDocument, state: EngineState): Map
     classLevels.set(level.classId, (classLevels.get(level.classId) ?? 0) + 1);
   }
   state.facts["character.level"] = character.build.levels.length;
+  state.facts["deathSave.stable"] =
+    character.state.dead !== true &&
+    character.state.deathSaveFailures < 3 &&
+    character.state.exhaustion < 6 &&
+    character.state.currentHitPoints === 0 &&
+    (character.state.stableAtZeroHitPoints === true || character.state.deathSaveSuccesses === 3);
+  state.facts["deathSave.dead"] =
+    character.state.dead === true ||
+    character.state.deathSaveFailures === 3 ||
+    character.state.exhaustion >= 6;
   for (const [classId, count] of classLevels) {
     const className = classId.split(".").at(-1);
     if (className !== undefined) {
@@ -3389,7 +3411,7 @@ function ruleD20TestModifiers(
 
 function recordD20Test(
   testId: string,
-  ability: Ability,
+  ability: Ability | "none",
   proficiency: ProficiencyEntry,
   context: EvaluateCharacterInput["context"],
   additionalRollEffects: readonly D20RollEffect[],
@@ -3401,10 +3423,10 @@ function recordD20Test(
   sourceReferencesForTest: SourceReference[],
   state: EngineState,
 ): void {
-  const abilityModifier = requireNumber(
-    state.facts[`ability.${ability}.modifier`] ?? null,
-    `${ability} modifier`,
-  );
+  const abilityModifier =
+    ability === "none"
+      ? 0
+      : requireNumber(state.facts[`ability.${ability}.modifier`] ?? null, `${ability} modifier`);
   const applicableModifiers = ruleModifiers.filter(
     (modifier) =>
       modifier.target === testId ||
@@ -3434,7 +3456,7 @@ function recordD20Test(
     nodes: [
       {
         id: `${traceId}.ability`,
-        operation: "apply-ability-modifier",
+        operation: ability === "none" ? "no-ability-modifier" : "apply-ability-modifier",
         inputs: [ability, abilityModifier],
         output: abilityModifier,
       },
@@ -3717,6 +3739,24 @@ function evaluateD20Tests(
     );
   }
 
+  recordD20Test(
+    "savingThrow.death",
+    "none",
+    proficiencyEntry("none", 0, []),
+    context,
+    additionalRollEffects,
+    ruleModifiers,
+    bonusDice,
+    rerollValues,
+    rerollSources,
+    rerollSourceReferences,
+    [
+      { entityId: "srd521.rule.death-saving-throws", sourceId: "wotc-srd-5.2.1-en", page: 17 },
+      ...testSourceReferences("savingThrow.death", []),
+    ],
+    state,
+  );
+
   for (const ability of abilities) {
     const proficient = firstClassBody?.savingThrowProficiencies.includes(ability) ?? false;
     const sources = proficient && firstClassId !== undefined ? [firstClassId] : [];
@@ -3921,7 +3961,7 @@ function speciesRollEffects(
       if (!situationalTags.has(effect.situationalTag)) return [];
       const testIds =
         effect.testIds === "saving-throws"
-          ? abilities.map((ability) => `savingThrow.${ability}`)
+          ? [...abilities.map((ability) => `savingThrow.${ability}`), "savingThrow.death"]
           : effect.testIds;
       return testIds.map((testId) => ({
         testId,
