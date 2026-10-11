@@ -30,7 +30,7 @@
           "requireClassProficiency": true,
           "sourceId": "srd521.class-feature.wizard.scholar"
         },
-        "supportedLevelMaximum": 8,
+        "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 6,
@@ -418,7 +418,8 @@
           "5": 2,
           "6": 2,
           "7": 2,
-          "8": 2
+          "8": 2,
+          "9": 2
         },
         "maximum": 2,
         "minimum": 2,

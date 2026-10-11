@@ -451,7 +451,7 @@ describe("bootstrap content package", () => {
       },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.sorcerer")?.builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
       defaultAbilityScoreImprovementAbility: "charisma",
       defaultClassSkillIds: ["srd521.skill.arcana", "srd521.skill.persuasion"],
     });
@@ -648,7 +648,7 @@ describe("bootstrap content package", () => {
       .parse(JSON.parse(readFileSync(new URL("entities/wizard.json", root), "utf8")));
     const wizard = entities.find((entity) => entity.id === "srd521.class.wizard");
     expect(z.record(z.unknown()).parse(wizard?.body).builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
     });
     const spells = entities.filter((entity) => entity.kind === "spell");
     const wizardBody = z

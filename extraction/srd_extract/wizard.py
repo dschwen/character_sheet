@@ -555,7 +555,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits.get("skillProficiencyChoice", {}),
-                "countByLevel": {str(level): 2 for level in range(1, 9)},
+                "countByLevel": {str(level): 2 for level in range(1, 10)},
             },
             "startingEquipment": {
                 "id": "srd521.choice.class.wizard.starting-equipment",
@@ -610,7 +610,7 @@ def _class_entity(
             },
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 8,
+                "supportedLevelMaximum": 9,
                 "defaultAbilityScores": {
                     "strength": 8,
                     "dexterity": 14,

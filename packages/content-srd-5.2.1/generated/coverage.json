@@ -60,7 +60,7 @@
       "name": "Rogue"
     },
     {
-      "builderMaximum": 8,
+      "builderMaximum": 9,
       "builderMinimum": 1,
       "id": "srd521.class.sorcerer",
       "name": "Sorcerer"
@@ -72,7 +72,7 @@
       "name": "Warlock"
     },
     {
-      "builderMaximum": 8,
+      "builderMaximum": 9,
       "builderMinimum": 1,
       "id": "srd521.class.wizard",
       "name": "Wizard"

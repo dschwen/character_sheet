@@ -26,9 +26,9 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | Paladin | 1 | 8 |
 | Ranger | 1 | 8 |
 | Rogue | 1 | 8 |
-| Sorcerer | 1 | 8 |
+| Sorcerer | 1 | 9 |
 | Warlock | 1 | 8 |
-| Wizard | 1 | 8 |
+| Wizard | 1 | 9 |
 
 ## Review evidence
 

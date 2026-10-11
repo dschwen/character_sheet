@@ -13,6 +13,8 @@ from srd_extract.wizard import (
 def test_wizard_starting_equipment_preserves_package_and_gold_choices() -> None:
     entity = _class_entity({}, (), (), {}, [])
     equipment = entity["body"]["startingEquipment"]
+    assert entity["body"]["builder"]["supportedLevelMaximum"] == 9
+    assert entity["body"]["skillProficiencyChoice"]["countByLevel"]["9"] == 2
 
     assert [option["currencyGp"] for option in equipment["options"]] == [5, 55]
     assert equipment["options"][0]["items"][1] == {

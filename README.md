@@ -89,6 +89,9 @@ guidance. Save results and target effects remain manually adjudicated.
 Barbarian also reaches level 9. Combat → Attacks → Attack options offers Reckless Attack
 declarations and Brutal Strike, with Advantage tradeoff checks, hit-confirmed extra damage
 rolls, and Forceful/Hamstring Blow guidance. Turn timing and target effects are manual.
+Wizard and Sorcerer also reach level 9, with fifth-level slots and fourteen regular preparations.
+Evoker gains a separate Savant spellbook addition; Draconic Sorcery gains its level-9 automatic
+spells. Newly available spell effects may still require manual adjudication.
 Play also supports fullscreen Death Saving Throws. Apply the final result only after any reroll
 decision; natural 1/20 results, successes/failures, stabilization, and regained HP are resolved on
 the sheet. Declare first aid and turn timing manually. Ordinary healing cannot revive the dead.

@@ -90,6 +90,10 @@ remain manually declared; see `docs/rules-engine/barbarian-level-9.md`.
 Exhaustion now also penalizes weapon, Unarmed Strike, and all modeled spell attack sources.
 Shared spellcasting traces are adjusted once, without changing damage, save DCs, slots, or
 Advantage. See `docs/rules-engine/attack-condition-modifiers.md`.
+Wizard and Sorcerer creation and advancement also reach level 9: both gain fifth-level
+slots and fourteen regular preparations. Evoker gains its separate level-9 Savant addition;
+Draconic Sorcery adds Legend Lore and Summon Dragon without consuming ordinary preparations.
+Arcane Recovery supports the new fifth-level slot. See `docs/rules-engine/arcane-level-9.md`.
 Other classes remain at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 

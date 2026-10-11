@@ -4,6 +4,7 @@ import pytest
 
 from srd_extract.sorcerer import (
     SorcererProgressionRow,
+    _class_entity,
     _innate_sorcery_content,
     _starting_equipment,
     parse_core_traits,
@@ -34,6 +35,15 @@ def test_sorcerer_progression_row_accepts_level_five_values() -> None:
     assert row.sorcery_points == 5
     assert row.cantrips == 5
     assert row.prepared_spells == 9
+
+
+def test_level_nine_builder_and_progression() -> None:
+    row = SorcererProgressionRow(9, 4, (), 9, 5, 14, (4, 3, 3, 3, 1, 0, 0, 0, 0))
+    entity = _class_entity({"skillProficiencyChoice": {}}, (row,), (), {}, [])
+    assert entity["body"]["builder"]["supportedLevelMaximum"] == 9
+    assert entity["body"]["skillProficiencyChoice"]["countByLevel"]["9"] == 2
+    assert entity["body"]["progression"][0]["spellSlots"]["5"] == 1
+    assert entity["body"]["progression"][0]["preparedSpells"] == 14
 
 
 def test_sorcerer_progression_row_rejects_wrong_bonus() -> None:

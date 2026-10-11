@@ -446,12 +446,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 9)},
+                "countByLevel": {str(level): 2 for level in range(1, 10)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 8,
+                "supportedLevelMaximum": 9,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -938,7 +938,7 @@ def generate_sorcerer_content(class_root: Path, spell_root: Path, output: Path) 
     coverage = read_json(output / "coverage.json")
     coverage["counts"]["STRUCTURED"] = len(all_entities)
     coverage["note"] = (
-        "Sorcerer through level 7; other reviewed classes through their documented limits; "
+        "Sorcerer through level 9; other reviewed classes through their documented limits; "
         "Human, Soldier, equipment, and representative spells."
     )
     write_json(output / "coverage.json", coverage)
