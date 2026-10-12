@@ -376,28 +376,32 @@ describe("guided character builder", () => {
     expect(evaluation.validations).toEqual([]);
   });
 
-  it.each(builderClassIds)("builds %s with each reviewed species and SRD background", (classId) => {
+  describe.each(builderClassIds)("%s origin matrix", (classId) => {
     const { rulesPackage } = loadWebData();
     const catalog = characterBuilderCatalog(rulesPackage);
 
-    for (const backgroundId of Object.keys(catalog.backgrounds)) {
-      const backgroundDraft = updateBuilderBackground(
-        defaultBuilderDraft(classId, catalog, 1, "Background matrix hero"),
-        catalog,
-        backgroundId,
-      );
-      for (const speciesId of Object.keys(catalog.species)) {
-        const draft = updateBuilderSpecies(backgroundDraft, catalog, speciesId);
-        const character = buildCharacter(draft, rulesPackage, options);
-        const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
+    // Keep every combination while bounding each integration case's work.
+    it.each(Object.keys(catalog.backgrounds))(
+      "builds each reviewed species with %s",
+      (backgroundId) => {
+        const backgroundDraft = updateBuilderBackground(
+          defaultBuilderDraft(classId, catalog, 1, "Background matrix hero"),
+          catalog,
+          backgroundId,
+        );
+        for (const speciesId of Object.keys(catalog.species)) {
+          const draft = updateBuilderSpecies(backgroundDraft, catalog, speciesId);
+          const character = buildCharacter(draft, rulesPackage, options);
+          const evaluation = evaluateCharacter({ character, packages: [rulesPackage] });
 
-        expect(
-          validateBuilderDraft(draft, catalog),
-          `${classId} / ${speciesId} / ${backgroundId}`,
-        ).toEqual([]);
-        expect(evaluation.validations, `${classId} / ${speciesId} / ${backgroundId}`).toEqual([]);
-      }
-    }
+          expect(
+            validateBuilderDraft(draft, catalog),
+            `${classId} / ${speciesId} / ${backgroundId}`,
+          ).toEqual([]);
+          expect(evaluation.validations, `${classId} / ${speciesId} / ${backgroundId}`).toEqual([]);
+        }
+      },
+    );
   });
 
   it("persists projected origin selections into a rules-valid character", () => {
