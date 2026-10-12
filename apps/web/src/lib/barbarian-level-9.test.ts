@@ -73,7 +73,7 @@ describe("Barbarian level 9 and source-driven attack Advantage tradeoffs", () =>
       attack.damage.bonus + 3,
     );
     expect(levelUpEligibility(character, catalog)).toMatchObject({
-      eligible: false,
+      eligible: true,
       currentLevel: 9,
     });
   });

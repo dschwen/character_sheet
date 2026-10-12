@@ -43,7 +43,21 @@ def test_barbarian_pages_28_to_30_audit(tmp_path: Path) -> None:
     assert reconciliation["valid"] is True
     assert reconciliation["counts"]["unresolved"] == 0
     barbarian = next(entity for entity in entities if entity["id"] == "srd521.class.barbarian")
-    assert barbarian["body"]["builder"]["supportedLevelMaximum"] == 9
+    assert barbarian["body"]["builder"]["supportedLevelMaximum"] == 10
+    retaliation = read_json(content / "authoring-ir" / "berserker.retaliation.json")
+    assert retaliation["level"] == 10
+    assert retaliation["source"][0]["page"] == 30
+    parameters = retaliation["proposedRules"][0]["parameters"]
+    assert parameters["actionEconomy"] == "reaction"
+    assert parameters["reactionAttack"] == {
+        "trigger": "damaged-by-creature",
+        "rangeFeet": 5,
+        "attackCount": 1,
+        "attackTypes": ["melee"],
+        "attackKinds": ["weapon", "unarmed"],
+    }
+    assert "resourceId" not in parameters
+    assert "Rage is not required" in " ".join(parameters["assistedInstructions"])
     assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["7"] == 3
     assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["8"] == 3
     assert barbarian["body"]["skillProficiencyChoice"]["countByLevel"]["9"] == 3

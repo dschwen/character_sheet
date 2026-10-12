@@ -12,6 +12,7 @@ export function AttackRollControls({
   damageMode,
   masteryReplacement,
   busy,
+  attackDisabled = false,
   onRoll,
   onDamage,
   onExplain,
@@ -21,6 +22,7 @@ export function AttackRollControls({
   damageMode: WeaponDamageModeSummary | undefined;
   masteryReplacement: string | undefined;
   busy: boolean;
+  attackDisabled?: boolean;
   onRoll: (request: D20RollRequest) => void;
   onDamage: (request: DicePoolRollRequest) => void;
   onExplain: (traceId: string) => void;
@@ -55,7 +57,7 @@ export function AttackRollControls({
       <button
         type="button"
         className="roll-cell"
-        disabled={busy || unavailable}
+        disabled={busy || unavailable || attackDisabled}
         title="Roll attack · Shift-click to inspect calculation"
         onClick={(event) => {
           if (event.shiftKey) {

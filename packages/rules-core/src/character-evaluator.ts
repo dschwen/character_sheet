@@ -24,6 +24,7 @@ import {
   actionTargetingSchema,
   onHitExtraDamageSchema,
   heroicInspirationGrantSchema,
+  reactionAttackSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -743,6 +744,7 @@ const resourceParametersSchema = z
 const actionParametersSchema = z
   .object({
     grantsHeroicInspiration: heroicInspirationGrantSchema.optional(),
+    reactionAttack: reactionAttackSchema.optional(),
     actionEconomy: z.string().optional(),
     targeting: actionTargetingSchema.optional(),
     assistedInstructions: z.array(z.string().min(1)).optional(),
@@ -7104,6 +7106,8 @@ function evaluateConditionalRules(
       const actionParameters: Record<string, JsonValue> = {};
       if (parameters.grantsHeroicInspiration !== undefined)
         actionParameters.grantsHeroicInspiration = parameters.grantsHeroicInspiration;
+      if (parameters.reactionAttack !== undefined)
+        actionParameters.reactionAttack = parameters.reactionAttack;
       if (parameters.assistedInstructions !== undefined)
         actionParameters.assistedInstructions = parameters.assistedInstructions;
       if (parameters.targeting !== undefined) {

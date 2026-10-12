@@ -452,7 +452,7 @@ def _class_entity(
                 "minimum": traits.skill_choice_count,
                 "maximum": traits.skill_choice_count,
                 "options": list(traits.skill_options),
-                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 10)},
+                "countByLevel": {str(level): 2 if level < 3 else 3 for level in range(1, 11)},
             },
             "weaponProficiencies": list(traits.weapon_proficiencies),
             "weaponMasteryChoice": {
@@ -464,7 +464,7 @@ def _class_entity(
             "startingEquipmentText": traits.starting_equipment_text,
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 9,
+                "supportedLevelMaximum": 10,
                 "defaultAbilityScores": {
                     "strength": 15,
                     "dexterity": 13,
@@ -921,6 +921,71 @@ def _extra_attack_ir(feature: ExtractedFeature) -> dict[str, Any]:
     }
 
 
+def _retaliation_ir(feature: ExtractedFeature) -> dict[str, Any]:
+    text = " ".join(node["normalizedText"] for node in feature.body_nodes)
+    for phrase in [
+        "take damage from a creature",
+        "within 5 feet",
+        "Reaction",
+        "one melee attack",
+        "weapon or an Unarmed Strike",
+    ]:
+        if phrase not in text:
+            raise ValueError(f"Retaliation source is missing {phrase}")
+    return {
+        "schemaVersion": "0.1.0",
+        "id": feature.id,
+        "kind": "subclass-feature",
+        "parentId": BERSERKER_ID,
+        "level": feature.level,
+        "source": list(feature.source_spans),
+        "text": _feature_text(feature),
+        "proposedRules": [
+            {
+                "id": "retaliation-attack",
+                "type": "grant-action",
+                "target": "action.retaliation",
+                "when": {"kind": "all", "args": []},
+                "parameters": {
+                    "actionEconomy": "reaction",
+                    "reactionAttack": {
+                        "trigger": "damaged-by-creature",
+                        "rangeFeet": 5,
+                        "attackCount": 1,
+                        "attackTypes": ["melee"],
+                        "attackKinds": ["weapon", "unarmed"],
+                    },
+                    "assistedInstructions": [
+                        "After you take damage from a creature within 5 feet, you may use your "
+                        "Reaction to make exactly one melee weapon or Unarmed Strike attack "
+                        "against that same creature. Confirm actual damage, distance, and Reaction "
+                        "availability manually. This does not grant the Attack action or "
+                        "Extra Attack.",
+                        "Rage is not required. The damage need not come from an attack roll, and "
+                        "this need not be your turn. Do not use it for damage from a non-creature "
+                        "source or a creature beyond 5 feet. Retaliation does not require sight; "
+                        "apply unseen-target or other situational roll modifiers as appropriate.",
+                        "Roll attack, then confirm a hit before resolving damage on the triggering "
+                        "creature's sheet. Mark your Reaction used manually. Reckless Attack "
+                        "applies only if already declared on your first attack on your turn and "
+                        "still active; Brutal Strike is available only on your own turn. "
+                        "Resolve Frenzy, mastery effects, and other turn triggers separately.",
+                    ],
+                },
+                "automationLevel": "roll-assisted",
+            }
+        ],
+        "review": {
+            "extraction": "approved",
+            "semantics": "needs-review",
+            "tests": "draft",
+            "notes": [
+                "Damage source, distance, Reaction use, target identity, and hit are declared."
+            ],
+        },
+    }
+
+
 def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str, Any]:
     raw_page = read_json(extraction_root / "raw" / "pages" / "0028.json")
     layout = read_json(extraction_root / "layout" / "pages" / "0028.json")
@@ -935,6 +1000,8 @@ def generate_barbarian_content(extraction_root: Path, output: Path) -> dict[str,
     progression = parse_progression(raw_page, progression_region)
     features = extract_class_features(document)
     berserker_features = extract_berserker_features(document)
+    retaliation = next(feature for feature in berserker_features if feature.name == "Retaliation")
+    write_json(output / "authoring-ir" / "berserker.retaliation.json", _retaliation_ir(retaliation))
     reconciliation = reconcile_progression(progression, features)
     if not reconciliation["valid"]:
         raise ValueError("Class progression contains unresolved feature references")

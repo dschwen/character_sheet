@@ -9,3 +9,4 @@ export { ExpressionEvaluator, type EvaluationContext, type EvaluationLimits } fr
 export { proposeRest } from "./rest.js";
 export { proposeSpellCast } from "./spell-transition.js";
 export { resolveSavingThrowDamage } from "./saving-throw-damage.js";
+export * from "./reaction-attacks.js";

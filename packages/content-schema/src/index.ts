@@ -16,6 +16,16 @@ export type JsonScalar = z.infer<typeof jsonScalarSchema>;
 export type EntityId = z.infer<typeof entityIdSchema>;
 export type FactPath = z.infer<typeof factPathSchema>;
 
+export const reactionAttackSchema = z
+  .object({
+    trigger: z.literal("damaged-by-creature"),
+    rangeFeet: z.number().positive(),
+    attackCount: z.literal(1),
+    attackTypes: z.array(z.enum(["melee", "ranged"])).min(1),
+    attackKinds: z.array(z.enum(["weapon", "unarmed"])).min(1),
+  })
+  .strict();
+
 export const heroicInspirationGrantSchema = z
   .object({ trigger: z.literal("start-of-turn-in-combat"), requiresMissing: z.literal(true) })
   .strict();

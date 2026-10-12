@@ -83,7 +83,11 @@ Expertise, spell and preparation additions, the reviewed level-3 subclass, and t
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
 same-class advancement for all twelve SRD classes through level 8.
-All twelve now reach level 9, and Fighter reaches level 10. Champion's Heroic Warrior
+All twelve now reach level 9; Fighter and Barbarian reach level 10. Berserker's Retaliation
+appears in Play → Use a feature. Declare damage from a creature within 5 feet and an available
+Reaction, then roll one melee weapon or Unarmed Strike attack against that creature, with
+normal/critical damage controls. Rage is not required. Reaction use and target damage are manual.
+Champion's Heroic Warrior
 appears in Play → Use a feature: confirm combat and the start of your turn to gain missing
 Heroic Inspiration. The grant is traced, persisted, and undoable; it cannot stack Inspiration.
 Fighter level 10 also grants four Second Wind uses and five Weapon Mastery choices.

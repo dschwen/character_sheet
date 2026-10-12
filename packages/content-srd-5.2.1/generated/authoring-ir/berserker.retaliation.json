@@ -1,0 +1,66 @@
+{
+  "id": "srd521.subclass-feature.barbarian.path-of-the-berserker.retaliation",
+  "kind": "subclass-feature",
+  "level": 10,
+  "parentId": "srd521.subclass.barbarian.path-of-the-berserker",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "retaliation-attack",
+      "parameters": {
+        "actionEconomy": "reaction",
+        "assistedInstructions": [
+          "After you take damage from a creature within 5 feet, you may use your Reaction to make exactly one melee weapon or Unarmed Strike attack against that same creature. Confirm actual damage, distance, and Reaction availability manually. This does not grant the Attack action or Extra Attack.",
+          "Rage is not required. The damage need not come from an attack roll, and this need not be your turn. Do not use it for damage from a non-creature source or a creature beyond 5 feet. Retaliation does not require sight; apply unseen-target or other situational roll modifiers as appropriate.",
+          "Roll attack, then confirm a hit before resolving damage on the triggering creature's sheet. Mark your Reaction used manually. Reckless Attack applies only if already declared on your first attack on your turn and still active; Brutal Strike is available only on your own turn. Resolve Frenzy, mastery effects, and other turn triggers separately."
+        ],
+        "reactionAttack": {
+          "attackCount": 1,
+          "attackKinds": [
+            "weapon",
+            "unarmed"
+          ],
+          "attackTypes": [
+            "melee"
+          ],
+          "rangeFeet": 5,
+          "trigger": "damaged-by-creature"
+        }
+      },
+      "target": "action.retaliation",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Damage source, distance, Reaction use, target identity, and hit are declared."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0030-b014"
+      ],
+      "page": 30,
+      "quoteHash": "55f6866aadb76dbe1690008990c7d01ad11369655d35a6cb114111c1f26292df",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "When you take damage from a creature that is within 5 feet of you, you can take a Reaction to make one melee attack against that creature, using a weapon or an Unarmed Strike."
+      }
+    ],
+    "title": "Retaliation"
+  }
+}

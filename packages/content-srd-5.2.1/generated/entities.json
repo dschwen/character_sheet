@@ -22,7 +22,7 @@
           "srd521.skill.animal-handling"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 9,
+        "supportedLevelMaximum": 10,
         "supportedLevelMinimum": 1
       },
       "hitPointDie": 12,
@@ -342,6 +342,7 @@
       "skillProficiencyChoice": {
         "countByLevel": {
           "1": 2,
+          "10": 3,
           "2": 2,
           "3": 3,
           "4": 3,

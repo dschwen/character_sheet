@@ -28,6 +28,7 @@ import {
   resolveSavingThrowDamage,
   deathSaveStatus,
   proposeDeathSavingThrow,
+  reactionAttackDefinition,
 } from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
@@ -61,6 +62,7 @@ import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
 import { CharacterLevelUp } from "./character-level-up";
 import { SavingThrowRerollControls } from "./saving-throw-reroll-controls";
+import { ReactionAttackControls } from "./reaction-attack-controls";
 import { savingThrowRerollDefinition, savingThrowRerollRequest } from "../lib/saving-throw-reroll";
 import { failedSaveRerollDefinition, failedSaveRerollRequest } from "../lib/failed-save-reroll";
 import { FailedSaveRerollControls } from "./failed-save-reroll-controls";
@@ -650,6 +652,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     evaluation?.actions.filter(
       (action) =>
         supportsStateTransition(action) ||
+        reactionAttackDefinition(action) !== undefined ||
         savingThrowRerollDefinition(action) !== undefined ||
         actionRequirements(action).damageDiceCount !== undefined,
     ) ?? [];
@@ -2615,13 +2618,15 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           <div
                             key={action.id}
                             className={
-                              heroicInspirationGrant(action) !== undefined
-                                ? "heroic-inspiration-card"
-                                : savingThrowRerollDefinition(action)
-                                  ? "saving-throw-reroll-card"
-                                  : targeting === undefined
-                                    ? undefined
-                                    : "targeted-action-card"
+                              reactionAttackDefinition(action) !== undefined
+                                ? "saving-throw-reroll-card"
+                                : heroicInspirationGrant(action) !== undefined
+                                  ? "heroic-inspiration-card"
+                                  : savingThrowRerollDefinition(action)
+                                    ? "saving-throw-reroll-card"
+                                    : targeting === undefined
+                                      ? undefined
+                                      : "targeted-action-card"
                             }
                           >
                             <span>
@@ -2696,6 +2701,20 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                 </button>
                               </div>
                             )}
+                            <ReactionAttackControls
+                              key={`reaction:${character.id}:${character.metadata.updatedAt}:${action.id}`}
+                              action={action}
+                              evaluation={evaluation}
+                              busy={diceRolling}
+                              damageModeIds={weaponDamageModes}
+                              onRoll={performRoll}
+                              onDamage={(request) => {
+                                void performDicePoolRoll(request);
+                              }}
+                              onBaseDamage={rollAttackDamage}
+                              onExplain={setSelectedTraceId}
+                              onNotice={setNotice}
+                            />
                             <SavingThrowRerollControls
                               key={`${character.id}:${character.metadata.updatedAt}:${action.id}`}
                               action={action}
