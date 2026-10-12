@@ -30,7 +30,8 @@
             "5": 2,
             "6": 4,
             "7": 4,
-            "8": 4
+            "8": 4,
+            "9": 4
           },
           "eligibleSkillIds": [
             "srd521.skill.acrobatics",
@@ -56,7 +57,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.rogue.expertise"
         },
-        "supportedLevelMaximum": 8,
+        "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
       "conditionalWeaponProficiencies": [
@@ -419,7 +420,8 @@
           "5": 4,
           "6": 4,
           "7": 4,
-          "8": 4
+          "8": 4,
+          "9": 4
         },
         "maximum": 4,
         "minimum": 4,
@@ -1417,6 +1419,47 @@
       "class-option",
       "rogue",
       "cunning-strike"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.rogue.cunning-strike",
+      "costDice": 1,
+      "minimumLevel": 9,
+      "requiredFeatureId": "srd521.subclass-feature.rogue.thief.supreme-sneak",
+      "requirements": [
+        "hide-action-invisible",
+        "end-turn-behind-three-quarters-or-total-cover"
+      ]
+    },
+    "id": "srd521.option.rogue.cunning-strike.stealth-attack",
+    "kind": "class-option",
+    "name": {
+      "en": "Stealth Attack"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Thief Supreme Sneak Stealth Attack option; cover and Hide assisted.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0064-b007"
+        ],
+        "page": 64,
+        "quoteHash": "5ceb983035e364dee20e5541e6d59a9fc3335a215518e3291301cf37479e44b2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "rogue",
+      "cunning-strike",
+      "thief"
     ]
   },
   {

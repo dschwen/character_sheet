@@ -1,0 +1,59 @@
+{
+  "id": "srd521.subclass-feature.rogue.thief.supreme-sneak",
+  "kind": "subclass-feature",
+  "level": 9,
+  "parentId": "srd521.subclass.rogue.thief",
+  "proposedRules": [
+    {
+      "automationLevel": "roll-assisted",
+      "id": "cunning-strike-stealth-attack",
+      "parameters": {
+        "actionEconomy": "on-sneak-attack",
+        "assistedInstructions": [
+          "Stealth Attack (cost 1d6): you must have the Hide action's Invisible condition. Invisibility from a spell or another source alone is not enough.",
+          "This attack doesn't end that Hide condition if you end this turn behind Three-Quarters Cover or Total Cover. Confirm the cover at turn end with the DM; no turn or cover tracking is automatic.",
+          "This does not grant Invisible or prevent other causes of Hide ending. If the cover requirement fails, end Hide's Invisible condition manually. Do not remove unrelated Invisible effects."
+        ],
+        "requirements": [
+          "hide-action-invisible",
+          "end-turn-behind-three-quarters-or-total-cover"
+        ],
+        "sneakAttackDiceCost": 1
+      },
+      "target": "action.cunning-strike.stealth-attack",
+      "type": "grant-action",
+      "when": {
+        "args": [],
+        "kind": "all"
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Targets, turn state, and applied conditions remain assisted."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0064-b007"
+      ],
+      "page": 64,
+      "quoteHash": "5ceb983035e364dee20e5541e6d59a9fc3335a215518e3291301cf37479e44b2",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "You gain the following Cunning Strike option. Stealth Attack (Cost: 1d6). If you have the Hide action’s Invisible condition, this attack doesn’t end that condition on you if you end the turn behind Three-Quarters Cover or Total Cover."
+      }
+    ],
+    "title": "Supreme Sneak"
+  }
+}

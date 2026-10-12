@@ -22,6 +22,7 @@ import {
   savingThrowRerollSchema,
   failedSaveRerollSchema,
   actionTargetingSchema,
+  onHitExtraDamageSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -749,14 +750,7 @@ const actionParametersSchema = z
     resourceId: z.string().min(1).optional(),
     activatesEffectId: z.string().min(1).optional(),
     spellId: z.string().min(1).optional(),
-    extraDamage: z
-      .object({
-        diceSize: z.number().int().positive(),
-        type: z.string().min(1),
-        frequency: z.string().min(1),
-      })
-      .strict()
-      .optional(),
+    extraDamage: onHitExtraDamageSchema.optional(),
     requirements: z.array(z.string().min(1)).optional(),
     setsSpeed: z.number().nonnegative().optional(),
     sneakAttackDiceCost: z.number().int().positive().optional(),
@@ -7163,7 +7157,20 @@ function evaluateConditionalRules(
         state.traces[damageTraceId] = withRuleSource(damageTrace, ir);
         state.facts[damageTraceId] = diceCount;
         state.values[damageTraceId] = { value: diceCount, traceId: damageTraceId };
-        actionParameters.extraDamage = { ...parameters.extraDamage, diceCount };
+        const extra = parameters.extraDamage;
+        actionParameters.extraDamage = {
+          diceCount,
+          diceSize: extra.diceSize,
+          type: extra.type,
+          frequency: extra.frequency,
+          maximumOptions: extra.maximumOptions,
+          ...(extra.optionActionEconomy === undefined
+            ? {}
+            : { optionActionEconomy: extra.optionActionEconomy }),
+          ...(extra.weaponEligibility === undefined
+            ? {}
+            : { weaponEligibility: extra.weaponEligibility }),
+        };
       }
       if (parameters.requirements !== undefined) {
         actionParameters.requirements = parameters.requirements;

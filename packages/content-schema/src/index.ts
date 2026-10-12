@@ -16,6 +16,23 @@ export type JsonScalar = z.infer<typeof jsonScalarSchema>;
 export type EntityId = z.infer<typeof entityIdSchema>;
 export type FactPath = z.infer<typeof factPathSchema>;
 
+export const onHitExtraDamageSchema = z
+  .object({
+    diceSize: z.number().int().positive(),
+    type: z.string().min(1),
+    frequency: z.string().min(1),
+    optionActionEconomy: z.string().min(1).optional(),
+    maximumOptions: z.number().int().nonnegative().default(0),
+    weaponEligibility: z
+      .object({
+        anyProperties: z.array(z.string().min(1)).default([]),
+        anyAttackTypes: z.array(z.enum(["melee", "ranged"])).default([]),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
 export type Expr =
   | { kind: "literal"; value: JsonScalar }
   | { kind: "ref"; path: FactPath }

@@ -388,7 +388,7 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 4 for level in range(1, 9)},
+                "countByLevel": {str(level): 4 for level in range(1, 10)},
             },
             "weaponMasteryChoice": {
                 "categories": ["simple"],
@@ -398,7 +398,7 @@ def _class_entity(
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 8,
+                "supportedLevelMaximum": 9,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 15,
@@ -444,6 +444,7 @@ def _class_entity(
                         "6": 4,
                         "7": 4,
                         "8": 4,
+                        "9": 4,
                     },
                 },
             },
@@ -610,8 +611,25 @@ def _sneak_attack_ir(feature: dict[str, Any]) -> dict[str, Any]:
                         "diceSize": 6,
                         "type": "weapon-damage-type",
                         "frequency": "once-per-turn",
+                        "optionActionEconomy": "on-sneak-attack",
+                        "maximumOptions": 1,
+                        "weaponEligibility": {
+                            "anyProperties": ["finesse"],
+                            "anyAttackTypes": ["ranged"],
+                        },
                     },
                     "requirements": ["finesse-or-ranged-weapon", "advantage-or-adjacent-ally"],
+                    "assistedInstructions": [
+                        "Confirm a creature was hit with a Finesse or Ranged weapon. "
+                        "You need Advantage, or an ally within 5 feet of the target who isn't "
+                        "Incapacitated while you don't have Disadvantage.",
+                        "Sneak Attack is once per turn, not only on your turn. "
+                        "Confirm it has not been used on this turn. Resolve hit, ally position, "
+                        "and attack roll eligibility manually.",
+                        "Select at most one Cunning Strike effect. Remove its die cost before "
+                        "rolling damage; resolve the effect immediately after damage. "
+                        "A critical hit doubles only the remaining damage dice.",
+                    ],
                 },
                 "automationLevel": "roll-assisted",
             }
@@ -674,6 +692,12 @@ def _cunning_strike_ir(feature: dict[str, Any]) -> dict[str, Any]:
                         "difficultyClassFact": "classFeature.rogue.saveDifficultyClass",
                     },
                     "requirements": ["poisoners-kit"],
+                    "assistedInstructions": [
+                        "You must have a Poisoner's Kit on your person. After damage, the target "
+                        "makes a Constitution save. On failure, set Poisoned on the target's "
+                        "sheet for 1 minute; it repeats the save at each turn's end, ending "
+                        "the effect on success. Resolve saves and duration manually."
+                    ],
                 },
                 "automationLevel": "roll-assisted",
             },
@@ -690,6 +714,11 @@ def _cunning_strike_ir(feature: dict[str, Any]) -> dict[str, Any]:
                         "difficultyClassFact": "classFeature.rogue.saveDifficultyClass",
                     },
                     "requirements": ["target-large-or-smaller"],
+                    "assistedInstructions": [
+                        "The target must be Large or smaller. After damage, it makes a Dexterity "
+                        "save. On failure, set Prone on the target's sheet; "
+                        "resolve the save manually."
+                    ],
                 },
                 "automationLevel": "roll-assisted",
             },
@@ -702,6 +731,10 @@ def _cunning_strike_ir(feature: dict[str, Any]) -> dict[str, Any]:
                     "actionEconomy": "on-sneak-attack",
                     "sneakAttackDiceCost": 1,
                     "movement": {"speedFraction": 0.5, "provokesOpportunityAttacks": False},
+                    "assistedInstructions": [
+                        "Immediately after the attack, you may move up to half your current "
+                        "Speed without provoking Opportunity Attacks. Resolve movement manually."
+                    ],
                 },
                 "automationLevel": "roll-assisted",
             },
@@ -726,6 +759,42 @@ def _uncanny_dodge_ir(feature: dict[str, Any]) -> dict[str, Any]:
                 "automationLevel": "roll-assisted",
             }
         ],
+    )
+
+
+def _supreme_sneak_ir(feature: dict[str, Any]) -> dict[str, Any]:
+    return _feature_ir(
+        feature,
+        [
+            {
+                "id": "cunning-strike-stealth-attack",
+                "type": "grant-action",
+                "target": "action.cunning-strike.stealth-attack",
+                "when": _always(),
+                "parameters": {
+                    "actionEconomy": "on-sneak-attack",
+                    "sneakAttackDiceCost": 1,
+                    "requirements": [
+                        "hide-action-invisible",
+                        "end-turn-behind-three-quarters-or-total-cover",
+                    ],
+                    "assistedInstructions": [
+                        "Stealth Attack (cost 1d6): you must have the Hide action's Invisible "
+                        "condition. Invisibility from a spell or another source "
+                        "alone is not enough.",
+                        "This attack doesn't end that Hide condition if you end this turn behind "
+                        "Three-Quarters Cover or Total Cover. Confirm the cover at turn end "
+                        "with the DM; no turn or cover tracking is automatic.",
+                        "This does not grant Invisible or prevent other causes of Hide ending. "
+                        "If the cover requirement fails, end Hide's Invisible condition manually. "
+                        "Do not remove unrelated Invisible effects.",
+                    ],
+                },
+                "automationLevel": "roll-assisted",
+            }
+        ],
+        kind="subclass-feature",
+        parent_id=SUBCLASS_ID,
     )
 
 
@@ -811,11 +880,35 @@ def generate_rogue_content(extraction_root: Path, output: Path) -> dict[str, Any
         _source_spans([core_node, equipment_heading, equipment_node, progression_node]),
     )
     cunning_strike = next(feature for feature in features if feature["name"] == "Cunning Strike")
+    supreme_sneak = next(
+        feature for feature in thief_features if feature["name"] == "Supreme Sneak"
+    )
     rogue_entities = [
         class_entity,
         *[_feature_entity(feature, "class-feature") for feature in features],
         _sneak_attack_table(progression, progression_source),
         *_cunning_strike_options(cunning_strike),
+        {
+            "id": "srd521.option.rogue.cunning-strike.stealth-attack",
+            "kind": "class-option",
+            "name": {"en": "Stealth Attack"},
+            "tags": ["class-option", "rogue", "cunning-strike", "thief"],
+            "source": supreme_sneak["source"],
+            "body": {
+                "choiceId": CUNNING_STRIKE_CHOICE_ID,
+                "costDice": 1,
+                "minimumLevel": 9,
+                "requiredFeatureId": supreme_sneak["id"],
+                "requirements": [
+                    "hide-action-invisible",
+                    "end-turn-behind-three-quarters-or-total-cover",
+                ],
+            },
+            "rules": [],
+            "review": _review(
+                "Thief Supreme Sneak Stealth Attack option; cover and Hide assisted."
+            ),
+        },
         *_thief_entities(document, thief_features),
     ]
     replacement_ids = {entity["id"] for entity in rogue_entities}
@@ -845,6 +938,7 @@ def generate_rogue_content(extraction_root: Path, output: Path) -> dict[str, Any
         "rogue.uncanny-dodge.json": _uncanny_dodge_ir(by_name["Uncanny Dodge"]),
         "thief.fast-hands.json": _fast_hands_ir(thief_by_name["Fast Hands"]),
         "thief.second-story-work.json": _second_story_work_ir(thief_by_name["Second-Story Work"]),
+        "thief.supreme-sneak.json": _supreme_sneak_ir(thief_by_name["Supreme Sneak"]),
     }
     for filename, ir in authoring.items():
         write_json(output / "authoring-ir" / filename, ir)

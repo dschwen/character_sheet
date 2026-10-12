@@ -6,7 +6,8 @@
     "rogue.cunning-strike.json",
     "rogue.uncanny-dodge.json",
     "thief.fast-hands.json",
-    "thief.second-story-work.json"
+    "thief.second-story-work.json",
+    "thief.supreme-sneak.json"
   ],
   "classId": "srd521.class.rogue",
   "coreTraits": {
@@ -87,6 +88,7 @@
     "srd521.option.rogue.cunning-strike.poison",
     "srd521.option.rogue.cunning-strike.trip",
     "srd521.option.rogue.cunning-strike.withdraw",
+    "srd521.option.rogue.cunning-strike.stealth-attack",
     "srd521.subclass.rogue.thief",
     "srd521.subclass-feature.rogue.thief.fast-hands",
     "srd521.subclass-feature.rogue.thief.second-story-work",

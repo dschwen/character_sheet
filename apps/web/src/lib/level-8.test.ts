@@ -18,6 +18,7 @@ import {
   paladinId,
   rangerId,
   monkId,
+  rogueId,
   spellSelectionCounts,
 } from "./character-builder";
 import {
@@ -62,6 +63,7 @@ describe.each(builderClassIds)("%s level-8 progression", (classId) => {
         rangerId,
         paladinId,
         monkId,
+        rogueId,
       ].some((id) => id === classId),
       currentLevel: 8,
     });

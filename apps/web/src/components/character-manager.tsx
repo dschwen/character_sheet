@@ -38,6 +38,8 @@ import {
 } from "../lib/action-targeting";
 import { DamageRiderControls } from "./damage-rider-controls";
 import { MovementCapabilities } from "./movement-capabilities";
+import { OnHitDamageControls } from "./on-hit-damage-controls";
+import { onHitDamageDefinition } from "../lib/on-hit-damage";
 import { spellDamageRollRequest } from "../lib/feature-damage-roll";
 import { spellProtectionInstructions } from "../lib/spell-protection";
 import {
@@ -647,6 +649,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         savingThrowRerollDefinition(action) !== undefined ||
         actionRequirements(action).damageDiceCount !== undefined,
     ) ?? [];
+  const onHitActions =
+    evaluation?.actions.filter((action) => onHitDamageDefinition(action) !== undefined) ?? [];
   const trace =
     selectedTraceId === undefined
       ? undefined
@@ -2566,9 +2570,22 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 )}
                 <Section
                   title="Use a feature"
-                  eyebrow={`${String(playActions.length)} active actions`}
+                  eyebrow={`${String(playActions.length + onHitActions.length)} active actions`}
                 >
-                  {playActions.length === 0 ? (
+                  {onHitActions.map((action) => (
+                    <OnHitDamageControls
+                      key={`${character.id}:${character.metadata.updatedAt}:${action.id}`}
+                      action={action}
+                      actions={evaluation.actions}
+                      attacks={evaluation.attacks}
+                      actionName={(value) => actionDisplayName(value, names)}
+                      busy={diceRolling}
+                      onRoll={performDicePoolRoll}
+                      onNotice={setNotice}
+                      onExplain={setSelectedTraceId}
+                    />
+                  ))}
+                  {playActions.length === 0 && onHitActions.length === 0 ? (
                     <p className="empty">
                       No feature actions or active-status rolls are available.
                     </p>

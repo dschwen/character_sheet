@@ -67,7 +67,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(870);
+    expect(parsedEntities).toHaveLength(871);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -97,6 +97,7 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.subclass.rogue.thief");
     expect(entityIds).toContain("srd521.table.rogue.sneak-attack-dice");
     expect(entityIds).toContain("srd521.option.rogue.cunning-strike.withdraw");
+    expect(entityIds).toContain("srd521.option.rogue.cunning-strike.stealth-attack");
     expect(entityIds).toContain("srd521.class.sorcerer");
     expect(entityIds).toContain("srd521.subclass.sorcerer.draconic-sorcery");
     expect(entityIds).toContain("srd521.option.sorcerer.metamagic.quickened");
@@ -445,7 +446,7 @@ describe("bootstrap content package", () => {
       ]),
     );
     expect(metadata.find(({ id }) => id === "srd521.class.rogue")?.builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
       defaultAbilityScoreImprovementAbility: "dexterity",
       expertiseChoice: {
         sourceId: "srd521.class-feature.rogue.expertise",

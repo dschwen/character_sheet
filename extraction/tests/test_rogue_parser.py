@@ -4,8 +4,40 @@ from srd_extract.rogue import (
     RogueProgressionRow,
     _feature_entity,
     _starting_equipment,
+    _supreme_sneak_ir,
     parse_core_traits,
 )
+
+
+def test_supreme_sneak_preserves_hide_origin_cover_cost_and_source() -> None:
+    source = [{"sourceId": "wotc-srd-5.2.1-en", "page": 64, "blocks": ["p0064-b001"]}]
+    ir = _supreme_sneak_ir(
+        {
+            "id": "srd521.subclass-feature.rogue.thief.supreme-sneak",
+            "name": "Supreme Sneak",
+            "level": 9,
+            "source": source,
+            "bodyNodes": [{"kind": "ParagraphNode", "normalizedText": "Source rule text."}],
+        }
+    )
+    assert ir["level"] == 9
+    assert ir["source"] == source
+    assert ir["parentId"] == "srd521.subclass.rogue.thief"
+    rule = ir["proposedRules"][0]
+    assert rule["target"] == "action.cunning-strike.stealth-attack"
+    assert rule["parameters"]["sneakAttackDiceCost"] == 1
+    assert rule["parameters"]["requirements"] == [
+        "hide-action-invisible",
+        "end-turn-behind-three-quarters-or-total-cover",
+    ]
+    assert "activatesEffectId" not in rule["parameters"]
+    assert ir["review"]["semantics"] == "needs-review"
+
+
+def test_rogue_level_nine_scaling() -> None:
+    row = RogueProgressionRow(9, 4, ("Subclass feature",), 5)
+    assert row.proficiency_bonus == 4
+    assert row.sneak_attack_dice == 5
 
 
 @pytest.mark.parametrize("name", ["Evasion", "Reliable Talent"])

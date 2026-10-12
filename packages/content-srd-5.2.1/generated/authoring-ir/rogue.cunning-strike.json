@@ -9,6 +9,9 @@
       "id": "cunning-strike-poison",
       "parameters": {
         "actionEconomy": "on-sneak-attack",
+        "assistedInstructions": [
+          "You must have a Poisoner's Kit on your person. After damage, the target makes a Constitution save. On failure, set Poisoned on the target's sheet for 1 minute; it repeats the save at each turn's end, ending the effect on success. Resolve saves and duration manually."
+        ],
         "requirements": [
           "poisoners-kit"
         ],
@@ -30,6 +33,9 @@
       "id": "cunning-strike-trip",
       "parameters": {
         "actionEconomy": "on-sneak-attack",
+        "assistedInstructions": [
+          "The target must be Large or smaller. After damage, it makes a Dexterity save. On failure, set Prone on the target's sheet; resolve the save manually."
+        ],
         "requirements": [
           "target-large-or-smaller"
         ],
@@ -51,6 +57,9 @@
       "id": "cunning-strike-withdraw",
       "parameters": {
         "actionEconomy": "on-sneak-attack",
+        "assistedInstructions": [
+          "Immediately after the attack, you may move up to half your current Speed without provoking Opportunity Attacks. Resolve movement manually."
+        ],
         "movement": {
           "provokesOpportunityAttacks": false,
           "speedFraction": 0.5

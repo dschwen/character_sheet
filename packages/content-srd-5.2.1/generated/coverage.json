@@ -2,7 +2,7 @@
   "authoringIr": {
     "semanticsApproved": 0,
     "testsApproved": 0,
-    "total": 60
+    "total": 61
   },
   "classes": [
     {
@@ -54,7 +54,7 @@
       "name": "Ranger"
     },
     {
-      "builderMaximum": 8,
+      "builderMaximum": 9,
       "builderMinimum": 1,
       "id": "srd521.class.rogue",
       "name": "Rogue"
@@ -80,7 +80,7 @@
   ],
   "counts": {
     "EXECUTABLE": 0,
-    "STRUCTURED": 870,
+    "STRUCTURED": 871,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
@@ -90,7 +90,7 @@
     "background": 4,
     "class": 12,
     "class-feature": 174,
-    "class-option": 54,
+    "class-option": 55,
     "condition": 15,
     "equipment-ammunition": 5,
     "equipment-armor": 12,

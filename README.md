@@ -110,6 +110,10 @@ Monk also reaches level 9 with nine Focus Points, d8 Martial Arts, and Acrobatic
 Overview and Play show its equipment-aware eligibility and current Speed. It permits movement
 along vertical surfaces and across liquids on your turn, not permanent Climb/Swim/Fly Speeds.
 Positioning, remaining movement, and stopping or falling remain manually adjudicated.
+Rogue also reaches level 9 with 5d6 Sneak Attack and Thief's Supreme Sneak. Play → Use a feature
+rolls Sneak Attack separately from weapon damage, subtracting one selected Cunning Strike's cost
+before critical doubling. Stealth Attack requires explicit Hide-origin Invisible and end-turn
+cover declarations; target saves, conditions, and turn timing remain manually adjudicated.
 Play also supports fullscreen Death Saving Throws. Apply the final result only after any reroll
 decision; natural 1/20 results, successes/failures, stabilization, and regained HP are resolved on
 the sheet. Declare first aid and turn timing manually. Ordinary healing cannot revive the dead.

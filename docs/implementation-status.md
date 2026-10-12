@@ -122,8 +122,13 @@ limits. It grants no independent movement budget or permanent Climb/Swim/Fly Spe
 Armor, shields, and zero Speed block use; Focus and Evasion remain independent.
 The production-export smoke check passed builder creation, Overview/Play display, source
 inspection, Grappled eligibility changes, reload persistence, and desktop/narrow layouts.
-See `docs/rules-engine/monk-level-9.md`. Rogue remains at level 8. See
-`docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
+See `docs/rules-engine/monk-level-9.md`. Rogue also reaches level 9 with 5d6 Sneak Attack and
+Thief's Supreme Sneak. Shared metadata-driven extra-damage controls subtract one Cunning Strike
+cost before rolling and critical doubling, display source-linked save DCs/movement guidance,
+and require hit, once-per-turn, and effect eligibility declarations. Stealth Attack requires
+Hide-origin Invisible and sufficient end-turn cover; no Invisible condition is granted or removed
+automatically. All twelve builders now reach level 9. Levels 10–20 remain unfinished. See
+`docs/rules-engine/rogue-level-9.md`; independent rules review and full browser gates remain pending.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside
 ASI. Per-acquisition records store the feat and ability allocation. The engine enforces its
@@ -142,7 +147,7 @@ interaction verification and independent semantic review remain outstanding.
 | 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                           |
 | 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                             |
 | 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                |
-| 7: Levels 6–20                   | In progress. All twelve builders reach level 8. Finish levels 9–20, General feats, Epic Boons, higher-level features, spell progression, interactions, and twelve reviewed level-20 fixtures.                               |
+| 7: Levels 6–20                   | In progress. All twelve builders reach level 9. Finish levels 10–20, General feats, Epic Boons, higher-level features, spell progression, interactions, and twelve reviewed level-20 fixtures.                              |
 | 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                    |
 | 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.              |
 | 10: Beta hardening               | Complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit.                                |
@@ -160,6 +165,8 @@ the plan's explicit deferred work, not a character-sheet completion gate.
 4. Audit each requirement and exit criterion in the original plan against authoritative artifacts,
    commands, tests, and rendered behavior before marking the overall goal complete.
 
-Browser verification is currently outstanding for the latest healing, aura, recovery, post-roll bonus, spell-choice, rest-time feature-option, and damage-rider controls: no browser connection
-was available in the session. Engine/roll-helper tests, type checks, and a production build passed;
-these are not a substitute for rendered interaction verification.
+Broader browser verification remains outstanding for the earlier healing, aura, recovery,
+post-roll bonus, spell-choice, rest-time feature-option, and damage-rider controls, which were
+implemented without a browser connection. Recent Paladin, Monk, and Rogue production-export
+smoke checks cover their documented flows only. Engine/roll-helper tests, type checks, and
+production builds do not substitute for a complete rendered interaction audit.

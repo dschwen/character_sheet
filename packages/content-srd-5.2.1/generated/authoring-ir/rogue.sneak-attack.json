@@ -17,10 +17,25 @@
       "id": "use-sneak-attack",
       "parameters": {
         "actionEconomy": "on-hit",
+        "assistedInstructions": [
+          "Confirm a creature was hit with a Finesse or Ranged weapon. You need Advantage, or an ally within 5 feet of the target who isn't Incapacitated while you don't have Disadvantage.",
+          "Sneak Attack is once per turn, not only on your turn. Confirm it has not been used on this turn. Resolve hit, ally position, and attack roll eligibility manually.",
+          "Select at most one Cunning Strike effect. Remove its die cost before rolling damage; resolve the effect immediately after damage. A critical hit doubles only the remaining damage dice."
+        ],
         "extraDamage": {
           "diceSize": 6,
           "frequency": "once-per-turn",
-          "type": "weapon-damage-type"
+          "maximumOptions": 1,
+          "optionActionEconomy": "on-sneak-attack",
+          "type": "weapon-damage-type",
+          "weaponEligibility": {
+            "anyAttackTypes": [
+              "ranged"
+            ],
+            "anyProperties": [
+              "finesse"
+            ]
+          }
         },
         "requirements": [
           "finesse-or-ranged-weapon",
