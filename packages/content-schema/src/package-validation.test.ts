@@ -339,7 +339,7 @@ describe("bootstrap content package", () => {
 
     expect(metadata).toHaveLength(12);
     expect(metadata.find(({ id }) => id === "srd521.class.fighter")?.builder).toMatchObject({
-      supportedLevelMaximum: 9,
+      supportedLevelMaximum: 10,
     });
     expect(metadata.find(({ id }) => id === "srd521.class.barbarian")?.builder).toMatchObject({
       supportedLevelMaximum: 9,

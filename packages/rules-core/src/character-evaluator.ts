@@ -23,6 +23,7 @@ import {
   failedSaveRerollSchema,
   actionTargetingSchema,
   onHitExtraDamageSchema,
+  heroicInspirationGrantSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -741,6 +742,7 @@ const resourceParametersSchema = z
   .passthrough();
 const actionParametersSchema = z
   .object({
+    grantsHeroicInspiration: heroicInspirationGrantSchema.optional(),
     actionEconomy: z.string().optional(),
     targeting: actionTargetingSchema.optional(),
     assistedInstructions: z.array(z.string().min(1)).optional(),
@@ -3000,6 +3002,7 @@ function materializeFacts(character: CharacterDocument, state: EngineState): Map
     classLevels.set(level.classId, (classLevels.get(level.classId) ?? 0) + 1);
   }
   state.facts["character.level"] = character.build.levels.length;
+  state.facts["state.heroicInspiration"] = character.state.heroicInspiration;
   state.facts["deathSave.stable"] =
     character.state.dead !== true &&
     character.state.deathSaveFailures < 3 &&
@@ -7099,6 +7102,8 @@ function evaluateConditionalRules(
       const available = trace.result === true;
       const parameters = actionParametersSchema.parse(rule.parameters);
       const actionParameters: Record<string, JsonValue> = {};
+      if (parameters.grantsHeroicInspiration !== undefined)
+        actionParameters.grantsHeroicInspiration = parameters.grantsHeroicInspiration;
       if (parameters.assistedInstructions !== undefined)
         actionParameters.assistedInstructions = parameters.assistedInstructions;
       if (parameters.targeting !== undefined) {

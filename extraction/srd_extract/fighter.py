@@ -504,7 +504,7 @@ def _class_entity(
         **traits,
         "skillProficiencyChoice": {
             **traits.get("skillProficiencyChoice", {}),
-            "countByLevel": {str(level): 2 for level in range(1, 9)},
+            "countByLevel": {str(level): 2 for level in range(1, 11)},
         },
         "startingEquipment": {
             "id": "srd521.choice.class.fighter.starting-equipment",
@@ -607,7 +607,7 @@ def _class_entity(
         },
         "builder": {
             "supportedLevelMinimum": 1,
-            "supportedLevelMaximum": 9,
+            "supportedLevelMaximum": 10,
             "defaultAbilityScores": {
                 "strength": 15,
                 "dexterity": 13,
@@ -792,6 +792,12 @@ def _fighter_authoring_ir(
 ) -> dict[str, dict[str, Any]]:
     by_name = {feature["name"]: feature for feature in features}
     champion_by_name = {feature["name"]: feature for feature in champion_features}
+    heroic_text = " ".join(
+        node["normalizedText"] for node in champion_by_name["Heroic Warrior"]["bodyNodes"]
+    )
+    for phrase in ["During combat", "Heroic Inspiration", "start your turn without it"]:
+        if phrase not in heroic_text:
+            raise ValueError(f"Heroic Warrior source is missing {phrase}")
     action_surge = _feature_ir(
         by_name["Action Surge"],
         [
@@ -1032,6 +1038,44 @@ def _fighter_authoring_ir(
         ],
     )
     return {
+        "champion.heroic-warrior.json": _feature_ir(
+            champion_by_name["Heroic Warrior"],
+            [
+                {
+                    "id": "heroic-warrior-inspiration",
+                    "type": "grant-action",
+                    "target": "action.heroic-warrior",
+                    "when": {
+                        "kind": "equals",
+                        "left": {"kind": "ref", "path": "state.heroicInspiration"},
+                        "right": {"kind": "literal", "value": False},
+                    },
+                    "parameters": {
+                        "actionEconomy": "no-action",
+                        "grantsHeroicInspiration": {
+                            "trigger": "start-of-turn-in-combat",
+                            "requiresMissing": True,
+                        },
+                        "assistedInstructions": [
+                            "At the start of your turn during combat, you may gain Heroic "
+                            "Inspiration if you do not already have it. No action or resource "
+                            "is spent. Combat and turn timing are manually declared.",
+                            "This does not stack or transfer Inspiration, grant it outside "
+                            "combat, or replenish it immediately after spending it mid-turn. "
+                            "Wait for another eligible turn start. Spend Inspiration manually "
+                            "when using its reroll; the reroll itself remains assisted.",
+                        ],
+                    },
+                    "automationLevel": "state-automated",
+                }
+            ],
+            [
+                "Combat and turn-start declarations are assisted; "
+                "Inspiration is a traced state grant."
+            ],
+            kind="subclass-feature",
+            parent_id=CHAMPION_ID,
+        ),
         "fighter.indomitable.json": indomitable,
         "fighter.action-surge.json": action_surge,
         "fighter.tactical-mind.json": tactical_mind,

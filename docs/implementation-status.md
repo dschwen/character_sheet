@@ -129,6 +129,12 @@ and require hit, once-per-turn, and effect eligibility declarations. Stealth Att
 Hide-origin Invisible and sufficient end-turn cover; no Invisible condition is granted or removed
 automatically. All twelve builders now reach level 9. Levels 10–20 remain unfinished. See
 `docs/rules-engine/rogue-level-9.md`; independent rules review and full browser gates remain pending.
+Fighter now reaches level 10 with four Second Wind uses, five Weapon Mastery choices, and
+Champion's Heroic Warrior. Shared grant metadata powers a combat/turn-start declaration and
+atomic, source-linked Heroic Inspiration transition; held Inspiration cannot stack or transfer.
+No action or resource is spent. UI confirmations reset after use, while Inspiration persists and
+supports Undo. Encounter timing and the Inspiration reroll remain assisted. Other classes still
+stop at level 9. See `docs/rules-engine/fighter-level-10.md`.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside
 ASI. Per-acquisition records store the feat and ability allocation. The engine enforces its
@@ -147,7 +153,7 @@ interaction verification and independent semantic review remain outstanding.
 | 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                           |
 | 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                             |
 | 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                |
-| 7: Levels 6–20                   | In progress. All twelve builders reach level 9. Finish levels 10–20, General feats, Epic Boons, higher-level features, spell progression, interactions, and twelve reviewed level-20 fixtures.                              |
+| 7: Levels 6–20                   | In progress. Fighter reaches level 10; the other eleven builders reach 9. Finish remaining levels through 20, General feats, Epic Boons, higher-level features, interactions, and twelve reviewed level-20 fixtures.        |
 | 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                    |
 | 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.              |
 | 10: Beta hardening               | Complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit.                                |

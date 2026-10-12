@@ -39,8 +39,27 @@ def test_indomitable_authoring_and_source_guards() -> None:
             "Indomitable",
         ]
     )
-    champion = tuple(feature(name, 3) for name in ["Improved Critical", "Remarkable Athlete"])
-    ir = _fighter_authoring_ir(features, champion)["fighter.indomitable.json"]
+    heroic = feature("Heroic Warrior", 10)
+    heroic["source"][0]["page"] = 49
+    heroic["bodyNodes"][0]["normalizedText"] = (
+        "During combat, you can give yourself Heroic Inspiration whenever you "
+        "start your turn without it."
+    )
+    champion = (
+        *tuple(feature(name, 3) for name in ["Improved Critical", "Remarkable Athlete"]),
+        heroic,
+    )
+    records = _fighter_authoring_ir(features, champion)
+    heroic_ir = records["champion.heroic-warrior.json"]
+    assert heroic_ir["level"] == 10
+    assert heroic_ir["source"][0]["page"] == 49
+    assert heroic_ir["parentId"] == "srd521.subclass.fighter.champion"
+    assert heroic_ir["proposedRules"][0]["parameters"]["grantsHeroicInspiration"] == {
+        "trigger": "start-of-turn-in-combat",
+        "requiresMissing": True,
+    }
+    assert "resourceId" not in heroic_ir["proposedRules"][0]["parameters"]
+    ir = records["fighter.indomitable.json"]
     assert ir["level"] == 9
     assert ir["source"][0]["page"] == 48
     assert ir["review"]["semantics"] == "needs-review"
@@ -214,6 +233,12 @@ def test_fighter_starting_equipment_preserves_all_three_source_packages() -> Non
         "equipped": False,
     }
     assert equipment["options"][2]["currencyGp"] == 155
+
+
+def test_fighter_builder_level_ten_boundary() -> None:
+    entity = _class_entity({}, (), {"entries": []}, [])
+    assert entity["body"]["builder"]["supportedLevelMaximum"] == 10
+    assert entity["body"]["skillProficiencyChoice"]["countByLevel"]["10"] == 2
 
 
 def test_parse_fighter_progression_enforces_twenty_levels() -> None:

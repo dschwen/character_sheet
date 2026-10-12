@@ -1,0 +1,64 @@
+{
+  "id": "srd521.subclass-feature.fighter.champion.heroic-warrior",
+  "kind": "subclass-feature",
+  "level": 10,
+  "parentId": "srd521.subclass.fighter.champion",
+  "proposedRules": [
+    {
+      "automationLevel": "state-automated",
+      "id": "heroic-warrior-inspiration",
+      "parameters": {
+        "actionEconomy": "no-action",
+        "assistedInstructions": [
+          "At the start of your turn during combat, you may gain Heroic Inspiration if you do not already have it. No action or resource is spent. Combat and turn timing are manually declared.",
+          "This does not stack or transfer Inspiration, grant it outside combat, or replenish it immediately after spending it mid-turn. Wait for another eligible turn start. Spend Inspiration manually when using its reroll; the reroll itself remains assisted."
+        ],
+        "grantsHeroicInspiration": {
+          "requiresMissing": true,
+          "trigger": "start-of-turn-in-combat"
+        }
+      },
+      "target": "action.heroic-warrior",
+      "type": "grant-action",
+      "when": {
+        "kind": "equals",
+        "left": {
+          "kind": "ref",
+          "path": "state.heroicInspiration"
+        },
+        "right": {
+          "kind": "literal",
+          "value": false
+        }
+      }
+    }
+  ],
+  "review": {
+    "extraction": "approved",
+    "notes": [
+      "Combat and turn-start declarations are assisted; Inspiration is a traced state grant."
+    ],
+    "semantics": "needs-review",
+    "tests": "draft"
+  },
+  "schemaVersion": "0.1.0",
+  "source": [
+    {
+      "blocks": [
+        "p0049-b008"
+      ],
+      "page": 49,
+      "quoteHash": "f5062610f60f3cb1bbf51aca876ed364dc89f1cd189affc79145a00af19e4ea5",
+      "sourceId": "wotc-srd-5.2.1-en"
+    }
+  ],
+  "text": {
+    "nodes": [
+      {
+        "kind": "ParagraphNode",
+        "text": "The thrill of battle drives you toward victory. During combat, you can give yourself Heroic Inspiration whenever you start your turn without it."
+      }
+    ],
+    "title": "Heroic Warrior"
+  }
+}

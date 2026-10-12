@@ -343,6 +343,7 @@ export interface StateTransitionProposal {
 
 export interface ActionUseRequest {
   actionId: string;
+  turnStart?: { inCombat: boolean; startingTurn: boolean };
   targeting?: { count: number; eligibilityConfirmed: boolean };
   rolls?: number[];
   amount?: number;

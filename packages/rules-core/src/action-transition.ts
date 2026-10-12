@@ -3,6 +3,7 @@ import {
   failedSaveRerollSchema,
   savingThrowRerollSchema,
   resolvedActionTargetingSchema,
+  heroicInspirationGrantSchema,
 } from "@dnd/content-schema";
 
 import type { CalculationTrace, JsonValue } from "@dnd/calculation-trace";
@@ -21,6 +22,7 @@ import { deathSaveStatus } from "./death-saving-throws.js";
 const actionUseRequestSchema = z
   .object({
     actionId: z.string().min(1),
+    turnStart: z.object({ inCombat: z.boolean(), startingTurn: z.boolean() }).strict().optional(),
     targeting: z
       .object({ count: z.number().int().positive(), eligibilityConfirmed: z.boolean() })
       .strict()
@@ -206,6 +208,91 @@ export function proposeAction(
   }
 
   const reroll = savingThrowRerollSchema.safeParse(action?.parameters?.savingThrowReroll);
+  const inspiration = heroicInspirationGrantSchema.safeParse(
+    action?.parameters?.grantsHeroicInspiration,
+  );
+  if (request.turnStart !== undefined && !inspiration.success)
+    addValidation(
+      validations,
+      "ACTION_TURN_START_NOT_EXPECTED",
+      "This action does not accept a turn-start declaration.",
+      ["request.turnStart"],
+    );
+  if (action !== undefined && inspiration.success) {
+    if (!request.turnStart?.inCombat || !request.turnStart.startingTurn)
+      addValidation(
+        validations,
+        "ACTION_TURN_START_REQUIRED",
+        "Confirm you are starting your turn during combat.",
+        ["request.turnStart"],
+      );
+    if (character.state.heroicInspiration)
+      addValidation(
+        validations,
+        "HEROIC_INSPIRATION_ALREADY_HELD",
+        "You already have Heroic Inspiration; this feature cannot stack or transfer it.",
+        ["state.heroicInspiration"],
+      );
+    if (
+      request.rolls.length > 0 ||
+      request.amount !== undefined ||
+      request.targeting !== undefined ||
+      request.failedSave !== undefined ||
+      request.failedSavingThrow !== undefined ||
+      request.completedD20Test !== undefined
+    )
+      addValidation(
+        validations,
+        "HEROIC_INSPIRATION_CONTEXT_UNEXPECTED",
+        "This grant does not accept dice, spending, targets, or a completed test.",
+        ["request"],
+      );
+    if (
+      action.actionEconomy !== "no-action" ||
+      action.parameters?.resourceId !== undefined ||
+      action.parameters?.spends !== undefined ||
+      action.parameters?.variableSpend !== undefined
+    )
+      addValidation(
+        validations,
+        "HEROIC_INSPIRATION_COST_UNSUPPORTED",
+        "This grant requires no action and no resource cost.",
+        ["action.parameters"],
+      );
+    const applicable = validations.length === 0;
+    const nextState = cloneState(originalState);
+    const changes: StateChange[] = [];
+    const traces: Record<string, CalculationTrace> = {};
+    if (applicable) {
+      nextState.heroicInspiration = true;
+      recordChange(
+        changes,
+        traces,
+        "state.heroicInspiration",
+        originalState.heroicInspiration,
+        true,
+        "Declared start of turn during combat grants missing Heroic Inspiration.",
+        "grant-heroic-inspiration-at-turn-start",
+        [
+          request.turnStart?.inCombat ?? false,
+          request.turnStart?.startingTurn ?? false,
+          originalState.heroicInspiration,
+        ],
+        evaluation.traces[action.traceId],
+      );
+    }
+    const guidance = z.array(z.string()).safeParse(action.parameters?.assistedInstructions);
+    return {
+      kind: "action",
+      actionId: action.id,
+      applicable,
+      changes,
+      nextState,
+      validations,
+      traces,
+      ...(applicable && guidance.success ? { guidance: guidance.data } : {}),
+    };
+  }
   if (request.targeting !== undefined && action?.parameters?.targeting === undefined)
     addValidation(
       validations,

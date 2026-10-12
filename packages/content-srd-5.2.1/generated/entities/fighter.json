@@ -22,7 +22,7 @@
           "srd521.skill.survival"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 9,
+        "supportedLevelMaximum": 10,
         "supportedLevelMinimum": 1
       },
       "fightingStyleChoice": {
@@ -330,13 +330,15 @@
       "skillProficiencyChoice": {
         "countByLevel": {
           "1": 2,
+          "10": 2,
           "2": 2,
           "3": 2,
           "4": 2,
           "5": 2,
           "6": 2,
           "7": 2,
-          "8": 2
+          "8": 2,
+          "9": 2
         },
         "maximum": 2,
         "minimum": 2,

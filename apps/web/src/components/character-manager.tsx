@@ -40,6 +40,7 @@ import { DamageRiderControls } from "./damage-rider-controls";
 import { MovementCapabilities } from "./movement-capabilities";
 import { OnHitDamageControls } from "./on-hit-damage-controls";
 import { onHitDamageDefinition } from "../lib/on-hit-damage";
+import { heroicInspirationGrant, heroicInspirationTrigger } from "../lib/heroic-inspiration";
 import { spellDamageRollRequest } from "../lib/feature-damage-roll";
 import { spellProtectionInstructions } from "../lib/spell-protection";
 import {
@@ -160,6 +161,8 @@ interface TransitionResult {
 
 interface ActionDraft {
   amount: string;
+  inCombat?: boolean;
+  startingTurn?: boolean;
   targetCount?: string;
   targetsConfirmed?: boolean;
 }
@@ -241,6 +244,7 @@ function actionDisplayName(action: ActionSummary, names: ReadonlyMap<string, str
 }
 
 function supportsStateTransition(action: ActionSummary): boolean {
+  if (heroicInspirationGrant(action) !== undefined) return true;
   const parameters = objectValue(action.parameters);
   return (
     typeof parameters?.resourceId === "string" &&
@@ -1217,6 +1221,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
     try {
       const actionName = actionDisplayName(action, names);
+      const turnStart = heroicInspirationTrigger(
+        action,
+        draft.inCombat ?? false,
+        draft.startingTurn ?? false,
+      );
+      if (turnStart !== undefined) request.turnStart = turnStart;
       const targeting = actionTargetingRequest(
         action,
         draft.targetCount ?? "1",
@@ -1235,8 +1245,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       const effectDescription = objectValue(activatedEffect?.body)?.description;
       applyTransition(
         proposal,
-        `${actionName} applied (${String(proposal.changes.length)} changes). ${actionMovementMessage(action) ?? ""} ${typeof effectDescription === "string" ? effectDescription : ""} ${(proposal.guidance ?? []).join(" ")}`.trim(),
+        turnStart === undefined
+          ? `${actionName} applied (${String(proposal.changes.length)} changes). ${actionMovementMessage(action) ?? ""} ${typeof effectDescription === "string" ? effectDescription : ""} ${(proposal.guidance ?? []).join(" ")}`.trim()
+          : `${actionName}: Heroic Inspiration gained. No action or resource spent. ${(proposal.guidance ?? []).join(" ")}`,
       );
+      if (proposal.applicable && turnStart !== undefined)
+        updateActionDraft(action.id, { inCombat: false, startingTurn: false });
       if (
         requiresCompletedD20Test(action) &&
         previousRoll !== undefined &&
@@ -2601,11 +2615,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           <div
                             key={action.id}
                             className={
-                              savingThrowRerollDefinition(action)
-                                ? "saving-throw-reroll-card"
-                                : targeting === undefined
-                                  ? undefined
-                                  : "targeted-action-card"
+                              heroicInspirationGrant(action) !== undefined
+                                ? "heroic-inspiration-card"
+                                : savingThrowRerollDefinition(action)
+                                  ? "saving-throw-reroll-card"
+                                  : targeting === undefined
+                                    ? undefined
+                                    : "targeted-action-card"
                             }
                           >
                             <span>
@@ -2707,6 +2723,46 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                               }}
                             />
                             <div className="action-inputs">
+                              {heroicInspirationGrant(action) === undefined ? null : (
+                                <div className="heroic-inspiration-trigger">
+                                  <p>
+                                    Gain missing Heroic Inspiration · no action or resource cost.
+                                  </p>
+                                  <label>
+                                    <input
+                                      type="checkbox"
+                                      checked={draft.inCombat ?? false}
+                                      onChange={(event) => {
+                                        updateActionDraft(action.id, {
+                                          inCombat: event.target.checked,
+                                        });
+                                      }}
+                                    />
+                                    I am in combat
+                                  </label>
+                                  <label>
+                                    <input
+                                      type="checkbox"
+                                      checked={draft.startingTurn ?? false}
+                                      onChange={(event) => {
+                                        updateActionDraft(action.id, {
+                                          startingTurn: event.target.checked,
+                                        });
+                                      }}
+                                    />
+                                    I am starting my turn now
+                                  </label>
+                                  <button
+                                    type="button"
+                                    className="button secondary compact"
+                                    onClick={() => {
+                                      setSelectedTraceId(action.traceId);
+                                    }}
+                                  >
+                                    Explain trigger
+                                  </button>
+                                </div>
+                              )}
                               {requirements.rollDiceCount === undefined ||
                               requirements.rollDiceSize === undefined ? null : (
                                 <button
@@ -2795,6 +2851,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   disabled={
                                     !action.available ||
                                     diceRolling ||
+                                    (heroicInspirationGrant(action) !== undefined &&
+                                      (!draft.inCombat || !draft.startingTurn)) ||
                                     (requiresCompletedD20Test(action) &&
                                       !canApplyPostRollBonus(action, latestRoll))
                                   }
@@ -2802,7 +2860,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                     void useAction(action);
                                   }}
                                 >
-                                  {transitionDice === undefined ? "Use" : "Use & roll"}
+                                  {heroicInspirationGrant(action) !== undefined
+                                    ? "Gain Inspiration"
+                                    : transitionDice === undefined
+                                      ? "Use"
+                                      : "Use & roll"}
                                 </button>
                               ) : null}
                             </div>

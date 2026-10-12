@@ -56,7 +56,7 @@ describe("Fighter level 9 and source-driven failed-save rerolls", () => {
       expect.arrayContaining([expect.objectContaining({ page: 48 })]),
     );
     expect(levelUpEligibility(character, catalog)).toMatchObject({
-      eligible: false,
+      eligible: true,
       currentLevel: 9,
     });
   });

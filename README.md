@@ -83,6 +83,11 @@ Expertise, spell and preparation additions, the reviewed level-3 subclass, and t
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
 same-class advancement for all twelve SRD classes through level 8.
+All twelve now reach level 9, and Fighter reaches level 10. Champion's Heroic Warrior
+appears in Play → Use a feature: confirm combat and the start of your turn to gain missing
+Heroic Inspiration. The grant is traced, persisted, and undoable; it cannot stack Inspiration.
+Fighter level 10 also grants four Second Wind uses and five Weapon Mastery choices.
+Turn timing and spending Inspiration for a reroll remain manually adjudicated.
 Fighter additionally reaches level 9: Indomitable spends a Long Rest use to reroll a declared
 failed save with a Fighter-level bonus, and Tactical Master offers per-attack mastery replacement
 guidance. Save results and target effects remain manually adjudicated.
@@ -335,7 +340,7 @@ Improvement and Fighting Styles on pages 87–88:
 
 This parser validates all 20 progression rows, reconciles every feature reference, extracts the
 Champion subclass and all four SRD Fighting Styles, and generates draft authoring IR for the
-supported Fighter features. Fighter choices and progression currently reach level 8.
+supported Fighter features. Fighter choices and progression currently reach level 10.
 
 Generate the source-linked Light, Two-Handed, and Versatile damage modes:
 

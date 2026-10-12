@@ -16,6 +16,10 @@ export type JsonScalar = z.infer<typeof jsonScalarSchema>;
 export type EntityId = z.infer<typeof entityIdSchema>;
 export type FactPath = z.infer<typeof factPathSchema>;
 
+export const heroicInspirationGrantSchema = z
+  .object({ trigger: z.literal("start-of-turn-in-combat"), requiresMissing: z.literal(true) })
+  .strict();
+
 export const onHitExtraDamageSchema = z
   .object({
     diceSize: z.number().int().positive(),

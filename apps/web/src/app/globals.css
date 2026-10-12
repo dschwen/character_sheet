@@ -937,6 +937,7 @@ button.vital-card:hover {
   font-size: 10px;
 }
 .play-action-list > .saving-throw-reroll-card,
+.play-action-list > .heroic-inspiration-card,
 .play-action-list > .targeted-action-card {
   display: grid;
   align-items: start;
@@ -2850,4 +2851,21 @@ button.builder-choice:disabled {
 
 .on-hit-damage-inputs input[type="checkbox"] {
   margin-top: 3px;
+}
+.heroic-inspiration-trigger {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.heroic-inspiration-trigger label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.heroic-inspiration-trigger p {
+  margin: 0;
+  font-size: 13px;
 }
