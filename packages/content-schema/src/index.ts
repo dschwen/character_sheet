@@ -465,6 +465,18 @@ export const classFeatureChoiceSchema = z
 
 export const failedSaveRerollSchema = z.object({ bonusFact: z.string().min(1) }).strict();
 
+export const movementCapabilitySchema = z
+  .object({
+    id: entityIdSchema,
+    surfaces: z.array(z.enum(["vertical-surfaces", "liquids"])).min(1),
+    requiresNoArmor: z.boolean().default(false),
+    requiresNoShield: z.boolean().default(false),
+    ownTurnOnly: z.boolean().default(false),
+    preventsFallingDuringMovement: z.boolean().default(false),
+    instructions: z.array(z.string().min(1)).default([]),
+  })
+  .strict();
+
 export const actionTargetingSchema = z
   .object({
     maximumFact: factPathSchema,
@@ -689,6 +701,7 @@ export const featureAutomationBodySchema = z
       )
       .default([]),
     unarmedStrikeDamageTypes: z.array(z.string().min(1)).default([]),
+    movementCapabilities: z.array(movementCapabilitySchema).default([]),
     spellHealingEffects: z
       .array(
         z

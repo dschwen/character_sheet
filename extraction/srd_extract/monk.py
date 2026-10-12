@@ -271,6 +271,30 @@ def _feature_entity(feature: dict[str, Any], kind: str) -> dict[str, Any]:
                 ],
             }
         )
+    if feature["name"] == "Acrobatic Movement":
+        entity["body"].update(
+            {
+                "automationLevel": "sheet-automated",
+                "movementCapabilities": [
+                    {
+                        "id": "srd521.movement.acrobatic-movement",
+                        "surfaces": ["vertical-surfaces", "liquids"],
+                        "requiresNoArmor": True,
+                        "requiresNoShield": True,
+                        "ownTurnOnly": True,
+                        "preventsFallingDuringMovement": True,
+                        "instructions": [
+                            "On your turn, you can move along vertical surfaces and across "
+                            "liquids without falling during that movement.",
+                            "This uses your existing movement; it grants no separate movement "
+                            "budget, Climb Speed, Swim Speed, or ability to fly.",
+                            "The protection is during movement only. Resolve what supports "
+                            "you when you stop, and any falling or sinking, with the DM.",
+                        ],
+                    }
+                ],
+            }
+        )
     return entity
 
 
@@ -339,12 +363,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 2 for level in range(1, 9)},
+                "countByLevel": {str(level): 2 for level in range(1, 10)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 8,
+                "supportedLevelMaximum": 9,
                 "defaultAbilityScores": {
                     "strength": 8,
                     "dexterity": 15,

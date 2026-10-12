@@ -17,7 +17,7 @@
           "srd521.skill.insight"
         ],
         "defaultGrantedFeatIds": [],
-        "supportedLevelMaximum": 8,
+        "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
       "conditionalWeaponProficiencies": [
@@ -419,7 +419,8 @@
           "5": 2,
           "6": 2,
           "7": 2,
-          "8": 2
+          "8": 2,
+          "9": 2
         },
         "maximum": 2,
         "minimum": 2,
@@ -1015,7 +1016,26 @@
   },
   {
     "body": {
+      "automationLevel": "sheet-automated",
       "level": 9,
+      "movementCapabilities": [
+        {
+          "id": "srd521.movement.acrobatic-movement",
+          "instructions": [
+            "On your turn, you can move along vertical surfaces and across liquids without falling during that movement.",
+            "This uses your existing movement; it grants no separate movement budget, Climb Speed, Swim Speed, or ability to fly.",
+            "The protection is during movement only. Resolve what supports you when you stop, and any falling or sinking, with the DM."
+          ],
+          "ownTurnOnly": true,
+          "preventsFallingDuringMovement": true,
+          "requiresNoArmor": true,
+          "requiresNoShield": true,
+          "surfaces": [
+            "vertical-surfaces",
+            "liquids"
+          ]
+        }
+      ],
       "text": "While you aren’t wearing armor or wielding a Shield, you gain the ability to move along vertical surfaces and across liquids on your turn without falling during the movement."
     },
     "id": "srd521.class-feature.monk.acrobatic-movement",

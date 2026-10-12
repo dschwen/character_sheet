@@ -2,6 +2,7 @@ import pytest
 
 from srd_extract.monk import (
     MonkProgressionRow,
+    _class_entity,
     _feature_entity,
     _starting_equipment,
     _wholeness_ir,
@@ -58,6 +59,43 @@ def test_wholeness_uses_progression_die_and_separate_long_rest_resource() -> Non
         "bonusFact": "ability.wisdom.modifier",
         "minimum": 1,
     }
+
+
+def test_acrobatic_movement_retains_source_and_does_not_grant_a_speed() -> None:
+    source = [{"page": 51, "sourceId": "wotc-srd-5.2.1-en", "blocks": ["p0051-b001"]}]
+    entity = _feature_entity(
+        {
+            "id": "srd521.class-feature.monk.acrobatic-movement",
+            "name": "Acrobatic Movement",
+            "level": 9,
+            "source": source,
+            "bodyNodes": [
+                {"normalizedText": "Move along vertical surfaces and across liquids on your turn."}
+            ],
+        },
+        "class-feature",
+    )
+    assert entity["source"] == source
+    assert entity["body"]["level"] == 9
+    capability = entity["body"]["movementCapabilities"][0]
+    assert capability["surfaces"] == ["vertical-surfaces", "liquids"]
+    assert capability["requiresNoArmor"] is True
+    assert capability["requiresNoShield"] is True
+    assert capability["ownTurnOnly"] is True
+    assert capability["preventsFallingDuringMovement"] is True
+    assert "when you stop" in " ".join(capability["instructions"])
+    assert "speedOverrides" not in entity["body"]
+    assert entity["review"]["semanticsApproved"] is False
+
+
+def test_level_nine_progression_uses_d8_nine_focus_and_fifteen_foot_bonus() -> None:
+    row = MonkProgressionRow(9, 4, ("Acrobatic Movement",), 8, 9, 15)
+    body = _class_entity({"skillProficiencyChoice": {}}, (row,), (), [])["body"]
+    assert body["builder"]["supportedLevelMaximum"] == 9
+    assert body["skillProficiencyChoice"]["countByLevel"]["9"] == 2
+    assert body["progression"][0]["martialArtsDie"] == {"diceCount": 1, "diceSize": 8}
+    assert body["progression"][0]["focusPoints"] == 9
+    assert body["progression"][0]["unarmoredMovement"] == 15
 
 
 def test_parse_core_monk_traits() -> None:

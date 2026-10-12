@@ -381,7 +381,7 @@ describe("bootstrap content package", () => {
       },
     });
     expect(metadata.find(({ id }) => id === "srd521.class.monk")?.builder).toMatchObject({
-      supportedLevelMaximum: 8,
+      supportedLevelMaximum: 9,
       defaultAbilityScoreImprovementAbility: "dexterity",
       defaultClassSkillIds: ["srd521.skill.acrobatics", "srd521.skill.insight"],
     });

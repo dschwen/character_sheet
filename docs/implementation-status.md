@@ -116,7 +116,13 @@ unfinished. See `docs/rules-engine/paladin-level-9.md`.
 The production-export smoke check passed creation, target declarations, spending/exhaustion,
 reload persistence, and desktop/narrow layouts for this Paladin flow. It does not establish
 the broader browser/accessibility or independent semantic review gates.
-Monk and Rogue remain at level 8. See
+Monk also reaches level 9 with nine Focus Points and source-driven Acrobatic Movement.
+Overview and Play show equipment/Speed eligibility, current adjusted Speed, and turn/stopping
+limits. It grants no independent movement budget or permanent Climb/Swim/Fly Speeds.
+Armor, shields, and zero Speed block use; Focus and Evasion remain independent.
+The production-export smoke check passed builder creation, Overview/Play display, source
+inspection, Grappled eligibility changes, reload persistence, and desktop/narrow layouts.
+See `docs/rules-engine/monk-level-9.md`. Rogue remains at level 8. See
 `docs/rules-engine/fighter-level-9.md`; browser verification and independent review are pending.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside

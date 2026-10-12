@@ -106,6 +106,10 @@ Beacon of Hope and Dispel Magic. Play → Use a feature offers Abjure Foes: decl
 within 60 feet, spend one shared Channel Divinity use, and resolve their Wisdom saves on their
 own sheets. Its target limit and save DC use current Charisma. Paladin's one-spell preparation
 replacement limit per Long Rest is also not yet enforced.
+Monk also reaches level 9 with nine Focus Points, d8 Martial Arts, and Acrobatic Movement.
+Overview and Play show its equipment-aware eligibility and current Speed. It permits movement
+along vertical surfaces and across liquids on your turn, not permanent Climb/Swim/Fly Speeds.
+Positioning, remaining movement, and stopping or falling remain manually adjudicated.
 Play also supports fullscreen Death Saving Throws. Apply the final result only after any reroll
 decision; natural 1/20 results, successes/failures, stabilization, and regained HP are resolved on
 the sheet. Declare first aid and turn timing manually. Ordinary healing cannot revive the dead.

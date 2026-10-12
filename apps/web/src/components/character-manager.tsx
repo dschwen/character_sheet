@@ -37,6 +37,7 @@ import {
   actionInstructions,
 } from "../lib/action-targeting";
 import { DamageRiderControls } from "./damage-rider-controls";
+import { MovementCapabilities } from "./movement-capabilities";
 import { spellDamageRollRequest } from "../lib/feature-damage-roll";
 import { spellProtectionInstructions } from "../lib/spell-protection";
 import {
@@ -2535,6 +2536,19 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   })}
                 </Section>
 
+                {(evaluation.movementCapabilities?.length ?? 0) === 0 ? null : (
+                  <Section
+                    title="Movement capabilities"
+                    eyebrow="Equipment-aware · assisted positioning"
+                  >
+                    <MovementCapabilities
+                      capabilities={evaluation.movementCapabilities ?? []}
+                      onExplain={(traceId) => {
+                        setSelectedTraceId(traceId);
+                      }}
+                    />
+                  </Section>
+                )}
                 {(evaluation.attackDamageRiders?.length ?? 0) === 0 ? null : (
                   <Section title="Damage riders" eyebrow="After an eligible hit">
                     {evaluation.attackDamageRiders?.map((rider) => (
@@ -3127,6 +3141,19 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   </div>
                 </Section>
 
+                {(evaluation.movementCapabilities?.length ?? 0) === 0 ? null : (
+                  <Section
+                    title="Movement capabilities"
+                    eyebrow="Equipment-aware · assisted positioning"
+                  >
+                    <MovementCapabilities
+                      capabilities={evaluation.movementCapabilities ?? []}
+                      onExplain={(traceId) => {
+                        setSelectedTraceId(traceId);
+                      }}
+                    />
+                  </Section>
+                )}
                 <Section title="At a glance" eyebrow="Defenses & senses">
                   <dl className="fact-list">
                     <div>

@@ -1027,6 +1027,31 @@ button.vital-card:hover {
   font-size: 13px;
   color: var(--green);
 }
+.movement-capability-list {
+  display: grid;
+  gap: 12px;
+}
+.movement-capability {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fbfaf6;
+}
+.movement-capability h3,
+.movement-capability p {
+  margin: 0;
+}
+.movement-capability p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.movement-capability-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .action-guidance .builder-callout {
   margin: 10px 0 0;
   font-size: 13px;

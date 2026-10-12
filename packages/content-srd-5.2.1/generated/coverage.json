@@ -36,7 +36,7 @@
       "name": "Fighter"
     },
     {
-      "builderMaximum": 8,
+      "builderMaximum": 9,
       "builderMinimum": 1,
       "id": "srd521.class.monk",
       "name": "Monk"

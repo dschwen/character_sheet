@@ -449,6 +449,7 @@ export interface SpellSlotRecoverySummary {
 }
 
 export interface CharacterEvaluation {
+  movementCapabilities?: MovementCapabilitySummary[];
   attackDamageRiders?: AttackDamageRiderSummary[];
   savingThrowDamageEffects?: SavingThrowDamageEffectSummary[];
   spellProtections?: SpellProtectionSummary[];
@@ -481,6 +482,21 @@ export interface SavingThrowDamageEffectSummary {
   failureFraction: number;
   active: boolean;
   reasons: string[];
+  traceId: string;
+}
+
+export interface MovementCapabilitySummary {
+  id: string;
+  sourceId: string;
+  sourceName: string;
+  surfaces: ("vertical-surfaces" | "liquids")[];
+  ownTurnOnly: boolean;
+  preventsFallingDuringMovement: boolean;
+  instructions: string[];
+  available: boolean;
+  reasons: string[];
+  walkingSpeed: number;
+  speedTraceId: string;
   traceId: string;
 }
 

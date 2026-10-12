@@ -43,6 +43,7 @@ import type {
   ProficiencyEntry,
   ProficiencyLevel,
   ResourceInstance,
+  MovementCapabilitySummary,
   SpellcastingSummary,
   SpellSummary,
   ValidationMessage,
@@ -3308,6 +3309,85 @@ function evaluateWalkingSpeed(
       ...state.traces[classBonusTraceId].sourceReferences,
     ],
   };
+}
+
+function evaluateMovementCapabilities(
+  granted: ReadonlySet<string>,
+  index: PackageIndex,
+  state: EngineState,
+): MovementCapabilitySummary[] {
+  const speed = state.values["speed.walking"];
+  const walkingSpeed = typeof speed?.value === "number" ? speed.value : 0;
+  const wearingArmor = state.facts["equipment.wearingArmor"] === true;
+  const wieldingShield = state.facts["equipment.wieldingShield"] === true;
+  return [...granted].flatMap((sourceId) => {
+    const entity = index.entities.get(sourceId);
+    const parsed = featureAutomationBodySchema.safeParse(entity?.body);
+    if (entity === undefined || !parsed.success) return [];
+    return parsed.data.movementCapabilities.map((capability) => {
+      const reasons = [
+        ...(capability.requiresNoArmor && wearingArmor
+          ? ["Wearing armor prevents this movement capability."]
+          : []),
+        ...(capability.requiresNoShield && wieldingShield
+          ? ["Wielding a Shield prevents this movement capability."]
+          : []),
+        ...(walkingSpeed <= 0 ? ["Current walking Speed permits no movement."] : []),
+      ];
+      const available = reasons.length === 0;
+      const traceId = `${sourceId}.${capability.id}.available`;
+      state.facts[traceId] = available;
+      state.traces[traceId] = {
+        id: traceId,
+        result: available,
+        nodes: [
+          {
+            id: `${traceId}.eligibility`,
+            operation: "evaluate-movement-capability-eligibility",
+            inputs: [
+              capability.requiresNoArmor,
+              wearingArmor,
+              capability.requiresNoShield,
+              wieldingShield,
+              walkingSpeed,
+            ],
+            output: available,
+            label:
+              "Equipment and final Speed eligibility; turn timing and remaining movement are manually declared.",
+          },
+          {
+            id: `${traceId}.scope`,
+            operation: "describe-movement-capability-scope",
+            inputs: [
+              capability.surfaces,
+              capability.ownTurnOnly,
+              capability.preventsFallingDuringMovement,
+            ],
+            output: capability.surfaces,
+            label: "Does not grant an independent movement budget or a Climb, Swim, or Fly Speed.",
+          },
+        ],
+        sourceReferences: [
+          ...entitySourceReferences(entity),
+          ...(state.traces[speed?.traceId ?? ""]?.sourceReferences ?? []),
+        ],
+      };
+      return {
+        id: capability.id,
+        sourceId,
+        sourceName: entity.name.en ?? sourceId,
+        surfaces: capability.surfaces,
+        ownTurnOnly: capability.ownTurnOnly,
+        preventsFallingDuringMovement: capability.preventsFallingDuringMovement,
+        instructions: capability.instructions,
+        available,
+        reasons,
+        walkingSpeed,
+        speedTraceId: speed?.traceId ?? "speed.walking",
+        traceId,
+      };
+    });
+  });
 }
 
 function evaluateFeatureSaveDifficultyClass(
@@ -7578,6 +7658,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateD20Minimums(granted, index, state);
   evaluateGrantedActionEnhancements(granted, index, state);
   evaluateActionMovement(state);
+  const movementCapabilities = evaluateMovementCapabilities(granted, index, state);
   validateConcentration(character, index, state);
   validateActiveState(character, state);
   const savingThrowDamageEffects = [...granted].flatMap((sourceId) => {
@@ -7627,6 +7708,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     }));
   return {
     facts: state.facts,
+    movementCapabilities,
     attackDamageRiders,
     savingThrowDamageEffects,
     savingThrowAuras: savingThrowAuras.auras,
