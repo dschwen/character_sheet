@@ -32938,6 +32938,7 @@
         "defaultGrantedFeatIds": [],
         "expertiseChoice": {
           "countByLevel": {
+            "10": 4,
             "2": 2,
             "3": 2,
             "4": 2,
@@ -32971,7 +32972,7 @@
           "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.bard.expertise"
         },
-        "supportedLevelMaximum": 9,
+        "supportedLevelMaximum": 10,
         "supportedLevelMinimum": 1
       },
       "cantripChange": {
@@ -32979,6 +32980,16 @@
         "replacementMaximum": 1
       },
       "hitPointDie": 8,
+      "preparedSpellListExpansion": {
+        "minimumLevel": 10,
+        "minimumSpellLevel": 1,
+        "sourceClassIds": [
+          "srd521.class.cleric",
+          "srd521.class.druid",
+          "srd521.class.wizard"
+        ],
+        "sourceFeatureId": "srd521.class-feature.bard.magical-secrets"
+      },
       "primaryAbilities": [
         "charisma"
       ],
@@ -33447,6 +33458,7 @@
       "skillProficiencyChoice": {
         "countByLevel": {
           "1": 3,
+          "10": 6,
           "2": 3,
           "3": 6,
           "4": 6,

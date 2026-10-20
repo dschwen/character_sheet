@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { preparedSpellLists } from "./prepared-spell-lists.js";
 import { validateFeatureOptionChoices, validFeatureOptionIds } from "./feature-option-choices.js";
 
 import type {
@@ -4728,7 +4729,44 @@ function evaluateSpellcasting(
   }
 
   const spellList = new Set(classBody.spellList);
+  const preparedLists = preparedSpellLists(classEntity, classLevel, [...index.entities.values()]);
+  const preparedSpellList = new Set(preparedLists.preparedSpellIds);
   const selectedPrepared = new Set(character.loadout.preparedSpellIds);
+  const expandedCount = [...selectedPrepared].filter(
+    (id) => !spellList.has(id) && preparedSpellList.has(id),
+  ).length;
+  if (expandedCount > preparedLists.maximumExpandedSelections) {
+    addValidation(
+      state,
+      "EXPANDED_PREPARED_SPELL_LIMIT",
+      `Choose no more than ${String(preparedLists.maximumExpandedSelections)} off-list preparations acquired through new selections and level-up replacements.`,
+      ["loadout.preparedSpellIds"],
+    );
+  }
+  if (preparedLists.sourceFeatureId !== undefined) {
+    const feature = index.entities.get(preparedLists.sourceFeatureId);
+    const traceId = `spellcasting.${classSlug}.expandedPreparations`;
+    state.values[traceId] = { value: preparedLists.maximumExpandedSelections, traceId };
+    state.traces[traceId] = {
+      id: traceId,
+      result: preparedLists.maximumExpandedSelections,
+      nodes: [
+        {
+          id: `${traceId}.limit`,
+          operation: "prepared-list-growth-plus-level-up-replacements",
+          inputs: [
+            preparedLists.calculation.preparedNow,
+            preparedLists.calculation.preparedBeforeExpansion,
+            preparedLists.calculation.levelsWithExpansion,
+            preparedLists.calculation.replacementsPerLevel,
+          ],
+          output: preparedLists.maximumExpandedSelections,
+          label: `Preparation growth plus level-up replacements; ${String(expandedCount)} off-list preparations currently selected.`,
+        },
+      ],
+      sourceReferences: [...classSources, ...(feature ? entitySourceReferences(feature) : [])],
+    };
+  }
   const learned = new Set(character.build.learnedSpellIds);
   const subclass =
     character.build.subclassId === undefined
@@ -4865,7 +4903,7 @@ function evaluateSpellcasting(
       continue;
     }
     const body = spellBodySchema.parse(entity.body);
-    if (!spellList.has(spellId)) {
+    if (!preparedSpellList.has(spellId)) {
       addValidation(
         state,
         `SPELL_NOT_ON_${classCode}_LIST`,

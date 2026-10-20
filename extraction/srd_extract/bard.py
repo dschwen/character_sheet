@@ -439,12 +439,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 10)},
+                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 11)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 9,
+                "supportedLevelMaximum": 10,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -468,13 +468,23 @@ def _class_entity(
                     "minimumLevel": 2,
                     "requireClassProficiency": False,
                     "eligibleSkillIds": all_skills,
-                    "countByLevel": {str(level): 2 if level < 9 else 4 for level in range(2, 10)},
+                    "countByLevel": {str(level): 2 if level < 9 else 4 for level in range(2, 11)},
                 },
             },
             "spellcastingAbility": "charisma",
             "spellPreparation": "full-list",
             "spellPreparationChange": {"event": "level-up", "replacementMaximum": 1},
             "cantripChange": {"event": "level-up", "replacementMaximum": 1},
+            "preparedSpellListExpansion": {
+                "sourceFeatureId": "srd521.class-feature.bard.magical-secrets",
+                "minimumLevel": 10,
+                "minimumSpellLevel": 1,
+                "sourceClassIds": [
+                    "srd521.class.cleric",
+                    "srd521.class.druid",
+                    "srd521.class.wizard",
+                ],
+            },
             "alwaysPreparedSpells": {},
             "spellList": [
                 entry["id"]
@@ -751,6 +761,11 @@ def generate_bard_content(class_root: Path, spell_root: Path, output: Path) -> d
     traits = parse_core_traits(core["normalizedText"], equipment["normalizedText"])
     progression = parse_progression(raw)
     features = extract_features(document)
+    secrets = next(feature for feature in features if feature["name"] == "Magical Secrets")
+    secrets_text = " ".join(node["normalizedText"] for node in secrets["bodyNodes"])
+    for phrase in ["new prepared spells", "Bard, Cleric,", "Druid, and Wizard", "replace"]:
+        if phrase not in secrets_text:
+            raise ValueError(f"Magical Secrets source is missing {phrase}")
     lore = extract_lore_features(document)
     spell_list = parse_spell_list(document)
     spells = extract_spell_entities(spell_document, spell_list)

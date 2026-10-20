@@ -83,7 +83,12 @@ Expertise, spell and preparation additions, the reviewed level-3 subclass, and t
 Score Improvement. It previews the complete rules evaluation before saving and preserves identity,
 inventory, currency, current Hit Points, conditions, and expended resources. This phase supports
 same-class advancement for all twelve SRD classes through level 8.
-All twelve now reach level 9; Fighter and Barbarian reach level 10. Berserker's Retaliation
+All twelve now reach level 9; Fighter, Barbarian, and Bard reach level 10. Bard's Magical
+Secrets expands level-1+ preparation choices to the Cleric, Druid, and Wizard lists. At level 10,
+choose one new preparation and optionally replace one existing spell; the other preparations
+stay on the Bard list. Cantrips remain Bard-only, while Lore's two always-prepared Discoveries
+are separate. Bardic Inspiration and Cutting Words become d10; learn a fourth Bard cantrip.
+Berserker's Retaliation
 appears in Play → Use a feature. Declare damage from a creature within 5 feet and an available
 Reaction, then roll one melee weapon or Unarmed Strike attack against that creature, with
 normal/critical damage controls. Rage is not required. Reaction use and target damage are manual.

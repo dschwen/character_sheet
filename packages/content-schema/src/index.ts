@@ -16,6 +16,15 @@ export type JsonScalar = z.infer<typeof jsonScalarSchema>;
 export type EntityId = z.infer<typeof entityIdSchema>;
 export type FactPath = z.infer<typeof factPathSchema>;
 
+export const preparedSpellListExpansionSchema = z
+  .object({
+    sourceFeatureId: entityIdSchema,
+    minimumLevel: z.number().int().min(1).max(20),
+    minimumSpellLevel: z.literal(1),
+    sourceClassIds: z.array(entityIdSchema).min(1),
+  })
+  .strict();
+
 export const reactionAttackSchema = z
   .object({
     trigger: z.literal("damaged-by-creature"),

@@ -1,7 +1,7 @@
 import { characterDocumentSchema, type CharacterDocument } from "@dnd/character-model";
 import { classFeatureChoiceSchema } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
-import { evaluateCharacter } from "@dnd/rules-core";
+import { evaluateCharacter, preparedSpellLists } from "@dnd/rules-core";
 
 export type SpellPreparationMode = "spellbook" | "full-list";
 
@@ -141,7 +141,9 @@ export function spellPreparationEditor(
   const alwaysPrepared = new Set(alwaysPreparedSpellIds);
   const selected = new Set(character.loadout.preparedSpellIds);
   const eligibleSpellIds = new Set([
-    ...(mode === "spellbook" ? character.build.learnedSpellIds : stringArray(classBody?.spellList)),
+    ...(mode === "spellbook"
+      ? character.build.learnedSpellIds
+      : preparedSpellLists(classEntity, classLevel, rulesPackage.entities).preparedSpellIds),
     ...alwaysPreparedSpellIds,
   ]);
   const options = rulesPackage.entities

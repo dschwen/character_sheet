@@ -758,6 +758,14 @@ export function CharacterLevelUp({
 
               {spellcasting === undefined || spellCounts === undefined ? null : (
                 <>
+                  {spellCounts.maximumExpandedSelections > 0 ? (
+                    <p className="builder-callout">
+                      Expanded spell lists apply to new preparations and permitted replacements. At
+                      most {String(spellCounts.maximumExpandedSelections)} off-list preparations are
+                      available in total; earlier choices remain subject to the normal replacement
+                      limit. Cantrips remain on your class list.
+                    </p>
+                  ) : null}
                   {[
                     {
                       label: "Cantrips",
@@ -877,6 +885,7 @@ export function CharacterLevelUp({
                           .filter(
                             (spell) =>
                               spell.level > 0 &&
+                              spellCounts.eligiblePreparedSpellIds.includes(spell.id) &&
                               spell.level <= spellCounts.maximumSpellLevel &&
                               !spellCounts.alwaysPreparedSpellIds.includes(spell.id) &&
                               (spellcasting.preparation === "full-list" ||

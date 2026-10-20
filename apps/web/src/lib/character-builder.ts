@@ -9,7 +9,7 @@ import {
   type StartingEquipmentOption,
 } from "@dnd/content-schema";
 import type { CharacterEvaluation, LoadedRulesPackage } from "@dnd/rules-api";
-import { evaluateCharacter } from "@dnd/rules-core";
+import { evaluateCharacter, preparedSpellLists } from "@dnd/rules-core";
 
 import { abilities, type Ability, shortEntityName, titleCase } from "./presentation";
 import { asiIncreases, asiOptions } from "./ability-score-improvements";
@@ -257,6 +257,8 @@ export interface SpellSelectionCounts {
   preparedSpells: number;
   maximumSpellLevel: number;
   alwaysPreparedSpellIds: string[];
+  eligiblePreparedSpellIds: string[];
+  maximumExpandedSelections: number;
 }
 
 export interface ClassSpellcastingCatalog {
@@ -271,6 +273,7 @@ export interface ClassSpellcastingCatalog {
     replacementMaximum: number;
   };
   spells: SpellOption[];
+  baseSpellIds: string[];
   countsByLevel: Readonly<Record<number, SpellSelectionCounts>>;
 }
 
@@ -439,7 +442,7 @@ function classCatalog(
   const skillChoice = objectValue(classBody?.skillProficiencyChoice);
   const options = skillChoice?.options;
   const progression = Array.isArray(classBody?.progression) ? classBody.progression : undefined;
-  if (!Array.isArray(options) || progression === undefined) {
+  if (classEntity === undefined || !Array.isArray(options) || progression === undefined) {
     throw new Error(`${shortEntityName(classId)} builder metadata is missing.`);
   }
   const startingEquipment = startingEquipmentChoiceSchema.safeParse(classBody?.startingEquipment);
@@ -615,6 +618,7 @@ function classCatalog(
         .map((row) => {
           const level = row.level as number;
           const slots = objectValue(row.spellSlots);
+          const preparedLists = preparedSpellLists(classEntity, level, rulesPackage.entities);
           return [
             level,
             {
@@ -629,6 +633,8 @@ function classCatalog(
                 ...spellsGrantedThroughLevel(classBody?.alwaysPreparedSpells, level),
                 ...spellsGrantedThroughLevel(subclassAlwaysPrepared, level),
               ],
+              eligiblePreparedSpellIds: preparedLists.preparedSpellIds,
+              maximumExpandedSelections: preparedLists.maximumExpandedSelections,
             },
           ];
         }),
@@ -637,7 +643,12 @@ function classCatalog(
       0,
       ...Object.values(countsByLevel).map((counts) => counts.maximumSpellLevel),
     );
-    const allowedSpells = new Set(stringArray(spellList));
+    const expanded = preparedSpellLists(
+      classEntity,
+      builder.data.supportedLevelMaximum,
+      rulesPackage.entities,
+    );
+    const allowedSpells = new Set(expanded.preparedSpellIds);
     const spells = rulesPackage.entities
       .filter((candidate) => candidate.kind === "spell" && allowedSpells.has(candidate.id))
       .map((spell) => {
@@ -672,6 +683,7 @@ function classCatalog(
           }
         : {}),
       spells,
+      baseSpellIds: stringArray(spellList),
       countsByLevel,
     };
   }
@@ -1922,7 +1934,17 @@ function spellSelections(
     .filter((spell) => spell.level === 0)
     .map((spell) => spell.id);
   const leveledCandidates = spellcasting.spells
-    .filter((spell) => spell.level > 0 && spell.level <= counts.maximumSpellLevel)
+    .filter(
+      (spell) =>
+        spell.level > 0 &&
+        spell.level <= counts.maximumSpellLevel &&
+        counts.eligiblePreparedSpellIds.includes(spell.id),
+    )
+    .sort(
+      (left, right) =>
+        Number(!spellcasting.baseSpellIds.includes(left.id)) -
+        Number(!spellcasting.baseSpellIds.includes(right.id)),
+    )
     .map((spell) => spell.id);
   const cantrips = fillSelections(
     draft.learnedSpellIds.filter((id) => cantripCandidates.includes(id)),
@@ -2466,7 +2488,12 @@ export function validateBuilderDraft(
         ? new Set(draft.learnedSpellIds)
         : new Set(
             spellcasting.spells
-              .filter((spell) => spell.level > 0 && spell.level <= counts.maximumSpellLevel)
+              .filter(
+                (spell) =>
+                  spell.level > 0 &&
+                  spell.level <= counts.maximumSpellLevel &&
+                  counts.eligiblePreparedSpellIds.includes(spell.id),
+              )
               .map((spell) => spell.id),
           );
     if (
@@ -2480,6 +2507,14 @@ export function validateBuilderDraft(
       )
     ) {
       issues.push(`Prepare exactly ${String(counts.preparedSpells)} ${selectedClass.name} spells.`);
+    }
+    if (
+      draft.preparedSpellIds.filter((id) => !spellcasting.baseSpellIds.includes(id)).length >
+      counts.maximumExpandedSelections
+    ) {
+      issues.push(
+        `Choose no more than ${String(counts.maximumExpandedSelections)} off-list preparations from new selections and level-up replacements.`,
+      );
     }
   }
   return issues;

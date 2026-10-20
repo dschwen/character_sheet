@@ -72,6 +72,8 @@ describe("guided character builder", () => {
       cantrips: 0,
       learnedLeveledSpells: 0,
       preparedSpells: 6,
+      eligiblePreparedSpellIds: catalog.classes[paladinId].spellcasting?.baseSpellIds,
+      maximumExpandedSelections: 0,
       maximumSpellLevel: 2,
       alwaysPreparedSpellIds: [
         "srd521.spell.divine-smite",
@@ -291,6 +293,8 @@ describe("guided character builder", () => {
       cantrips: 4,
       learnedLeveledSpells: 14,
       preparedSpells: 9,
+      eligiblePreparedSpellIds: catalog.classes[wizardId].spellcasting?.baseSpellIds,
+      maximumExpandedSelections: 0,
       maximumSpellLevel: 3,
       alwaysPreparedSpellIds: [],
     });

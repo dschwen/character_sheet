@@ -274,8 +274,8 @@ export function CharacterBuilder({
           <span>
             <strong>Create an adventurer</strong>
             <small>
-              {builderClassIds.map((classId) => catalog.classes[classId].name).join(" & ")} · levels
-              1–5
+              {selectedClass.name} · levels {String(selectedClass.builder.supportedLevelMinimum)}–
+              {String(selectedClass.builder.supportedLevelMaximum)}
             </small>
           </span>
         </div>
@@ -1094,6 +1094,14 @@ export function CharacterBuilder({
                 );
               })}
               <div className="spell-choice-section prepared-choice-section">
+                {spellCounts.maximumExpandedSelections > 0 ? (
+                  <p className="builder-callout">
+                    Expanded spell lists are available for new preparations and level-up
+                    replacements. Choose at most {String(spellCounts.maximumExpandedSelections)}{" "}
+                    off-list preparations in total. Cantrips remain on your class list;
+                    always-prepared feature spells are separate.
+                  </p>
+                ) : null}
                 <div className="spell-choice-heading">
                   <div>
                     <span>Daily loadout</span>
@@ -1109,6 +1117,7 @@ export function CharacterBuilder({
                     .filter(
                       (spell) =>
                         spell.level > 0 &&
+                        spellCounts.eligiblePreparedSpellIds.includes(spell.id) &&
                         spell.level <= spellCounts.maximumSpellLevel &&
                         !spellCounts.alwaysPreparedSpellIds.includes(spell.id) &&
                         (spellcasting.preparation === "full-list" ||

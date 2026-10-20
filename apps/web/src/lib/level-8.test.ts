@@ -145,7 +145,10 @@ describe("level-8 class-specific progression data", () => {
       const counts = spellSelectionCounts(draft, catalog);
       const spells = catalog.classes[classId].spellcasting?.spells ?? [];
       const selected = spells.find(
-        ({ level, id }) => level === 4 && !counts?.alwaysPreparedSpellIds.includes(id),
+        ({ level, id }) =>
+          level === 4 &&
+          !counts?.alwaysPreparedSpellIds.includes(id) &&
+          counts?.eligiblePreparedSpellIds.includes(id),
       );
       if (!selected) throw new Error("Missing eligible fourth-level spell");
       if (classId === wizardId && !draft.learnedSpellIds.includes(selected.id)) {

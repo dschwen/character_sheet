@@ -322,7 +322,11 @@ describe("guided character level up", () => {
       (spell) => spell.level === 0 && !draft.learnedSpellIds.includes(spell.id),
     );
     const replacementSpell = spellcasting?.spells.find(
-      (spell) => spell.level > 0 && spell.level <= 2 && !draft.preparedSpellIds.includes(spell.id),
+      (spell) =>
+        spell.level > 0 &&
+        spell.level <= 2 &&
+        !draft.preparedSpellIds.includes(spell.id) &&
+        spellSelectionCounts(draft, catalog)?.eligiblePreparedSpellIds.includes(spell.id),
     );
     if (replacementCantrip === undefined || replacementSpell === undefined) {
       throw new Error("Expected replacement Bard spell options.");

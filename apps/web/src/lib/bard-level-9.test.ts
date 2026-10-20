@@ -69,7 +69,7 @@ describe("Bard level 9 and additional Expertise", () => {
     );
     expect(characterDocumentSchema.parse(JSON.parse(JSON.stringify(character)))).toEqual(character);
     expect(levelUpEligibility(character, catalog)).toMatchObject({
-      eligible: false,
+      eligible: true,
       currentLevel: 9,
     });
   });
