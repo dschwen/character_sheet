@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:e2e": "pnpm --filter @dnd/web test:e2e",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit && pnpm --filter @dnd/web typecheck"
   },

@@ -10,6 +10,8 @@ export default tseslint.config(
       "**/.next/**",
       "**/out/**",
       "packages/webgl-dice/src/*.js",
+      // Dependency-free Node helper run directly by the e2e harness; it belongs to no TS project.
+      "apps/web/scripts/serve-out.mjs",
       "eslint.config.js",
     ],
   },

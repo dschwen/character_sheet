@@ -1374,7 +1374,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   return (
     <main>
       <header className="app-header">
-        <a className="brand" href="#top" aria-label="Adventurer's Ledger home">
+        <a className="brand" href="#top">
           <span className="brand-mark" aria-hidden="true">
             A
           </span>
@@ -1404,7 +1404,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
               ))}
             </select>
           </label>
+          <label className="sr-only" htmlFor="import-json-input">
+            Import a character JSON file
+          </label>
           <input
+            id="import-json-input"
             ref={importInput}
             className="sr-only"
             type="file"

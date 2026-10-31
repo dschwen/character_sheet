@@ -6,6 +6,8 @@ dist/
 .next/
 out/
 .pytest_cache/
+playwright-report/
+test-results/
 .mypy_cache/
 .ruff_cache/
 __pycache__/
