@@ -79,6 +79,7 @@
     }
   ],
   "counts": {
+    "AUTHORED": 2,
     "EXECUTABLE": 0,
     "STRUCTURED": 871,
     "TESTED": 0,
@@ -97,7 +98,7 @@
     "equipment-gear": 83,
     "equipment-shield": 1,
     "equipment-weapon": 38,
-    "feat": 12,
+    "feat": 14,
     "rule-table": 14,
     "species": 9,
     "spell": 339,
@@ -108,6 +109,32 @@
     "weapon-property": 3
   },
   "generatedAt": null,
-  "note": "Counts describe loaded entities, not completeness of SRD extraction. Builder limits describe implemented workflows, not semantic review approval. Proposed rules remain unverified until separately reviewed.",
-  "package": "srd-5.2.1"
+  "note": "Counts describe loaded entities, not completeness of SRD extraction. Builder limits describe implemented workflows, not semantic review approval. Proposed rules remain unverified until separately reviewed. AUTHORED records are out-of-SRD edition references attributed separately and are never presented as SRD content (see docs/adr/0013).",
+  "package": "srd-5.2.1",
+  "provenance": {
+    "editionReference": 2,
+    "pinnedSource": 871
+  },
+  "referenceRecords": [
+    {
+      "editions": [
+        "2014"
+      ],
+      "id": "dnd2014.feat.general.ritual-caster",
+      "name": "Ritual Caster (2014 PHB variant)",
+      "sourceIds": [
+        "phb-2014"
+      ]
+    },
+    {
+      "editions": [
+        "2024"
+      ],
+      "id": "dnd2024.feat.general.ritual-caster",
+      "name": "Ritual Caster (2024 PHB variant)",
+      "sourceIds": [
+        "phb-2024"
+      ]
+    }
+  ]
 }

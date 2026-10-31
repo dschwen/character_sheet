@@ -18,6 +18,7 @@ import {
 import {
   classFeatureChoiceSchema,
   featureAutomationBodySchema,
+  isEditionReferenceSpan,
   weaponPropertyBodySchema,
   savingThrowAuraRecipientSchema,
   savingThrowRerollSchema,
@@ -1754,13 +1755,20 @@ function sourceReferences(ir: AuthoringIr): SourceReference[] {
 }
 
 function entitySourceReferences(entity: ContentEntity): SourceReference[] {
-  return entity.source.map((source) => ({
-    entityId: entity.id,
-    sourceId: source.sourceId,
-    page: source.page,
-    ...(source.blocks === undefined ? {} : { blocks: source.blocks }),
-    quoteHash: source.quoteHash,
-  }));
+  return entity.source.map((source) => {
+    // Edition-reference spans (ADR 0013) cite a book directly: they carry no pinned page or blocks,
+    // so those stay absent instead of invented. Their quote hash still pins the record's own text.
+    if (isEditionReferenceSpan(source)) {
+      return { entityId: entity.id, sourceId: source.sourceId, quoteHash: source.quoteHash };
+    }
+    return {
+      entityId: entity.id,
+      sourceId: source.sourceId,
+      page: source.page,
+      ...(source.blocks === undefined ? {} : { blocks: source.blocks }),
+      quoteHash: source.quoteHash,
+    };
+  });
 }
 
 function withRuleSource(trace: CalculationTrace, ir: AuthoringIr): CalculationTrace {
@@ -4196,15 +4204,7 @@ function evaluateHitPoints(
       output: contribution,
       label: `Character level ${String(level.characterLevel)}`,
     });
-    sources.push(
-      ...classEntity.source.map((source) => ({
-        entityId: classEntity.id,
-        sourceId: source.sourceId,
-        page: source.page,
-        ...(source.blocks === undefined ? {} : { blocks: source.blocks }),
-        quoteHash: source.quoteHash,
-      })),
-    );
+    sources.push(...entitySourceReferences(classEntity));
   });
   for (const { ir, rule } of rules) {
     if (

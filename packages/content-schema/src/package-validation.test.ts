@@ -9,6 +9,7 @@ import {
   classFeatureChoiceSchema,
   contentEntitySchema,
   featureAutomationBodySchema,
+  isEditionReferenceSpan,
   packageManifestSchema,
   sourceManifestSchema,
   startingEquipmentChoiceSchema,
@@ -52,7 +53,11 @@ describe("bootstrap content package", () => {
       ).toBe(true);
     }
     const nondetection = catalog.find(({ id }) => id === "srd521.spell.nondetection");
-    expect(nondetection?.source.some(({ blocks }) => blocks?.includes("p0151-b008"))).toBe(true);
+    expect(
+      nondetection?.source.some(
+        (span) => !isEditionReferenceSpan(span) && span.blocks?.includes("p0151-b008"),
+      ),
+    ).toBe(true);
     expect(nondetection?.body).toMatchObject({
       components: {
         materialText: "a pinch of diamond dust worth 25+ GP, which the spell consumes",
@@ -67,7 +72,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(871);
+    expect(parsedEntities).toHaveLength(873);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -143,6 +148,61 @@ describe("bootstrap content package", () => {
     expect(entityIds).toContain("srd521.spell.spirit-guardians");
     expect(entityIds).toContain("srd521.condition.blinded");
     expect(entityIds).toContain("srd521.condition.unconscious");
+  });
+
+  it("declares out-of-SRD edition-reference records as authored, not extracted", () => {
+    const root = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
+    const manifest = packageManifestSchema.parse(
+      JSON.parse(readFileSync(new URL("manifest.json", root), "utf8")),
+    );
+    const entities = contentEntitySchema
+      .array()
+      .parse(JSON.parse(readFileSync(new URL("entities.json", root), "utf8")));
+
+    expect(manifest.referenceSources?.map(({ sourceId }) => sourceId).sort()).toEqual([
+      "phb-2014",
+      "phb-2024",
+    ]);
+    expect(manifest.referenceSources?.every(({ book }) => book === "Player's Handbook")).toBe(true);
+
+    const referenceIds = [
+      "dnd2014.feat.general.ritual-caster",
+      "dnd2024.feat.general.ritual-caster",
+    ];
+    const records = entities.filter(({ id }) => referenceIds.includes(id));
+    expect(records).toHaveLength(2);
+    const editions = new Map<string, string>();
+    for (const record of records) {
+      expect(record.kind).toBe("feat");
+      expect(record.review.status).toBe("AUTHORED");
+      expect(record.review.extractionApproved).toBe(false);
+      expect(record.tags).toEqual(expect.arrayContaining(["out-of-srd", "edition-reference"]));
+      expect(record.source).toHaveLength(1);
+      const span = record.source[0];
+      if (span === undefined || !isEditionReferenceSpan(span)) {
+        throw new Error(`${record.id}: expected an edition-reference span`);
+      }
+      expect(span.edition).toBeDefined();
+      expect(span.book).toBe("Player's Handbook");
+      expect(span.quoteHash).toMatch(/^[a-f0-9]{64}$/);
+      expect(span.referenceUrl).toMatch(/^https:\/\//);
+      expect("page" in span).toBe(false);
+      expect(z.object({ category: z.literal("general") }).safeParse(record.body).success).toBe(
+        true,
+      );
+      editions.set(record.id, span.edition);
+    }
+    expect(editions.get("dnd2024.feat.general.ritual-caster")).toBe("2024");
+    expect(editions.get("dnd2014.feat.general.ritual-caster")).toBe("2014");
+
+    for (const entity of entities) {
+      if (referenceIds.includes(entity.id)) continue;
+      expect(entity.review.status !== "AUTHORED", entity.id).toBe(true);
+      expect(
+        entity.source.every((span) => !isEditionReferenceSpan(span)),
+        entity.id,
+      ).toBe(true);
+    }
   });
 
   it("validates all standard source-linked conditions", () => {
@@ -632,7 +692,11 @@ describe("bootstrap content package", () => {
       "srd521.feat.origin.magic-initiate.druid",
       "srd521.feat.origin.magic-initiate.wizard",
     ]);
-    expect(entities.map((entity) => entity.source[0]?.page)).toEqual([
+    const originPages = entities.map((entity) => {
+      const span = entity.source[0];
+      return span === undefined || isEditionReferenceSpan(span) ? undefined : span.page;
+    });
+    expect(originPages).toEqual([
       83, 83, 83, 83, 86, 84, 84, 84, 85, 85, 86, 86, 86, 87, 87, 87, 87, 87, 87,
     ]);
     expect(savageAttacker.proposedRules[0]).toMatchObject({
@@ -712,7 +776,10 @@ describe("bootstrap content package", () => {
         "srd521.equipment.gear.scholars-pack",
       ]),
     );
-    expect(ammunition.find((entity) => entity.id.endsWith(".arrows"))?.source[0]?.page).toBe(96);
+    const arrowsSpan = ammunition.find((entity) => entity.id.endsWith(".arrows"))?.source[0];
+    expect(
+      arrowsSpan === undefined || isEditionReferenceSpan(arrowsSpan) ? undefined : arrowsSpan.page,
+    ).toBe(96);
   });
 
   it("validates Cleric, Life Domain, and Channel Divinity authoring IR", () => {

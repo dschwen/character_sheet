@@ -1,0 +1,184 @@
+[
+  {
+    "body": {
+      "abilityScoreIncreaseAbilities": [
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ],
+      "abilityScoreIncreasePatterns": [
+        [
+          1
+        ]
+      ],
+      "category": "general",
+      "maximumAbilityScore": 20,
+      "prerequisite": {
+        "anyAbilityScoreMinimums": [
+          {
+            "ability": "intelligence",
+            "minimum": 13
+          },
+          {
+            "ability": "wisdom",
+            "minimum": 13
+          },
+          {
+            "ability": "charisma",
+            "minimum": 13
+          }
+        ],
+        "minimumCharacterLevel": 4
+      },
+      "repeatable": false,
+      "ritualCaster": {
+        "castingAbilitySource": "feat-increased-ability",
+        "edition": "2024",
+        "growsWithProficiencyBonus": true,
+        "maximumSpellLevel": 1,
+        "quickRitualRecharge": "long-rest",
+        "requiredSpellTag": "ritual",
+        "spellCountSource": "proficiency-bonus",
+        "spellListSource": "all"
+      },
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "General Feat (Prerequisite: Level 4+; Intelligence, Wisdom, or Charisma 13+)"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20."
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Ritual Spells. Choose a number of level 1 spells that have the Ritual tag, equal to your Proficiency Bonus. You always have those spells prepared, and you can cast them with any spell slots you have. The spells' spellcasting ability is the ability increased by this feat. Whenever your Proficiency Bonus increases, you can add one additional level 1 spell with the Ritual tag."
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Quick Ritual. You can cast one of these spells using its regular casting time rather than the extended time for a Ritual. Doing so doesn't require a spell slot. Once you cast a spell this way, you can't use this benefit again until you finish a Long Rest."
+          }
+        ],
+        "title": "Ritual Caster (2024 PHB variant)"
+      }
+    },
+    "id": "dnd2024.feat.general.ritual-caster",
+    "kind": "feat",
+    "name": {
+      "en": "Ritual Caster (2024 PHB variant)"
+    },
+    "review": {
+      "extractionApproved": false,
+      "notes": "Authored out-of-SRD edition-reference record; no SRD extraction applies (ADR 0013). Feats are offered at the app's reviewed Ability Score Improvement levels. Casting time is not modeled; Quick Ritual is one free casting use per Long Rest. Reference: https://www.dndbeyond.com/feats/1789180-ritual-caster",
+      "semanticsApproved": false,
+      "status": "AUTHORED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "book": "Player's Handbook",
+        "edition": "2024",
+        "kind": "edition-reference",
+        "note": "Rules supplied by the project owner; no licensed book text is reproduced; no span in the pinned source applies.",
+        "quoteHash": "5031e588297b84ee0b4bc39d8419002b7d3d6028306af8f03b750383d5e7c68a",
+        "referenceUrl": "https://www.dndbeyond.com/feats/1789180-ritual-caster",
+        "sourceId": "phb-2024"
+      }
+    ],
+    "tags": [
+      "feat",
+      "general",
+      "edition-reference",
+      "out-of-srd"
+    ]
+  },
+  {
+    "body": {
+      "abilityScoreIncreaseAbilities": [],
+      "abilityScoreIncreasePatterns": [],
+      "category": "general",
+      "maximumAbilityScore": 20,
+      "prerequisite": {
+        "anyAbilityScoreMinimums": [
+          {
+            "ability": "intelligence",
+            "minimum": 13
+          },
+          {
+            "ability": "wisdom",
+            "minimum": 13
+          }
+        ]
+      },
+      "repeatable": false,
+      "ritualCaster": {
+        "castingAbilitySource": "chosen-class-list",
+        "classListOptions": [
+          "bard",
+          "cleric",
+          "druid",
+          "sorcerer",
+          "warlock",
+          "wizard"
+        ],
+        "edition": "2014",
+        "growsWithProficiencyBonus": false,
+        "initialSpellCount": 2,
+        "maximumInitialSpellLevel": 1,
+        "quickRitualRecharge": null,
+        "requiredSpellTag": "ritual",
+        "researchSpellLevelCap": "half-character-level-rounded-up",
+        "spellListSource": "chosen-class-list"
+      },
+      "text": {
+        "nodes": [
+          {
+            "kind": "ParagraphNode",
+            "text": "General Feat (Prerequisite: Intelligence or Wisdom 13 or higher)"
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Ritual Book. Choose one spellcasting class list: bard, cleric, druid, sorcerer, warlock, or wizard. Your ritual book contains two level 1 spells of your choice from that list; each chosen spell must have the Ritual tag. While you have the ritual book in your possession, you can cast the spells in it as Rituals. The spells' spellcasting ability is the ability your chosen class uses for its spells."
+          },
+          {
+            "kind": "ParagraphNode",
+            "text": "Copying Scrolls. You can transcribe Ritual spells you find on scrolls or spellbooks into your ritual book if each is from your chosen class's list and its spell level is at most half your character level, rounded up."
+          }
+        ],
+        "title": "Ritual Caster (2014 PHB variant)"
+      }
+    },
+    "id": "dnd2014.feat.general.ritual-caster",
+    "kind": "feat",
+    "name": {
+      "en": "Ritual Caster (2014 PHB variant)"
+    },
+    "review": {
+      "extractionApproved": false,
+      "notes": "Authored out-of-SRD edition-reference record; no SRD extraction applies (ADR 0013). Rules as supplied by the project owner; captured 2014 renderings differ in starting count and growth and the divergence is recorded for human review. Book possession, finding scrolls, and casting-time extension are assisted, not modeled. Feats are offered at the app's reviewed Ability Score Improvement levels. Reference: https://www.dndbeyond.com/feats/40-ritual-caster",
+      "semanticsApproved": false,
+      "status": "AUTHORED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "book": "Player's Handbook",
+        "edition": "2014",
+        "kind": "edition-reference",
+        "note": "Rules supplied by the project owner (initial two spells; research capped at half character level rounded up); original PHB renderings differ and are recorded for review; no span in the pinned source applies.",
+        "quoteHash": "1b6da30e84d3c55cd8131d148d0d0958f3db04694d27378f4de4b1e2a61bf6af",
+        "referenceUrl": "https://www.dndbeyond.com/feats/40-ritual-caster",
+        "sourceId": "phb-2014"
+      }
+    ],
+    "tags": [
+      "feat",
+      "general",
+      "edition-reference",
+      "out-of-srd"
+    ]
+  }
+]

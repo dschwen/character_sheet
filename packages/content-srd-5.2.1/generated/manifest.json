@@ -7,6 +7,22 @@
     "sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87"
   },
   "license": "CC-BY-4.0",
+  "referenceSources": [
+    {
+      "sourceId": "phb-2014",
+      "edition": "2014",
+      "book": "Player's Handbook",
+      "referenceUrl": "https://www.dndbeyond.com/feats/40-ritual-caster",
+      "note": "Out-of-SRD edition-reference record authored from owner-supplied rules text (ADR 0013); no pinned-source span applies."
+    },
+    {
+      "sourceId": "phb-2024",
+      "edition": "2024",
+      "book": "Player's Handbook",
+      "referenceUrl": "https://www.dndbeyond.com/feats/1789180-ritual-caster",
+      "note": "Out-of-SRD edition-reference record authored from owner-supplied rules text (ADR 0013); no pinned-source span applies."
+    }
+  ],
   "dependencies": [],
   "engineCompatibility": ">=0.1.0 <0.2.0"
 }

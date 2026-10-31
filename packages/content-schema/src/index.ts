@@ -132,7 +132,7 @@ export const predicateSchema: z.ZodType<Predicate> = z.lazy(() =>
   ]),
 );
 
-export const sourceSpanSchema = z
+export const pinnedSourceSpanSchema = z
   .object({
     sourceId: z.string().min(1),
     page: z.number().int().positive(),
@@ -140,6 +140,31 @@ export const sourceSpanSchema = z
     quoteHash: z.string().regex(/^[a-f0-9]{64}$/),
   })
   .strict();
+
+// Out-of-SRD records cite an edition's book directly instead of a span in the pinned source:
+// no page/blocks, an explicit edition and book, an optional reference URL, and a quoteHash of
+// the record's own stored text so review pins remain stable. See docs/adr/0013.
+export const editionReferenceSpanSchema = z
+  .object({
+    sourceId: z.string().min(1),
+    quoteHash: z.string().regex(/^[a-f0-9]{64}$/),
+    kind: z.literal("edition-reference"),
+    edition: z.enum(["2014", "2024"]),
+    book: z.string().min(1),
+    referenceUrl: z.string().url().startsWith("https://").optional(),
+    note: z.string().min(1).optional(),
+  })
+  .strict();
+
+export const sourceSpanSchema = z.union([pinnedSourceSpanSchema, editionReferenceSpanSchema]);
+
+export type PinnedSourceSpan = z.infer<typeof pinnedSourceSpanSchema>;
+export type EditionReferenceSpan = z.infer<typeof editionReferenceSpanSchema>;
+export type SourceSpan = PinnedSourceSpan | EditionReferenceSpan;
+
+export function isEditionReferenceSpan(span: SourceSpan): span is EditionReferenceSpan {
+  return "kind" in span;
+}
 
 export const sourceManifestSchema = z
   .object({
@@ -166,6 +191,21 @@ export const packageManifestSchema = z
       })
       .strict(),
     license: z.literal("CC-BY-4.0"),
+    // Declares any edition-reference records living in this package (ADR 0013). The package still
+    // pins exactly one acquired source document above; these entries describe what is not from it.
+    referenceSources: z
+      .array(
+        z
+          .object({
+            sourceId: z.string().min(1),
+            edition: z.enum(["2014", "2024"]).optional(),
+            book: z.string().min(1),
+            referenceUrl: z.string().url().startsWith("https://").optional(),
+            note: z.string().min(1).optional(),
+          })
+          .strict(),
+      )
+      .optional(),
     dependencies: z.array(z.string().min(1)),
     engineCompatibility: z.string().min(1),
   })
@@ -178,6 +218,8 @@ export const reviewStatusSchema = z.enum([
   "EXECUTABLE",
   "TESTED",
   "VERIFIED",
+  // Authored out-of-SRD edition references: supplied rules text, never extracted. See ADR 0013.
+  "AUTHORED",
 ]);
 
 export const automationLevelSchema = z.enum([
@@ -220,7 +262,9 @@ export const authoringIrSchema = z
     kind: z.enum(["class-feature", "subclass-feature", "feat"]),
     parentId: entityIdSchema,
     level: z.number().int().min(1).max(20),
-    source: z.array(sourceSpanSchema).min(1),
+    // Authoring IR describes extracted content with an approved extraction step, so its spans are
+    // pinned-source spans. Edition-reference records have no authoring IR (see docs/adr/0013).
+    source: z.array(pinnedSourceSpanSchema).min(1),
     text: z
       .object({
         title: z.string().min(1),
@@ -785,7 +829,6 @@ export const featureAutomationBodySchema = z
 
 export type PackageManifest = z.infer<typeof packageManifestSchema>;
 export type SourceManifest = z.infer<typeof sourceManifestSchema>;
-export type SourceSpan = z.infer<typeof sourceSpanSchema>;
 export type ContentEntity = z.infer<typeof contentEntitySchema>;
 export type StartingEquipmentItem = z.infer<typeof startingEquipmentItemSchema>;
 export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSchema>;

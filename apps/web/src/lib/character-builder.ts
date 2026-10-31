@@ -912,6 +912,11 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
   const feats = Object.fromEntries(
     rulesPackage.entities
       .filter((candidate) => candidate.kind === "feat")
+      // Out-of-SRD edition-reference records (ADR 0013) stay out of the builder catalog until the
+      // rules engine implements their variant semantics; offering one earlier would present a
+      // half-implemented feat that cannot grant its spells. Re-entry is a deliberate later step
+      // with explicit source labels, not a side effect of the metadata gate.
+      .filter((candidate) => candidate.review.status !== "AUTHORED")
       .map((candidate) => {
         const body = objectValue(candidate.body);
         const proficiencyChoice = objectValue(body?.proficiencyChoice);

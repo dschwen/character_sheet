@@ -6,6 +6,7 @@ import {
   type CharacterDocument,
   type CharacterState,
 } from "@dnd/character-model";
+import { isEditionReferenceSpan } from "@dnd/content-schema";
 import type {
   EvaluateCharacterInput,
   RestEvent,
@@ -757,7 +758,7 @@ export function proposeRest(
       source?.source.map((span) => ({
         entityId: source.id,
         sourceId: span.sourceId,
-        page: span.page,
+        ...(isEditionReferenceSpan(span) ? {} : { page: span.page }),
       })) ?? [],
     );
   }
@@ -785,7 +786,7 @@ export function proposeRest(
         entity.source.map((span) => ({
           entityId: entity.id,
           sourceId: span.sourceId,
-          page: span.page,
+          ...(isEditionReferenceSpan(span) ? {} : { page: span.page }),
         })),
       ),
     );
