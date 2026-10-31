@@ -29,10 +29,11 @@ queue|inspect|record|apply` flags unreviewed and changed records, pins each appr
   flags all 63 extracted records as needing semantics and test review; no approvals have been
   recorded yet.
 - A Playwright browser gate in `apps/web/e2e` drives the production static export in Chromium at
-  desktop and narrow viewports: builder creation, reload persistence, one level up with its
-  feature grant, calculation-trace inspection, export/import round-trip, atomic play-state changes
-  with undo and reload persistence, and axe scans that fail on critical or serious violations of
-  the sheet or the builder. It runs as the CI `browser` job. See
+  desktop and narrow viewports: builder creation, reload persistence, a Fighter level up with its
+  feature grant, a spellcaster level up with its prepared-spell growth and opened spell options,
+  calculation-trace inspection, export/import round-trip, atomic play-state changes with undo and
+  reload persistence, and axe scans that fail on critical or serious violations of the sheet or the
+  builder. It runs as the CI `browser` job. See
   [Browser verification](testing/browser-verification.md) for what the suite does and does not cover.
 - Automated tests do not constitute the separate human extraction, semantics, and test approvals
   specified by the plan. No claim of complete SRD coverage or independent verification is made.
@@ -159,6 +160,15 @@ one replacement per gained level. At level 10 this permits at most two ordinary 
 not an entire rewritten list or foreign cantrips. Lore Discoveries remain separate. Existing
 advancement guards preserve prior selections and spent state; preparation stays level-up-only.
 See `docs/rules-engine/bard-level-10.md`.
+Bard also reaches level 11, the first class advanced past a feature grant: the level adds only
+derived progression values — sixteen preparations and one sixth-level slot, with unchanged cantrips,
+Inspiration die, and proficiency. The sixth level is derived from the progression row's slot keys:
+at level 10 sixth-level spells are rejected in builder and core, and at 11 the same shared
+derivation opens sixth-level Bard spells and sixth-level Magical Secrets choices, with the off-list
+bound rising to four through the existing growth-plus-replacements resolver and no new
+class-specific code. Advancement enforces exactly one new preparation and at most one replacement,
+retains prior selections and spent state, and closes at 11; the rendered flow is verified in both
+browser viewports. See `docs/rules-engine/bard-level-11.md`.
 
 Grappler is now available through shared, catalog-driven creation/advancement controls alongside
 ASI. Per-acquisition records store the feat and ability allocation. The engine enforces its
@@ -177,7 +187,7 @@ interaction verification and independent semantic review remain outstanding.
 | 4: Fighter vertical slice        | Builder, advancement, equipment, attacks, rests, persistence, and integration tests exist. The complete UI lifecycle, all numeric provenance, and all choices require browser and legality audit.                                                                                                                                               |
 | 5: Spellcasting slice            | Wizard spellbook/preparation, slots, attacks, saves, concentration, spell descriptions, and tests exist. The full source-link/trace and representative-spell gates still need a recorded audit.                                                                                                                                                 |
 | 6: All single classes through 5  | All twelve builders and class fixtures exist. Assisted features remain; review coverage, relevant feats/equipment completeness, and visible unsupported-mechanic labeling need verification.                                                                                                                                                    |
-| 7: Levels 6–20                   | In progress. Fighter, Barbarian, and Bard reach level 10; the other nine builders reach 9. Finish remaining levels through 20, General feats, Epic Boons, higher-level features, interactions, and twelve reviewed level-20 fixtures.                                                                                                           |
+| 7: Levels 6–20                   | In progress. Bard reaches level 11; Fighter and Barbarian reach 10; the other nine builders reach 9. Finish remaining levels through 20, General feats, Epic Boons, higher-level features, interactions, and twelve reviewed level-20 fixtures.                                                                                                 |
 | 8: Multiclassing                 | Prerequisites, proficiency rules, separate class preparation/casting, combined slots, Pact Magic interactions, builder flow, and the reviewed interaction matrix remain.                                                                                                                                                                        |
 | 9: Items and complete play-state | Conditions, concentration, HP/death saves, rests, and reversible local changes exist. Magic-item ownership/equipment/attunement activation, charges/recharge, bonuses, and complete traced transitions remain.                                                                                                                                  |
 | 10: Beta hardening               | A critical/serious axe gate over the initial sheet and the builder runs in the CI `browser` job. The complete accessibility/mobile/print audit, migrations, profiling, threat model/CSP, backup and diagnostic bundle, clean reproducible generation in CI, and the public-beta completion audit remain.                                        |

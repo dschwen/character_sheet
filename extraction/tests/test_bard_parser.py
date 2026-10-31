@@ -71,11 +71,13 @@ def test_bard_progression_row_rejects_wrong_inspiration_die() -> None:
 def test_level_nine_builder_adds_two_more_expertise_selections() -> None:
     row = BardProgressionRow(9, 4, (), 8, 3, 14, (4, 3, 3, 3, 1, 0, 0, 0, 0))
     body = _class_entity({"skillProficiencyChoice": {}}, (row,), (), {}, [])["body"]
-    assert body["builder"]["supportedLevelMaximum"] == 10
+    assert body["builder"]["supportedLevelMaximum"] == 11
     assert body["builder"]["expertiseChoice"]["countByLevel"]["8"] == 2
     assert body["builder"]["expertiseChoice"]["countByLevel"]["9"] == 4
     assert body["skillProficiencyChoice"]["countByLevel"]["9"] == 6
     assert body["builder"]["expertiseChoice"]["countByLevel"]["10"] == 4
+    assert body["builder"]["expertiseChoice"]["countByLevel"]["11"] == 4
+    assert body["skillProficiencyChoice"]["countByLevel"]["11"] == 6
     assert body["preparedSpellListExpansion"] == {
         "sourceFeatureId": "srd521.class-feature.bard.magical-secrets",
         "minimumLevel": 10,

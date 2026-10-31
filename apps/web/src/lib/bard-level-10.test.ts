@@ -72,7 +72,7 @@ describe("Bard level 10 and source-driven prepared spell list expansion", () => 
     expect(
       evaluation.actions.find(({ id }) => id === "action.cutting-words")?.parameters,
     ).toMatchObject({ checkBonus: { diceCount: 1, diceSize: 10, mode: "subtract" } });
-    expect(levelUpEligibility(character, catalog).eligible).toBe(false);
+    expect(levelUpEligibility(character, catalog).eligible).toBe(true);
     expect(
       evaluation.traces["spellcasting.bard.expandedPreparations"]?.sourceReferences,
     ).toContainEqual(expect.objectContaining({ page: 33 }));

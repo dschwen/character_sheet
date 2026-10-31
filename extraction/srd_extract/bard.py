@@ -439,12 +439,12 @@ def _class_entity(
             **traits,
             "skillProficiencyChoice": {
                 **traits["skillProficiencyChoice"],
-                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 11)},
+                "countByLevel": {str(level): 3 if level < 3 else 6 for level in range(1, 12)},
             },
             "startingEquipment": _starting_equipment(),
             "builder": {
                 "supportedLevelMinimum": 1,
-                "supportedLevelMaximum": 10,
+                "supportedLevelMaximum": 11,
                 "defaultAbilityScores": {
                     "strength": 10,
                     "dexterity": 13,
@@ -468,7 +468,7 @@ def _class_entity(
                     "minimumLevel": 2,
                     "requireClassProficiency": False,
                     "eligibleSkillIds": all_skills,
-                    "countByLevel": {str(level): 2 if level < 9 else 4 for level in range(2, 11)},
+                    "countByLevel": {str(level): 2 if level < 9 else 4 for level in range(2, 12)},
                 },
             },
             "spellcastingAbility": "charisma",

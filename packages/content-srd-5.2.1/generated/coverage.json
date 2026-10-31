@@ -12,7 +12,7 @@
       "name": "Barbarian"
     },
     {
-      "builderMaximum": 10,
+      "builderMaximum": 11,
       "builderMinimum": 1,
       "id": "srd521.class.bard",
       "name": "Bard"
