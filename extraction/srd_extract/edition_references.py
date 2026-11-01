@@ -54,7 +54,16 @@ _TEXT_2014 = [
     ),
 ]
 
-_CLASS_LIST_2014 = ["bard", "cleric", "druid", "sorcerer", "warlock", "wizard"]
+# Machine field: class-list options resolve against class entities in the pinned SRD package.
+# The record's rules text keeps the printed class-name wording; the engine consumes these ids.
+_CLASS_LIST_2014 = [
+    "srd521.class.bard",
+    "srd521.class.cleric",
+    "srd521.class.druid",
+    "srd521.class.sorcerer",
+    "srd521.class.warlock",
+    "srd521.class.wizard",
+]
 
 
 def _text_nodes(texts: list[str]) -> list[dict[str, str]]:

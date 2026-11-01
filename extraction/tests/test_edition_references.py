@@ -98,12 +98,12 @@ def test_2014_variant_takes_no_ability_bonus_and_books_two_rituals() -> None:
     assert ritual["maximumInitialSpellLevel"] == 1
     assert ritual["researchSpellLevelCap"] == "half-character-level-rounded-up"
     assert ritual["classListOptions"] == [
-        "bard",
-        "cleric",
-        "druid",
-        "sorcerer",
-        "warlock",
-        "wizard",
+        "srd521.class.bard",
+        "srd521.class.cleric",
+        "srd521.class.druid",
+        "srd521.class.sorcerer",
+        "srd521.class.warlock",
+        "srd521.class.wizard",
     ]
     assert ritual["spellListSource"] == "chosen-class-list"
     assert ritual["castingAbilitySource"] == "chosen-class-list"

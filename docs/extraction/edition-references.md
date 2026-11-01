@@ -31,12 +31,16 @@ Reference anchors (captured renderings, not licensed text):
 
 ## Engine semantics
 
-The 2024 variant's engine semantics are implemented in `packages/rules-core`: Proficiency-Bonus
-spell counts with optional growth, level 1 Ritual-tag-only selections, casting ability tied to the
-feat's increased ability, and a Quick Ritual free cast recharged by a Long Rest. See
-[Ritual Caster — 2024 PHB variant engine semantics](../rules-engine/ritual-caster-2024.md). The
-2014 variant's ritual-book semantics are not implemented yet; the engine evaluates only records whose
-body declares `ritualCaster.edition: "2024"`.
+Both variants' engine semantics are implemented in `packages/rules-core`. The 2024 variant:
+Proficiency-Bonus spell counts with optional growth, level 1 Ritual-tag-only selections, casting
+ability tied to the feat's increased ability, and a Quick Ritual free cast recharged by a Long Rest
+([Ritual Caster — 2024 PHB variant](../rules-engine/ritual-caster-2024.md)). The 2014 variant: a
+chosen class spell list given as class entity ids in `classListOptions`, exactly two level 1 Ritual
+spells at acquisition, research capped at half the character's level rounded up, the chosen class's
+casting ability, and always-ritual slot-free casting ([Ritual Caster — 2014 PHB
+variant](../rules-engine/ritual-caster-2014.md)). Each record's engine behavior is dispatched by its
+`ritualCaster.edition` literal, and their calculation traces are qualified by the full feat entity id
+so both variants can coexist on one sheet.
 
 ## Builder availability
 

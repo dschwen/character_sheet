@@ -187,9 +187,15 @@ recorded +1 (Intelligence, Wisdom, or Charisma); always-prepared grants; and a Q
 cast recharged by a Long Rest through the shared free-cast resource. Feat traces cite the record's
 edition-reference span without inventing a page, while granted spells keep their pinned SRD sources.
 Feat prerequisite blocks may now state ability minimums only: an absent level floor means no level
-gate. The 2014 variant's ritual-book semantics, the builder presentation with explicit variant
-labels, and the browser gate for a selection flow remain unfinished. See
-`docs/rules-engine/ritual-caster-2024.md`.
+gate. The 2014 variant now evaluates too: a chosen class spell list declared as class entity ids,
+exactly two level 1 Ritual spells at acquisition, research capped at half the character's level
+rounded up, the chosen class's casting ability, and slot-free always-ritual casting of unprepared
+grants through the shared ritual casting request; a feat declaring no ability-increase patterns
+occupies its feat slot with exactly one allocation of no increases so aggregate reconciliation
+accepts it. Both variants' calculation traces are qualified by the full feat entity id, and a shared
+test keeps both feats distinct on one sheet. The builder presentation with explicit variant labels
+and the browser gate for a selection flow remain unfinished. See
+`docs/rules-engine/ritual-caster-2024.md` and `docs/rules-engine/ritual-caster-2014.md`.
 
 | Milestone                        | Current evidence and required remaining work                                                                                                                                                                                                                                                                                                    |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

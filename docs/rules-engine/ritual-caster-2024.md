@@ -28,9 +28,11 @@ The 2024 text makes the increased ability the spells' spellcasting ability. The 
 feat's recorded selection to contain exactly one +1 to Intelligence, Wisdom, or Charisma; any other
 shape — zero increases, two abilities, +2, or an ability outside the feat's own allowed set — is
 `RITUAL_CASTER_CASTING_ABILITY_TIE_INVALID`, and the feat grants nothing until the tie is well
-formed. The tied ability feeds the shared spellcasting traces
-(`spellcasting.general.ritual-caster.attackBonus` and `.saveDifficultyClass`) and every granted
-spell's casting option.
+formed. The tied ability feeds the shared spellcasting traces and every granted spell's casting
+option. Because both Ritual Caster records share the feat slug `general.ritual-caster`, the trace
+ids are qualified by the full feat entity id — `spellcasting.dnd2024.feat.general.ritual-caster.attackBonus`
+and `.saveDifficultyClass` — so a sheet carrying both variants keeps the two feats' spellcasting
+distinct (see [Ritual Caster — 2014 PHB variant](ritual-caster-2014.md)).
 
 ## Quick Ritual
 
@@ -56,8 +58,8 @@ its source text does not state.
 
 ## Not yet implemented
 
-The 2014 variant's ritual-book semantics (class-list choice, exactly two spells at acquisition,
-scroll research capped at half character level rounded up) are a separate stage. Both variants remain
-held out of the builder catalog — see [Out-of-SRD edition-reference records](../extraction/edition-references.md)
-— until they are re-admitted with explicit "2014 PHB variant" / "2024 PHB variant" labels and a
+The 2014 variant's engine semantics are implemented alongside this one — see
+[Ritual Caster — 2014 PHB variant](ritual-caster-2014.md). Both variants remain held out of the
+builder catalog — see [Out-of-SRD edition-reference records](../extraction/edition-references.md) —
+until they are re-admitted with explicit "2014 PHB variant" / "2024 PHB variant" labels and a
 browser-verified selection flow.

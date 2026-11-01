@@ -627,8 +627,8 @@ const magicInitiateFeatBodySchema = z
   .passthrough();
 // 2024-variant Ritual Caster (out-of-SRD edition reference; docs/adr/0013): its always-prepared
 // level 1 Ritual spell count tracks the character's Proficiency Bonus, and its spellcasting
-// ability is the ability the feat increases. The 2014 variant record does not parse here; it is
-// evaluated only once its distinct ritual-book semantics are implemented.
+// ability is the ability the feat increases. The two variants have distinct bodies and distinct
+// semantics; the 2014 record parses only the schema below it, never this one.
 const ritualCasterFeatBodySchema = z
   .object({
     category: z.literal("general"),
@@ -643,6 +643,29 @@ const ritualCasterFeatBodySchema = z
         growsWithProficiencyBonus: z.literal(true),
         castingAbilitySource: z.literal("feat-increased-ability"),
         quickRitualRecharge: z.literal("long-rest"),
+      })
+      .strict(),
+  })
+  .passthrough();
+// 2014-variant Ritual Caster: choose one class spell list; the ritual book starts with exactly
+// two level 1 Ritual spells from that list, and research may extend it with further Ritual spells
+// from the same list up to half the character's level, rounded up (the recorded owner policy —
+// printed 2014 renderings diverge; see docs/extraction/edition-references.md).
+const ritualCaster2014FeatBodySchema = z
+  .object({
+    category: z.literal("general"),
+    ritualCaster: z
+      .object({
+        edition: z.literal("2014"),
+        requiredSpellTag: z.literal("ritual"),
+        initialSpellCount: z.number().int().positive(),
+        maximumInitialSpellLevel: z.number().int().positive(),
+        researchSpellLevelCap: z.literal("half-character-level-rounded-up"),
+        spellListSource: z.literal("chosen-class-list"),
+        castingAbilitySource: z.literal("chosen-class-list"),
+        classListOptions: z.array(z.string().min(1)).min(1),
+        growsWithProficiencyBonus: z.literal(false),
+        quickRitualRecharge: z.null(),
       })
       .strict(),
   })
@@ -2963,16 +2986,22 @@ function validateProgressionSelections(
     const pendingRecords = [...recordedFeatSelections];
     const allocationsByFeat = abilityIncreaseFeats.map((feat) => {
       const featBody = featBodySchema.parse(feat.body);
-      const possible = (featBody.abilityScoreIncreasePatterns ?? [])
-        .flatMap(allocationsForPattern)
-        .filter((allocation) =>
-          abilities.every(
-            (ability, index) =>
-              allocation[index] === 0 ||
-              featBody.abilityScoreIncreaseAbilities === undefined ||
-              featBody.abilityScoreIncreaseAbilities.includes(ability),
-          ),
-        );
+      // A feat whose record declares no increase patterns (e.g. the 2014-style Ritual Caster
+      // record) occupies its feat slot with exactly one legal allocation: no increases at all.
+      const patterns = featBody.abilityScoreIncreasePatterns ?? [];
+      const possible =
+        patterns.length === 0
+          ? [Array.from({ length: abilities.length }, () => 0)]
+          : patterns
+              .flatMap(allocationsForPattern)
+              .filter((allocation) =>
+                abilities.every(
+                  (ability, index) =>
+                    allocation[index] === 0 ||
+                    featBody.abilityScoreIncreaseAbilities === undefined ||
+                    featBody.abilityScoreIncreaseAbilities.includes(ability),
+                ),
+              );
       const recordIndex = pendingRecords.findIndex((record) => record.featId === feat.id);
       if (recordIndex < 0) return possible;
       const [record] = pendingRecords.splice(recordIndex, 1);
@@ -5483,6 +5512,11 @@ function evaluateRitualCaster(
   for (const featId of character.build.featIds) {
     const feat = index.entities.get(featId);
     if (feat?.kind !== "feat") continue;
+    const parsed2014 = ritualCaster2014FeatBodySchema.safeParse(feat.body);
+    if (parsed2014.success) {
+      evaluateRitualCaster2014(character, index, state, feat, parsed2014.data);
+      continue;
+    }
     const parsed = ritualCasterFeatBodySchema.safeParse(feat.body);
     if (!parsed.success) continue;
     const body = parsed.data;
@@ -5567,9 +5601,11 @@ function evaluateRitualCaster(
     );
     const attackBonus = abilityModifier + proficiencyBonus;
     const saveDifficultyClass = 8 + abilityModifier + proficiencyBonus;
-    const featSlug = featId.split(".").slice(-2).join(".");
-    const attackTraceId = `spellcasting.${featSlug}.attackBonus`;
-    const saveTraceId = `spellcasting.${featSlug}.saveDifficultyClass`;
+    // Edition-qualified ids: both edition-reference records share the slug "general.ritual-caster",
+    // so the full entity id keeps their spellcasting calculations distinct on a sheet that
+    // carries both variants at once.
+    const attackTraceId = `spellcasting.${featId}.attackBonus`;
+    const saveTraceId = `spellcasting.${featId}.saveDifficultyClass`;
     const sources = entitySourceReferences(feat);
     for (const [traceId, result, operation, inputs] of [
       [
@@ -5678,6 +5714,150 @@ function evaluateRitualCaster(
   state.spells.sort(
     (left, right) => left.level - right.level || left.name.localeCompare(right.name),
   );
+}
+
+// 2014-variant evaluation: one chosen class spell list; a book of exactly initialSpellCount
+// level-maximumInitialSpellLevel Ritual spells from that list; and an optional research record
+// adding further Ritual spells from the same list at spell levels up to half the character's
+// level, rounded up. The chosen class's spellcasting ability casts the book; grants are not
+// prepared — they carry a free-at-will casting option that ritual casting requests use without
+// expending a slot or a resource (docs/rules-engine/ritual-caster-2014.md).
+function evaluateRitualCaster2014(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+  feat: ContentEntity,
+  body: z.infer<typeof ritualCaster2014FeatBodySchema>,
+): void {
+  const featId = feat.id;
+  const featName = feat.name.en ?? featId;
+  const chosenListIds = ritualCasterChoice(character, state, `${featId}.choice.spell-list-class`);
+  const listClassId = chosenListIds[0];
+  const listClass = listClassId === undefined ? undefined : index.entities.get(listClassId);
+  const classBody =
+    listClass?.kind === "class" ? spellcastingClassBodySchema.safeParse(listClass.body) : undefined;
+  if (
+    chosenListIds.length !== 1 ||
+    listClassId === undefined ||
+    !body.ritualCaster.classListOptions.includes(listClassId) ||
+    listClass?.kind !== "class" ||
+    classBody?.success !== true
+  ) {
+    addValidation(
+      state,
+      "RITUAL_CASTER_CLASS_CHOICE_INVALID",
+      `${featName} must choose exactly one of its allowed class spell lists.`,
+      ["build.choices"],
+    );
+    return;
+  }
+  const spellList = new Set(classBody.data.spellList);
+  const ability = classBody.data.spellcastingAbility;
+  const characterLevel = character.build.levels.length;
+  const researchMaximumLevel = Math.ceil(characterLevel / 2);
+
+  const initialSpellIds = ritualCasterChoice(character, state, `${featId}.choice.ritual-spells`);
+  if (
+    initialSpellIds.length !== body.ritualCaster.initialSpellCount ||
+    new Set(initialSpellIds).size !== initialSpellIds.length
+  ) {
+    addValidation(
+      state,
+      "RITUAL_CASTER_INITIAL_COUNT_INVALID",
+      `${featName}'s ritual book must start with exactly ${String(body.ritualCaster.initialSpellCount)} distinct spells of level ${String(body.ritualCaster.maximumInitialSpellLevel)} or lower.`,
+      ["build.choices"],
+    );
+  }
+  const researchSpellIds = ritualCasterChoice(
+    character,
+    state,
+    `${featId}.choice.ritual-book-research`,
+  );
+  if (
+    new Set(researchSpellIds).size !== researchSpellIds.length ||
+    researchSpellIds.some((spellId) => initialSpellIds.includes(spellId))
+  ) {
+    addValidation(
+      state,
+      "RITUAL_CASTER_RESEARCH_DUPLICATE",
+      `${featName}'s researched spells must be distinct and not already in its initial ritual book.`,
+      ["build.choices"],
+    );
+  }
+  const bookSpellIsValid = (spellId: string, maximumLevel: number): boolean => {
+    const spell = index.entities.get(spellId);
+    if (spell?.kind === "spell") {
+      const spellBody = spellBodySchema.parse(spell.body);
+      if (spellList.has(spellId) && spellBody.ritual && spellBody.level <= maximumLevel)
+        return true;
+    }
+    addValidation(
+      state,
+      "RITUAL_CASTER_SPELL_INVALID",
+      `${spellId} is not a level ${String(maximumLevel)} or lower spell with the ${body.ritualCaster.requiredSpellTag} tag on the ${listClass.name.en ?? listClassId} spell list.`,
+      ["build.choices"],
+    );
+    return false;
+  };
+  const validBookSpellIds = initialSpellIds
+    .filter((spellId) => bookSpellIsValid(spellId, body.ritualCaster.maximumInitialSpellLevel))
+    .concat(researchSpellIds.filter((spellId) => bookSpellIsValid(spellId, researchMaximumLevel)));
+
+  const abilityModifier = requireNumber(
+    state.facts[`ability.${ability}.modifier`] ?? null,
+    `${featName} spellcasting ability modifier`,
+  );
+  const proficiencyBonus = requireNumber(state.facts.proficiencyBonus ?? null, "Proficiency Bonus");
+  const attackBonus = abilityModifier + proficiencyBonus;
+  const saveDifficultyClass = 8 + abilityModifier + proficiencyBonus;
+  const attackTraceId = `spellcasting.${featId}.attackBonus`;
+  const saveTraceId = `spellcasting.${featId}.saveDifficultyClass`;
+  const sources = entitySourceReferences(feat);
+  for (const [traceId, result, operation, inputs] of [
+    [
+      attackTraceId,
+      attackBonus,
+      "add-ability-and-proficiency",
+      [abilityModifier, proficiencyBonus],
+    ],
+    [
+      saveTraceId,
+      saveDifficultyClass,
+      "add-spell-save-base-ability-and-proficiency",
+      [8, abilityModifier, proficiencyBonus],
+    ],
+  ] as const) {
+    state.facts[traceId] = result;
+    state.values[traceId] = { value: result, traceId };
+    state.traces[traceId] = {
+      id: traceId,
+      result,
+      nodes: [
+        {
+          id: `${traceId}.sum`,
+          operation,
+          inputs: [...inputs],
+          output: result,
+        },
+      ],
+      sourceReferences: sources,
+    };
+  }
+  const castingOption: NonNullable<SpellSummary["castingOptions"]>[number] = {
+    sourceId: featId,
+    ability,
+    attackBonus,
+    saveDifficultyClass,
+    attackTraceId,
+    saveTraceId,
+    freeCastAtWill: true,
+    freeCastGuidance: [
+      "Ritual book spells are cast with a ritual casting request; they expend no spell slot and are never prepared.",
+    ],
+  };
+  validBookSpellIds.forEach((spellId) => {
+    addMagicInitiateSpell(character, spellId, false, castingOption, index, state);
+  });
 }
 
 function validateConcentration(

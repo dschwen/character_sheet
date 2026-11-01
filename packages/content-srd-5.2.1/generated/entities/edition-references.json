@@ -116,12 +116,12 @@
       "ritualCaster": {
         "castingAbilitySource": "chosen-class-list",
         "classListOptions": [
-          "bard",
-          "cleric",
-          "druid",
-          "sorcerer",
-          "warlock",
-          "wizard"
+          "srd521.class.bard",
+          "srd521.class.cleric",
+          "srd521.class.druid",
+          "srd521.class.sorcerer",
+          "srd521.class.warlock",
+          "srd521.class.wizard"
         ],
         "edition": "2014",
         "growsWithProficiencyBonus": false,
