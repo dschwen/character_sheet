@@ -5843,6 +5843,10 @@ function evaluateRitualCaster2014(
       sourceReferences: sources,
     };
   }
+  // The 2014 book is only used through ritual casting requests: the record grants no resource-based
+  // or at-will non-ritual free casting, so no free-cast fields are set here. A `useFreeCast`
+  // request against a book spell fails with SPELL_FREE_CAST_UNAVAILABLE, and the transition's
+  // `asRitual` branch never reaches the preparation check.
   const castingOption: NonNullable<SpellSummary["castingOptions"]>[number] = {
     sourceId: featId,
     ability,
@@ -5850,10 +5854,6 @@ function evaluateRitualCaster2014(
     saveDifficultyClass,
     attackTraceId,
     saveTraceId,
-    freeCastAtWill: true,
-    freeCastGuidance: [
-      "Ritual book spells are cast with a ritual casting request; they expend no spell slot and are never prepared.",
-    ],
   };
   validBookSpellIds.forEach((spellId) => {
     addMagicInitiateSpell(character, spellId, false, castingOption, index, state);

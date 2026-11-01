@@ -3876,41 +3876,54 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     <p className="empty">No spells known.</p>
                   ) : (
                     <div className="spell-list">
-                      {evaluation.spells.map((spell) => (
-                        <div key={spell.id}>
-                          <span>
-                            <strong>{spell.name}</strong>
+                      {evaluation.spells.map((spell) => {
+                        // Out-of-SRD edition-reference feats (ADR 0013) attribute their grants by
+                        // their full feat entity id, whose name states the variant and edition.
+                        const ritualFeatSourceId = spell.castingOptions?.find((option) =>
+                          option.sourceId.includes(".feat.general.ritual-caster"),
+                        )?.sourceId;
+                        return (
+                          <div key={spell.id}>
+                            <span>
+                              <strong>{spell.name}</strong>
+                              <small>
+                                {spell.level === 0 ? "Cantrip" : `Level ${String(spell.level)}`} ·{" "}
+                                {titleCase(spell.school)}
+                              </small>
+                            </span>
+                            <span className="spell-badges">
+                              {spell.effectsRequireReview ? (
+                                <i title="Damage and conditional effects require source-text adjudication.">
+                                  Effects assisted
+                                </i>
+                              ) : null}
+                              {spell.prepared ? <i>Prepared</i> : null}
+                              {spell.concentration ? <i>Concentration</i> : null}
+                              {spell.ritual ? <i>Ritual</i> : null}
+                              {ritualFeatSourceId === undefined ? null : (
+                                <i title="Granted by an out-of-SRD edition-reference feat record.">
+                                  {names.get(ritualFeatSourceId) ??
+                                    shortEntityName(ritualFeatSourceId)}
+                                </i>
+                              )}
+                              {spell.castingOptions?.some((option) =>
+                                option.sourceId.includes(".feat.origin.magic-initiate."),
+                              ) ? (
+                                <i>Magic Initiate</i>
+                              ) : null}
+                              {spell.castingOptions?.some((option) =>
+                                option.sourceId.startsWith("srd521.species."),
+                              ) ? (
+                                <i>Species Magic</i>
+                              ) : null}
+                            </span>
                             <small>
-                              {spell.level === 0 ? "Cantrip" : `Level ${String(spell.level)}`} ·{" "}
-                              {titleCase(spell.school)}
+                              {spell.castingTime} · {spell.range} · {spell.duration}
                             </small>
-                          </span>
-                          <span className="spell-badges">
-                            {spell.effectsRequireReview ? (
-                              <i title="Damage and conditional effects require source-text adjudication.">
-                                Effects assisted
-                              </i>
-                            ) : null}
-                            {spell.prepared ? <i>Prepared</i> : null}
-                            {spell.concentration ? <i>Concentration</i> : null}
-                            {spell.ritual ? <i>Ritual</i> : null}
-                            {spell.castingOptions?.some((option) =>
-                              option.sourceId.includes(".feat.origin.magic-initiate."),
-                            ) ? (
-                              <i>Magic Initiate</i>
-                            ) : null}
-                            {spell.castingOptions?.some((option) =>
-                              option.sourceId.startsWith("srd521.species."),
-                            ) ? (
-                              <i>Species Magic</i>
-                            ) : null}
-                          </span>
-                          <small>
-                            {spell.castingTime} · {spell.range} · {spell.duration}
-                          </small>
-                          {spellRollControls(spell)}
-                        </div>
-                      ))}
+                            {spellRollControls(spell)}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </Section>

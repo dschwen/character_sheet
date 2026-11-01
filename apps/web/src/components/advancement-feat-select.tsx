@@ -43,6 +43,12 @@ export function AdvancementFeatSelect({
         Prerequisites are checked before this feat’s increase. Additional feat categories are not
         yet supported here.
       </small>
+      {feat?.editionReference === undefined ? null : (
+        <small>
+          Out-of-SRD edition reference: {feat.editionReference.edition} {feat.editionReference.book}{" "}
+          — not SRD 5.2.1 content. Reference: {feat.editionReference.referenceUrl}
+        </small>
+      )}
       {feat?.advancement?.combatGuidance.map((guidance) => (
         <small key={guidance}>{guidance}</small>
       ))}

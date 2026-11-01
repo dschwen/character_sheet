@@ -11,6 +11,8 @@ import {
   expertiseSelectionSources,
   featureChoiceCount,
   magicInitiateFeatIds,
+  proficiencyBonusAtLevel,
+  ritualCasterFeatIds,
   spellSelectionCounts,
   updateBuilderLevel,
   validateBuilderDraft,
@@ -19,6 +21,7 @@ import {
   type BuildCharacterOptions,
   type CharacterBuilderDraft,
   type MagicInitiateSelection,
+  type RitualCasterSelection,
 } from "./character-builder";
 import { abilities, type Ability } from "./presentation";
 import { featSelectionKey, savedAdvancementFeats } from "./advancement-feats";
@@ -92,6 +95,41 @@ export function magicInitiateSelections(
         levelOneSpellId !== undefined
         ? [[featId, { ability, cantripIds: [...cantripIds], levelOneSpellId }]]
         : [];
+    }),
+  );
+}
+
+export function ritualCasterSelections(
+  character: CharacterDocument,
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): Readonly<Record<string, RitualCasterSelection>> {
+  return Object.fromEntries(
+    ritualCasterFeatIds(draft, catalog).flatMap((featId) => {
+      const definition = catalog.feats[featId]?.ritualCaster;
+      if (definition === undefined) return [];
+      const spellIds = character.build.choices.find(
+        (choice) => choice.choiceId === `${featId}.choice.ritual-spells`,
+      )?.optionIds;
+      // Saved records are the source of truth; a character with no initial-spell record gets an
+      // empty draft here and the reconcile/update path fills it like a fresh selection.
+      if (spellIds === undefined) return [];
+      const listClassId = character.build.choices.find(
+        (choice) => choice.choiceId === `${featId}.choice.spell-list-class`,
+      )?.optionIds[0];
+      const researchSpellIds = character.build.choices.find(
+        (choice) => choice.choiceId === `${featId}.choice.ritual-book-research`,
+      )?.optionIds;
+      return [
+        [
+          featId,
+          {
+            listClassId: definition.edition === "2014" ? (listClassId ?? "") : "",
+            spellIds: [...spellIds],
+            researchSpellIds: [...(researchSpellIds ?? [])],
+          },
+        ],
+      ];
     }),
   );
 }
@@ -246,6 +284,7 @@ export function createLevelUpDraft(
       .filter((choice) => choice.sourceId === originFeatId)
       .map((choice) => choice.skillId),
     magicInitiateChoices: {},
+    ritualCasterChoices: {},
     expertiseSkillIds: character.build.proficiencyChoices.expertise
       .filter((choice) => expertiseSources.includes(choice.sourceId))
       .sort(
@@ -260,6 +299,7 @@ export function createLevelUpDraft(
     preparedSpellIds: [...character.loadout.preparedSpellIds],
   };
   currentDraft.magicInitiateChoices = magicInitiateSelections(character, currentDraft, catalog);
+  currentDraft.ritualCasterChoices = ritualCasterSelections(character, currentDraft, catalog);
   return updateBuilderLevel(currentDraft, catalog, eligibility.targetLevel);
 }
 
@@ -388,6 +428,41 @@ function advancementIssues(
         `Replace no more than ${String(replacementMaximum)} ${catalog.feats[featId]?.name ?? featId} spell during level up.`,
       );
     }
+  }
+  const currentRitualCaster = ritualCasterSelections(character, draft, catalog);
+  for (const featId of ritualCasterFeatIds(draft, catalog)) {
+    const before = currentRitualCaster[featId];
+    const after = draft.ritualCasterChoices[featId];
+    const definition = catalog.feats[featId]?.ritualCaster;
+    if (before === undefined || after === undefined || definition === undefined) continue;
+    const featName = catalog.feats[featId]?.name ?? featId;
+    if (definition.edition === "2014") {
+      // The 2014 book is fixed at acquisition: researching new spells happens in play and the
+      // builder never authors research, so the carried records must stay byte-identical here.
+      if (
+        before.listClassId !== after.listClassId ||
+        before.spellIds.length !== after.spellIds.length ||
+        before.spellIds.some((spellId) => !after.spellIds.includes(spellId)) ||
+        before.researchSpellIds.length !== after.researchSpellIds.length ||
+        before.researchSpellIds.some((spellId) => !after.researchSpellIds.includes(spellId))
+      )
+        issues.push(
+          `${featName} ritual book selections cannot change during level up; new research happens during play.`,
+        );
+      continue;
+    }
+    // The 2024 selection never shrinks through level-up editing; additions are bounded by the
+    // Proficiency Bonus growth the engine's count bound newly opens at this level.
+    const growth = Math.max(
+      0,
+      proficiencyBonusAtLevel(targetLevel) - proficiencyBonusAtLevel(targetLevel - 1),
+    );
+    const added = after.spellIds.filter((spellId) => !before.spellIds.includes(spellId)).length;
+    const removed = before.spellIds.filter((spellId) => !after.spellIds.includes(spellId)).length;
+    if (removed > 0 || added > growth)
+      issues.push(
+        `${featName} ritual spells cannot be removed; additions are limited to the ${String(growth)} slot${growth === 1 ? "" : "s"} opened by Proficiency Bonus growth.`,
+      );
   }
   const selectedSpecies = catalog.species[draft.speciesId];
   if (selectedSpecies !== undefined) {

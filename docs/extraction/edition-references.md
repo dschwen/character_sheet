@@ -44,10 +44,14 @@ so both variants can coexist on one sheet.
 
 ## Builder availability
 
-Both records are still held out of the character builder's feat catalog: presenting a feat whose
-spells cannot yet be chosen through the UI would half-implement it. They re-enter the builder as a
-deliberate later step, with explicit "2014 PHB variant" / "2024 PHB variant" source labels and a
-browser-verified selection flow.
+Both records are in the character builder's feat catalog, gated like every other General feat: the
+catalog admits an `AUTHORED` feat only when its body parses as a `ritualCaster` definition the
+engine dispatches on, and the feat select offers each record only where its stated prerequisites
+apply. Each appears under its explicit "2014 PHB variant" / "2024 PHB variant" label, the pickers
+state that the record is an out-of-SRD edition reference rather than SRD 5.2.1 content, and the
+sheet's spell list attributes each grant with the variant name. The whole selection flow — both
+variants through creation and a level up — is gated by `e2e/ritual-caster.spec.ts` in the browser
+suite.
 
 ## Recorded divergences
 

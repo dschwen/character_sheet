@@ -193,8 +193,14 @@ rounded up, the chosen class's casting ability, and slot-free always-ritual cast
 grants through the shared ritual casting request; a feat declaring no ability-increase patterns
 occupies its feat slot with exactly one allocation of no increases so aggregate reconciliation
 accepts it. Both variants' calculation traces are qualified by the full feat entity id, and a shared
-test keeps both feats distinct on one sheet. The builder presentation with explicit variant labels
-and the browser gate for a selection flow remain unfinished. See
+test keeps both feats distinct on one sheet. The builder and level-up flows now present both
+variants through the feat select at Ability Score Improvement grants, with explicit variant labels,
+provenance notes, a bounds-checked spell editor (auto-filled to exactly the Proficiency Bonus at
+acquisition for the 2024 variant; exactly two chosen class-list spells for the 2014 variant),
+level-up rules that lock the 2014 book and open only Proficiency-Bonus-growth slots for the 2024
+book, and sheet attribution of every grant to its variant record. `e2e/ritual-caster.spec.ts`
+drives both variants through the production export. Researching 2014 book spells during play
+remains outside the UI: the builder and level-up read the research record but never add to it. See
 `docs/rules-engine/ritual-caster-2024.md` and `docs/rules-engine/ritual-caster-2014.md`.
 
 | Milestone                        | Current evidence and required remaining work                                                                                                                                                                                                                                                                                                    |

@@ -85,6 +85,17 @@ export function featAllocationOptions(feat: {
     }
   };
   for (const pattern of metadata.abilityScoreIncreasePatterns) visit(pattern, 0, {});
+  if (metadata.abilityScoreIncreasePatterns.length === 0) {
+    // A feat record that declares no increase patterns at all (the 2014-variant Ritual Caster
+    // record) occupies its feat slot with exactly one legal allocation: no increases at all.
+    // The rules engine reconciles the same shape in allocationsByFeat.
+    const selection: AdvancementFeatSelection = { featId: feat.id, abilityScoreIncreases: {} };
+    options.set(featSelectionKey(selection), {
+      value: featSelectionKey(selection),
+      label: `${feat.name}: no ability score increase`,
+      selection,
+    });
+  }
   return [...options.values()];
 }
 

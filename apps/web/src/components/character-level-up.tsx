@@ -6,6 +6,7 @@ import type { CharacterDocument } from "@dnd/character-model";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 import { featIncreaseLabel } from "../lib/advancement-feats";
 import { AdvancementFeatSelect } from "./advancement-feat-select";
+import { RitualCasterChoices } from "./ritual-caster-choices";
 
 import {
   createLevelUpDraft,
@@ -25,6 +26,7 @@ import {
   featureFeatOptionAlreadySelected,
   magicInitiateFeatIds,
   masteryCount,
+  reconcileRitualCasterChoices,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
   updateMagicInitiateSelection,
@@ -597,16 +599,28 @@ export function CharacterLevelUp({
                     setDraft((value) =>
                       value === undefined
                         ? value
-                        : {
-                            ...value,
-                            advancementFeats: value.advancementFeats.map((allocation, index) =>
-                              index === asiIndex ? selection : allocation,
-                            ),
-                          },
+                        : reconcileRitualCasterChoices(
+                            {
+                              ...value,
+                              advancementFeats: value.advancementFeats.map((allocation, index) =>
+                                index === asiIndex ? selection : allocation,
+                              ),
+                            },
+                            catalog,
+                          ),
                     );
                   }}
                 />
               ) : null}
+
+              <RitualCasterChoices
+                draft={draft}
+                catalog={catalog}
+                levelUp
+                setDraft={(update) => {
+                  setDraft((value) => (value === undefined ? value : update(value)));
+                }}
+              />
 
               {newMasteryCount > 0 ? (
                 <div className="spell-choice-section">

@@ -90,6 +90,7 @@ export interface CharacterBuilderDraft {
   speciesChoiceSelections: Readonly<Record<string, string[]>>;
   originFeatSkillIds: string[];
   magicInitiateChoices: Readonly<Record<string, MagicInitiateSelection>>;
+  ritualCasterChoices: Readonly<Record<string, RitualCasterSelection>>;
   expertiseSkillIds: string[];
   featureChoiceSelections: Readonly<Record<string, string[]>>;
   startingEquipmentOptionId: string;
@@ -102,6 +103,15 @@ export interface MagicInitiateSelection {
   ability: Ability;
   cantripIds: string[];
   levelOneSpellId: string;
+}
+
+// `<featId>.choice.ritual-spells` and, for the 2014 variant, the class-list and research records.
+// spellIds is the initial book (2014) or the current selection (2024); research is the 2014 book's
+// copied-in-play additions, which the builder preserves but never authors.
+export interface RitualCasterSelection {
+  listClassId: string;
+  spellIds: string[];
+  researchSpellIds: string[];
 }
 
 export type SpeciesSize = NonNullable<CharacterDocument["build"]["speciesSize"]>;
@@ -178,6 +188,8 @@ export interface FeatBuilderCatalog {
   skillMinimum: number;
   skillMaximum: number;
   magicInitiate?: MagicInitiateCatalog;
+  ritualCaster?: RitualCasterCatalog;
+  editionReference?: EditionReferenceCatalog;
 }
 
 export interface MagicInitiateCatalog {
@@ -197,6 +209,25 @@ export interface SpellOption {
   name: string;
   level: number;
   school: string;
+}
+
+// The out-of-SRD Ritual Caster variant each record declares, with its selection pools. Spell
+// options are stored at their real levels; every use filters to the variant's level bound.
+export interface RitualCasterCatalog {
+  edition: "2014" | "2024";
+  maximumSpellLevel: number;
+  initialSpellCount: number;
+  maximumInitialSpellLevel: number;
+  researchLevelCap: "half-character-level-rounded-up" | null;
+  classListOptions: { id: string; name: string }[];
+  allRitualSpells: SpellOption[];
+  spellsByClass: Record<string, SpellOption[]>;
+}
+
+export interface EditionReferenceCatalog {
+  edition: string;
+  book: string;
+  referenceUrl: string;
 }
 
 export interface ClassBuilderCatalog {
@@ -742,6 +773,133 @@ function classCatalog(
   };
 }
 
+// The same Proficiency Bonus progression the engine uses for its spell-count bounds
+// (2 + floor((level - 1) / 4)); the builder test asserts the shared boundaries hold together.
+export function proficiencyBonusAtLevel(level: number): number {
+  return 2 + Math.floor((level - 1) / 4);
+}
+
+type RitualCasterBody =
+  | { edition: "2024" }
+  | {
+      edition: "2014";
+      initialSpellCount: number;
+      maximumInitialSpellLevel: number;
+      classListOptions: string[];
+    };
+
+// Mirror the two ritualCaster shapes the rules engine dispatches on. A record whose ritualCaster
+// block matches neither is not evaluated as a ritual feat by the engine either, so offering it in
+// the builder would present a feat that cannot grant its spells.
+function ritualCasterBody(value: unknown): RitualCasterBody | undefined {
+  const body = objectValue(value);
+  const ritual = objectValue(body?.ritualCaster);
+  if (body?.category !== "general" || ritual?.requiredSpellTag !== "ritual") return undefined;
+  if (
+    ritual.edition === "2024" &&
+    ritual.maximumSpellLevel === 1 &&
+    ritual.spellListSource === "all" &&
+    ritual.spellCountSource === "proficiency-bonus" &&
+    ritual.growsWithProficiencyBonus === true &&
+    ritual.castingAbilitySource === "feat-increased-ability" &&
+    ritual.quickRitualRecharge === "long-rest"
+  )
+    return { edition: "2024" };
+  const classListOptions = stringArray(ritual.classListOptions);
+  if (
+    ritual.edition === "2014" &&
+    Number.isInteger(ritual.initialSpellCount) &&
+    (ritual.initialSpellCount as number) > 0 &&
+    ritual.maximumInitialSpellLevel === 1 &&
+    ritual.researchSpellLevelCap === "half-character-level-rounded-up" &&
+    ritual.spellListSource === "chosen-class-list" &&
+    ritual.castingAbilitySource === "chosen-class-list" &&
+    ritual.growsWithProficiencyBonus === false &&
+    ritual.quickRitualRecharge === null &&
+    classListOptions.length > 0
+  )
+    return {
+      edition: "2014",
+      initialSpellCount: ritual.initialSpellCount as number,
+      maximumInitialSpellLevel: 1,
+      classListOptions,
+    };
+  return undefined;
+}
+
+export function ritualCasterSpellOptions(
+  definition: RitualCasterCatalog,
+  listClassId: string,
+  maximumLevel: number,
+): SpellOption[] {
+  const pool =
+    definition.edition === "2024"
+      ? definition.allRitualSpells
+      : (definition.spellsByClass[listClassId] ?? []);
+  return pool.filter((spell) => spell.level <= maximumLevel);
+}
+
+function ritualCasterInitialMaximumLevel(definition: RitualCasterCatalog): number {
+  return definition.edition === "2024"
+    ? definition.maximumSpellLevel
+    : definition.maximumInitialSpellLevel;
+}
+
+export function ritualCasterInitialCandidates(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  featId: string,
+): SpellOption[] {
+  const definition = catalog.feats[featId]?.ritualCaster;
+  if (definition === undefined) return [];
+  const selection = draft.ritualCasterChoices[featId];
+  return ritualCasterSpellOptions(
+    definition,
+    selection?.listClassId ?? "",
+    ritualCasterInitialMaximumLevel(definition),
+  );
+}
+
+export function ritualCasterResearchCandidates(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  featId: string,
+): SpellOption[] {
+  const definition = catalog.feats[featId]?.ritualCaster;
+  const selection = draft.ritualCasterChoices[featId];
+  if (definition?.researchLevelCap !== "half-character-level-rounded-up" || selection === undefined)
+    return [];
+  return ritualCasterSpellOptions(definition, selection.listClassId, Math.ceil(draft.level / 2));
+}
+
+function ritualCasterAcquisitionLevel(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  featId: string,
+): number {
+  const index = draft.advancementFeats.findIndex((selection) => selection.featId === featId);
+  if (index < 0) return 0;
+  return catalog.classes[draft.classId].abilityScoreImprovementLevels[index] ?? 0;
+}
+
+// The 2024 selection is bounded between the Proficiency Bonus at the recorded acquisition level
+// and the current one; it never grows automatically. The 2014 book is exactly its initial count;
+// research is preserved, never auto-filled.
+export function ritualCasterBounds(
+  definition: RitualCasterCatalog,
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  featId: string,
+): { minimum: number; maximum: number } {
+  if (definition.edition === "2014")
+    return { minimum: definition.initialSpellCount, maximum: definition.initialSpellCount };
+  const acquisition = proficiencyBonusAtLevel(ritualCasterAcquisitionLevel(draft, catalog, featId));
+  return {
+    minimum: acquisition,
+    maximum: Math.max(acquisition, proficiencyBonusAtLevel(draft.level)),
+  };
+}
+
 export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): BuilderCatalog {
   const entity = (id: string) => rulesPackage.entities.find((candidate) => candidate.id === id);
   const species = Object.fromEntries(
@@ -909,14 +1067,33 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
         ];
       }),
   ) as Record<string, BackgroundBuilderCatalog>;
+  const ritualSpellOptionsFor = (spellIds: readonly string[]): SpellOption[] =>
+    spellIds.flatMap((spellId) => {
+      const spell = entity(spellId);
+      const spellBody = objectValue(spell?.body);
+      const level = numericValue(spellBody?.level, -1);
+      return spell?.kind === "spell" && level >= 1 && spellBody?.ritual === true
+        ? [
+            {
+              id: spell.id,
+              name: localizedName(spell),
+              level,
+              school: typeof spellBody.school === "string" ? spellBody.school : "unknown",
+            },
+          ]
+        : [];
+    });
   const feats = Object.fromEntries(
     rulesPackage.entities
       .filter((candidate) => candidate.kind === "feat")
-      // Out-of-SRD edition-reference records (ADR 0013) stay out of the builder catalog until the
-      // rules engine implements their variant semantics; offering one earlier would present a
-      // half-implemented feat that cannot grant its spells. Re-entry is a deliberate later step
-      // with explicit source labels, not a side effect of the metadata gate.
-      .filter((candidate) => candidate.review.status !== "AUTHORED")
+      // Out-of-SRD edition-reference records (ADR 0013) are offered only where the rules engine
+      // can evaluate their variant semantics — currently the two Ritual Caster records, whose
+      // names state their edition and whose picker carries the provenance note. Any other
+      // AUTHORED record stays out of the catalog until the engine evaluates it.
+      .filter(
+        (candidate) =>
+          candidate.review.status !== "AUTHORED" || ritualCasterBody(candidate.body) !== undefined,
+      )
       .map((candidate) => {
         const body = objectValue(candidate.body);
         const proficiencyChoice = objectValue(body?.proficiencyChoice);
@@ -947,6 +1124,53 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
         const abilityIds = stringArray(body?.spellcastingAbilityChoice)
           .map(abilityValue)
           .filter((ability): ability is Ability => ability !== undefined);
+        const ritualBody = ritualCasterBody(candidate.body);
+        const editionSpan = objectValue(
+          (Array.isArray(candidate.source) ? candidate.source : []).find(
+            (span) => objectValue(span)?.kind === "edition-reference",
+          ),
+        );
+        const ritualDefinition =
+          ritualBody === undefined
+            ? undefined
+            : {
+                edition: ritualBody.edition,
+                maximumSpellLevel: 1,
+                initialSpellCount: ritualBody.edition === "2014" ? ritualBody.initialSpellCount : 0,
+                maximumInitialSpellLevel: 1,
+                researchLevelCap:
+                  ritualBody.edition === "2014"
+                    ? ("half-character-level-rounded-up" as const)
+                    : null,
+                classListOptions:
+                  ritualBody.edition === "2014"
+                    ? ritualBody.classListOptions.flatMap((classId) => {
+                        const classEntity = entity(classId);
+                        return classEntity === undefined
+                          ? []
+                          : [{ id: classId, name: localizedName(classEntity) }];
+                      })
+                    : [],
+                allRitualSpells:
+                  ritualBody.edition === "2024"
+                    ? ritualSpellOptionsFor(
+                        rulesPackage.entities
+                          .filter((candidate2) => candidate2.kind === "spell")
+                          .map((candidate2) => candidate2.id),
+                      )
+                    : [],
+                spellsByClass:
+                  ritualBody.edition === "2014"
+                    ? Object.fromEntries(
+                        ritualBody.classListOptions.map((classId) => [
+                          classId,
+                          ritualSpellOptionsFor(
+                            stringArray(objectValue(entity(classId)?.body)?.spellList),
+                          ),
+                        ]),
+                      )
+                    : {},
+              };
         return [
           candidate.id,
           {
@@ -958,6 +1182,23 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
             ...(advancementFeatMetadataSchema.safeParse(body).success
               ? { advancement: advancementFeatMetadataSchema.parse(body) }
               : {}),
+            ...(ritualDefinition === undefined
+              ? {}
+              : {
+                  ritualCaster: ritualDefinition,
+                  ...(editionSpan?.edition === undefined ||
+                  typeof editionSpan.edition !== "string" ||
+                  typeof editionSpan.book !== "string" ||
+                  typeof editionSpan.referenceUrl !== "string"
+                    ? {}
+                    : {
+                        editionReference: {
+                          edition: editionSpan.edition,
+                          book: editionSpan.book,
+                          referenceUrl: editionSpan.referenceUrl,
+                        },
+                      }),
+                }),
             skillMinimum: categories.includes("skill")
               ? numericValue(proficiencyChoice?.minimum)
               : 0,
@@ -1288,6 +1529,127 @@ export function updateMagicInitiateSelection(
     magicInitiateChoices: {
       ...draft.magicInitiateChoices,
       [featId]: { ability, cantripIds, levelOneSpellId },
+    },
+  };
+}
+
+export function ritualCasterFeatIds(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): string[] {
+  return [
+    ...new Set(
+      draft.advancementFeats.flatMap((selection) =>
+        catalog.feats[selection.featId]?.ritualCaster === undefined ? [] : [selection.featId],
+      ),
+    ),
+  ];
+}
+
+export function reconcileRitualCasterChoices(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): CharacterBuilderDraft {
+  const choices = Object.fromEntries(
+    ritualCasterFeatIds(draft, catalog).flatMap((featId) => {
+      const definition = catalog.feats[featId]?.ritualCaster;
+      if (definition === undefined) return [];
+      const current = draft.ritualCasterChoices[featId];
+      // Prefer a still-valid saved class list; otherwise default to the character's own class
+      // when its list is selectable, else the first allowed class.
+      const listClassId = definition.classListOptions.some(
+        (option) => option.id === current?.listClassId,
+      )
+        ? (current?.listClassId ?? "")
+        : definition.classListOptions.some((option) => option.id === draft.classId)
+          ? draft.classId
+          : (definition.classListOptions[0]?.id ?? "");
+      const initialOptions = ritualCasterSpellOptions(
+        definition,
+        listClassId,
+        ritualCasterInitialMaximumLevel(definition),
+      ).map((spell) => spell.id);
+      const bounds = ritualCasterBounds(definition, draft, catalog, featId);
+      // Auto-fill only reaches the minimum for a new selection; a selection the user already
+      // grew toward its cap is kept where it is, bounded by the cap.
+      const currentSpellIds = current?.spellIds ?? [];
+      const filledCount = Math.min(
+        Math.max(bounds.minimum, currentSpellIds.length),
+        bounds.maximum,
+      );
+      const spellIds = fillSelections(currentSpellIds, initialOptions, filledCount);
+      // Research is never auto-filled: the builder only carries records that already exist (from a
+      // saved character), and keeps the ones still legal at the draft's current level.
+      const previousResearch = current?.researchSpellIds ?? [];
+      const researchMaximum =
+        definition.researchLevelCap === "half-character-level-rounded-up"
+          ? Math.ceil(draft.level / 2)
+          : 0;
+      const researchOptions = ritualCasterSpellOptions(
+        definition,
+        listClassId,
+        researchMaximum,
+      ).map((spell) => spell.id);
+      const researchSpellIds = previousResearch.filter(
+        (spellId, index) =>
+          previousResearch.indexOf(spellId) === index &&
+          !spellIds.includes(spellId) &&
+          researchOptions.includes(spellId),
+      );
+      return [[featId, { listClassId, spellIds, researchSpellIds }]];
+    }),
+  );
+  return { ...draft, ritualCasterChoices: choices };
+}
+
+export function updateRitualCasterSelection(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  featId: string,
+  selection: Partial<RitualCasterSelection>,
+): CharacterBuilderDraft {
+  if (!ritualCasterFeatIds(draft, catalog).includes(featId)) return draft;
+  const current = draft.ritualCasterChoices[featId];
+  if (current === undefined) return reconcileRitualCasterChoices(draft, catalog);
+  const definition = catalog.feats[featId]?.ritualCaster;
+  if (definition === undefined) return draft;
+  const requested = { ...current, ...selection };
+  const listClassId = definition.classListOptions.some(
+    (option) => option.id === requested.listClassId,
+  )
+    ? requested.listClassId
+    : current.listClassId;
+  const initialOptions = ritualCasterSpellOptions(
+    definition,
+    listClassId,
+    ritualCasterInitialMaximumLevel(definition),
+  ).map((spell) => spell.id);
+  const bounds = ritualCasterBounds(definition, draft, catalog, featId);
+  // Trimming only exceeds the cap; dropping below the minimum is kept so validation can name it.
+  const spellIds = requested.spellIds
+    .filter(
+      (spellId, index) =>
+        initialOptions.includes(spellId) && requested.spellIds.indexOf(spellId) === index,
+    )
+    .slice(0, Math.max(bounds.maximum, 0));
+  const researchMaximum =
+    definition.researchLevelCap === "half-character-level-rounded-up"
+      ? Math.ceil(draft.level / 2)
+      : 0;
+  const researchOptions = ritualCasterSpellOptions(definition, listClassId, researchMaximum).map(
+    (spell) => spell.id,
+  );
+  const researchSpellIds = requested.researchSpellIds.filter(
+    (spellId, index) =>
+      requested.researchSpellIds.indexOf(spellId) === index &&
+      !spellIds.includes(spellId) &&
+      researchOptions.includes(spellId),
+  );
+  return {
+    ...draft,
+    ritualCasterChoices: {
+      ...draft.ritualCasterChoices,
+      [featId]: { listClassId, spellIds, researchSpellIds },
     },
   };
 }
@@ -2068,6 +2430,7 @@ export function defaultBuilderDraft(
     speciesChoiceSelections: reconcileSpeciesChoiceSelections(species, {}),
     originFeatSkillIds,
     magicInitiateChoices: {},
+    ritualCasterChoices: {},
     expertiseSkillIds: [],
     featureChoiceSelections,
     startingEquipmentOptionId: startingEquipmentOption.id,
@@ -2090,7 +2453,10 @@ export function defaultBuilderDraft(
     selectedClass.spellcasting === undefined
       ? draft
       : { ...draft, ...spellSelections(draft, catalog, level) };
-  return reconcileMagicInitiateChoices(completedDraft, catalog);
+  return reconcileRitualCasterChoices(
+    reconcileMagicInitiateChoices(completedDraft, catalog),
+    catalog,
+  );
 }
 
 export function updateBuilderLevel(
@@ -2146,10 +2512,13 @@ export function updateBuilderLevel(
       requiredExpertise,
     ),
   };
-  return reconcileMagicInitiateChoices(
-    selectedClass.spellcasting === undefined
-      ? next
-      : { ...next, ...spellSelections(next, catalog, level) },
+  return reconcileRitualCasterChoices(
+    reconcileMagicInitiateChoices(
+      selectedClass.spellcasting === undefined
+        ? next
+        : { ...next, ...spellSelections(next, catalog, level) },
+      catalog,
+    ),
     catalog,
   );
 }
@@ -2398,6 +2767,53 @@ export function validateBuilderDraft(
     )
   ) {
     issues.push("Remove Magic Initiate choices for feats this character does not have.");
+  }
+  for (const featId of ritualCasterFeatIds(draft, catalog)) {
+    const feat = catalog.feats[featId];
+    const definition = feat?.ritualCaster;
+    const selection = draft.ritualCasterChoices[featId];
+    if (definition === undefined || selection === undefined) {
+      issues.push(`Complete the ${feat?.name ?? featId} ritual spell choices.`);
+      continue;
+    }
+    const bounds = ritualCasterBounds(definition, draft, catalog, featId);
+    const initialOptions = ritualCasterSpellOptions(
+      definition,
+      selection.listClassId,
+      ritualCasterInitialMaximumLevel(definition),
+    ).map((spell) => spell.id);
+    // Research exists only for the 2014 variant; any research record on the 2024 record is rejected
+    // because its cap is null and the option set is therefore empty.
+    const researchMaximum =
+      definition.researchLevelCap === "half-character-level-rounded-up"
+        ? Math.ceil(draft.level / 2)
+        : 0;
+    const researchOptions = ritualCasterSpellOptions(
+      definition,
+      selection.listClassId,
+      researchMaximum,
+    ).map((spell) => spell.id);
+    if (
+      (definition.edition === "2014" &&
+        !definition.classListOptions.some((option) => option.id === selection.listClassId)) ||
+      selection.spellIds.length < bounds.minimum ||
+      selection.spellIds.length > bounds.maximum ||
+      new Set(selection.spellIds).size !== selection.spellIds.length ||
+      selection.spellIds.some((spellId) => !initialOptions.includes(spellId)) ||
+      new Set(selection.researchSpellIds).size !== selection.researchSpellIds.length ||
+      selection.researchSpellIds.some(
+        (spellId) => !researchOptions.includes(spellId) || selection.spellIds.includes(spellId),
+      )
+    ) {
+      issues.push(`Complete the ${feat?.name ?? featId} ritual spell choices.`);
+    }
+  }
+  if (
+    Object.keys(draft.ritualCasterChoices).some(
+      (featId) => !ritualCasterFeatIds(draft, catalog).includes(featId),
+    )
+  ) {
+    issues.push("Remove ritual spell choices for feats this character does not have.");
   }
 
   for (const choice of selectedClass.featureChoices) {
@@ -2676,6 +3092,31 @@ function assembleCharacter(
               choiceId: `${featId}.choice.level-one-spell`,
               optionIds: [selection.levelOneSpellId],
             },
+          ];
+        }),
+        ...ritualCasterFeatIds(draft, catalog).flatMap((featId) => {
+          const definition = catalog.feats[featId]?.ritualCaster;
+          const selection = draft.ritualCasterChoices[featId];
+          if (definition === undefined || selection === undefined) return [];
+          return [
+            ...(definition.edition === "2014"
+              ? [
+                  {
+                    choiceId: `${featId}.choice.spell-list-class`,
+                    optionIds: [selection.listClassId],
+                  },
+                ]
+              : []),
+            { choiceId: `${featId}.choice.ritual-spells`, optionIds: selection.spellIds },
+            // The engine reads the research record only when it exists; an empty one is not authored.
+            ...(definition.edition === "2014" && selection.researchSpellIds.length > 0
+              ? [
+                  {
+                    choiceId: `${featId}.choice.ritual-book-research`,
+                    optionIds: selection.researchSpellIds,
+                  },
+                ]
+              : []),
           ];
         }),
       ],

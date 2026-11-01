@@ -18,11 +18,11 @@ style) is not modeled: feats are offered at the reviewed Ability Score Improveme
 
 Three records in `build.choices` describe the book, all keyed by the feat's entity id:
 
-| Choice id                                    | Meaning                                                     |
-| -------------------------------------------- | ----------------------------------------------------------- |
-| `<featId>.choice.spell-list-class`           | Exactly one class id from the record's `classListOptions`    |
-| `<featId>.choice.ritual-spells`              | Exactly `initialSpellCount` (2) distinct starting spells     |
-| `<featId>.choice.ritual-book-research`       | Optional further spells copied in later                        |
+| Choice id                              | Meaning                                                   |
+| -------------------------------------- | --------------------------------------------------------- |
+| `<featId>.choice.spell-list-class`     | Exactly one class id from the record's `classListOptions` |
+| `<featId>.choice.ritual-spells`        | Exactly `initialSpellCount` (2) distinct starting spells  |
+| `<featId>.choice.ritual-book-research` | Optional further spells copied in later                   |
 
 `classListOptions` is a machine field of class entity ids (`srd521.class.bard` …
 `srd521.class.wizard`) so the choice resolves against class entities in the pinned SRD package; the
@@ -54,13 +54,15 @@ citing `phb-2014`, one `phb-2024`), each feeding its own feat's grants.
 
 ## Casting the book
 
-Book spells are granted as spell summaries that are **not prepared**, with `freeCastAtWill: true`
-and guidance on their casting option: they are cast through a ritual casting request
-(`request.asRitual` in the shared spell transition), which for a level 1+ spell checks only the
-Ritual tag and never reaches the preparation check, so no spell slot is expended and no preparation
-is required. There is no Quick Ritual resource — the 2014 text has no quick-casting benefit — and no
-free-cast resource to track. Book possession, finding scrolls or spellbooks to copy, and the extended
-ritual casting time are assisted, not modeled.
+Book spells are granted as spell summaries that are **not prepared**, and their casting options
+carry no free-cast fields at all — no `freeCastAtWill` and no `freeCastResourceId`, because the
+2014 text has no quick-casting benefit to model. Casting a book spell therefore goes through a
+ritual casting request (`request.asRitual` in the shared spell transition), which for a level 1+
+spell checks only the Ritual tag and never reaches the preparation check, so no spell slot is
+expended and no preparation is required; a `useFreeCast` request on a book spell is rejected with
+`SPELL_FREE_CAST_UNAVAILABLE`. In the sheet, the Ritual affordance is the only casting path for
+these grants, and the Overview attributes each one to its variant record. Book possession, finding
+scrolls or spellbooks to copy, and the extended ritual casting time are assisted, not modeled.
 
 ## Provenance
 
@@ -71,6 +73,7 @@ relabels them.
 
 ## Not yet implemented
 
-Both variants remain held out of the builder catalog until they are re-admitted with explicit
-"2014 PHB variant" / "2024 PHB variant" labels and a browser-verified selection flow — see
-[Out-of-SRD edition-reference records](../extraction/edition-references.md).
+Researching new book spells during play is not a UI flow: the builder and level-up read the
+research record but never add to it, so a researched spell exists only in a document authored or
+imported with one. The rest of the selection flow is built and browser-gated — see
+[Browser verification harness](../testing/browser-verification.md) (`e2e/ritual-caster.spec.ts`).

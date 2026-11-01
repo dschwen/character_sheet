@@ -56,10 +56,17 @@ zero in `FEAT_LEVEL_PREREQUISITE` and `FEAT_ACQUISITION_PREREQUISITE`, and in th
 gate). This is what makes the 2014-style record expressible without inventing a level requirement
 its source text does not state.
 
-## Not yet implemented
+## Builder presentation
 
-The 2014 variant's engine semantics are implemented alongside this one — see
-[Ritual Caster — 2014 PHB variant](ritual-caster-2014.md). Both variants remain held out of the
-builder catalog — see [Out-of-SRD edition-reference records](../extraction/edition-references.md) —
-until they are re-admitted with explicit "2014 PHB variant" / "2024 PHB variant" labels and a
-browser-verified selection flow.
+Both variants are in the builder and level-up flows, and the 2014 variant's engine semantics are
+implemented alongside this one — see [Ritual Caster — 2014 PHB variant](ritual-caster-2014.md) and
+[Out-of-SRD edition-reference records](../extraction/edition-references.md). Each feat appears in
+the feat select at an Ability Score Improvement grant under its explicit variant label, with an
+out-of-SRD provenance note beside it. Choosing the feat immediately materializes its spell choices:
+this variant auto-fills exactly to the Proficiency Bonus at acquisition, bounded thereafter at the
+current Proficiency Bonus, and a spell-list picker never appears because its pool is every
+Ritual-tagged spell. During a level up, earlier selections are locked and only the slots opened by
+Proficiency Bonus growth are selectable; removing a spell or adding more than the growth allows is
+reported as an advancement issue. The sheet attributes each granted spell to this variant's record.
+The flow is browser-gated in `e2e/ritual-caster.spec.ts` — see
+[Browser verification harness](../testing/browser-verification.md).

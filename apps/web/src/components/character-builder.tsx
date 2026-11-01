@@ -7,6 +7,7 @@ import type { StartingEquipmentItem } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 import { featIncreases } from "../lib/advancement-feats";
 import { AdvancementFeatSelect } from "./advancement-feat-select";
+import { RitualCasterChoices } from "./ritual-caster-choices";
 
 import {
   activeSpeciesChoices,
@@ -28,6 +29,7 @@ import {
   magicInitiateFeatIds,
   previewBuilderCharacter,
   reconcileMagicInitiateChoices,
+  reconcileRitualCasterChoices,
   skillIds,
   spellSelectionCounts,
   updateBuilderBackground,
@@ -804,15 +806,21 @@ export function CharacterBuilder({
                   catalog={catalog}
                   index={index}
                   onChange={(selection) => {
-                    setDraft((value) => ({
-                      ...value,
-                      advancementFeats: value.advancementFeats.map((previous, abilityIndex) =>
-                        abilityIndex === index ? selection : previous,
+                    setDraft((value) =>
+                      reconcileRitualCasterChoices(
+                        {
+                          ...value,
+                          advancementFeats: value.advancementFeats.map((previous, abilityIndex) =>
+                            abilityIndex === index ? selection : previous,
+                          ),
+                        },
+                        catalog,
                       ),
-                    }));
+                    );
                   }}
                 />
               ))}
+              <RitualCasterChoices draft={draft} catalog={catalog} setDraft={setDraft} />
             </div>
           ) : null}
 

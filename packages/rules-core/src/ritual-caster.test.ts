@@ -7,6 +7,7 @@ import { contentEntitySchema, packageManifestSchema } from "@dnd/content-schema"
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 
 import { evaluateCharacter } from "./character-evaluator.js";
+import { proposeSpellCast } from "./spell-transition.js";
 
 const packageRoot = new URL("../../content-srd-5.2.1/generated/", import.meta.url);
 const fixturesRoot = new URL("../../test-fixtures/", import.meta.url);
@@ -272,9 +273,9 @@ describe("2014-variant Ritual Caster", () => {
         ability: "intelligence",
         attackBonus: 5,
         saveDifficultyClass: 13,
-        freeCastAtWill: true,
       });
-      expect(option?.freeCastGuidance).toBeDefined();
+      // The 2014 text grants no non-ritual free casting: the book has no free-cast fields.
+      expect(option?.freeCastAtWill).toBeUndefined();
       expect(option?.freeCastResourceId).toBeUndefined();
     }
 
@@ -287,6 +288,25 @@ describe("2014-variant Ritual Caster", () => {
       5,
       ritual2014FeatId,
       "phb-2014",
+    );
+  });
+
+  it("book spells cast through a ritual request and reject non-ritual free casting", () => {
+    const input = {
+      character: ritualBook2014Wizard("srd521.class.wizard", [
+        "srd521.spell.alarm",
+        "srd521.spell.identify",
+      ]),
+      packages: [loadRulesPackage()],
+    };
+    const ritualCast = proposeSpellCast(input, { spellId: "srd521.spell.alarm", asRitual: true });
+    expect(ritualCast.applicable).toBe(true);
+    expect(ritualCast.validations.map((validation) => validation.code)).toEqual([]);
+
+    const freeCast = proposeSpellCast(input, { spellId: "srd521.spell.alarm", useFreeCast: true });
+    expect(freeCast.applicable).toBe(false);
+    expect(freeCast.validations.map((validation) => validation.code)).toContain(
+      "SPELL_FREE_CAST_UNAVAILABLE",
     );
   });
 
