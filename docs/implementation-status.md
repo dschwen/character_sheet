@@ -178,6 +178,19 @@ qualification is not invented. Combat displays its three benefits as explicitly 
 target tracking, grapple resolution, movement and conditional Advantage are not automated. Browser
 interaction verification and independent semantic review remain outstanding.
 
+Ritual Caster's 2024 PHB variant — an out-of-SRD edition-reference record per ADR 0013, never
+presented as SRD content — now has engine semantics in `packages/rules-core`: a recorded feat
+selection plus a single `<featId>.choice.ritual-spells` record in `build.choices`; a spell count
+bounded by the Proficiency Bonus at acquisition and the current Proficiency Bonus, never grown
+automatically; level 1 Ritual-tagged spells only; the casting ability tied to the feat's single
+recorded +1 (Intelligence, Wisdom, or Charisma); always-prepared grants; and a Quick Ritual free
+cast recharged by a Long Rest through the shared free-cast resource. Feat traces cite the record's
+edition-reference span without inventing a page, while granted spells keep their pinned SRD sources.
+Feat prerequisite blocks may now state ability minimums only: an absent level floor means no level
+gate. The 2014 variant's ritual-book semantics, the builder presentation with explicit variant
+labels, and the browser gate for a selection flow remain unfinished. See
+`docs/rules-engine/ritual-caster-2024.md`.
+
 | Milestone                        | Current evidence and required remaining work                                                                                                                                                                                                                                                                                                    |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 0: Decisions and skeleton        | Monorepo, schemas, CI, acquisition, and ADRs exist. Fresh-clone installation and every initial exit criterion still need a recorded completion audit.                                                                                                                                                                                           |

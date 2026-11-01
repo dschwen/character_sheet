@@ -564,9 +564,12 @@ const featBodySchema = z
   .object({
     category: z.string().min(1),
     repeatable: z.boolean().default(false),
+    // A prerequisite block may state ability minimums only: that is the whole of some editions'
+    // feat prerequisites (e.g. the 2014-style Ritual Caster record), so the level floor is
+    // optional and treated as 0 (no level gate) when absent.
     prerequisite: z
       .object({
-        minimumCharacterLevel: z.number().int().positive(),
+        minimumCharacterLevel: z.number().int().positive().optional(),
         anyAbilityScoreMinimums: z
           .array(
             z.object({
@@ -618,6 +621,28 @@ const magicInitiateFeatBodySchema = z
         event: z.literal("level-up"),
         replacementMaximum: z.number().int().nonnegative(),
         sameLevel: z.boolean().default(true),
+      })
+      .strict(),
+  })
+  .passthrough();
+// 2024-variant Ritual Caster (out-of-SRD edition reference; docs/adr/0013): its always-prepared
+// level 1 Ritual spell count tracks the character's Proficiency Bonus, and its spellcasting
+// ability is the ability the feat increases. The 2014 variant record does not parse here; it is
+// evaluated only once its distinct ritual-book semantics are implemented.
+const ritualCasterFeatBodySchema = z
+  .object({
+    category: z.literal("general"),
+    abilityScoreIncreaseAbilities: z.array(z.enum(abilities)).min(1),
+    ritualCaster: z
+      .object({
+        edition: z.literal("2024"),
+        requiredSpellTag: z.literal("ritual"),
+        maximumSpellLevel: z.number().int().positive(),
+        spellListSource: z.literal("all"),
+        spellCountSource: z.literal("proficiency-bonus"),
+        growsWithProficiencyBonus: z.literal(true),
+        castingAbilitySource: z.literal("feat-increased-ability"),
+        quickRitualRecharge: z.literal("long-rest"),
       })
       .strict(),
   })
@@ -2782,14 +2807,12 @@ function validateProgressionSelections(
       continue;
     }
     const body = featBodySchema.parse(feat.body);
-    if (
-      body.prerequisite !== undefined &&
-      characterLevel < body.prerequisite.minimumCharacterLevel
-    ) {
+    const minimumLevel = body.prerequisite?.minimumCharacterLevel ?? 0;
+    if (characterLevel < minimumLevel) {
       addValidation(
         state,
         "FEAT_LEVEL_PREREQUISITE",
-        `${featId} requires character level ${String(body.prerequisite.minimumCharacterLevel)}.`,
+        `${featId} requires character level ${String(minimumLevel)}.`,
         ["build.featIds"],
       );
     }
@@ -5429,6 +5452,234 @@ function evaluateMagicInitiate(
   );
 }
 
+function ritualCasterChoice(
+  character: CharacterDocument,
+  state: EngineState,
+  choiceId: string,
+): string[] {
+  const choices = character.build.choices.filter((choice) => choice.choiceId === choiceId);
+  if (choices.length > 1) {
+    addValidation(
+      state,
+      "DUPLICATE_RITUAL_CASTER_CHOICE",
+      `${choiceId} must be recorded only once.`,
+      ["build.choices"],
+    );
+  }
+  return choices[0]?.optionIds ?? [];
+}
+
+// Mirrors the engine's Proficiency Bonus expression (evaluateProficiency) for an earlier level,
+// used to bound the feat's spell count: equal to the bonus when taken, plus optional additions.
+function proficiencyBonusAtLevel(level: number): number {
+  return 2 + Math.floor((level - 1) / 4);
+}
+
+function evaluateRitualCaster(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+): void {
+  for (const featId of character.build.featIds) {
+    const feat = index.entities.get(featId);
+    if (feat?.kind !== "feat") continue;
+    const parsed = ritualCasterFeatBodySchema.safeParse(feat.body);
+    if (!parsed.success) continue;
+    const body = parsed.data;
+    const featName = feat.name.en ?? featId;
+
+    const increases: Partial<Record<Ability, number>> = {};
+    const acquisitionLevels: number[] = [];
+    character.build.levels.forEach((level) => {
+      for (const selection of level.featSelections ?? []) {
+        if (selection.featId !== featId) continue;
+        acquisitionLevels.push(level.characterLevel);
+        for (const ability of abilities) {
+          const increase = selection.abilityScoreIncreases[ability];
+          if (increase === undefined) continue;
+          increases[ability] = (increases[ability] ?? 0) + increase;
+        }
+      }
+    });
+    const increasedAbilities = abilities.filter((ability) => (increases[ability] ?? 0) > 0);
+    const castingAbility = increasedAbilities[0];
+    const acquiredLevel = acquisitionLevels[0] ?? 0;
+    const grantedIncreaseTotal = increasedAbilities.reduce(
+      (total, ability) => total + (increases[ability] ?? 0),
+      0,
+    );
+    if (
+      acquisitionLevels.length !== 1 ||
+      increasedAbilities.length !== 1 ||
+      grantedIncreaseTotal !== 1 ||
+      castingAbility === undefined ||
+      !body.abilityScoreIncreaseAbilities.includes(castingAbility)
+    ) {
+      addValidation(
+        state,
+        "RITUAL_CASTER_CASTING_ABILITY_TIE_INVALID",
+        `${featName} must be taken with exactly one +1 increase to ${body.abilityScoreIncreaseAbilities.join(", ")}; the increased ability sets its spellcasting ability.`,
+        ["build.levels"],
+      );
+      continue;
+    }
+    // Level and ability prerequisites are validated by the shared feat-acquisition checks
+    // (FEAT_ACQUISITION_PREREQUISITE, FEAT_ABILITY_PREREQUISITE). Reaching this point requires a
+    // recorded feat selection, so the spell-count bounds can reference the level it was taken at.
+    const proficiencyBonus = requireNumber(
+      state.facts.proficiencyBonus ?? null,
+      "Proficiency Bonus",
+    );
+    const minimumCount = proficiencyBonusAtLevel(acquiredLevel);
+    const selectedSpellIds = ritualCasterChoice(character, state, `${featId}.choice.ritual-spells`);
+    if (
+      selectedSpellIds.length < minimumCount ||
+      selectedSpellIds.length > proficiencyBonus ||
+      new Set(selectedSpellIds).size !== selectedSpellIds.length
+    ) {
+      addValidation(
+        state,
+        "RITUAL_CASTER_SPELL_COUNT_INVALID",
+        `${featName} grants ${String(minimumCount)}–${String(proficiencyBonus)} level 1 spells with the Ritual tag (Proficiency Bonus ${String(proficiencyBonus)}; feat acquired at level ${String(acquiredLevel)}).`,
+        ["build.choices"],
+      );
+    }
+    const spellLevel = body.ritualCaster.maximumSpellLevel;
+    const validSpellIds = selectedSpellIds.filter((spellId) => {
+      const spell = index.entities.get(spellId);
+      if (spell?.kind === "spell") {
+        const spellBody = spellBodySchema.parse(spell.body);
+        if (spellBody.level === spellLevel && spellBody.ritual) return true;
+      }
+      addValidation(
+        state,
+        "RITUAL_CASTER_SPELL_INVALID",
+        `${spellId} is not a level ${String(spellLevel)} spell with the ${body.ritualCaster.requiredSpellTag} tag.`,
+        ["build.choices"],
+      );
+      return false;
+    });
+
+    const ability = castingAbility;
+    const abilityModifier = requireNumber(
+      state.facts[`ability.${ability}.modifier`] ?? null,
+      `${featName} spellcasting ability modifier`,
+    );
+    const attackBonus = abilityModifier + proficiencyBonus;
+    const saveDifficultyClass = 8 + abilityModifier + proficiencyBonus;
+    const featSlug = featId.split(".").slice(-2).join(".");
+    const attackTraceId = `spellcasting.${featSlug}.attackBonus`;
+    const saveTraceId = `spellcasting.${featSlug}.saveDifficultyClass`;
+    const sources = entitySourceReferences(feat);
+    for (const [traceId, result, operation, inputs] of [
+      [
+        attackTraceId,
+        attackBonus,
+        "add-ability-and-proficiency",
+        [abilityModifier, proficiencyBonus],
+      ],
+      [
+        saveTraceId,
+        saveDifficultyClass,
+        "add-spell-save-base-ability-and-proficiency",
+        [8, abilityModifier, proficiencyBonus],
+      ],
+    ] as const) {
+      state.facts[traceId] = result;
+      state.values[traceId] = { value: result, traceId };
+      state.traces[traceId] = {
+        id: traceId,
+        result,
+        nodes: [
+          {
+            id: `${traceId}.sum`,
+            operation,
+            inputs: [...inputs],
+            output: result,
+          },
+        ],
+        sourceReferences: sources,
+      };
+    }
+    const resourceId = `${featId}.free-cast`;
+    const maximum = 1;
+    const expended = character.state.expendedResources[resourceId] ?? 0;
+    const current = Math.max(0, maximum - expended);
+    const resourceTraceId = `${resourceId}.current`;
+    if (expended > maximum) {
+      addValidation(
+        state,
+        "RESOURCE_EXPENDED_ABOVE_MAXIMUM",
+        `Expended ${resourceId} uses exceed its maximum.`,
+        [`state.expendedResources.${resourceId}`],
+      );
+    }
+    state.resources.push({
+      id: resourceId,
+      maximum,
+      expended,
+      current,
+      recharge: [{ event: body.ritualCaster.quickRitualRecharge, amount: "all" }],
+      traceId: resourceTraceId,
+    });
+    state.facts[`${resourceId}.maximum`] = maximum;
+    state.facts[resourceTraceId] = current;
+    state.values[`${resourceId}.maximum`] = { value: maximum, traceId: `${resourceId}.maximum` };
+    state.values[resourceTraceId] = { value: current, traceId: resourceTraceId };
+    state.traces[`${resourceId}.maximum`] = {
+      id: `${resourceId}.maximum`,
+      result: maximum,
+      nodes: [
+        {
+          id: `${resourceId}.maximum.grant`,
+          operation: "grant-free-spell-cast",
+          inputs: [featId],
+          output: maximum,
+        },
+      ],
+      sourceReferences: sources,
+    };
+    state.traces[resourceTraceId] = {
+      id: resourceTraceId,
+      result: current,
+      nodes: [
+        {
+          id: `${resourceTraceId}.subtract`,
+          operation: "subtract-expended",
+          inputs: [maximum, expended],
+          output: current,
+        },
+      ],
+      sourceReferences: sources,
+    };
+    const baseCastingOption: NonNullable<SpellSummary["castingOptions"]>[number] = {
+      sourceId: featId,
+      ability,
+      attackBonus,
+      saveDifficultyClass,
+      attackTraceId,
+      saveTraceId,
+    };
+    validSpellIds.forEach((spellId) => {
+      addMagicInitiateSpell(
+        character,
+        spellId,
+        true,
+        {
+          ...baseCastingOption,
+          freeCastResourceId: resourceId,
+          freeCastAvailable: current > 0,
+        },
+        index,
+        state,
+      );
+    });
+  }
+  state.spells.sort(
+    (left, right) => left.level - right.level || left.name.localeCompare(right.name),
+  );
+}
+
 function validateConcentration(
   character: CharacterDocument,
   index: PackageIndex,
@@ -7601,6 +7852,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateSpellcasting(character, classLevels, granted, index, state);
   evaluateElementalAffinity(character, classLevels, index, state);
   evaluateMagicInitiate(character, index, state);
+  evaluateRitualCaster(character, index, state);
   evaluateSpeciesTraits(character, origins, index, state);
   const resourceAmounts = evaluateResources(character, rules, granted, index, state);
   const spellSlotRecoveries = evaluateSpellRecoveryFeatures(granted, index, state);

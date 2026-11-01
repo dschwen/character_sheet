@@ -11,9 +11,11 @@ import {
 export const advancementFeatMetadataSchema = z.object({
   category: z.literal("general"),
   repeatable: z.boolean().default(false),
+  // Ability-only prerequisites are a real feat shape (see the 2014-style edition reference
+  // record); an absent level floor means no level gate, handled as 0 at the gate below.
   prerequisite: z
     .object({
-      minimumCharacterLevel: z.number().int().positive(),
+      minimumCharacterLevel: z.number().int().positive().optional(),
       anyAbilityScoreMinimums: z
         .array(z.object({ ability: z.enum(abilities), minimum: z.number().int().positive() }))
         .optional(),

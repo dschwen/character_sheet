@@ -29,12 +29,21 @@ Reference anchors (captured renderings, not licensed text):
 <https://www.dndbeyond.com/feats/1789180-ritual-caster> and
 <https://www.dndbeyond.com/feats/40-ritual-caster>.
 
+## Engine semantics
+
+The 2024 variant's engine semantics are implemented in `packages/rules-core`: Proficiency-Bonus
+spell counts with optional growth, level 1 Ritual-tag-only selections, casting ability tied to the
+feat's increased ability, and a Quick Ritual free cast recharged by a Long Rest. See
+[Ritual Caster — 2024 PHB variant engine semantics](../rules-engine/ritual-caster-2024.md). The
+2014 variant's ritual-book semantics are not implemented yet; the engine evaluates only records whose
+body declares `ritualCaster.edition: "2024"`.
+
 ## Builder availability
 
-Both records are currently held out of the character builder's feat catalog: the rules engine does
-not yet implement either variant's spell-granting semantics, so offering them would present a feat
-that cannot grant its spells. They re-enter the builder only as a deliberate later step, with
-explicit "2014 PHB variant" / "2024 PHB variant" source labels.
+Both records are still held out of the character builder's feat catalog: presenting a feat whose
+spells cannot yet be chosen through the UI would half-implement it. They re-enter the builder as a
+deliberate later step, with explicit "2014 PHB variant" / "2024 PHB variant" source labels and a
+browser-verified selection flow.
 
 ## Recorded divergences
 
