@@ -186,6 +186,10 @@ def _span_hashes(spans: list[SpanVerification]) -> list[str]:
     return [str(verification.span["quoteHash"]) for verification in spans]
 
 
+def _source_verified(spans: list[SpanVerification]) -> bool:
+    return bool(spans) and all(span.status == _VERIFIED for span in spans)
+
+
 def build_review_items(
     records: list[dict[str, Any]], ledger: dict[str, list[dict[str, Any]]], index: _PageIndex
 ) -> list[ReviewItem]:
@@ -206,10 +210,10 @@ def _flags(item: ReviewItem) -> list[str]:
     flags: list[str] = []
     review = item.record["review"]
     span_hashes = _span_hashes(item.spans)
-    all_verified = all(verification.status == _VERIFIED for verification in item.spans)
+    all_verified = _source_verified(item.spans)
     if str(review["extraction"]) != "approved":
         flags.append("LOW_EXTRACTION_CONFIDENCE")
-    if any(verification.status == _UNRESOLVED for verification in item.spans):
+    if not item.spans or any(verification.status == _UNRESOLVED for verification in item.spans):
         flags.append("BROKEN_REFERENCE")
     if any(verification.status == _CHANGED for verification in item.spans):
         flags.append("SOURCE_HASH_CHANGED")
@@ -238,7 +242,9 @@ def record_decision(
         raise ValueError(f"Unknown review area: {area}")
     if decision not in DECISIONS:
         raise ValueError(f"Unknown review decision: {decision}")
-    if not allow_drift:
+    if decision == "approved" and not allow_drift:
+        if not item.spans:
+            raise ValueError(f"Cannot record {area} approval without a source span")
         for verification in item.spans:
             if verification.status != _VERIFIED:
                 raise ValueError(
@@ -264,7 +270,12 @@ def record_decision(
 def apply_ledger(
     generated_dir: Path, reviews_dir: Path, extraction_root: Path
 ) -> tuple[int, int, list[str]]:
-    """Promote approved, still-pinned decisions into generated review blocks."""
+    """Reconcile semantic/test status with current decisions and verified live source.
+
+    Generated approval flags are a projection, not independent review evidence. Missing,
+    withdrawn, or stale evidence revokes a prior approval without changing the ledger.
+    Extractor-owned extraction status is left unchanged.
+    """
 
     index = _PageIndex(extraction_root)
     ledger = load_ledger(reviews_dir)
@@ -274,22 +285,29 @@ def apply_ledger(
     for path in sorted((generated_dir / "authoring-ir").glob("*.json")):
         record = read_json(path)
         log = ledger.get(str(record["id"]), [])
-        if not log:
-            continue
         rules_hash = _record_rules_hash(record)
         spans = verify_record(record, index)
         span_hashes = _span_hashes(spans)
+        source_verified = _source_verified(spans)
         changed = False
         for area in ("semantics", "tests"):
             decision = _latest_decision(log, area)
-            if decision is None or not _latest_decision_ok(decision):
-                continue
-            if not _pins_match(decision, rules_hash, span_hashes):
+            approved = decision is not None and _latest_decision_ok(decision)
+            current = (
+                decision is not None
+                and approved
+                and source_verified
+                and _pins_match(decision, rules_hash, span_hashes)
+            )
+            if approved and not current:
                 stale += 1
                 stale_ids.append(str(record["id"]))
-                continue
-            if str(record["review"][area]) != "approved":
+            status = str(record["review"][area])
+            if current and status != "approved":
                 record["review"][area] = "approved"
+                changed = True
+            elif not current and status == "approved":
+                record["review"][area] = "needs-review" if area == "semantics" else "draft"
                 changed = True
         if changed:
             write_json(path, record)
@@ -440,7 +458,7 @@ def main() -> int:
     _add_common(record_parser)
 
     apply_parser = subcommands.add_parser(
-        "apply", help="promote approved, still-pinned decisions into generated records"
+        "apply", help="reconcile generated approval flags with verified, still-pinned decisions"
     )
     _add_common(apply_parser)
 

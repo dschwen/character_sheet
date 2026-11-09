@@ -177,3 +177,186 @@ def test_record_refuses_unverified_spans_without_allow_drift(tmp_path: Path) -> 
         record_decision(reviews, item, "semantics", "approved", "reviewer-1", None, False)
     entry = record_decision(reviews, item, "semantics", "approved", "reviewer-1", None, True)
     assert entry["pins"]["spanHashes"] == [ir_record()["source"][0]["quoteHash"]]
+
+
+@pytest.mark.parametrize("area", ["semantics", "tests"])
+@pytest.mark.parametrize("already_applied", [False, True])
+@pytest.mark.parametrize("drift", ["changed", "unresolved", "missing-spans"])
+def test_apply_requires_verified_live_source(
+    tmp_path: Path, area: str, already_applied: bool, drift: str
+) -> None:
+    generated, extraction, reviews = make_fixture(tmp_path)
+    record_decision(
+        reviews, item_for(generated, extraction, reviews), area, "approved", "human", None, False
+    )
+    if already_applied:
+        assert apply_ledger(generated, reviews, extraction) == (1, 0, [])
+    ledger_before = load_ledger(reviews)
+    record_path = generated / "authoring-ir" / "test.rage.json"
+    if drift == "missing-spans":
+        record = read_json(record_path)
+        record["source"] = []
+        write_json(record_path, record)
+    else:
+        path = extraction / "srd-5.2.1-test" / "normalized" / "pages" / "0028.json"
+        document = read_json(path)
+        if drift == "changed":
+            document["nodes"][0]["normalizedText"] = "Changed after approval"
+        else:
+            document["nodes"][0]["sourceBlocks"] = ["p0028-b099"]
+        write_json(path, document)
+    updated, stale, stale_ids = apply_ledger(generated, reviews, extraction)
+    assert updated == int(already_applied)
+    assert stale == 1
+    assert stale_ids == [RAGE_ID]
+    assert read_json(record_path)["review"][area] == (
+        "needs-review" if area == "semantics" else "draft"
+    )
+    assert load_ledger(reviews) == ledger_before
+    assert apply_ledger(generated, reviews, extraction) == (0, 1, [RAGE_ID])
+
+
+@pytest.mark.parametrize("area", ["semantics", "tests"])
+def test_withdrawal_revokes_previously_applied_approval(tmp_path: Path, area: str) -> None:
+    generated, extraction, reviews = make_fixture(tmp_path)
+    record_decision(
+        reviews, item_for(generated, extraction, reviews), area, "approved", "human", None, False
+    )
+    apply_ledger(generated, reviews, extraction)
+    record_decision(
+        reviews,
+        item_for(generated, extraction, reviews),
+        area,
+        "needs-review",
+        "human",
+        "Withdrawn",
+        False,
+    )
+    ledger_before = load_ledger(reviews)
+    assert apply_ledger(generated, reviews, extraction) == (1, 0, [])
+    assert read_json(generated / "authoring-ir" / "test.rage.json")["review"][area] != "approved"
+    assert load_ledger(reviews) == ledger_before
+    assert apply_ledger(generated, reviews, extraction) == (0, 0, [])
+
+
+@pytest.mark.parametrize("area", ["semantics", "tests"])
+def test_rule_drift_revokes_approval_without_extractor_reset(tmp_path: Path, area: str) -> None:
+    generated, extraction, reviews = make_fixture(tmp_path)
+    record_decision(
+        reviews, item_for(generated, extraction, reviews), area, "approved", "human", None, False
+    )
+    apply_ledger(generated, reviews, extraction)
+    path = generated / "authoring-ir" / "test.rage.json"
+    record = read_json(path)
+    record["proposedRules"][0]["parameters"]["changed"] = True
+    write_json(path, record)
+    assert apply_ledger(generated, reviews, extraction) == (1, 1, [RAGE_ID])
+    assert read_json(path)["review"][area] != "approved"
+
+
+def test_override_cannot_bypass_apply_source_verification(tmp_path: Path) -> None:
+    generated, extraction, reviews = make_fixture(tmp_path, source_text="Changed source text")
+    item = item_for(generated, extraction, reviews)
+    record_decision(reviews, item, "semantics", "approved", "human", "Explicit override", True)
+    assert apply_ledger(generated, reviews, extraction) == (0, 1, [RAGE_ID])
+    assert (
+        read_json(generated / "authoring-ir" / "test.rage.json")["review"]["semantics"]
+        == "needs-review"
+    )
+
+
+def test_missing_ledger_cannot_preserve_generated_approval(tmp_path: Path) -> None:
+    record = ir_record()
+    record["review"]["semantics"] = "approved"
+    record["review"]["tests"] = "approved"
+    generated, extraction, reviews = make_fixture(tmp_path, record=record)
+    assert apply_ledger(generated, reviews, extraction) == (1, 0, [])
+    assert read_json(generated / "authoring-ir" / "test.rage.json")["review"] == {
+        "extraction": "approved",
+        "semantics": "needs-review",
+        "tests": "draft",
+    }
+
+
+def test_withdrawal_is_allowed_when_source_has_drifted(tmp_path: Path) -> None:
+    generated, extraction, reviews = make_fixture(tmp_path, source_text="Changed source text")
+    record_decision(
+        reviews,
+        item_for(generated, extraction, reviews),
+        "semantics",
+        "needs-review",
+        "human",
+        "Source changed",
+        False,
+    )
+    assert load_ledger(reviews)[RAGE_ID][-1]["decision"] == "needs-review"
+
+
+def test_approval_requires_at_least_one_source_span(tmp_path: Path) -> None:
+    record = ir_record()
+    record["source"] = []
+    generated, extraction, reviews = make_fixture(tmp_path, record=record)
+    item = item_for(generated, extraction, reviews)
+    assert "BROKEN_REFERENCE" in item.flags
+    with pytest.raises(ValueError, match="source span"):
+        record_decision(reviews, item, "semantics", "approved", "human", None, False)
+
+
+def test_reapproval_after_rule_change_and_independent_review_areas(tmp_path: Path) -> None:
+    generated, extraction, reviews = make_fixture(tmp_path)
+    for area in ("semantics", "tests"):
+        record_decision(
+            reviews,
+            item_for(generated, extraction, reviews),
+            area,
+            "approved",
+            "human",
+            None,
+            False,
+        )
+    assert apply_ledger(generated, reviews, extraction) == (1, 0, [])
+    path = generated / "authoring-ir" / "test.rage.json"
+    record = read_json(path)
+    record["proposedRules"][0]["parameters"]["changed"] = True
+    write_json(path, record)
+    assert apply_ledger(generated, reviews, extraction) == (1, 2, [RAGE_ID])
+    item = item_for(generated, extraction, reviews)
+    assert set(item.flags) == {"SEMANTICS_CHANGED", "TESTS_CHANGED"}
+    record_decision(reviews, item, "semantics", "approved", "human", "Re-reviewed", False)
+    assert apply_ledger(generated, reviews, extraction) == (1, 1, [RAGE_ID])
+    record = read_json(path)
+    assert record["review"]["semantics"] == "approved"
+    assert record["review"]["tests"] == "draft"
+    record_decision(
+        reviews, item_for(generated, extraction, reviews), "tests", "approved", "human", None, False
+    )
+    assert apply_ledger(generated, reviews, extraction) == (1, 0, [])
+    assert apply_ledger(generated, reviews, extraction) == (0, 0, [])
+    assert len(load_ledger(reviews)[RAGE_ID]) == 4
+
+
+def test_one_unresolved_span_blocks_a_multi_span_approval(tmp_path: Path) -> None:
+    record = ir_record()
+    original = record["source"][0]
+    record["source"] = [
+        {**original, "blocks": ["p0028-b001"], "quoteHash": _quote(SOURCE_TEXT)},
+        {**original, "blocks": ["p0028-b002"], "quoteHash": _quote(OTHER_TEXT)},
+    ]
+    generated, extraction, reviews = make_fixture(tmp_path, record=record)
+    record_decision(
+        reviews, item_for(generated, extraction, reviews), "tests", "approved", "human", None, False
+    )
+    path = extraction / "srd-5.2.1-test" / "normalized" / "pages" / "0028.json"
+    document = read_json(path)
+    document["nodes"].pop()
+    write_json(path, document)
+    assert apply_ledger(generated, reviews, extraction) == (0, 1, [RAGE_ID])
+
+
+def test_extractor_review_defaults_and_absent_decisions_are_preserved(tmp_path: Path) -> None:
+    record = ir_record()
+    record["review"]["semantics"] = "missing"
+    record["review"]["tests"] = "missing"
+    generated, extraction, reviews = make_fixture(tmp_path, record=record)
+    assert apply_ledger(generated, reviews, extraction) == (0, 0, [])
+    assert read_json(generated / "authoring-ir" / "test.rage.json") == record

@@ -4,8 +4,9 @@ This documents the review tooling in `extraction/srd_extract/review.py`. It impl
 plan's review-queue requirements (§8.11), the source-hash guardrail (§8.10), and the
 rule-authoring sequence (§16) as an auditable command workflow. It is the CLI foundation for
 the plan's review application; a visual side-by-side review UI has not been built, so the
-`inspect` output is the current review surface. No authoring IR semantics or tests have been
-human-approved yet; the checked-in ledger is empty until a reviewer records decisions.
+`inspect` output is the current review surface. The checked-in ledger is empty; local,
+untracked reviewer decisions may already exist. Use `queue` to inspect current evidence rather
+than assuming that the generated coverage report reflects unapplied local decisions.
 
 ## How approvals work
 
@@ -19,11 +20,23 @@ human-approved yet; the checked-in ledger is empty until a reviewer records deci
 4. `review apply` promotes a generated record's status to `approved` only while the live
    record and the live normalized extraction still match its pins. If proposed rules change,
    the queue reports `SEMANTICS_CHANGED`/`TESTS_CHANGED`; if source text changes, it reports
-   `SOURCE_HASH_CHANGED`. Stale approvals never silently persist: the reviewer must re-decide.
+   `SOURCE_HASH_CHANGED`. Every source span must verify; missing spans and unresolved blocks
+   block approval too. Stale approvals are demoted to `semantics: "needs-review"` or
+   `tests: "draft"`. A latest `needs-review` decision or missing ledger decision also revokes
+   a generated approval. Other extractor-authored, non-approved defaults stay unchanged.
 5. `review record` refuses to approve a record whose source spans do not resolve against the
    live normalized extraction (or whose quote hashes drifted) unless `--allow-drift` is passed.
+   That override permits recording historical evidence only: it never bypasses `apply`'s live
+   source checks. A reviewer can always record a `needs-review` withdrawal, even after drift.
 6. Coverage counts (`docs/coverage`) only change through `apply`, so automated tests still do
    not manufacture review evidence.
+
+`apply` reconciles both promotions and revocations without editing the append-only ledger.
+Its updated count is the number of generated records changed, not the number of approvals;
+its stale count is per approval area, while stale record IDs are deduplicated. Repeating it
+without an evidence change writes nothing. Semantics and tests remain independent: approving
+one area does not approve the other. The extractor-owned `extraction` status remains unchanged;
+the tooling records extraction decisions but does not project them into that schema field.
 
 Source-span resolution finds, in any extraction run, the exact set of normalized document
 nodes whose recorded blocks reconstruct the span, and re-computes the quote hash from their
@@ -55,7 +68,7 @@ From the repository root:
   --extraction generated/extraction \
   --reviews extraction/reviews
 
-# Promote approved, still-pinned decisions into the generated records, then regenerate coverage:
+# Reconcile current decisions into generated review flags, then regenerate coverage:
 .venv/bin/python -m srd_extract.review apply \
   --generated packages/content-srd-5.2.1/generated \
   --extraction generated/extraction \
@@ -90,6 +103,8 @@ the three approvals and their pins, but does not itself mark any entity `VERIFIE
 
 - The queue verifies source spans, quote hashes, and approval pins; it does not judge whether
   a proposed rule is correct. That judgment is what `record` captures.
+- Generated flags and coverage are snapshots. After a source, rule, or decision change, run
+  `apply` and regenerate coverage to clear stale approvals before publishing those snapshots.
 - `TESTS_MISSING` means no approved test decision exists in the ledger; it is not a claim
   that no automated tests exist. `inspect` lists the tests it found so the reviewer can judge
   sufficiency, which is exactly the approval the plan keeps separate from passing builds.
