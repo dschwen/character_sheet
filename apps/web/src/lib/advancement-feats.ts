@@ -1,4 +1,5 @@
-import { z } from "zod";
+import type { z } from "zod";
+import { featAcquisitionMetadataSchema } from "@dnd/content-schema";
 import type { CharacterDocument } from "@dnd/character-model";
 import { abilities, titleCase, type Ability } from "./presentation";
 import {
@@ -8,24 +9,7 @@ import {
   type AsiAllocation,
 } from "./ability-score-improvements";
 
-export const advancementFeatMetadataSchema = z.object({
-  category: z.literal("general"),
-  repeatable: z.boolean().default(false),
-  // Ability-only prerequisites are a real feat shape (see the 2014-style edition reference
-  // record); an absent level floor means no level gate, handled as 0 at the gate below.
-  prerequisite: z
-    .object({
-      minimumCharacterLevel: z.number().int().positive().optional(),
-      anyAbilityScoreMinimums: z
-        .array(z.object({ ability: z.enum(abilities), minimum: z.number().int().positive() }))
-        .optional(),
-    })
-    .optional(),
-  abilityScoreIncreasePatterns: z.array(z.array(z.number().int().positive())),
-  abilityScoreIncreaseAbilities: z.array(z.enum(abilities)).default([...abilities]),
-  maximumAbilityScore: z.number().int().positive(),
-  combatGuidance: z.array(z.string()).default([]),
-});
+export const advancementFeatMetadataSchema = featAcquisitionMetadataSchema;
 export type AdvancementFeatMetadata = z.infer<typeof advancementFeatMetadataSchema>;
 export type AdvancementFeatSelection = NonNullable<
   CharacterDocument["build"]["levels"][number]["featSelections"]

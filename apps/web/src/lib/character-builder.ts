@@ -241,6 +241,7 @@ export interface ClassBuilderCatalog {
   skillMaximum: number;
   skillCountByLevel: Readonly<Record<number, number>>;
   abilityScoreImprovementLevels: number[];
+  grantedFeatureIdsByLevel: Readonly<Record<number, string[]>>;
   description: string;
   builder: ClassBuilderMetadata;
   featureChoices: ClassFeatureChoiceCatalog[];
@@ -763,6 +764,27 @@ function classCatalog(
     skillMaximum: numericValue(skillChoice?.maximum),
     skillCountByLevel,
     abilityScoreImprovementLevels,
+    grantedFeatureIdsByLevel: Object.fromEntries(
+      Array.from({ length: 20 }, (_, index) => {
+        const level = index + 1;
+        const rows = [
+          ...(progression as unknown[]),
+          ...(Array.isArray(subclassProgression) ? (subclassProgression as unknown[]) : []),
+        ];
+        return [
+          level,
+          rows.flatMap((row) => {
+            const value = objectValue(row);
+            return numericValue(value?.level, 99) <= level && Array.isArray(value?.features)
+              ? value.features.flatMap((feature: unknown) => {
+                  const id = typeof feature === "string" ? feature : objectValue(feature)?.entityId;
+                  return typeof id === "string" ? [id] : [];
+                })
+              : [];
+          }),
+        ];
+      }),
+    ),
     description: `${primaryAbilities || "Adventuring"} specialist with a d${String(hitPointDie)} Hit Die and ${focus}.`,
     builder: builder.data,
     featureChoices,
@@ -1457,7 +1479,13 @@ export function magicInitiateFeatIds(
   catalog: BuilderCatalog,
 ): string[] {
   const backgroundFeatId = catalog.backgrounds[draft.backgroundId]?.featId;
-  return [...new Set([backgroundFeatId, draft.originFeatId])].filter(
+  return [
+    ...new Set([
+      backgroundFeatId,
+      draft.originFeatId,
+      ...draft.advancementFeats.map(({ featId }) => featId),
+    ]),
+  ].filter(
     (featId): featId is string =>
       featId !== undefined && catalog.feats[featId]?.magicInitiate !== undefined,
   );
@@ -1818,6 +1846,11 @@ export function featureFeatOptionAlreadySelected(
 ): boolean {
   const choices = catalog.classes[draft.classId].featureChoices;
   const group = choices.find((choice) => choice.id === choiceId)?.featSelection?.exclusiveGroup;
+  if (
+    catalog.feats[optionId]?.repeatable === false &&
+    draft.advancementFeats.some((selection) => selection.featId === optionId)
+  )
+    return true;
   return (
     group !== undefined &&
     choices.some(
@@ -2061,6 +2094,7 @@ export function expertiseSkillCandidates(
         ...(catalog.backgrounds[draft.backgroundId]?.skillIds ?? []),
         ...draft.speciesSkillIds,
         ...draft.originFeatSkillIds,
+        ...draft.advancementFeats.flatMap((selection) => selection.skillIds ?? []),
       ];
   return [...new Set(proficientSkills)].filter((id) => choice.eligibleSkillIds.includes(id));
 }
@@ -2124,6 +2158,7 @@ function reconciledFeatureChoiceSelections(
   selectedClass: ClassBuilderCatalog,
   current: Readonly<Record<string, string[]>>,
   level: number,
+  acquiredFeatIds: readonly string[] = [],
 ): Readonly<Record<string, string[]>> {
   const usedBookSpells = new Set<string>();
   const usedFeatGroups = new Map<string, Set<string>>();
@@ -2136,6 +2171,7 @@ function reconciledFeatureChoiceSelections(
           [...(choice.defaultOptionIds ?? []), ...choice.options.map((option) => option.id)].filter(
             (optionId, index, optionIds) =>
               optionIds.indexOf(optionId) === index &&
+              !acquiredFeatIds.includes(optionId) &&
               (choice.featSelection === undefined ||
                 !usedFeatGroups.get(choice.featSelection.exclusiveGroup)?.has(optionId)) &&
               (choice.spellSelection?.spellbookAddition !== true ||
@@ -2166,6 +2202,24 @@ export function advancementOptions(
 ) {
   const grantLevel = catalog.classes[draft.classId].abilityScoreImprovementLevels[index] ?? 0;
   const earlier = draft.advancementFeats.slice(0, index);
+  const selectedClass = catalog.classes[draft.classId];
+  const grantedFeatures = selectedClass.grantedFeatureIdsByLevel[grantLevel] ?? [];
+  const initialFeats = [
+    catalog.backgrounds[draft.backgroundId]?.featId,
+    draft.originFeatId,
+    ...selectedClass.builder.defaultGrantedFeatIds,
+    ...selectedClass.featureChoices
+      .filter((choice) => choice.level <= grantLevel)
+      .flatMap((choice) =>
+        choice.options
+          .filter(
+            (option) =>
+              option.grantedFeatId !== undefined &&
+              draft.featureChoiceSelections[choice.id]?.includes(option.id),
+          )
+          .map((option) => option.grantedFeatId),
+      ),
+  ];
   const bonuses = featIncreases(earlier);
   const score = (ability: Ability) =>
     draft.abilityScores[ability] +
@@ -2175,7 +2229,15 @@ export function advancementOptions(
     const metadata = feat.advancement;
     if (metadata === undefined || (metadata.prerequisite?.minimumCharacterLevel ?? 0) > grantLevel)
       return [];
-    if (!metadata.repeatable && earlier.some((selection) => selection.featId === feat.id))
+    if (
+      !metadata.repeatable &&
+      (initialFeats.includes(feat.id) || earlier.some((selection) => selection.featId === feat.id))
+    )
+      return [];
+    if (
+      metadata.requiresAnyFeatureIds.length > 0 &&
+      !metadata.requiresAnyFeatureIds.some((id) => grantedFeatures.includes(id))
+    )
       return [];
     if (
       metadata.prerequisite?.anyAbilityScoreMinimums !== undefined &&
@@ -2192,6 +2254,82 @@ export function advancementOptions(
       ),
     );
   });
+}
+
+export function advancementSkillCandidates(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  index: number,
+): string[] {
+  const used = new Set([
+    ...(catalog.backgrounds[draft.backgroundId]?.skillIds ?? []),
+    ...draft.classSkillIds,
+    ...draft.speciesSkillIds,
+    ...draft.originFeatSkillIds,
+    ...draft.advancementFeats.flatMap((selection, position) =>
+      position === index ? [] : (selection.skillIds ?? []),
+    ),
+  ]);
+  return skillIds.map((id) => `${skillPrefix}${id}`).filter((id) => !used.has(id));
+}
+
+/** Reconcile only editable nested choices; historical acquisitions stay in their own records. */
+export function reconcileAdvancementFeatChoices(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+): CharacterBuilderDraft {
+  let next = draft;
+  for (let index = 0; index < next.advancementFeats.length; index++) {
+    const selection = next.advancementFeats[index];
+    if (!selection) continue;
+    const feat = catalog.feats[selection.featId];
+    const count = feat?.skillMaximum ?? 0;
+    const updated = {
+      featId: selection.featId,
+      abilityScoreIncreases: selection.abilityScoreIncreases,
+      ...(count > 0
+        ? {
+            skillIds: fillSelections(
+              selection.skillIds ?? [],
+              advancementSkillCandidates(next, catalog, index),
+              count,
+            ),
+          }
+        : {}),
+    };
+    next = {
+      ...next,
+      advancementFeats: next.advancementFeats.map((record, position) =>
+        position === index ? updated : record,
+      ),
+    };
+  }
+  next = {
+    ...next,
+    featureChoiceSelections: reconciledFeatureChoiceSelections(
+      catalog.classes[next.classId],
+      next.featureChoiceSelections,
+      next.level,
+      next.advancementFeats.map((selection) => selection.featId),
+    ),
+  };
+  return reconcileRitualCasterChoices(reconcileMagicInitiateChoices(next, catalog), catalog);
+}
+
+export function updateAdvancementFeatSelection(
+  draft: CharacterBuilderDraft,
+  catalog: BuilderCatalog,
+  index: number,
+  selection: AdvancementFeatSelection,
+): CharacterBuilderDraft {
+  const changedFeat = draft.advancementFeats[index]?.featId !== selection.featId;
+  const next = {
+    ...draft,
+    advancementFeats: draft.advancementFeats.map((record, position) =>
+      position === index ? structuredClone(selection) : record,
+    ),
+  };
+  return changedFeat ? reconcileAdvancementFeatChoices(next, catalog) : next;
 }
 
 function reconciledAsiAllocations(
@@ -2482,6 +2620,9 @@ export function updateBuilderLevel(
     selectedClass,
     draft.featureChoiceSelections,
     level,
+    draft.advancementFeats
+      .filter((_, index) => (selectedClass.abilityScoreImprovementLevels[index] ?? 99) <= level)
+      .map((selection) => selection.featId),
   );
   const initialNext = {
     ...draft,
@@ -2739,7 +2880,17 @@ export function validateBuilderDraft(
     ...draft.classSkillIds,
     ...draft.speciesSkillIds,
     ...draft.originFeatSkillIds,
+    ...draft.advancementFeats.flatMap((selection) => selection.skillIds ?? []),
   ];
+  for (const [index, selection] of draft.advancementFeats.entries()) {
+    const feat = catalog.feats[selection.featId];
+    const choices = selection.skillIds ?? [];
+    if (
+      choices.length !== (feat?.skillMaximum ?? 0) ||
+      choices.some((id) => !advancementSkillCandidates(draft, catalog, index).includes(id))
+    )
+      issues.push("Choose the required distinct feat skill proficiencies.");
+  }
   if (new Set(allSkills).size !== allSkills.length) {
     issues.push("Each selected skill proficiency must be unique.");
   }
@@ -3133,6 +3284,9 @@ function assembleCharacter(
                 skillId,
                 sourceId: selectedOriginFeat.id,
               }))),
+          ...draft.advancementFeats.flatMap((selection) =>
+            (selection.skillIds ?? []).map((skillId) => ({ skillId, sourceId: selection.featId })),
+          ),
         ],
         expertise:
           selectedClass.builder.expertiseChoice !== undefined &&

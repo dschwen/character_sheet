@@ -236,7 +236,17 @@ export function createLevelUpDraft(
   if (species === undefined || background === undefined || speciesSize === undefined) {
     throw new Error("Level up requires an origin supported by the guided builder.");
   }
-  const originFeatId = character.build.featIds.find((featId) => {
+  const unrecordedFeatIds = [...character.build.featIds];
+  const advancementSkillIds = new Set(
+    character.build.levels
+      .flatMap((level) => level.featSelections ?? [])
+      .flatMap((selection) => selection.skillIds ?? []),
+  );
+  for (const selection of character.build.levels.flatMap((level) => level.featSelections ?? [])) {
+    const index = unrecordedFeatIds.indexOf(selection.featId);
+    if (index >= 0) unrecordedFeatIds.splice(index, 1);
+  }
+  const originFeatId = unrecordedFeatIds.find((featId) => {
     const feat = catalog.feats[featId];
     return feat?.category === "origin" && (featId !== background.featId || feat.repeatable);
   });
@@ -281,7 +291,9 @@ export function createLevelUpDraft(
       .map((choice) => choice.skillId),
     speciesChoiceSelections: speciesChoiceSelections(character, species),
     originFeatSkillIds: skills
-      .filter((choice) => choice.sourceId === originFeatId)
+      .filter(
+        (choice) => choice.sourceId === originFeatId && !advancementSkillIds.has(choice.skillId),
+      )
       .map((choice) => choice.skillId),
     magicInitiateChoices: {},
     ritualCasterChoices: {},
@@ -352,7 +364,11 @@ function advancementIssues(
     if (
       saved.some((allocation, index) => {
         const after = draft.advancementFeats[index];
-        return after === undefined || featSelectionKey(allocation) !== featSelectionKey(after);
+        return (
+          after === undefined ||
+          featSelectionKey(allocation) !== featSelectionKey(after) ||
+          JSON.stringify(allocation.skillIds ?? []) !== JSON.stringify(after.skillIds ?? [])
+        );
       })
     )
       issues.push("Earlier Ability Score Improvement allocations cannot change during level up.");

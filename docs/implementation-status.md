@@ -178,6 +178,17 @@ qualification is not invented. Combat displays its three benefits as explicitly 
 target tracking, grapple resolution, movement and conditional Advantage are not automated. Browser
 interaction verification and independent semantic review remain outstanding.
 
+Unrestricted advancement feat grants now offer Origin, General, and qualifying Fighting Style
+categories through one shared acquisition metadata schema. Non-repeatability includes background,
+species, class-feature, and earlier advancement grants; feature prerequisites are checked at the
+acquisition level. Acquired Origin feats do not consume the species grant. Additional styles do
+not replace the class's initial style or collide with Champion's later grant. Magic Initiate
+reuses the spell-choice/casting path, with ability selection available for a newly acquired feat.
+Repeatable Skilled records separate `skillIds` per acquisition while aggregate proficiencies
+retain feat-source traces. Earlier nested choices and play state are preserved on advancement.
+Tool choices, Epic Boons, and the existing assisted combat benefits remain unfinished; this
+does not complete the full level-1–5 audit. See `docs/rules-engine/feat-acquisition.md`.
+
 Ritual Caster's 2024 PHB variant — an out-of-SRD edition-reference record per ADR 0013, never
 presented as SRD content — now has engine semantics in `packages/rules-core`: a recorded feat
 selection plus a single `<featId>.choice.ritual-spells` record in `build.choices`; a spell count

@@ -137,8 +137,12 @@ locks earlier allocations and preserves legacy aggregate-only bonuses without in
 Grappler is also offered from source-linked feat metadata, with a +1 Strength or Dexterity choice,
 non-repeatability, and a level-4 plus Strength-or-Dexterity-13 prerequisite checked before its own
 increase. Combat displays its Punch and Grab, Attack Advantage, and Fast Wrestler guidance;
-targets, grapple saves, movement, and conditional Advantage remain manually adjudicated. Other
-feat categories and Epic Boons are not yet offered by this workflow. Champion Fighters gain
+targets, grapple saves, movement, and conditional Advantage remain manually adjudicated.
+Epic Boons are not yet offered by this workflow. Origin feats and qualifying Fighting Style
+feats now use the same advancement selector as General feats. Background/species feats remain
+separate grants; already-owned non-repeatable feats are excluded. Magic Initiate opens its spell
+choices, and repeatable Skilled stores three distinct skill choices per acquisition (tools remain
+unsupported). See `docs/rules-engine/feat-acquisition.md`. Champion Fighters gain
 distinct Fighting Style choices. Barbarians gain Initiative
 advantage and an optional half-Speed movement reminder when entering Rage. Archery and Defense are calculated; Great Weapon
 Fighting and Two-Weapon Fighting use explicit conditional weapon-damage modes. Turn eligibility

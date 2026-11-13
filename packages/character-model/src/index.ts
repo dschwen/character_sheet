@@ -73,6 +73,7 @@ const characterLevelSchema = z
           .object({
             featId: entityIdSchema,
             abilityScoreIncreases: featAbilityScoreIncreasesSchema,
+            skillIds: z.array(entityIdSchema).optional(),
           })
           .strict(),
       )

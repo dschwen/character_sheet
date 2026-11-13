@@ -29,7 +29,7 @@ import {
   magicInitiateFeatIds,
   previewBuilderCharacter,
   reconcileMagicInitiateChoices,
-  reconcileRitualCasterChoices,
+  updateAdvancementFeatSelection,
   skillIds,
   spellSelectionCounts,
   updateBuilderBackground,
@@ -160,6 +160,7 @@ export function CharacterBuilder({
     ...draft.classSkillIds,
     ...draft.speciesSkillIds,
     ...draft.originFeatSkillIds,
+    ...draft.advancementFeats.flatMap((selection) => selection.skillIds ?? []),
   ]);
 
   function updateLevel(level: number): void {
@@ -807,15 +808,12 @@ export function CharacterBuilder({
                   index={index}
                   onChange={(selection) => {
                     setDraft((value) =>
-                      reconcileRitualCasterChoices(
-                        {
-                          ...value,
-                          advancementFeats: value.advancementFeats.map((previous, abilityIndex) =>
-                            abilityIndex === index ? selection : previous,
-                          ),
-                        },
-                        catalog,
-                      ),
+                      updateAdvancementFeatSelection(value, catalog, index, selection),
+                    );
+                  }}
+                  onMagicChange={(featId, selection) => {
+                    setDraft((value) =>
+                      updateMagicInitiateSelection(value, catalog, featId, selection),
                     );
                   }}
                 />
@@ -1223,6 +1221,7 @@ export function CharacterBuilder({
                       ...draft.classSkillIds,
                       ...draft.speciesSkillIds,
                       ...draft.originFeatSkillIds,
+                      ...draft.advancementFeats.flatMap((selection) => selection.skillIds ?? []),
                       ...selectedBackground.skillIds,
                     ]
                       .map(skillName)

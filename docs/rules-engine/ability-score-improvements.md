@@ -6,15 +6,17 @@ offer all 21 allocations through shared controls. The granting levels come from 
 source-linked progression table, including Fighter's extra level-6 grant and third grant at 8.
 All twelve class builders and same-class advancement workflows reach level 8. Repeated ASI
 entries in the source progression tables resolve to the original class feature rather than a
-missing reference. Grappler is now available alongside ASI; additional feat categories and Epic
-Boons remain an unfinished workflow.
+missing reference. Origin, General, and qualifying Fighting Style feats now share the acquisition
+workflow; Epic Boons remain unfinished. See `feat-acquisition.md` for category eligibility,
+grant accounting, and nested choices.
 
 The draft stores generic feat IDs and per-feat ability increases, not class-specific ASI tuples.
 Shared controls generate the legal options from each supported feat's source-linked patterns,
 allowed abilities, repeatability, prerequisite, and maximum score. Saved documents retain the existing
 `build.featIds` and `build.featAbilityScoreIncreases` fields and additionally record each new
-General feat selection in `build.levels[].featSelections`. Each entry contains its `featId` and
-`abilityScoreIncreases`, allowing later General feat options without a class-specific UI branch.
+feat selection in `build.levels[].featSelections`. Each entry contains its `featId` and
+`abilityScoreIncreases`, plus optional acquisition-specific `skillIds` for skill-granting feats.
+The shared acquisition schema lives in content-schema rather than a UI-specific category filter.
 The evaluator validates acquisition levels against the class progression, feat category and
 level prerequisite, selected feat counts, per-feat increase patterns, aggregate consistency, and
 maximum scores. Existing source-linked ability traces still use the selected feat's source.

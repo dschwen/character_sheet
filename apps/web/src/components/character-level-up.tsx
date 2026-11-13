@@ -26,7 +26,7 @@ import {
   featureFeatOptionAlreadySelected,
   magicInitiateFeatIds,
   masteryCount,
-  reconcileRitualCasterChoices,
+  updateAdvancementFeatSelection,
   spellSelectionCounts,
   updateBuilderFeatureChoice,
   updateMagicInitiateSelection,
@@ -599,17 +599,10 @@ export function CharacterLevelUp({
                     setDraft((value) =>
                       value === undefined
                         ? value
-                        : reconcileRitualCasterChoices(
-                            {
-                              ...value,
-                              advancementFeats: value.advancementFeats.map((allocation, index) =>
-                                index === asiIndex ? selection : allocation,
-                              ),
-                            },
-                            catalog,
-                          ),
+                        : updateAdvancementFeatSelection(value, catalog, asiIndex, selection),
                     );
                   }}
+                  showSpellChoices={false}
                 />
               ) : null}
 
@@ -686,8 +679,26 @@ export function CharacterLevelUp({
                     </div>
                     <label className="builder-field compact-field">
                       Spellcasting ability
-                      <select value={selection.ability} disabled>
-                        <option value={selection.ability}>{titleCase(selection.ability)}</option>
+                      <select
+                        value={selection.ability}
+                        disabled={original !== undefined}
+                        onChange={(event) => {
+                          const ability = definition.abilityIds.find(
+                            (id) => id === event.target.value,
+                          );
+                          if (ability)
+                            setDraft((value) =>
+                              value === undefined
+                                ? value
+                                : updateMagicInitiateSelection(value, catalog, featId, { ability }),
+                            );
+                        }}
+                      >
+                        {definition.abilityIds.map((ability) => (
+                          <option key={ability} value={ability}>
+                            {titleCase(ability)}
+                          </option>
+                        ))}
                       </select>
                       <small>This choice is fixed when you gain the feat.</small>
                     </label>

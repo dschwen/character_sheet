@@ -20,6 +20,12 @@ same suite.
 
 ## What the suite verifies
 
+`feat-acquisition.spec.ts` additionally checks Origin-feat acquisition without replacing origin
+grants, a second Fighting Style, repeatable Skilled's three acquisition-specific choices and
+preservation through advancement, and new Magic Initiate spell/ability choices during level up.
+All four scenarios run at both configured viewports against the production export. Stored build
+assertions complement the rendered controls; they do not establish full combat-effect coverage.
+
 | Spec                      | Behavior under test                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `builder-flow.spec.ts`    | Create a Fighter through the builder (class selection asserted, not assumed), reload persistence from browser storage, one level up with the level-2 feature grant visible, Shift-click inspection opening the calculation trace, export via the production download path, and import of the exported document back into the same page.                                                                                                                                                                            |
@@ -38,10 +44,10 @@ Selectors use roles and accessible names, not test ids, because the app has no t
   here.
 - The axe scans cover two page states (initial sheet, builder dialog), not the Play/Combat/
   Spells/Features/Diagnostics tabs or the level-up dialog, and only critical/serious impacts.
-- Only two of the thirteen condition toggles, three classes through the builder (Fighter, a
-  spellcaster at its maximum level, and a level 4 Wizard), four level-ups (Fighter 1→2,
-  Bard 10→11, and Wizard 4→5 for each ritual variant), and the short-rest/long-rest, dice,
-  spell, inventory, and death-save flows remain uncovered as stated.
+- The creation/advancement matrix is limited to Fighter, Bard, and Wizard, not all twelve
+  classes or all legal choices. It covers Fighter 1→2, 3→4, and 4→5, Bard 10→11, and Wizard
+  4→5 for each ritual variant. Only two of thirteen condition toggles are exercised. Full
+  short-rest/long-rest, dice, spell casting, inventory, and death-save flows remain uncovered.
 - `ritual-caster` asserts the builder presentation, selection bounds, level-up rules, and sheet
   attribution; it does not cast a granted spell in the Play view, use the Quick Ritual resource,
   or research a 2014 book spell (research is a play-time flow the UI does not expose).

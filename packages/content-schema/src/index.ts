@@ -16,6 +16,39 @@ export type JsonScalar = z.infer<typeof jsonScalarSchema>;
 export type EntityId = z.infer<typeof entityIdSchema>;
 export type FactPath = z.infer<typeof factPathSchema>;
 
+/** Eligibility and allocations for an unrestricted feat grant, independent of the granting class. */
+export const featAcquisitionMetadataSchema = z.object({
+  category: z.enum(["origin", "general", "fighting-style"]),
+  repeatable: z.boolean().default(false),
+  prerequisite: z
+    .object({
+      minimumCharacterLevel: z.number().int().positive().optional(),
+      anyAbilityScoreMinimums: z
+        .array(
+          z.object({
+            ability: z.enum([
+              "strength",
+              "dexterity",
+              "constitution",
+              "intelligence",
+              "wisdom",
+              "charisma",
+            ]),
+            minimum: z.number().int().positive(),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
+  requiresAnyFeatureIds: z.array(entityIdSchema).default([]),
+  abilityScoreIncreasePatterns: z.array(z.array(z.number().int().positive())).default([]),
+  abilityScoreIncreaseAbilities: z
+    .array(z.enum(["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]))
+    .default(["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]),
+  maximumAbilityScore: z.number().int().positive().default(20),
+  combatGuidance: z.array(z.string()).default([]),
+});
+
 export const preparedSpellListExpansionSchema = z
   .object({
     sourceFeatureId: entityIdSchema,

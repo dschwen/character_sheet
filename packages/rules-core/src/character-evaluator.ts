@@ -27,6 +27,7 @@ import {
   onHitExtraDamageSchema,
   heroicInspirationGrantSchema,
   reactionAttackSchema,
+  featAcquisitionMetadataSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -2014,7 +2015,12 @@ function resolveOrigins(
         ["build.speciesSize"],
       );
     }
-    const selectedOriginFeats = character.build.featIds.filter((featId) => {
+    const unrecordedFeats = [...character.build.featIds];
+    for (const selection of character.build.levels.flatMap((level) => level.featSelections ?? [])) {
+      const position = unrecordedFeats.indexOf(selection.featId);
+      if (position >= 0) unrecordedFeats.splice(position, 1);
+    }
+    const selectedOriginFeats = unrecordedFeats.filter((featId) => {
       const entity = index.entities.get(featId);
       return entity?.kind === "feat" && featBodySchema.parse(entity.body).category === "origin";
     });
@@ -2218,6 +2224,8 @@ function validateProgressionSelections(
     }
   }
   const selectedFeats = new Set([...selectedGroups.values()].flatMap((group) => [...group]));
+  for (const selection of character.build.levels.flatMap((level) => level.featSelections ?? []))
+    selectedFeats.add(selection.featId);
   if (character.build.featIds.some((id) => managedFeats.has(id) && !selectedFeats.has(id))) {
     addValidation(
       state,
@@ -2793,10 +2801,22 @@ function validateProgressionSelections(
   }
 
   const characterLevel = character.build.levels.length;
-  const selectedGeneralFeats = character.build.featIds.filter((featId) => {
-    const feat = index.entities.get(featId);
-    return feat?.kind === "feat" && featBodySchema.parse(feat.body).category === "general";
-  });
+  const selectedGeneralFeats = [
+    ...character.build.featIds.filter((featId) => {
+      const feat = index.entities.get(featId);
+      return feat?.kind === "feat" && featBodySchema.parse(feat.body).category === "general";
+    }),
+    ...character.build.levels
+      .flatMap((level) => level.featSelections ?? [])
+      .filter((selection) => {
+        const feat = index.entities.get(selection.featId);
+        return (
+          feat?.kind === "feat" &&
+          ["origin", "fighting-style"].includes(featBodySchema.parse(feat.body).category)
+        );
+      })
+      .map((selection) => selection.featId),
+  ];
   const grantedGeneralFeatChoices = [...classLevelCounts.entries()].reduce(
     (count, [classId, classLevel]) => {
       const classEntity = index.entities.get(classId);
@@ -2820,7 +2840,7 @@ function validateProgressionSelections(
       classLevelCounts.size === 1 && fighterLevel > 0
         ? "FIGHTER_GENERAL_FEAT_CHOICE_COUNT"
         : "GENERAL_FEAT_CHOICE_COUNT",
-      `This class progression grants ${String(grantedGeneralFeatChoices)} General feat choice.`,
+      `This class progression grants ${String(grantedGeneralFeatChoices)} advancement feat choice(s).`,
       ["build.featIds"],
     );
   }
@@ -2866,13 +2886,14 @@ function validateProgressionSelections(
       addValidation(
         state,
         "FEAT_ACQUISITION_LEVEL",
-        "Recorded General feat choices must match the granting class level.",
+        "Recorded feat choices must match the granting class level.",
         ["build.levels"],
       );
     for (const selection of level.featSelections) {
       recordedCounts.set(selection.featId, (recordedCounts.get(selection.featId) ?? 0) + 1);
       const entity = index.entities.get(selection.featId);
       const body = entity?.kind === "feat" ? featBodySchema.parse(entity.body) : undefined;
+      const acquisition = featAcquisitionMetadataSchema.safeParse(entity?.body);
       if (
         body?.prerequisite?.anyAbilityScoreMinimums !== undefined &&
         !body.prerequisite.anyAbilityScoreMinimums.some(
@@ -2890,14 +2911,50 @@ function validateProgressionSelections(
           ["build.levels"],
         );
       if (
-        body?.category !== "general" ||
-        (body.prerequisite?.minimumCharacterLevel ?? 0) > level.characterLevel
+        !acquisition.success ||
+        (body?.prerequisite?.minimumCharacterLevel ?? 0) > level.characterLevel
       )
         addValidation(
           state,
           "FEAT_ACQUISITION_PREREQUISITE",
           "Recorded feat is unavailable at its acquisition level.",
           ["build.levels"],
+        );
+      if (acquisition.success && acquisition.data.requiresAnyFeatureIds.length > 0) {
+        const availableFeatures = grantedFeatureIds(levelsSeen, index);
+        grantSubclassFeatures(character, levelsSeen, index, availableFeatures);
+        if (!acquisition.data.requiresAnyFeatureIds.some((id) => availableFeatures.has(id)))
+          addValidation(
+            state,
+            "FEAT_ACQUISITION_FEATURE_PREREQUISITE",
+            "Feat feature prerequisites must already be granted at acquisition.",
+            ["build.levels"],
+          );
+      }
+      const skillIds = selection.skillIds ?? [];
+      const proficiencyChoice = body?.proficiencyChoice;
+      const skillMinimum = proficiencyChoice?.categories.includes("skill")
+        ? proficiencyChoice.minimum
+        : 0;
+      const skillMaximum = proficiencyChoice?.categories.includes("skill")
+        ? proficiencyChoice.maximum
+        : 0;
+      if (
+        skillIds.length < skillMinimum ||
+        skillIds.length > skillMaximum ||
+        new Set(skillIds).size !== skillIds.length ||
+        skillIds.some(
+          (skillId) =>
+            !character.build.proficiencyChoices.skills.some(
+              (choice) => choice.skillId === skillId && choice.sourceId === selection.featId,
+            ),
+        )
+      )
+        addValidation(
+          state,
+          "FEAT_ACQUISITION_SKILL_CHOICES",
+          "Record the distinct proficiencies granted by each feat acquisition.",
+          ["build.levels", "build.proficiencyChoices.skills"],
         );
       if (
         body?.abilityScoreIncreasePatterns === undefined &&
@@ -2927,7 +2984,22 @@ function validateProgressionSelections(
       );
   }
   for (const [featId, count] of recordedCounts) {
-    if (count > selectedGeneralFeats.filter((id) => id === featId).length)
+    const background = index.entities.get(character.build.backgroundId ?? "");
+    const backgroundGrants =
+      background?.kind === "background" &&
+      backgroundBodySchema.parse(background.body).featId === featId
+        ? 1
+        : 0;
+    const featureGrants = character.build.levels
+      .flatMap((level) => level.selectedFeatureChoices)
+      .flatMap((choice) => choice.optionIds)
+      .filter((id) => id === featId).length;
+    if (
+      count >
+      character.build.featIds.filter((id) => id === featId).length -
+        backgroundGrants -
+        featureGrants
+    )
       addValidation(
         state,
         "FEAT_ACQUISITION_COUNT",
@@ -3767,7 +3839,7 @@ function evaluateD20Tests(
   if (origins.species !== undefined && origins.speciesBody?.skillProficiencyChoice !== undefined) {
     allowedSkillChoiceSources.add(origins.species.id);
   }
-  for (const featId of character.build.featIds) {
+  for (const featId of new Set(character.build.featIds)) {
     const feat = index.entities.get(featId);
     if (
       feat?.kind === "feat" &&
@@ -3916,7 +3988,7 @@ function evaluateD20Tests(
       }
     }
   }
-  for (const featId of character.build.featIds) {
+  for (const featId of new Set(character.build.featIds)) {
     const feat = index.entities.get(featId);
     if (feat?.kind !== "feat") {
       continue;
@@ -3928,14 +4000,15 @@ function evaluateD20Tests(
     const featChoices = character.build.proficiencyChoices.skills.filter(
       (choice) => choice.sourceId === featId,
     );
+    const acquisitions = character.build.featIds.filter((id) => id === featId).length;
     if (
-      featChoices.length < proficiencyChoice.minimum ||
-      featChoices.length > proficiencyChoice.maximum
+      featChoices.length < proficiencyChoice.minimum * acquisitions ||
+      featChoices.length > proficiencyChoice.maximum * acquisitions
     ) {
       addValidation(
         state,
         "FEAT_SKILL_PROFICIENCY_COUNT",
-        `${featId} requires ${String(proficiencyChoice.minimum)} proficiency choices in the supported skill-only slice.`,
+        `${featId} requires ${String(proficiencyChoice.minimum * acquisitions)} proficiency choices in the supported skill-only slice.`,
         ["build.proficiencyChoices.skills"],
       );
     }
