@@ -6,6 +6,12 @@ because some of its functionality exists or tests pass.
 
 ## Current evidence
 
+- Savage Attacker now exposes a declared once-per-turn weapon-hit damage choice. Shared feat
+  metadata drives attack summaries, source traces and the Combat UI; fullscreen dice roll two
+  complete pools and let the player choose either. Critical dice and declared damage modes are
+  supported; extra riders, target damage and turn-use tracking remain manual. Browser tests cover
+  ordinary/critical physical rolls and unavailable-WebGL fallback at both viewports. See
+  [Savage Attacker](rules-engine/savage-attacker.md).
 - Paladin/Ranger level-2 Fighting Style choices now offer all four SRD feats and their respective
   Blessed Warrior / Druidic Warrior alternatives. Shared conditional-choice metadata grants two
   own-class cantrips without consuming ordinary preparations and supports one replacement per

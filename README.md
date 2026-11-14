@@ -142,6 +142,10 @@ Paladin and Ranger level-2 choices offer all four SRD Fighting Styles or Blessed
 Druidic Warrior, with two class-cast cantrips and one cantrip replacement per later class level.
 See [Warrior choices](docs/rules-engine/warrior-cantrips.md).
 
+Savage Attacker's Combat controls roll two complete weapon-damage pools in fullscreen and let
+you choose either result, including critical-hit dice. Confirm the hit and unused turn benefit;
+extra damage riders, turn use and applying damage to a target remain manual.
+
 Epic Boons are not yet offered by this workflow. Origin feats and qualifying Fighting Style
 feats now use the same advancement selector as General feats. Background/species feats remain
 separate grants; already-owned non-repeatable feats are excluded. Magic Initiate opens its spell

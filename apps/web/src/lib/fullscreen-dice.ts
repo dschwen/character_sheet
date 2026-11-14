@@ -1,4 +1,5 @@
 import type { DiceRoller, DieSpec, DieType, ThrowOptions } from "@dnd/webgl-dice";
+import { resolveDicePoolChoices, validatePoolChoiceCount } from "./dice-pool-choice";
 
 import {
   resolveD20Roll,
@@ -97,9 +98,14 @@ async function throwPhysicalDiceGroups(
 
 function scheduleClear(): void {
   clearTimer = setTimeout(() => {
-    void fullscreenRoller().then((roller) => {
-      roller.clear();
-    });
+    void fullscreenRoller().then(
+      (roller) => {
+        roller.clear();
+      },
+      () => {
+        // Initialization failed; there is no fullscreen canvas to clear.
+      },
+    );
   }, 1800);
 }
 
@@ -163,4 +169,19 @@ export function rollDiceFullscreen(
   return throwDice === undefined
     ? enqueueRoll(() => resolvePhysicalDicePool(request, throwPhysicalDice))
     : resolvePhysicalDicePool(request, throwDice);
+}
+
+export function rollDiceChoicesFullscreen(
+  request: DicePoolRollRequest,
+  count: number,
+  throwDice?: PhysicalDiceThrow,
+): Promise<DicePoolRollResult[]> {
+  validatePoolChoiceCount(count);
+  const roll = async () =>
+    resolveDicePoolChoices(
+      request,
+      count,
+      await (throwDice ?? throwPhysicalDice)(request.diceSize, request.diceCount * count),
+    );
+  return throwDice === undefined ? enqueueRoll(roll) : roll();
 }

@@ -29,6 +29,7 @@ import {
   reactionAttackSchema,
   featAcquisitionMetadataSchema,
   featureChoiceEnabled,
+  weaponDamageRollChoiceSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -7500,6 +7501,37 @@ function evaluateAttacks(
         instructions: definition.instructions,
       });
     }
+    const damageRollChoices = damageEffects.flatMap(({ entity: feat }) => {
+      const parsed = weaponDamageRollChoiceSchema.safeParse(feat.body);
+      if (!parsed.success || baseDamage.diceCount === undefined) return [];
+      const choiceTraceId = `${attackId}.damage-roll-choice.${feat.id}`;
+      state.traces[choiceTraceId] = {
+        id: choiceTraceId,
+        result: parsed.data.weaponDamageRolls,
+        nodes: [
+          {
+            id: `${choiceTraceId}.grant`,
+            operation: "grant-declared-weapon-damage-pool-choice",
+            inputs: [feat.id, parsed.data.trigger, parsed.data.chooseDamageRoll],
+            output: parsed.data.weaponDamageRolls,
+            label:
+              "Declare a weapon hit and an unused once-per-turn benefit; choose one complete pool.",
+          },
+        ],
+        sourceReferences: [...entitySourceReferences(feat), ...entitySourceReferences(entity)],
+      };
+      return [
+        {
+          sourceId: feat.id,
+          sourceName: feat.name.en ?? feat.id,
+          traceId: choiceTraceId,
+          rollCount: parsed.data.weaponDamageRolls,
+          selection: parsed.data.chooseDamageRoll,
+          requiresWeaponHit: true as const,
+          oncePerTurn: true as const,
+        },
+      ];
+    });
     state.attacks.push({
       id: attackId,
       itemId: resolved.item.id,
@@ -7510,6 +7542,7 @@ function evaluateAttacks(
       proficient,
       damage: baseDamage,
       damageModes,
+      ...(damageRollChoices.length === 0 ? {} : { damageRollChoices }),
       attackType: weapon.attackType,
       properties: weapon.properties,
       ...(weapon.range === undefined

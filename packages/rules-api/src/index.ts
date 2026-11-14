@@ -136,6 +136,7 @@ export interface DamageSummary {
 }
 
 export interface AttackSummary {
+  damageRollChoices?: WeaponDamageRollChoiceSummary[];
   rollOptions?: AttackRollOptionSummary[];
   advantageSources?: string[];
   disadvantageSources?: string[];
@@ -163,6 +164,16 @@ export interface AttackSummary {
   criticalHitThreshold: number;
   criticalHitTraceId: string;
   traceId: string;
+}
+
+export interface WeaponDamageRollChoiceSummary {
+  sourceId: string;
+  sourceName: string;
+  traceId: string;
+  rollCount: number;
+  selection: "either";
+  requiresWeaponHit: true;
+  oncePerTurn: true;
 }
 
 export interface AttackRollOptionSummary {

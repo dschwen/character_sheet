@@ -26,7 +26,8 @@ selects Skilled as the Human feat and records three selected skill proficiencies
 
 Every derived numeric value has a trace. Walking Speed cites Human page 86, and the automatic
 Athletics proficiency cites Soldier page 83. Savage Attacker is exposed as an available
-once-per-turn roll-assisted option; actual weapon damage rolling remains a combat concern.
+once-per-turn roll-assisted option. The [Combat UI](savage-attacker.md) now rolls both complete
+weapon-damage pools and lets the player choose either; turn eligibility and target damage remain manual.
 
 ## Validation
 

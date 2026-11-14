@@ -40,6 +40,7 @@ new feat spell/skill choices. Unit tests cover all twelve classes taking an Orig
 grant sources, repeatability, prerequisite gating, additional styles, round trips, and history
 preservation. The production-export browser gate covers these new paths at desktop/narrow widths.
 
-This slice does not add tools to Skilled, complete Paladin/Ranger's level-2 style/cantrip alternatives,
-automate Savage Attacker or Grappler combat effects, introduce encounter budgets, or claim full
-semantic review of levels 1–5. Those audit gaps remain work, not implicit grants.
+Later slices add [Paladin/Ranger's level-2 alternatives](warrior-cantrips.md) and
+[Savage Attacker's declared damage-pool choice](savage-attacker.md). Tools for Skilled, Grappler's
+target-specific combat effects, encounter budgets, and full semantic review of levels 1–5 remain
+unfinished; these are not implicit grants.

@@ -65,7 +65,8 @@ Focused interaction tests verify:
 
 ## Current boundary
 
-This fixture does not execute Graze, Sap, Slow, or Savage Attacker damage rolls, enforce attack
-range or ammunition, apply damage, or represent tool proficiencies. Fighter levels 2–5 are covered
+This fixture does not execute Graze, Sap or Slow, enforce attack range or ammunition, apply target
+damage, or represent tool choices. [Savage Attacker](savage-attacker.md) now has declared whole-pool
+roll controls in Combat; turn use remains manual. Fighter levels 2–5 are covered
 by the separate level-5 fixture. Second Wind, Defense, and Savage Attacker retain semantic-review
 warnings because their authoring IR has not been approved.

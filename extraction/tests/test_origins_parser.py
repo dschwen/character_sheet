@@ -317,9 +317,16 @@ def test_parse_origin_feats_rejects_incomplete_benefits() -> None:
     )
 
     assert savage["weaponDamageRolls"] == 2
+    assert savage["trigger"] == "once-per-turn-weapon-hit"
+    assert savage["chooseDamageRoll"] == "either"
     assert skilled["proficiencyChoice"]["maximum"] == 3
     with pytest.raises(ValueError, match="incomplete"):
         parse_origin_feat("Savage Attacker", "Savage Attacker Origin Feat Once per turn.")
+    with pytest.raises(ValueError, match="incomplete"):
+        parse_origin_feat(
+            "Savage Attacker",
+            "Savage Attacker Origin Feat roll the weapon’s damage dice twice and use either roll",
+        )
 
 
 def test_parse_alert_and_magic_initiate() -> None:

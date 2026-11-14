@@ -13,6 +13,23 @@ function physicalThrows(...results: readonly number[][]): PhysicalDiceThrow {
 }
 
 describe("fullscreen physical dice result mapping", () => {
+  it("does not leave a delayed unhandled rejection when renderer initialization fails", async () => {
+    vi.useFakeTimers();
+    try {
+      // This suite runs in Node, where no fullscreen renderer can initialize.
+      await expect(
+        rollDiceFullscreen({ label: "Unavailable renderer", diceCount: 1, diceSize: 6 }),
+      ).rejects.toThrow("only available in a browser");
+      await vi.runAllTimersAsync();
+      const result = await rollDiceFullscreen(
+        { label: "Subsequent roll", diceCount: 1, diceSize: 6 },
+        physicalThrows([4]),
+      );
+      expect(result.total).toBe(4);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it("keeps the higher physical d20 for Advantage", async () => {
     const result = await rollD20Fullscreen(
       { label: "Attack", modifier: 5, mode: "advantage" },

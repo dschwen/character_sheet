@@ -1,4 +1,8 @@
-import type { AttackSummary, WeaponDamageModeSummary } from "@dnd/rules-api";
+import type {
+  AttackSummary,
+  WeaponDamageModeSummary,
+  WeaponDamageRollChoiceSummary,
+} from "@dnd/rules-api";
 import type { DicePoolRollRequest } from "./dice-roll";
 
 export function selectedWeaponDamageMode(
@@ -33,4 +37,24 @@ export function weaponDamageRollRequest(
     minimumTotal: 0,
     ...(damage.dieMinimum === undefined ? {} : { dieMinimum: damage.dieMinimum }),
   };
+}
+
+export interface WeaponDamageChoiceRequest {
+  pool: DicePoolRollRequest;
+  choice: WeaponDamageRollChoiceSummary;
+}
+
+export function weaponDamageChoiceRequest(
+  attack: AttackSummary,
+  sourceId: string,
+  declarations: { hitTarget: boolean; unusedThisTurn: boolean; critical: boolean },
+  modeId?: string,
+): WeaponDamageChoiceRequest {
+  const choice = attack.damageRollChoices?.find((entry) => entry.sourceId === sourceId);
+  if (!choice || attack.properties.includes("unarmed-strike"))
+    throw new Error("This attack has no eligible weapon-damage choice.");
+  if (!declarations.hitTarget || !declarations.unusedThisTurn)
+    throw new Error("Confirm a weapon hit and that this benefit has not been used this turn.");
+  const pool = weaponDamageRollRequest(attack, modeId, declarations.critical);
+  return { choice, pool: { ...pool, label: `${choice.sourceName} · ${pool.label}` } };
 }

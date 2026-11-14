@@ -1068,7 +1068,10 @@ def parse_origin_feat(
             "description": description,
         }
     if name == "Savage Attacker":
-        if "roll the weapon’s damage dice twice and use either roll" not in description:
+        if (
+            "Once per turn when you hit a target with a weapon" not in description
+            or "roll the weapon’s damage dice twice and use either roll" not in description
+        ):
             raise ValueError("Savage Attacker benefit text is incomplete")
         return {
             "category": "origin",

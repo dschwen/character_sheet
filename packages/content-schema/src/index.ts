@@ -601,6 +601,13 @@ export const classFeatureChoiceSchema = z
 
 export const failedSaveRerollSchema = z.object({ bonusFact: z.string().min(1) }).strict();
 
+/** Whole weapon-damage pools; never a per-die best-of or extra-damage reroll. */
+export const weaponDamageRollChoiceSchema = z.object({
+  trigger: z.literal("once-per-turn-weapon-hit"),
+  weaponDamageRolls: z.number().int().min(2).max(4),
+  chooseDamageRoll: z.literal("either"),
+});
+
 export const movementCapabilitySchema = z
   .object({
     id: entityIdSchema,

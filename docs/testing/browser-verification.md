@@ -20,6 +20,11 @@ same suite.
 
 ## What the suite verifies
 
+`weapon-damage-choice.spec.ts` exercises Savage Attacker's hit/unused-turn declarations,
+source explanation, normal/critical fullscreen pools, either-result selection, transient results,
+and intentional WebGL failure with fallback/state preservation. The negative test accepts only
+the exact vendor console error it deliberately induces; every other render error still fails.
+
 `warrior-cantrips.spec.ts` checks Paladin/Ranger style options, selecting their conditional
 cantrip alternative, reload persistence, and one cantrip replacement on level 2→3. Both configured
 viewports run these flows; these are not complete spell/combat effect tests.
@@ -51,7 +56,7 @@ Selectors use roles and accessible names, not test ids, because the app has no t
 - The creation/advancement matrix covers Fighter, Bard, Wizard, Paladin and Ranger, not all twelve
   classes or all legal choices. It covers Fighter 1→2, 3→4, and 4→5, Bard 10→11, and Wizard
   4→5 for each ritual variant. Only two of thirteen condition toggles are exercised. Full
-  short-rest/long-rest, dice, spell casting, inventory, and death-save flows remain uncovered.
+  short-rest/long-rest, other dice, spell casting, inventory, and death-save flows remain uncovered.
 - `ritual-caster` asserts the builder presentation, selection bounds, level-up rules, and sheet
   attribution; it does not cast a granted spell in the Play view, use the Quick Ritual resource,
   or research a 2014 book spell (research is a play-time flow the UI does not expose).

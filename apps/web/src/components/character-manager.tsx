@@ -40,6 +40,9 @@ import {
 import { DamageRiderControls } from "./damage-rider-controls";
 import { MovementCapabilities } from "./movement-capabilities";
 import { OnHitDamageControls } from "./on-hit-damage-controls";
+import { WeaponDamageChoiceControls } from "./weapon-damage-choice-controls";
+import { chooseDicePoolResult, rollDicePoolChoices } from "../lib/dice-pool-choice";
+import type { WeaponDamageChoiceRequest } from "../lib/weapon-damage-roll";
 import { onHitDamageDefinition } from "../lib/on-hit-damage";
 import { heroicInspirationGrant, heroicInspirationTrigger } from "../lib/heroic-inspiration";
 import { spellDamageRollRequest } from "../lib/feature-damage-roll";
@@ -123,7 +126,11 @@ import {
   type DicePoolRollResult,
   type DiceRollResult,
 } from "../lib/dice-roll";
-import { rollD20Fullscreen, rollDiceFullscreen } from "../lib/fullscreen-dice";
+import {
+  rollD20Fullscreen,
+  rollDiceFullscreen,
+  rollDiceChoicesFullscreen,
+} from "../lib/fullscreen-dice";
 
 const storageKey = "dnd-character-manager.document.v1";
 const tabs = ["overview", "play", "combat", "spells", "features", "diagnostics"] as const;
@@ -402,10 +409,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     selections: Record<string, string>;
   }>();
   const [latestRoll, setLatestRoll] = useState<DiceRollResult>();
+  const [damageDeclarationRevision, setDamageDeclarationRevision] = useState(0);
+  const [weaponDamageChoice, setWeaponDamageChoice] = useState<{
+    character: CharacterDocument;
+    sourceName: string;
+    candidates: DicePoolRollResult[];
+    selectedIndex?: number;
+  }>();
   const [useD20Minimums, setUseD20Minimums] = useState(true);
   const [diceRolling, setDiceRolling] = useState(false);
   const [castFeedback, setCastFeedback] = useState<CastFeedback>();
   const diceRollingRef = useRef(false);
+  const rollGenerationRef = useRef(0);
   const equipmentCatalog = useMemo(() => inventoryCatalog(rulesPackage), [rulesPackage]);
   const conditionOptions = useMemo(() => {
     const conditionBodies = new Map(
@@ -672,6 +687,12 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       .map((status) => status.id);
   }
 
+  function clearLatestRoll(): void {
+    rollGenerationRef.current += 1;
+    setLatestRoll(undefined);
+    setWeaponDamageChoice(undefined);
+  }
+
   function beginDiceRoll(): boolean {
     if (diceRollingRef.current) {
       setNotice("Wait for the current dice to settle.");
@@ -679,7 +700,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
     diceRollingRef.current = true;
     setDiceRolling(true);
-    setLatestRoll(undefined);
+    clearLatestRoll();
     return true;
   }
 
@@ -711,6 +732,31 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       });
       setLatestRoll(result);
       return result;
+    } finally {
+      finishDiceRoll();
+    }
+  }
+
+  async function performWeaponDamageChoice(request: WeaponDamageChoiceRequest): Promise<void> {
+    if (!beginDiceRoll()) return;
+    // A declared use invalidates confirmations on every weapon, not only the clicked row.
+    setDamageDeclarationRevision((revision) => revision + 1);
+    const generation = rollGenerationRef.current;
+    let fallbackReason: string | undefined;
+    try {
+      const candidates = await rollDiceChoicesFullscreen(
+        request.pool,
+        request.choice.rollCount,
+      ).catch((error: unknown) => {
+        fallbackReason = errorMessage(error);
+        return rollDicePoolChoices(request.pool, request.choice.rollCount);
+      });
+      if (generation === rollGenerationRef.current) {
+        setWeaponDamageChoice({ character, sourceName: request.choice.sourceName, candidates });
+        setNotice(
+          `${fallbackReason === undefined ? "" : `3D dice were unavailable (${fallbackReason}); used the fallback roller for all complete pools. `}${request.choice.sourceName}: choose one complete damage pool. Apply only that result to the target; roll extra damage separately. Record this turn's use manually.`,
+        );
+      }
     } finally {
       finishDiceRoll();
     }
@@ -858,7 +904,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     const fixture = fixtures.find((option) => option.filename === filename);
     if (fixture === undefined) return;
     setCharacter(fixture.character);
-    setLatestRoll(undefined);
+    clearLatestRoll();
     setPreviousCharacter(undefined);
     setSource(filename);
     setSelectedTraceId(undefined);
@@ -888,7 +934,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         builderCatalog,
       );
       setCharacter(imported);
-      setLatestRoll(undefined);
+      clearLatestRoll();
       setPreviousCharacter(undefined);
       setSource("imported");
       setSelectedTraceId(undefined);
@@ -929,7 +975,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   }
 
   function savePlayState(nextCharacter: CharacterDocument, message: string): void {
-    setLatestRoll(undefined);
+    clearLatestRoll();
     setPreviousCharacter(character);
     setCharacter(nextCharacter);
     setSource("browser-save");
@@ -939,7 +985,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   function undoPlayState(): void {
     if (previousCharacter === undefined) return;
     setCharacter(previousCharacter);
-    setLatestRoll(undefined);
+    clearLatestRoll();
     setPreviousCharacter(undefined);
     setSource("browser-save");
     setNotice("Undid the last character change.");
@@ -1469,6 +1515,37 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           </div>
         )}
 
+        {weaponDamageChoice?.character === character ? (
+          <fieldset
+            className="builder-subsection"
+            aria-label={`${weaponDamageChoice.sourceName} damage choice`}
+          >
+            <legend>{weaponDamageChoice.sourceName}: choose one complete damage pool</legend>
+            <p>
+              The modifier is included once in each candidate, not added again. Apply only your
+              chosen result; target damage is manual.
+            </p>
+            {weaponDamageChoice.candidates.map((candidate, index) => (
+              <button
+                key={index}
+                type="button"
+                disabled={diceRolling}
+                aria-pressed={weaponDamageChoice.selectedIndex === index}
+                onClick={() => {
+                  setLatestRoll(chooseDicePoolResult(weaponDamageChoice.candidates, index));
+                  setWeaponDamageChoice({ ...weaponDamageChoice, selectedIndex: index });
+                }}
+              >
+                Use pool {String(index + 1)}: {dicePoolRollExpression(candidate)} ·{" "}
+                {dicePoolRollDetail(candidate)}
+              </button>
+            ))}
+            <button type="button" onClick={clearLatestRoll}>
+              Dismiss damage choice
+            </button>
+          </fieldset>
+        ) : null}
+
         {latestRoll === undefined ? null : (
           <div className="dice-result" role="status" aria-live="polite">
             <div
@@ -1508,7 +1585,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             <button
               type="button"
               onClick={() => {
-                setLatestRoll(undefined);
+                clearLatestRoll();
               }}
               aria-label="Dismiss dice result"
             >
@@ -3424,6 +3501,18 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                         {String(damage.dieMinimum.value)} · Explain
                                       </button>
                                     )}
+                                    {attack.damageRollChoices?.map((choice) => (
+                                      <WeaponDamageChoiceControls
+                                        key={`${character.id}:${character.metadata.updatedAt}:${attack.id}:${mode?.id ?? "normal"}:${choice.sourceId}:${String(damageDeclarationRevision)}`}
+                                        attack={attack}
+                                        choice={choice}
+                                        modeId={mode?.id}
+                                        busy={diceRolling}
+                                        unavailable={mode?.available === false}
+                                        onRoll={performWeaponDamageChoice}
+                                        onExplain={setSelectedTraceId}
+                                      />
+                                    ))}
                                     <button
                                       type="button"
                                       disabled={mode?.available === false || diceRolling}
@@ -4132,7 +4221,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
           }}
           onComplete={(builtCharacter) => {
             setCharacter(builtCharacter);
-            setLatestRoll(undefined);
+            clearLatestRoll();
             setPreviousCharacter(undefined);
             setSource("builder");
             setTab("overview");
