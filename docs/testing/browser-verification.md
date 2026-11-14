@@ -20,6 +20,10 @@ same suite.
 
 ## What the suite verifies
 
+`warrior-cantrips.spec.ts` checks Paladin/Ranger style options, selecting their conditional
+cantrip alternative, reload persistence, and one cantrip replacement on level 2→3. Both configured
+viewports run these flows; these are not complete spell/combat effect tests.
+
 `feat-acquisition.spec.ts` additionally checks Origin-feat acquisition without replacing origin
 grants, a second Fighting Style, repeatable Skilled's three acquisition-specific choices and
 preservation through advancement, and new Magic Initiate spell/ability choices during level up.
@@ -44,7 +48,7 @@ Selectors use roles and accessible names, not test ids, because the app has no t
   here.
 - The axe scans cover two page states (initial sheet, builder dialog), not the Play/Combat/
   Spells/Features/Diagnostics tabs or the level-up dialog, and only critical/serious impacts.
-- The creation/advancement matrix is limited to Fighter, Bard, and Wizard, not all twelve
+- The creation/advancement matrix covers Fighter, Bard, Wizard, Paladin and Ranger, not all twelve
   classes or all legal choices. It covers Fighter 1→2, 3→4, and 4→5, Bard 10→11, and Wizard
   4→5 for each ritual variant. Only two of thirteen condition toggles are exercised. Full
   short-rest/long-rest, dice, spell casting, inventory, and death-save flows remain uncovered.

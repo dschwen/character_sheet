@@ -497,9 +497,17 @@ export const classFeatureChoiceSchema = z
     defaultOptionIds: z.array(entityIdSchema).optional(),
     changeOn: z.array(z.enum(["level-up", "short-rest", "long-rest"])).optional(),
     replacementMaximum: z.number().int().positive().optional(),
+    requiredOption: z
+      .object({ choiceId: entityIdSchema, optionId: entityIdSchema })
+      .strict()
+      .optional(),
     optionSelection: z.object({ sourceFeatureId: entityIdSchema }).strict().optional(),
     featSelection: z
-      .object({ sourceFeatureId: entityIdSchema, exclusiveGroup: z.string().min(1) })
+      .object({
+        sourceFeatureId: entityIdSchema,
+        exclusiveGroup: z.string().min(1),
+        allowAlternativeOptions: z.literal(true).optional(),
+      })
       .strict()
       .optional(),
     spellSelection: z
@@ -518,6 +526,17 @@ export const classFeatureChoiceSchema = z
   })
   .strict()
   .superRefine((choice, context) => {
+    if (
+      choice.requiredOption !== undefined &&
+      (choice.spellSelection === undefined || choice.requiredOption.choiceId === choice.id)
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["requiredOption"],
+        message:
+          "Conditional choices require spell-selection semantics and a different parent choice",
+      });
+    }
     if (
       choice.optionSelection !== undefined &&
       (choice.featSelection !== undefined || choice.spellSelection !== undefined)
@@ -868,6 +887,16 @@ export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSche
 export type StartingEquipmentChoice = z.infer<typeof startingEquipmentChoiceSchema>;
 export type ClassBuilderMetadata = z.infer<typeof classBuilderMetadataSchema>;
 export type ClassFeatureChoice = z.infer<typeof classFeatureChoiceSchema>;
+
+/** A conditional child is enabled only by its single selected parent option. */
+export function featureChoiceEnabled(
+  choice: Pick<ClassFeatureChoice, "requiredOption">,
+  selections: Readonly<Record<string, readonly string[] | undefined>>,
+): boolean {
+  if (choice.requiredOption === undefined) return true;
+  const parent = selections[choice.requiredOption.choiceId] ?? [];
+  return parent.length === 1 && parent[0] === choice.requiredOption.optionId;
+}
 export type FeatureAutomationBody = z.infer<typeof featureAutomationBodySchema>;
 export type DraftRule = z.infer<typeof draftRuleSchema>;
 export type AuthoringIr = z.infer<typeof authoringIrSchema>;

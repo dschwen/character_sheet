@@ -33,13 +33,62 @@
         "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
+      "fightingStyleCantripChoice": {
+        "changeOn": [
+          "level-up"
+        ],
+        "defaultOptionIds": [
+          "srd521.spell.guidance",
+          "srd521.spell.sacred-flame"
+        ],
+        "id": "srd521.choice.paladin.blessed-warrior-cantrips",
+        "level": 2,
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "srd521.spell.guidance",
+          "srd521.spell.light",
+          "srd521.spell.mending",
+          "srd521.spell.resistance",
+          "srd521.spell.sacred-flame",
+          "srd521.spell.spare-the-dying",
+          "srd521.spell.thaumaturgy"
+        ],
+        "replacementMaximum": 1,
+        "requiredOption": {
+          "choiceId": "srd521.choice.paladin.fighting-style",
+          "optionId": "srd521.option.paladin.fighting-style.blessed-warrior"
+        },
+        "spellSelection": {
+          "allowCantrips": true,
+          "alwaysPrepared": true,
+          "castingClassId": "srd521.class.paladin",
+          "maximumSpellLevel": 0,
+          "sourceClassIds": [
+            "srd521.class.cleric"
+          ],
+          "sourceFeatureId": "srd521.class-feature.paladin.fighting-style"
+        }
+      },
       "fightingStyleChoice": {
+        "defaultOptionIds": [
+          "srd521.feat.fighting-style.defense"
+        ],
+        "featSelection": {
+          "allowAlternativeOptions": true,
+          "exclusiveGroup": "fighting-style",
+          "sourceFeatureId": "srd521.class-feature.paladin.fighting-style"
+        },
         "id": "srd521.choice.paladin.fighting-style",
         "level": 2,
         "maximum": 1,
         "minimum": 1,
         "options": [
-          "srd521.feat.fighting-style.defense"
+          "srd521.feat.fighting-style.archery",
+          "srd521.feat.fighting-style.defense",
+          "srd521.feat.fighting-style.great-weapon-fighting",
+          "srd521.feat.fighting-style.two-weapon-fighting",
+          "srd521.option.paladin.fighting-style.blessed-warrior"
         ]
       },
       "hitPointDie": 10,
@@ -645,6 +694,39 @@
       "paladin",
       "spellcaster",
       "martial"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.paladin.fighting-style",
+      "text": "You gain a Fighting Style feat of your choice (see “Feats” for feats). Instead of choosing one of those feats, you can choose the option below. Blessed Warrior. You learn two Cleric cantrips of your choice (see the Cleric class’s section for a list of Cleric spells). Guidance and Sacred Flame are recommended. The chosen cantrips count as Paladin spells for you, and Charisma is your spellcasting ability for them. Whenever you gain a Paladin level, you can replace one of these cantrips with another Cleric cantrip."
+    },
+    "id": "srd521.option.paladin.fighting-style.blessed-warrior",
+    "kind": "class-option",
+    "name": {
+      "en": "Blessed Warrior"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0054-b009"
+        ],
+        "page": 54,
+        "quoteHash": "4b223a353bc2f9d7c73e5d94311a1847ccaf921572610fee530878ccafa83275",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "paladin",
+      "fighting-style-alternative"
     ]
   },
   {

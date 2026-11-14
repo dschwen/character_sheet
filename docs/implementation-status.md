@@ -6,6 +6,10 @@ because some of its functionality exists or tests pass.
 
 ## Current evidence
 
+- Paladin/Ranger level-2 Fighting Style choices now offer all four SRD feats and their respective
+  Blessed Warrior / Druidic Warrior alternatives. Shared conditional-choice metadata grants two
+  own-class cantrips without consuming ordinary preparations and supports one replacement per
+  later class level. See [Warrior choices](rules-engine/warrior-cantrips.md).
 - The local-first web builder, sheet, import/export, inventory, spell preparation, play-state,
   fullscreen dice, and guided same-class advancement are implemented in `apps/web`.
 - The framework-independent evaluator and traced atomic action, spell-cast, and rest proposals

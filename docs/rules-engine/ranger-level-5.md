@@ -19,8 +19,9 @@ structured text. Through level 5, these limits remain intentionally assisted:
   structured options; their situational triggers and combat application remain manual.
 - Deft Explorer validates and evaluates one Expertise selection. Its two language choices remain
   descriptive pending a general language-choice model.
-- Defense is the reviewed Fighting Style path. Druidic Warrior remains structured text pending a
-  generic cross-class cantrip choice model.
+- Level 2 offers all four SRD Fighting Style feats or Druidic Warrior. The latter grants two
+  Druid cantrips cast as Ranger spells with Wisdom, and permits one cantrip replacement on
+  each later Ranger level. See [shared warrior choices](warrior-cantrips.md).
 
 ## Level 7 and rest-time choices
 

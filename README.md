@@ -138,6 +138,10 @@ Grappler is also offered from source-linked feat metadata, with a +1 Strength or
 non-repeatability, and a level-4 plus Strength-or-Dexterity-13 prerequisite checked before its own
 increase. Combat displays its Punch and Grab, Attack Advantage, and Fast Wrestler guidance;
 targets, grapple saves, movement, and conditional Advantage remain manually adjudicated.
+Paladin and Ranger level-2 choices offer all four SRD Fighting Styles or Blessed Warrior /
+Druidic Warrior, with two class-cast cantrips and one cantrip replacement per later class level.
+See [Warrior choices](docs/rules-engine/warrior-cantrips.md).
+
 Epic Boons are not yet offered by this workflow. Origin feats and qualifying Fighting Style
 feats now use the same advancement selector as General feats. Background/species feats remain
 separate grants; already-owned non-repeatable feats are excluded. Magic Initiate opens its spell

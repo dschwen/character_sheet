@@ -377,6 +377,14 @@ function advancementIssues(
   }
   const currentChoices = choiceSelections(character);
   for (const choice of selectedClass.featureChoices.filter(
+    (choice) => choice.level < targetLevel && !choice.changeOn?.includes("level-up"),
+  )) {
+    const before = currentChoices[choice.id] ?? [];
+    const after = draft.featureChoiceSelections[choice.id] ?? [];
+    if (before.length !== after.length || before.some((id) => !after.includes(id)))
+      issues.push("Earlier feature choices cannot change during this level up.");
+  }
+  for (const choice of selectedClass.featureChoices.filter(
     (candidate) => candidate.level < targetLevel && candidate.changeOn?.includes("level-up"),
   )) {
     const current = new Set(currentChoices[choice.id] ?? []);

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 import type { CharacterDocument } from "@dnd/character-model";
-import type { StartingEquipmentItem } from "@dnd/content-schema";
+import { featureChoiceEnabled, type StartingEquipmentItem } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
 import { featIncreases } from "../lib/advancement-feats";
 import { AdvancementFeatSelect } from "./advancement-feat-select";
@@ -98,7 +98,8 @@ export function CharacterBuilder({
   const spellcasting = selectedClass.spellcasting;
   const spellCounts = spellSelectionCounts(draft, catalog);
   const activeFeatureChoices = selectedClass.featureChoices.filter(
-    (choice) => choice.level <= draft.level,
+    (choice) =>
+      choice.level <= draft.level && featureChoiceEnabled(choice, draft.featureChoiceSelections),
   );
   const selectedEquipmentOption =
     selectedClass.startingEquipment.options.find(
@@ -689,7 +690,9 @@ export function CharacterBuilder({
                           choice.spellSelection?.spellbookAddition === true &&
                           featureSpellbookChoices(draft, catalog).includes(option.id));
                       const maximumReached =
-                        !selected && selectedIds.length >= featureChoiceCount(choice, draft.level);
+                        featureChoiceCount(choice, draft.level) > 1 &&
+                        !selected &&
+                        selectedIds.length >= featureChoiceCount(choice, draft.level);
                       return (
                         <button
                           key={option.id}

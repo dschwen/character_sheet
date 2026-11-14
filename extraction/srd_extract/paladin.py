@@ -10,6 +10,7 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
+from srd_extract.fighting_style_choices import add_cantrip_alternative
 from srd_extract.io import read_json, write_json
 from srd_extract.progression import progression_feature_ids
 from srd_extract.wizard import (
@@ -857,6 +858,14 @@ def generate_paladin_content(
     )
     paladin_entities = [
         class_entity,
+        add_cantrip_alternative(
+            class_entity,
+            features,
+            read_json(output / "entities.json"),
+            name="Blessed Warrior",
+            source_class_id="srd521.class.cleric",
+            default_cantrips=["srd521.spell.guidance", "srd521.spell.sacred-flame"],
+        ),
         *[_feature_entity(feature, "class-feature") for feature in features],
         _rule_table(progression, progression_source, "lay-on-hands", "Paladin Lay On Hands Pool"),
         _rule_table(

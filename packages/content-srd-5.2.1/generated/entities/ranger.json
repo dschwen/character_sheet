@@ -67,13 +67,66 @@
         "supportedLevelMaximum": 9,
         "supportedLevelMinimum": 1
       },
+      "fightingStyleCantripChoice": {
+        "changeOn": [
+          "level-up"
+        ],
+        "defaultOptionIds": [
+          "srd521.spell.guidance",
+          "srd521.spell.starry-wisp"
+        ],
+        "id": "srd521.choice.ranger.druidic-warrior-cantrips",
+        "level": 2,
+        "maximum": 2,
+        "minimum": 2,
+        "options": [
+          "srd521.spell.druidcraft",
+          "srd521.spell.elementalism",
+          "srd521.spell.guidance",
+          "srd521.spell.mending",
+          "srd521.spell.message",
+          "srd521.spell.poison-spray",
+          "srd521.spell.produce-flame",
+          "srd521.spell.resistance",
+          "srd521.spell.shillelagh",
+          "srd521.spell.spare-the-dying",
+          "srd521.spell.starry-wisp"
+        ],
+        "replacementMaximum": 1,
+        "requiredOption": {
+          "choiceId": "srd521.choice.ranger.fighting-style",
+          "optionId": "srd521.option.ranger.fighting-style.druidic-warrior"
+        },
+        "spellSelection": {
+          "allowCantrips": true,
+          "alwaysPrepared": true,
+          "castingClassId": "srd521.class.ranger",
+          "maximumSpellLevel": 0,
+          "sourceClassIds": [
+            "srd521.class.druid"
+          ],
+          "sourceFeatureId": "srd521.class-feature.ranger.fighting-style"
+        }
+      },
       "fightingStyleChoice": {
+        "defaultOptionIds": [
+          "srd521.feat.fighting-style.defense"
+        ],
+        "featSelection": {
+          "allowAlternativeOptions": true,
+          "exclusiveGroup": "fighting-style",
+          "sourceFeatureId": "srd521.class-feature.ranger.fighting-style"
+        },
         "id": "srd521.choice.ranger.fighting-style",
         "level": 2,
         "maximum": 1,
         "minimum": 1,
         "options": [
-          "srd521.feat.fighting-style.defense"
+          "srd521.feat.fighting-style.archery",
+          "srd521.feat.fighting-style.defense",
+          "srd521.feat.fighting-style.great-weapon-fighting",
+          "srd521.feat.fighting-style.two-weapon-fighting",
+          "srd521.option.ranger.fighting-style.druidic-warrior"
         ]
       },
       "hitPointDie": 10,
@@ -711,6 +764,39 @@
       "ranger",
       "spellcaster",
       "martial"
+    ]
+  },
+  {
+    "body": {
+      "choiceId": "srd521.choice.ranger.fighting-style",
+      "text": "You gain a Fighting Style feat of your choice (see “Feats”). Instead of choosing one of those feats, you can choose the option below. Druidic Warrior. You learn two Druid cantrips of your choice (see the Druid class’s section for a list of Druid spells). Guidance and Starry Wisp are recommended. The chosen cantrips count as Ranger spells for you, and Wisdom is your spellcasting ability for them. Whenever you gain a Ranger level, you can replace one of these cantrips with another Druid cantrip."
+    },
+    "id": "srd521.option.ranger.fighting-style.druidic-warrior",
+    "kind": "class-option",
+    "name": {
+      "en": "Druidic Warrior"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0059-b004"
+        ],
+        "page": 59,
+        "quoteHash": "f3145f398c879b9223dc7b0923ce321e1ead265b0cef50430a918cd578ef8c9e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "class-option",
+      "ranger",
+      "fighting-style-alternative"
     ]
   },
   {

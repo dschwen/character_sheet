@@ -28,6 +28,7 @@ import {
   heroicInspirationGrantSchema,
   reactionAttackSchema,
   featAcquisitionMetadataSchema,
+  featureChoiceEnabled,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -2185,13 +2186,22 @@ function validateProgressionSelections(
       }
       const group = selectedGroups.get(definition.exclusiveGroup) ?? new Set<string>();
       for (const selection of selections) {
+        const selectedEntity = index.entities.get(selection.id);
+        const alternativeBody = z
+          .object({ choiceId: z.literal(choice.id) })
+          .safeParse(selectedEntity?.body);
+        const eligibleOption =
+          selectedEntity?.kind === "feat" ||
+          (definition.allowAlternativeOptions === true &&
+            selectedEntity?.kind === "class-option" &&
+            alternativeBody.success);
         if (
           !required ||
           selection.classId !== classId ||
           selection.level < choice.level ||
           !choice.options.includes(selection.id) ||
-          index.entities.get(selection.id)?.kind !== "feat" ||
-          !character.build.featIds.includes(selection.id) ||
+          !eligibleOption ||
+          (selectedEntity.kind === "feat" && !character.build.featIds.includes(selection.id)) ||
           group.has(selection.id)
         ) {
           addValidation(
@@ -2204,7 +2214,10 @@ function validateProgressionSelections(
         group.add(selection.id);
       }
       selectedGroups.set(definition.exclusiveGroup, group);
-      if (ownerValid) choice.options.forEach((id) => managedFeats.add(id));
+      if (ownerValid)
+        choice.options
+          .filter((id) => index.entities.get(id)?.kind === "feat")
+          .forEach((id) => managedFeats.add(id));
       if (required)
         state.traces[choice.id] = {
           id: choice.id,
@@ -4442,6 +4455,13 @@ function resolveFeatureSpellSelections(
   const classLevels = new Map([[classId, classLevel]]);
   const grantedFeatures = grantedFeatureIds(classLevels, index);
   grantSubclassFeatures(character, classLevels, index, grantedFeatures);
+  const selectedChoices: Record<string, string[]> = {};
+  for (const choice of character.build.levels.flatMap((level) => level.selectedFeatureChoices)) {
+    selectedChoices[choice.choiceId] = [
+      ...(selectedChoices[choice.choiceId] ?? []),
+      ...choice.optionIds,
+    ];
+  }
   for (const owner of index.entities.values()) {
     if (owner.kind !== "class" && owner.kind !== "subclass") continue;
     const ownerBody = z.record(z.unknown()).safeParse(owner.body);
@@ -4469,7 +4489,10 @@ function resolveFeatureSpellSelections(
           );
       });
       const required =
-        ownerValid && classLevel >= choice.level && grantedFeatures.has(definition.sourceFeatureId);
+        ownerValid &&
+        classLevel >= choice.level &&
+        grantedFeatures.has(definition.sourceFeatureId) &&
+        featureChoiceEnabled(choice, selectedChoices);
       if (required && definition.spellbookAddition === true) spellbookBonusCount += choice.minimum;
       if (
         (!required && selections.length > 0) ||
@@ -5176,7 +5199,11 @@ function evaluateSpellcasting(
     abilityModifier,
     attackBonus,
     saveDifficultyClass,
-    cantripsKnown: expectedCantrips,
+    cantripsKnown:
+      expectedCantrips +
+      [...featureSpells.alwaysPrepared].filter(
+        (id) => !learned.has(id) && spellBodySchema.parse(index.entities.get(id)?.body).level === 0,
+      ).length,
     preparedSpellLimit: progression.preparedSpells,
     alwaysPreparedSpells: alwaysPrepared.size,
     ...(spellbookMinimum === undefined ? {} : { spellbookMinimum }),

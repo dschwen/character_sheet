@@ -2,6 +2,7 @@ import { characterDocumentSchema, type CharacterDocument } from "@dnd/character-
 import {
   classBuilderMetadataSchema,
   classFeatureChoiceSchema,
+  featureChoiceEnabled,
   startingEquipmentChoiceSchema,
   type ClassBuilderMetadata,
   type ClassFeatureChoice,
@@ -554,7 +555,12 @@ function classCatalog(
       }
       return [{ ...parsed.data, options: choiceOptions }];
     })
-    .sort((left, right) => left.level - right.level || left.id.localeCompare(right.id));
+    .sort(
+      (left, right) =>
+        left.level - right.level ||
+        Number(left.requiredOption !== undefined) - Number(right.requiredOption !== undefined) ||
+        left.id.localeCompare(right.id),
+    );
   const subclassProgression = subclassBody?.progression;
   const subclassLevel = Array.isArray(subclassProgression)
     ? Math.min(
@@ -2162,10 +2168,12 @@ function reconciledFeatureChoiceSelections(
 ): Readonly<Record<string, string[]>> {
   const usedBookSpells = new Set<string>();
   const usedFeatGroups = new Map<string, Set<string>>();
+  const resolved: Record<string, string[]> = {};
   return Object.fromEntries(
     selectedClass.featureChoices
       .filter((choice) => choice.level <= level)
       .map((choice) => {
+        if (!featureChoiceEnabled(choice, resolved)) return [choice.id, []];
         const selected = fillSelections(
           current[choice.id] ?? [],
           [...(choice.defaultOptionIds ?? []), ...choice.options.map((option) => option.id)].filter(
@@ -2189,6 +2197,7 @@ function reconciledFeatureChoiceSelections(
           selected.forEach((id) => group.add(id));
           usedFeatGroups.set(choice.featSelection.exclusiveGroup, group);
         }
+        resolved[choice.id] = selected;
         return [choice.id, selected];
       }),
   );
@@ -2394,7 +2403,10 @@ export function spellSelectionCounts(
     );
   const chosenSpells = selectedClass.featureChoices
     .filter(
-      (choice) => choice.spellSelection?.alwaysPrepared === true && choice.level <= draft.level,
+      (choice) =>
+        choice.spellSelection?.alwaysPrepared === true &&
+        choice.level <= draft.level &&
+        featureChoiceEnabled(choice, draft.featureChoiceSelections),
     )
     .flatMap((choice) => draft.featureChoiceSelections[choice.id] ?? []);
   return {
@@ -2672,6 +2684,8 @@ export function updateBuilderFeatureChoice(
 ): CharacterBuilderDraft {
   const selectedClass = catalog.classes[draft.classId];
   const choice = selectedClass.featureChoices.find((candidate) => candidate.id === choiceId);
+  if (choice !== undefined && !featureChoiceEnabled(choice, draft.featureChoiceSelections))
+    return draft;
   if (choice === undefined || choice.level > draft.level) return draft;
   if (featureFeatOptionAlreadySelected(draft, catalog, choiceId, optionId)) return draft;
   const optionIds = choice.options.map((option) => option.id);
@@ -2717,13 +2731,28 @@ export function updateBuilderFeatureChoice(
       : current.includes(optionId)
         ? withoutOptionAndDependents(optionId)
         : [...current, optionId].slice(0, maximum);
-  const next = {
+  let next = {
     ...draft,
     featureChoiceSelections: {
       ...draft.featureChoiceSelections,
       [choiceId]: selected,
     },
   };
+  if (
+    selectedClass.featureChoices.some(
+      (candidate) => candidate.requiredOption?.choiceId === choiceId,
+    )
+  ) {
+    next = {
+      ...next,
+      featureChoiceSelections: reconciledFeatureChoiceSelections(
+        selectedClass,
+        next.featureChoiceSelections,
+        draft.level,
+        draft.advancementFeats.map((selection) => selection.featId),
+      ),
+    };
+  }
   return selectedClass.spellcasting === undefined
     ? next
     : { ...next, ...spellSelections(next, catalog, draft.level) };
@@ -2969,23 +2998,25 @@ export function validateBuilderDraft(
 
   for (const choice of selectedClass.featureChoices) {
     const selected = draft.featureChoiceSelections[choice.id] ?? [];
+    const enabled = featureChoiceEnabled(choice, draft.featureChoiceSelections);
     if (selected.some((id) => featureFeatOptionAlreadySelected(draft, catalog, choice.id, id)))
       issues.push("Each feature-granted feat in the same group must be distinct.");
     const optionIds = choice.options.map((option) => option.id);
     const requiredCount = featureChoiceCount(choice, draft.level);
     const selectionLevels =
-      choice.level <= draft.level
+      choice.level <= draft.level && enabled
         ? featureChoiceSelectionLevels(choice, selected, draft.level)
         : undefined;
     if (
       (choice.level <= draft.level &&
+        enabled &&
         (choice.countByLevel === undefined
           ? selected.length < choice.minimum || selected.length > choice.maximum
           : selected.length !== requiredCount)) ||
-      (choice.level > draft.level && selected.length > 0) ||
+      ((!enabled || choice.level > draft.level) && selected.length > 0) ||
       new Set(selected).size !== selected.length ||
       selected.some((id) => !optionIds.includes(id)) ||
-      (choice.level <= draft.level && selectionLevels === undefined)
+      (choice.level <= draft.level && enabled && selectionLevels === undefined)
     ) {
       const range =
         choice.countByLevel === undefined
@@ -3116,7 +3147,9 @@ function assembleCharacter(
     { choiceId: string; optionIds: string[] }[]
   >();
   for (const choice of selectedClass.featureChoices.filter(
-    (candidate) => candidate.level <= draft.level,
+    (candidate) =>
+      candidate.level <= draft.level &&
+      featureChoiceEnabled(candidate, draft.featureChoiceSelections),
   )) {
     const optionIds = draft.featureChoiceSelections[choice.id] ?? [];
     const selectionLevels = featureChoiceSelectionLevels(choice, optionIds, draft.level);

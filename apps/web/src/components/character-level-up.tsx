@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import type { CharacterDocument } from "@dnd/character-model";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
+import { featureChoiceEnabled } from "@dnd/content-schema";
 import { featIncreaseLabel } from "../lib/advancement-feats";
 import { AdvancementFeatSelect } from "./advancement-feat-select";
 import { RitualCasterChoices } from "./ritual-caster-choices";
@@ -161,8 +162,9 @@ export function CharacterLevelUp({
   ).length;
   const targetFeatureChoices = selectedClass.featureChoices.filter(
     (choice) =>
-      choice.level === targetLevel ||
-      (choice.level < targetLevel && choice.changeOn?.includes("level-up")),
+      featureChoiceEnabled(choice, draft.featureChoiceSelections) &&
+      (choice.level === targetLevel ||
+        (choice.level < targetLevel && choice.changeOn?.includes("level-up"))),
   );
   const expertiseSources = expertiseSelectionSources(draft, catalog);
   const eligibleExpertiseSkills = expertiseSkillCandidates(draft, catalog);
@@ -548,7 +550,9 @@ export function CharacterLevelUp({
                           choice.spellSelection?.spellbookAddition === true &&
                           featureSpellbookChoices(draft, catalog).includes(option.id));
                       const maximumReached =
-                        !selected && selectedIds.length >= featureChoiceCount(choice, targetLevel);
+                        featureChoiceCount(choice, targetLevel) > 1 &&
+                        !selected &&
+                        selectedIds.length >= featureChoiceCount(choice, targetLevel);
                       return (
                         <button
                           key={option.id}

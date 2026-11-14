@@ -47,6 +47,7 @@
   "extractedDevotionFeatures": 5,
   "generatedEntities": [
     "srd521.class.paladin",
+    "srd521.option.paladin.fighting-style.blessed-warrior",
     "srd521.class-feature.paladin.lay-on-hands",
     "srd521.class-feature.paladin.spellcasting",
     "srd521.class-feature.paladin.weapon-mastery",

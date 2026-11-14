@@ -44,6 +44,7 @@
   "extractedHunterFeatures": 5,
   "generatedEntities": [
     "srd521.class.ranger",
+    "srd521.option.ranger.fighting-style.druidic-warrior",
     "srd521.class-feature.ranger.spellcasting",
     "srd521.class-feature.ranger.favored-enemy",
     "srd521.class-feature.ranger.weapon-mastery",

@@ -72,7 +72,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(873);
+    expect(parsedEntities).toHaveLength(875);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -473,13 +473,27 @@ describe("bootstrap content package", () => {
     const paladinBody = z.record(z.unknown()).parse(paladin?.body);
     expect(classFeatureChoiceSchema.parse(paladinBody.fightingStyleChoice)).toMatchObject({
       level: 2,
-      options: ["srd521.feat.fighting-style.defense"],
+      defaultOptionIds: ["srd521.feat.fighting-style.defense"],
+      options: [
+        "srd521.feat.fighting-style.archery",
+        "srd521.feat.fighting-style.defense",
+        "srd521.feat.fighting-style.great-weapon-fighting",
+        "srd521.feat.fighting-style.two-weapon-fighting",
+        "srd521.option.paladin.fighting-style.blessed-warrior",
+      ],
     });
     const ranger = entities.find((entity) => entity.id === "srd521.class.ranger");
     const rangerBody = z.record(z.unknown()).parse(ranger?.body);
     expect(classFeatureChoiceSchema.parse(rangerBody.fightingStyleChoice)).toMatchObject({
       level: 2,
-      options: ["srd521.feat.fighting-style.defense"],
+      defaultOptionIds: ["srd521.feat.fighting-style.defense"],
+      options: [
+        "srd521.feat.fighting-style.archery",
+        "srd521.feat.fighting-style.defense",
+        "srd521.feat.fighting-style.great-weapon-fighting",
+        "srd521.feat.fighting-style.two-weapon-fighting",
+        "srd521.option.ranger.fighting-style.druidic-warrior",
+      ],
     });
     expect(metadata.find(({ id }) => id === "srd521.class.ranger")?.builder).toMatchObject({
       supportedLevelMaximum: 9,

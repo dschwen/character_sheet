@@ -23,7 +23,13 @@
       {
         "characterLevel": 2,
         "classId": "srd521.class.ranger",
-        "hitPointChoice": "fixed"
+        "hitPointChoice": "fixed",
+        "selectedFeatureChoices": [
+          {
+            "choiceId": "srd521.choice.ranger.fighting-style",
+            "optionIds": ["srd521.feat.fighting-style.defense"]
+          }
+        ]
       },
       {
         "characterLevel": 3,

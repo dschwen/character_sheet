@@ -8,7 +8,7 @@ Counts describe loaded entities, not completeness of SRD extraction. Builder lim
 | --- | ---: |
 | UNCLASSIFIED | 0 |
 | TEXT_ONLY | 0 |
-| STRUCTURED | 871 |
+| STRUCTURED | 873 |
 | EXECUTABLE | 0 |
 | TESTED | 0 |
 | VERIFIED | 0 |
@@ -48,7 +48,7 @@ See `docs/rules-engine` for class-specific assisted mechanics and limits.
 | background | 4 |
 | class | 12 |
 | class-feature | 174 |
-| class-option | 55 |
+| class-option | 57 |
 | condition | 15 |
 | equipment-ammunition | 5 |
 | equipment-armor | 12 |
@@ -67,7 +67,7 @@ See `docs/rules-engine` for class-specific assisted mechanics and limits.
 
 ## Out-of-SRD edition-reference records
 
-Pinned-source entities: 871.
+Pinned-source entities: 873.
 Edition-reference records: 2.
 Authored from explicitly supplied rules text, never extracted from the pinned source.
 See `docs/adr/0013-out-of-source-edition-reference-records.md`.

@@ -60,12 +60,14 @@ describe("guided character builder", () => {
       expect.objectContaining({
         id: "srd521.choice.paladin.fighting-style",
         level: 2,
-        options: [
-          expect.objectContaining({
-            id: "srd521.feat.fighting-style.defense",
-            grantedFeatId: "srd521.feat.fighting-style.defense",
-          }),
-        ],
+        defaultOptionIds: ["srd521.feat.fighting-style.defense"],
+      }),
+      expect.objectContaining({
+        id: "srd521.choice.paladin.blessed-warrior-cantrips",
+        requiredOption: {
+          choiceId: "srd521.choice.paladin.fighting-style",
+          optionId: "srd521.option.paladin.fighting-style.blessed-warrior",
+        },
       }),
     ]);
     expect(catalog.classes[paladinId].spellcasting?.countsByLevel[5]).toEqual({
@@ -95,14 +97,15 @@ describe("guided character builder", () => {
       catalog.classes[rangerId].featureChoices.map((choice) => [choice.id, choice.level]),
     ).toEqual([
       ["srd521.choice.ranger.fighting-style", 2],
+      ["srd521.choice.ranger.druidic-warrior-cantrips", 2],
       ["srd521.choice.ranger.hunters-prey", 3],
       ["srd521.choice.ranger.defensive-tactics", 7],
     ]);
-    expect(catalog.classes[rangerId].featureChoices[1]?.changeOn).toEqual([
-      "short-rest",
-      "long-rest",
-    ]);
-    expect(catalog.classes[rangerId].featureChoices[1]?.options).toEqual([
+    const huntersPrey = catalog.classes[rangerId].featureChoices.find(
+      (choice) => choice.id === "srd521.choice.ranger.hunters-prey",
+    );
+    expect(huntersPrey?.changeOn).toEqual(["short-rest", "long-rest"]);
+    expect(huntersPrey?.options).toEqual([
       expect.objectContaining({
         id: "srd521.option.ranger.hunters-prey.colossus-slayer",
         description: "1d8 extra damage · Once Per Turn",

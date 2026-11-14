@@ -48,5 +48,6 @@ These limits remain intentionally assisted:
   attack bonus, light, and damage-type choice are resolved manually.
 - The free Divine Smite and Find Steed uses are tracked separately from spell slots; their spell
   effects remain subject to the same assisted spell resolution as ordinary casting.
-- Defense is the reviewed Fighting Style path. Blessed Warrior remains structured text pending a
-  generic cross-class cantrip choice model.
+- Level 2 offers all four SRD Fighting Style feats or Blessed Warrior. The latter grants two
+  Cleric cantrips cast as Paladin spells with Charisma, and permits one cantrip replacement on
+  each later Paladin level. See [shared warrior choices](warrior-cantrips.md).
