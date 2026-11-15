@@ -12928,6 +12928,14 @@
         ]
       },
       "startingEquipmentText": "Choose A or B: (A) Spear, 5 Daggers, Artisan’s Tools or Musical Instrument chosen for the tool proficiency above, Explorer’s Pack, and 11 GP; or (B) 50 GP",
+      "toolProficiencyChoice": {
+        "categories": [
+          "artisan",
+          "musical-instrument"
+        ],
+        "maximum": 1,
+        "minimum": 1
+      },
       "toolProficiencyChoiceText": "Choose one type of Artisan’s Tools or Musical Instrument (see “Equipment”)",
       "weaponProficiencies": [
         "simple"
@@ -25443,7 +25451,7 @@
       ],
       "toolProficiencies": [],
       "toolProficiencyChoice": {
-        "category": "tool",
+        "category": "gaming-set",
         "maximum": 1,
         "minimum": 1,
         "text": "Choose one kind of Gaming Set (see “Equipment”)"
@@ -53684,6 +53692,1387 @@
       "class-option",
       "paladin",
       "fighting-style-alternative"
+    ]
+  },
+  {
+    "body": {
+      "ability": "intelligence",
+      "category": "artisan",
+      "checkId": "alchemist-s-supplies",
+      "description": "Alchemist’s Supplies (50 GP) Ability: Intelligence Weight: 8 lb. Utilize: Identify a substance (DC 15), or start a fire (DC 15) Craft: Acid, Alchemist’s Fire, Component Pouch, Oil, Paper, Perfume",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.alchemists-supplies",
+    "kind": "tool",
+    "name": {
+      "en": "Alchemist’s Supplies"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b010",
+          "p0093-b011",
+          "p0093-b012"
+        ],
+        "page": 93,
+        "quoteHash": "be61eeca488d476eab41d5ad9e25e5bffcb77d6b7fcec2798e7cce56f5bcec08",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "intelligence",
+      "category": "artisan",
+      "checkId": "brewer-s-supplies",
+      "description": "Brewer’s Supplies (20 GP) Ability: Intelligence Weight: 9 lb. Utilize: Detect poisoned drink (DC 15), or identify alcohol (DC 10) Craft: Antitoxin",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.brewers-supplies",
+    "kind": "tool",
+    "name": {
+      "en": "Brewer’s Supplies"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b013",
+          "p0093-b014"
+        ],
+        "page": 93,
+        "quoteHash": "a88393b15d4bd199fe2d224380822a6b5d25e258668129db6aad042e754c0caa",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "dexterity",
+      "category": "artisan",
+      "checkId": "calligrapher-s-supplies",
+      "description": "Calligrapher’s Supplies (10 GP) Ability: Dexterity Weight: 5 lb. Utilize: Write text with impressive flourishes that guard against forgery (DC 15) Craft: Ink, Spell Scroll",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.calligraphers-supplies",
+    "kind": "tool",
+    "name": {
+      "en": "Calligrapher’s Supplies"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b015",
+          "p0093-b016"
+        ],
+        "page": 93,
+        "quoteHash": "7d6e3ed7c79169b61fef1a440e4f7d1ede7bc8a4f7c61e3ad6a21ecaf2d967e3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "strength",
+      "category": "artisan",
+      "checkId": "carpenter-s-tools",
+      "description": "Carpenter’s Tools (8 GP) Ability: Strength Weight: 6 lb. Utilize: Seal or pry open a door or container (DC 20) Craft: Club, Greatclub, Quarterstaff, Barrel, Chest, Ladder, Pole, Portable Ram, Torch",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.carpenters-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Carpenter’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b017",
+          "p0093-b018"
+        ],
+        "page": 93,
+        "quoteHash": "5a6b68ec05edea24f5f938e23e10909a20ec400007d177be6325fd1e9bf8a544",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "wisdom",
+      "category": "artisan",
+      "checkId": "cartographer-s-tools",
+      "description": "Cartographer’s Tools (15 GP) Ability: Wisdom Weight: 6 lb. Utilize: Draft a map of a small area (DC 15) Craft: Map",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.cartographers-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Cartographer’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b019"
+        ],
+        "page": 93,
+        "quoteHash": "fd984ce01d3b331af9709b290a4277c3a760437f679526e8d62f6d6e55cc3f36",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "dexterity",
+      "category": "artisan",
+      "checkId": "cobbler-s-tools",
+      "description": "Cobbler’s Tools (5 GP) Ability: Dexterity Weight: 5 lb. Utilize: Modify footwear to give Advantage on the wearer’s next Dexterity (Acrobatics) check (DC 10) Craft: Climber’s Kit",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.cobblers-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Cobbler’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b020",
+          "p0093-b021"
+        ],
+        "page": 93,
+        "quoteHash": "22121c200f1c1b4888ec856e644b43f5eaa5430d461b122f02ce4fab80ef9362",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "wisdom",
+      "category": "artisan",
+      "checkId": "cook-s-utensils",
+      "description": "Cook’s Utensils (1 GP) Ability: Wisdom Weight: 8 lb. Utilize: Improve food’s flavor (DC 10), or detect spoiled or poisoned food (DC 15) Craft: Rations",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.cooks-utensils",
+    "kind": "tool",
+    "name": {
+      "en": "Cook’s Utensils"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b022",
+          "p0093-b023"
+        ],
+        "page": 93,
+        "quoteHash": "59ce6a5b641ea0f3c8441ed149a2166de890f5e2853047c748cdffa21e47a860",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "intelligence",
+      "category": "artisan",
+      "checkId": "glassblower-s-tools",
+      "description": "Glassblower’s Tools (30 GP) Ability: Intelligence Weight: 5 lb. Utilize: Discern what a glass object held in the past 24 hours (DC 15) Craft: Glass Bottle, Magnifying Glass, Spyglass, Vial",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.glassblowers-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Glassblower’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b024",
+          "p0093-b025"
+        ],
+        "page": 93,
+        "quoteHash": "f745aea5bf91ada34ab4716afe1db1b3e852b28f596b01477767f0cf47940fef",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "intelligence",
+      "category": "artisan",
+      "checkId": "jeweler-s-tools",
+      "description": "Jeweler’s Tools (25 GP) Ability: Intelligence Weight: 2 lb. Utilize: Discern a gem’s value (DC 15) Craft: Arcane Focus, Holy Symbol",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.jewelers-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Jeweler’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b026"
+        ],
+        "page": 93,
+        "quoteHash": "ec3aa3d0e2133dae3aa65d520d688aaef052b0f94d817476bdd0301b6a42dee9",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "dexterity",
+      "category": "artisan",
+      "checkId": "leatherworker-s-tools",
+      "description": "Leatherworker’s Tools (5 GP) Ability: Dexterity Weight: 5 lb. Utilize: Add a design to a leather item (DC 10) Craft: Sling, Whip, Hide Armor, Leather Armor, Studded Leather Armor, Backpack, Crossbow Bolt Case, Map or Scroll Case, Parchment, Pouch, Quiver, Waterskin",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.leatherworkers-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Leatherworker’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b027",
+          "p0093-b028"
+        ],
+        "page": 93,
+        "quoteHash": "7680f7534ec50eff3e8c3d7b4fd57915f280f8306304624885500c48c08e67a3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "strength",
+      "category": "artisan",
+      "checkId": "mason-s-tools",
+      "description": "Mason’s Tools (10 GP) Ability: Strength Weight: 8 lb. Utilize: Chisel a symbol or hole in stone (DC 10) Craft: Block and Tackle",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.masons-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Mason’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b029"
+        ],
+        "page": 93,
+        "quoteHash": "a1acc40f44f15abf26213f7d7abff043168ac178d66e21cff1acb9efbe8b1825",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "wisdom",
+      "category": "artisan",
+      "checkId": "painter-s-supplies",
+      "description": "Painter’s Supplies (10 GP) Ability: Wisdom Weight: 5 lb. Utilize: Paint a recognizable image of something you’ve seen (DC 10) Craft: Druidic Focus, Holy Symbol",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.painters-supplies",
+    "kind": "tool",
+    "name": {
+      "en": "Painter’s Supplies"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b030",
+          "p0093-b031"
+        ],
+        "page": 93,
+        "quoteHash": "3093f3c574e51fc47541893463cbcb799241246a12511e57429830ce63ff90b8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "intelligence",
+      "category": "artisan",
+      "checkId": "potter-s-tools",
+      "description": "Potter’s Tools (10 GP) Ability: Intelligence Weight: 3 lb. Utilize: Discern what a ceramic object held in the past 24 hours (DC 15) Craft: Jug, Lamp",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.potters-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Potter’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b032",
+          "p0093-b033"
+        ],
+        "page": 93,
+        "quoteHash": "7f0dee43059449c7a632d8409619f240ea5559f0af8534d0b414b8f0d07267c2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "strength",
+      "category": "artisan",
+      "checkId": "smith-s-tools",
+      "description": "Smith’s Tools (20 GP) Ability: Strength Weight: 8 lb. Utilize: Pry open a door or container (DC 20) Craft: Any Melee weapon (except Club, Greatclub, Quarterstaff, and Whip), Medium armor (except Hide), Heavy armor, Ball Bearings, Bucket, Caltrops, Chain, Crowbar, Firearm Bullets, Grappling Hook, Iron Pot, Iron Spikes, Sling Bullets",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.smiths-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Smith’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b034"
+        ],
+        "page": 93,
+        "quoteHash": "b11c32ae660684e8b0fb402afa8b738727a4f64c4689baecc9ad3add68532500",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0094-b002",
+          "p0094-b003"
+        ],
+        "page": 94,
+        "quoteHash": "179d092bcf2bc1b0bbb982317e22e8ced60f32b52ae1283f95c8360f76ddda15",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "dexterity",
+      "category": "artisan",
+      "checkId": "tinker-s-tools",
+      "description": "Tinker’s Tools (50 GP) Ability: Dexterity Weight: 10 lb. Utilize: Assemble a Tiny item composed of scrap, which falls apart in 1 minute (DC 20) Craft: Musket, Pistol, Bell, Bullseye Lantern, Flask, Hooded Lantern, Hunting Trap, Lock, Manacles, Mirror, Shovel, Signal Whistle, Tinderbox",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.tinkers-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Tinker’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b004",
+          "p0094-b005",
+          "p0094-b006"
+        ],
+        "page": 94,
+        "quoteHash": "f6a31744077858c549ef1d93724be8ea85963b472d5c06dea15887d5dcffbf55",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "dexterity",
+      "category": "artisan",
+      "checkId": "weaver-s-tools",
+      "description": "Weaver’s Tools (1 GP) Ability: Dexterity Weight: 5 lb. Utilize: Mend a tear in clothing (DC 10), or sew a Tiny design (DC 10) Craft: Padded Armor, Basket, Bedroll, Blanket, Fine Clothes, Net, Robe, Rope, Sack, String, Tent, Traveler’s Clothes",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.weavers-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Weaver’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b007",
+          "p0094-b008",
+          "p0094-b009"
+        ],
+        "page": 94,
+        "quoteHash": "36513a65219d53a4361c2146d7646edb0d0fa260427fe5aa1778815634025ee7",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "dexterity",
+      "category": "artisan",
+      "checkId": "woodcarver-s-tools",
+      "description": "Woodcarver’s Tools (1 GP) Ability: Dexterity Weight: 5 lb. Utilize: Carve a pattern in wood (DC 10) Craft: Club, Greatclub, Quarterstaff, Ranged weapons (except Pistol, Musket, and Sling), Arcane Focus, Arrows, Bolts, Druidic Focus, Ink Pen, Needles",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.woodcarvers-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Woodcarver’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b010",
+          "p0094-b011"
+        ],
+        "page": 94,
+        "quoteHash": "97c4f99966ed046ae293c7ed363dac46ae9203039bfaa281a4f4ebf9681fafc2",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "artisan"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "other",
+      "checkId": "disguise-kit",
+      "description": "Disguise Kit (25 GP) Ability: Charisma Weight: 3 lb. Utilize: Apply makeup (DC 10) Craft: Costume",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.disguise-kit",
+    "kind": "tool",
+    "name": {
+      "en": "Disguise Kit"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b013"
+        ],
+        "page": 94,
+        "quoteHash": "d1684a75a6babaed055352ef808b09f2250c61f9bc1507c9c2ae4b0a6effb89f",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "other"
+    ]
+  },
+  {
+    "body": {
+      "ability": "dexterity",
+      "category": "other",
+      "checkId": "forgery-kit",
+      "description": "Forgery Kit (15 GP) Ability: Dexterity Weight: 5 lb. Utilize: Mimic 10 or fewer words of someone else’s handwriting (DC 15), or duplicate a wax seal (DC 20)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.forgery-kit",
+    "kind": "tool",
+    "name": {
+      "en": "Forgery Kit"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b014",
+          "p0094-b015"
+        ],
+        "page": 94,
+        "quoteHash": "5a62441a58682ffa3b82ba8c78454049a723e5fdde3049bb194c8c8b9965f9cf",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "other"
+    ]
+  },
+  {
+    "body": {
+      "ability": "wisdom",
+      "category": "gaming-set",
+      "checkId": "dice",
+      "description": "Gaming Set (Varies) Ability: Wisdom Weight: — Utilize: Discern whether someone is cheating (DC 10), or win the game (DC 20) Variants: Dice (1 SP), dragonchess (1 GP), playing cards (5 SP), three-dragon ante (1 GP)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.dice",
+    "kind": "tool",
+    "name": {
+      "en": "Dice"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b016",
+          "p0094-b017",
+          "p0094-b018"
+        ],
+        "page": 94,
+        "quoteHash": "54383751035afd384c1a402c15c2e15e248fe8a15ef7bfcac66f0bd693c05f3b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "gaming-set"
+    ]
+  },
+  {
+    "body": {
+      "ability": "wisdom",
+      "category": "gaming-set",
+      "checkId": "dragonchess",
+      "description": "Gaming Set (Varies) Ability: Wisdom Weight: — Utilize: Discern whether someone is cheating (DC 10), or win the game (DC 20) Variants: Dice (1 SP), dragonchess (1 GP), playing cards (5 SP), three-dragon ante (1 GP)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.dragonchess",
+    "kind": "tool",
+    "name": {
+      "en": "Dragonchess"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b016",
+          "p0094-b017",
+          "p0094-b018"
+        ],
+        "page": 94,
+        "quoteHash": "54383751035afd384c1a402c15c2e15e248fe8a15ef7bfcac66f0bd693c05f3b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "gaming-set"
+    ]
+  },
+  {
+    "body": {
+      "ability": "wisdom",
+      "category": "gaming-set",
+      "checkId": "playing-cards",
+      "description": "Gaming Set (Varies) Ability: Wisdom Weight: — Utilize: Discern whether someone is cheating (DC 10), or win the game (DC 20) Variants: Dice (1 SP), dragonchess (1 GP), playing cards (5 SP), three-dragon ante (1 GP)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.playing-cards",
+    "kind": "tool",
+    "name": {
+      "en": "Playing cards"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b016",
+          "p0094-b017",
+          "p0094-b018"
+        ],
+        "page": 94,
+        "quoteHash": "54383751035afd384c1a402c15c2e15e248fe8a15ef7bfcac66f0bd693c05f3b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "gaming-set"
+    ]
+  },
+  {
+    "body": {
+      "ability": "wisdom",
+      "category": "gaming-set",
+      "checkId": "three-dragon-ante",
+      "description": "Gaming Set (Varies) Ability: Wisdom Weight: — Utilize: Discern whether someone is cheating (DC 10), or win the game (DC 20) Variants: Dice (1 SP), dragonchess (1 GP), playing cards (5 SP), three-dragon ante (1 GP)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.three-dragon-ante",
+    "kind": "tool",
+    "name": {
+      "en": "Three-dragon ante"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b016",
+          "p0094-b017",
+          "p0094-b018"
+        ],
+        "page": 94,
+        "quoteHash": "54383751035afd384c1a402c15c2e15e248fe8a15ef7bfcac66f0bd693c05f3b",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "gaming-set"
+    ]
+  },
+  {
+    "body": {
+      "ability": "intelligence",
+      "category": "other",
+      "checkId": "herbalism-kit",
+      "description": "Herbalism Kit (5 GP) Ability: Intelligence Weight: 3 lb. Utilize: Identify a plant (DC 10) Craft: Antitoxin, Candle, Healer’s Kit, Potion of Healing",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.herbalism-kit",
+    "kind": "tool",
+    "name": {
+      "en": "Herbalism Kit"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b019"
+        ],
+        "page": 94,
+        "quoteHash": "3b0776d142a257337f052eff6c818836640fe2feca679a58c4088484afb14e0c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "other"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "bagpipes",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.bagpipes",
+    "kind": "tool",
+    "name": {
+      "en": "Bagpipes"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "drum",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.drum",
+    "kind": "tool",
+    "name": {
+      "en": "Drum"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "dulcimer",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.dulcimer",
+    "kind": "tool",
+    "name": {
+      "en": "Dulcimer"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "flute",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.flute",
+    "kind": "tool",
+    "name": {
+      "en": "Flute"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "horn",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.horn",
+    "kind": "tool",
+    "name": {
+      "en": "Horn"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "lute",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.lute",
+    "kind": "tool",
+    "name": {
+      "en": "Lute"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "lyre",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.lyre",
+    "kind": "tool",
+    "name": {
+      "en": "Lyre"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "pan-flute",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.pan-flute",
+    "kind": "tool",
+    "name": {
+      "en": "Pan flute"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "shawm",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.shawm",
+    "kind": "tool",
+    "name": {
+      "en": "Shawm"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "charisma",
+      "category": "musical-instrument",
+      "checkId": "viol",
+      "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.viol",
+    "kind": "tool",
+    "name": {
+      "en": "Viol"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b020",
+          "p0094-b021",
+          "p0094-b022"
+        ],
+        "page": 94,
+        "quoteHash": "117ffcb72528ece3d2e281bd3b4a0156bf680bcffa2adde76009c31ae29a5bb3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "musical-instrument"
+    ]
+  },
+  {
+    "body": {
+      "ability": "wisdom",
+      "category": "other",
+      "checkId": "navigator-s-tools",
+      "description": "Navigator’s Tools (25 GP) Ability: Wisdom Weight: 2 lb. Utilize: Plot a course (DC 10), or determine position by stargazing (DC 15)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.navigators-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Navigator’s Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b023",
+          "p0094-b024"
+        ],
+        "page": 94,
+        "quoteHash": "06cbde0360d7aec5cf3bc5b42f42c3a01a8ead596672685df971b4d0a4b68940",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "other"
+    ]
+  },
+  {
+    "body": {
+      "ability": "intelligence",
+      "category": "other",
+      "checkId": "poisoner-s-kit",
+      "description": "Poisoner’s Kit (50 GP) Ability: Intelligence Weight: 2 lb. Utilize: Detect a poisoned object (DC 10) Craft: Basic Poison",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.poisoners-kit",
+    "kind": "tool",
+    "name": {
+      "en": "Poisoner’s Kit"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b025"
+        ],
+        "page": 94,
+        "quoteHash": "07439f98a8f9310e6460b5c3e218aac510939ab6cd229508089b7c0201251882",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "other"
+    ]
+  },
+  {
+    "body": {
+      "ability": "dexterity",
+      "category": "other",
+      "checkId": "thieves-tools",
+      "description": "Thieves’ Tools (25 GP) Ability: Dexterity Weight: 1 lb. Utilize: Pick a lock (DC 15), or disarm a trap (DC 15)",
+      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+    },
+    "id": "srd521.tool.thieves-tools",
+    "kind": "tool",
+    "name": {
+      "en": "Thieves’ Tools"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0094-b026"
+        ],
+        "page": 94,
+        "quoteHash": "aaf4db7e82b9c5ec2f7931eaace2cec3db91799f5fa773d400a4387921bd2921",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool",
+      "other"
+    ]
+  },
+  {
+    "body": {
+      "text": "Tool Proficiency If you have proficiency with a tool, add your Proficiency Bonus to any ability check you make that uses the tool. If you have proficiency in a skill that’s used with that check, you have Advantage on the check too. Your features might give you proficiency with a tool. A monster has proficiency with any tool in its stat block."
+    },
+    "id": "srd521.rule.tool-proficiency",
+    "kind": "rule",
+    "name": {
+      "en": "Tool Proficiency"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0093-b007",
+          "p0093-b008"
+        ],
+        "page": 93,
+        "quoteHash": "319087090f3eac1f99ff8de161aef0a663fc86b35b4e9c7a1090eb4c23f50e2c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "tool-proficiency"
     ]
   }
 ]

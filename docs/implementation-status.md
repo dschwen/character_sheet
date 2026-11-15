@@ -6,6 +6,11 @@ because some of its functionality exists or tests pass.
 
 ## Current evidence
 
+- Tool proficiency choices use a source-linked 37-tool catalog and shared pickers for Bard, Monk,
+  Soldier and mixed skill/tool Skilled grants. Source-specific original choices and per-acquisition
+  records persist through reload/advancement, and tool checks include source traces. Legacy missing
+  choices stay unrecorded and are identified on the sheet. Ownership, crafting and skill/tool
+  overlap Advantage remain manual. See [Tool proficiencies](rules-engine/tool-proficiencies.md).
 - Savage Attacker now exposes a declared once-per-turn weapon-hit damage choice. Shared feat
   metadata drives attack summaries, source traces and the Combat UI; fullscreen dice roll two
   complete pools and let the player choose either. Critical dice and declared damage modes are
@@ -196,7 +201,8 @@ not replace the class's initial style or collide with Champion's later grant. Ma
 reuses the spell-choice/casting path, with ability selection available for a newly acquired feat.
 Repeatable Skilled records separate `skillIds` per acquisition while aggregate proficiencies
 retain feat-source traces. Earlier nested choices and play state are preserved on advancement.
-Tool choices, Epic Boons, and the existing assisted combat benefits remain unfinished; this
+Tool choices are now implemented through shared metadata and a source-linked catalog. Epic Boons
+and the existing assisted combat benefits remain unfinished; this
 does not complete the full level-1–5 audit. See `docs/rules-engine/feat-acquisition.md`.
 
 Ritual Caster's 2024 PHB variant — an out-of-SRD edition-reference record per ADR 0013, never

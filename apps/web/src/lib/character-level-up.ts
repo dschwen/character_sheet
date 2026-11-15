@@ -276,6 +276,15 @@ export function createLevelUpDraft(
       character.build.backgroundAbilityScoreIncreases,
     ),
     originFeatId: originFeatId ?? "",
+    toolProficiencySelections:
+      character.build.toolProficiencyChoices === undefined
+        ? undefined
+        : Object.fromEntries(
+            character.build.toolProficiencyChoices.map(({ sourceId, toolIds }) => [
+              sourceId,
+              [...toolIds],
+            ]),
+          ),
     abilityScores: { ...character.build.abilityScores },
     advancementFeats: savedAdvancementFeats(
       character,
@@ -367,7 +376,8 @@ function advancementIssues(
         return (
           after === undefined ||
           featSelectionKey(allocation) !== featSelectionKey(after) ||
-          JSON.stringify(allocation.skillIds ?? []) !== JSON.stringify(after.skillIds ?? [])
+          JSON.stringify(allocation.skillIds ?? []) !== JSON.stringify(after.skillIds ?? []) ||
+          JSON.stringify(allocation.toolIds ?? []) !== JSON.stringify(after.toolIds ?? [])
         );
       })
     )
@@ -376,6 +386,18 @@ function advancementIssues(
     issues.push(error instanceof Error ? error.message : "Existing ASI choices could not be read.");
   }
   const currentChoices = choiceSelections(character);
+  if (
+    JSON.stringify(character.build.toolProficiencyChoices ?? null) !==
+    JSON.stringify(
+      draft.toolProficiencySelections === undefined
+        ? null
+        : Object.entries(draft.toolProficiencySelections).map(([sourceId, toolIds]) => ({
+            sourceId,
+            toolIds,
+          })),
+    )
+  )
+    issues.push("Earlier tool proficiency choices cannot change during level up.");
   for (const choice of selectedClass.featureChoices.filter(
     (choice) => choice.level < targetLevel && !choice.changeOn?.includes("level-up"),
   )) {

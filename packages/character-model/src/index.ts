@@ -74,6 +74,7 @@ const characterLevelSchema = z
             featId: entityIdSchema,
             abilityScoreIncreases: featAbilityScoreIncreasesSchema,
             skillIds: z.array(entityIdSchema).optional(),
+            toolIds: z.array(entityIdSchema).optional(),
           })
           .strict(),
       )
@@ -131,6 +132,16 @@ const characterBuildSchema = z
     learnedSpellIds: z.array(entityIdSchema).default([]),
     choices: z.array(choiceSelectionSchema).default([]),
     proficiencyChoices: proficiencyChoicesSchema,
+    toolProficiencyChoices: z
+      .array(
+        z
+          .object({
+            sourceId: entityIdSchema,
+            toolIds: z.array(entityIdSchema),
+          })
+          .strict(),
+      )
+      .optional(),
   })
   .strict()
   .superRefine((build, context) => {

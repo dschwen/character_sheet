@@ -124,7 +124,7 @@
       ],
       "toolProficiencies": [],
       "toolProficiencyChoice": {
-        "category": "tool",
+        "category": "gaming-set",
         "maximum": 1,
         "minimum": 1,
         "text": "Choose one kind of Gaming Set (see “Equipment”)"

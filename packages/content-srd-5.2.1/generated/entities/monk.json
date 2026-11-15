@@ -477,6 +477,14 @@
         ]
       },
       "startingEquipmentText": "Choose A or B: (A) Spear, 5 Daggers, Artisan’s Tools or Musical Instrument chosen for the tool proficiency above, Explorer’s Pack, and 11 GP; or (B) 50 GP",
+      "toolProficiencyChoice": {
+        "categories": [
+          "artisan",
+          "musical-instrument"
+        ],
+        "maximum": 1,
+        "minimum": 1
+      },
       "toolProficiencyChoiceText": "Choose one type of Artisan’s Tools or Musical Instrument (see “Equipment”)",
       "weaponProficiencies": [
         "simple"

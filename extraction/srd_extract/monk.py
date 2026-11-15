@@ -64,6 +64,8 @@ def parse_core_traits(table_text: str, starting_equipment: str) -> dict[str, Any
     match = pattern.fullmatch(table_text)
     if match is None:
         raise ValueError("Core Monk Traits table does not match the expected labels")
+    if "Choose one type of Artisan’s Tools or Musical Instrument" not in match.group("tools"):
+        raise ValueError("Monk tool choice is missing its source categories")
     return {
         "primaryAbilities": [
             value.strip().casefold() for value in match.group("primary").split(" and ")
@@ -86,6 +88,11 @@ def parse_core_traits(table_text: str, starting_equipment: str) -> dict[str, Any
             {"category": "martial", "attackType": "melee", "requiredProperties": ["light"]}
         ],
         "toolProficiencyChoiceText": match.group("tools"),
+        "toolProficiencyChoice": {
+            "minimum": 1,
+            "maximum": 1,
+            "categories": ["artisan", "musical-instrument"],
+        },
         "armorTraining": [],
         "startingEquipmentText": starting_equipment,
     }

@@ -8,6 +8,8 @@ import type { LoadedRulesPackage } from "@dnd/rules-api";
 import { featIncreases } from "../lib/advancement-feats";
 import { AdvancementFeatSelect } from "./advancement-feat-select";
 import { RitualCasterChoices } from "./ritual-caster-choices";
+import { ToolProficiencyChoices, OriginProficiencyChoices } from "./proficiency-picker";
+import { reconcileToolProficiencies } from "../lib/tool-proficiencies";
 
 import {
   activeSpeciesChoices,
@@ -494,11 +496,14 @@ export function CharacterBuilder({
                           .filter((id) => !unavailable.has(id));
                         setDraft((value) =>
                           reconcileMagicInitiateChoices(
-                            {
-                              ...value,
-                              originFeatId: feat.id,
-                              originFeatSkillIds: candidates.slice(0, feat.skillMaximum),
-                            },
+                            reconcileToolProficiencies(
+                              {
+                                ...value,
+                                originFeatId: feat.id,
+                                originFeatSkillIds: candidates.slice(0, feat.skillMaximum),
+                              },
+                              catalog,
+                            ),
                             catalog,
                           ),
                         );
@@ -941,46 +946,8 @@ export function CharacterBuilder({
                   })}
                 </div>
               </div>
-              {selectedOriginFeat === undefined || selectedOriginFeat.skillMaximum === 0 ? null : (
-                <div className="skill-choice-section">
-                  <div>
-                    <span>{selectedOriginFeat.name} feat</span>
-                    <h2>
-                      Choose {String(selectedOriginFeat.skillMaximum)} skill
-                      {selectedOriginFeat.skillMaximum === 1 ? "" : "s"}
-                    </h2>
-                    <small>
-                      {String(draft.originFeatSkillIds.length)} /{" "}
-                      {String(selectedOriginFeat.skillMaximum)} selected
-                    </small>
-                  </div>
-                  <div className="choice-pills">
-                    {skillIds.map((skill) => {
-                      const id = `srd521.skill.${skill}`;
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          disabled={skillDisabled(id, draft.originFeatSkillIds)}
-                          className={draft.originFeatSkillIds.includes(id) ? "selected" : undefined}
-                          onClick={() => {
-                            setDraft((value) => ({
-                              ...value,
-                              originFeatSkillIds: toggleList(
-                                value.originFeatSkillIds,
-                                id,
-                                selectedOriginFeat.skillMaximum,
-                              ),
-                            }));
-                          }}
-                        >
-                          {skillName(id)}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+              <ToolProficiencyChoices draft={draft} catalog={catalog} onChange={setDraft} />
+              <OriginProficiencyChoices draft={draft} catalog={catalog} onChange={setDraft} />
             </div>
           ) : null}
 

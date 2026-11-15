@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resolveToolGrants } from "./tool-proficiencies.js";
 import { preparedSpellLists } from "./prepared-spell-lists.js";
 import { validateFeatureOptionChoices, validFeatureOptionIds } from "./feature-option-choices.js";
 
@@ -30,6 +31,7 @@ import {
   featAcquisitionMetadataSchema,
   featureChoiceEnabled,
   weaponDamageRollChoiceSchema,
+  toolBodySchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -2946,16 +2948,15 @@ function validateProgressionSelections(
           );
       }
       const skillIds = selection.skillIds ?? [];
+      const toolIds = selection.toolIds ?? [];
       const proficiencyChoice = body?.proficiencyChoice;
-      const skillMinimum = proficiencyChoice?.categories.includes("skill")
-        ? proficiencyChoice.minimum
-        : 0;
-      const skillMaximum = proficiencyChoice?.categories.includes("skill")
-        ? proficiencyChoice.maximum
-        : 0;
+      const skillMinimum = proficiencyChoice?.minimum ?? 0;
+      const skillMaximum = proficiencyChoice?.maximum ?? 0;
       if (
-        skillIds.length < skillMinimum ||
-        skillIds.length > skillMaximum ||
+        skillIds.length + toolIds.length < skillMinimum ||
+        skillIds.length + toolIds.length > skillMaximum ||
+        (skillIds.length > 0 && !proficiencyChoice?.categories.includes("skill")) ||
+        (toolIds.length > 0 && !proficiencyChoice?.categories.includes("tool")) ||
         new Set(skillIds).size !== skillIds.length ||
         skillIds.some(
           (skillId) =>
@@ -4015,14 +4016,23 @@ function evaluateD20Tests(
       (choice) => choice.sourceId === featId,
     );
     const acquisitions = character.build.featIds.filter((id) => id === featId).length;
+    const toolCount = [
+      ...(character.build.toolProficiencyChoices ?? [])
+        .filter(({ sourceId }) => sourceId === featId)
+        .flatMap(({ toolIds }) => toolIds),
+      ...character.build.levels
+        .flatMap((level) => level.featSelections ?? [])
+        .filter(({ featId: id }) => id === featId)
+        .flatMap(({ toolIds }) => toolIds ?? []),
+    ].length;
     if (
-      featChoices.length < proficiencyChoice.minimum * acquisitions ||
-      featChoices.length > proficiencyChoice.maximum * acquisitions
+      featChoices.length + toolCount < proficiencyChoice.minimum * acquisitions ||
+      featChoices.length + toolCount > proficiencyChoice.maximum * acquisitions
     ) {
       addValidation(
         state,
         "FEAT_SKILL_PROFICIENCY_COUNT",
-        `${featId} requires ${String(proficiencyChoice.minimum * acquisitions)} proficiency choices in the supported skill-only slice.`,
+        `${featId} requires ${String(proficiencyChoice.minimum * acquisitions)} skill or tool proficiency choices.`,
         ["build.proficiencyChoices.skills"],
       );
     }
@@ -4136,35 +4146,24 @@ function evaluateD20Tests(
     );
   }
 
-  const toolGrants = [
-    ...(firstClassBody?.toolProficiencies ?? []).map((name) => ({
-      name,
-      sourceId: firstClassId ?? "",
-    })),
-    ...(origins.backgroundBody?.toolProficiencies ?? []).map((name) => ({
-      name,
-      sourceId: origins.background?.id ?? "",
-    })),
-  ];
-  const toolIds = [
-    ...new Set(
-      toolGrants.map(({ name }) =>
-        name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/gu, "-")
-          .replace(/^-|-$/gu, ""),
-      ),
-    ),
-  ];
+  const toolGrants = resolveToolGrants(character, index.entities, (code, message) => {
+    addValidation(state, code, message, ["build.toolProficiencyChoices", "build.levels"]);
+  });
+  const toolCheckId = ({ name, checkId }: (typeof toolGrants)[number]) =>
+    checkId ??
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/gu, "-")
+      .replace(/^-|-$/gu, "");
+  const toolIds = [...new Set(toolGrants.map(toolCheckId))];
   for (const toolId of toolIds) {
-    const grants = toolGrants.filter(
-      ({ name }) =>
-        name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/gu, "-")
-          .replace(/^-|-$/gu, "") === toolId,
-    );
-    const sources = grants.map(({ sourceId }) => sourceId);
+    const grants = toolGrants.filter((grant) => toolCheckId(grant) === toolId);
+    const sources = [...new Set(grants.map(({ sourceId }) => sourceId))];
+    const toolReferences = grants.flatMap(({ toolId }) => {
+      if (!toolId) return [];
+      const definition = toolBodySchema.safeParse(index.entities.get(toolId)?.body);
+      return definition.success ? [toolId, definition.data.proficiencyRuleId] : [toolId];
+    });
     const entry = proficiencyEntry("proficient", proficiencyBonus, sources);
     for (const ability of abilities) {
       const id = `tool.${toolId}.${ability}`;
@@ -4195,7 +4194,7 @@ function evaluateD20Tests(
         rerollValues,
         rerollSources,
         rerollSourceReferences,
-        testSourceReferences(baseId, sources),
+        testSourceReferences(baseId, [...sources, ...toolReferences]),
         state,
       );
       const test = state.d20Tests[id];

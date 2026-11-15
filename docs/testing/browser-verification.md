@@ -20,6 +20,10 @@ same suite.
 
 ## What the suite verifies
 
+`tool-proficiencies.spec.ts` checks the Bard/Monk category pools, Soldier's specific gaming-set
+choice, mixed/all-tool original Skilled, level-4 Skilled with mixed proficiencies, source-linked
+check explanations, reload persistence and locked advancement history at both viewport sizes.
+
 `weapon-damage-choice.spec.ts` exercises Savage Attacker's hit/unused-turn declarations,
 source explanation, normal/critical fullscreen pools, either-result selection, transient results,
 and intentional WebGL failure with fallback/state preservation. The negative test accepts only

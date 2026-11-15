@@ -7,6 +7,8 @@ import {
 } from "../lib/character-builder";
 import { shortEntityName, titleCase } from "../lib/presentation";
 import { featSelectionKey, type AdvancementFeatSelection } from "../lib/advancement-feats";
+import { advancementToolCandidates } from "../lib/tool-proficiencies";
+import { ProficiencyPicker } from "./proficiency-picker";
 
 export function AdvancementFeatSelect({
   draft,
@@ -63,43 +65,27 @@ export function AdvancementFeatSelect({
         ))}
       </label>
       {selected !== undefined && (feat?.skillMaximum ?? 0) > 0 ? (
-        <fieldset
-          className="builder-subsection"
-          aria-label={`${feat?.name ?? "Feat"} skill choices`}
-        >
-          <legend>
-            Feat skills · {String(selected.skillIds?.length ?? 0)} / {String(feat?.skillMaximum)}
-          </legend>
-          <p>
-            Choose distinct skill proficiencies. Tool choices are not implemented in this skill-only
-            slice.
-          </p>
-          <div className="builder-token-grid">
-            {advancementSkillCandidates(draft, catalog, index).map((id) => {
-              const chosen = selected.skillIds?.includes(id) === true;
-              return (
-                <button
-                  type="button"
-                  key={id}
-                  className={chosen ? "selected" : undefined}
-                  disabled={
-                    !chosen && (selected.skillIds?.length ?? 0) >= (feat?.skillMaximum ?? 0)
-                  }
-                  onClick={() => {
-                    onChange({
-                      ...selected,
-                      skillIds: chosen
-                        ? selected.skillIds?.filter((skillId) => skillId !== id)
-                        : [...(selected.skillIds ?? []), id],
-                    });
-                  }}
-                >
-                  {shortEntityName(id)}
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
+        <ProficiencyPicker
+          label={`${feat?.name ?? "Feat"} proficiency choices`}
+          maximum={feat?.skillMaximum ?? 0}
+          skillOptions={advancementSkillCandidates(draft, catalog, index).map((id) => ({
+            id,
+            name: shortEntityName(id),
+          }))}
+          toolOptions={advancementToolCandidates(draft, catalog, index).map((id) => ({
+            id,
+            name: catalog.tools[id]?.name ?? id,
+          }))}
+          skills={selected.skillIds ?? []}
+          tools={selected.toolIds ?? []}
+          onChange={({ skills, tools }) => {
+            onChange({
+              ...selected,
+              skillIds: skills,
+              toolIds: tools,
+            });
+          }}
+        />
       ) : null}
       {showSpellChoices &&
       feat?.magicInitiate !== undefined &&

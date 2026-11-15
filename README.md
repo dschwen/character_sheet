@@ -149,8 +149,10 @@ extra damage riders, turn use and applying damage to a target remain manual.
 Epic Boons are not yet offered by this workflow. Origin feats and qualifying Fighting Style
 feats now use the same advancement selector as General feats. Background/species feats remain
 separate grants; already-owned non-repeatable feats are excluded. Magic Initiate opens its spell
-choices, and repeatable Skilled stores three distinct skill choices per acquisition (tools remain
-unsupported). See `docs/rules-engine/feat-acquisition.md`. Champion Fighters gain
+choices, and repeatable Skilled stores any combination of three distinct skills or tools per
+acquisition. Shared tool pickers also cover Bard, Monk and Soldier choices from a source-linked
+37-tool catalog. See [Tool proficiencies](docs/rules-engine/tool-proficiencies.md) and
+`docs/rules-engine/feat-acquisition.md`. Champion Fighters gain
 distinct Fighting Style choices. Barbarians gain Initiative
 advantage and an optional half-Speed movement reminder when entering Rage. Archery and Defense are calculated; Great Weapon
 Fighting and Two-Weapon Fighting use explicit conditional weapon-damage modes. Turn eligibility
@@ -203,8 +205,9 @@ inspect the preview, then apply it. Leave this off for damage already resolved b
 damage modifiers remain manual.
 Rogues reach level 7 with Evasion and Reliable Talent. Proficient skill and fixed-tool checks
 automatically treat d20 results below 10 as 10, preserving the animated faces and explaining the
-adjustment. Fixed tool grants appear with ability-specific roll buttons; unresolved tool choices
-and tool-use requirements remain manual.
+adjustment. Fixed and selected tool grants appear with ability-specific roll buttons. Tool ownership,
+skill/tool overlap Advantage and tool-use requirements remain manual; older saves identify missing
+original tool choices rather than inventing selections.
 Paladins reach level 7 with Aura of Devotion: Charmed is suppressed while their Aura of Protection
 is active. Allies can set “Aura of Devotion (other Paladin)” in Play → Beneficial statuses;
 remove it when leaving range or when the source Paladin becomes Incapacitated. Charmed stays

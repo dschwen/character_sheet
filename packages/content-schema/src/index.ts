@@ -601,6 +601,55 @@ export const classFeatureChoiceSchema = z
 
 export const failedSaveRerollSchema = z.object({ bonusFact: z.string().min(1) }).strict();
 
+export const toolBodySchema = z
+  .object({
+    proficiencyRuleId: entityIdSchema,
+    category: z.enum(["artisan", "gaming-set", "musical-instrument", "other"]),
+    ability: characterBuilderAbilitySchema,
+    checkId: z.string().min(1),
+    description: z.string().min(1),
+  })
+  .strict();
+
+export const toolProficiencyChoiceSchema = z
+  .object({
+    minimum: z.number().int().nonnegative(),
+    maximum: z.number().int().positive(),
+    category: z.enum(["artisan", "gaming-set", "musical-instrument", "other"]).optional(),
+    categories: z
+      .array(z.enum(["artisan", "gaming-set", "musical-instrument", "other"]))
+      .optional(),
+    options: z.array(entityIdSchema).optional(),
+    text: z.string().optional(),
+  })
+  .strict()
+  .refine(
+    (value) =>
+      value.minimum <= value.maximum &&
+      ((value.categories?.length ?? 0) > 0 ||
+        value.category !== undefined ||
+        (value.options?.length ?? 0) > 0),
+    "Tool choices require an eligible pool and valid bounds",
+  );
+
+export function eligibleToolIds(
+  definition: z.infer<typeof toolProficiencyChoiceSchema>,
+  entities: readonly ContentEntity[],
+): string[] {
+  return entities
+    .filter((entity) => {
+      if (entity.kind !== "tool") return false;
+      const parsed = toolBodySchema.safeParse(entity.body);
+      return (
+        parsed.success &&
+        (definition.options === undefined || definition.options.includes(entity.id)) &&
+        ((definition.categories === undefined && definition.category === undefined) ||
+          (definition.categories ?? [definition.category]).includes(parsed.data.category))
+      );
+    })
+    .map(({ id }) => id);
+}
+
 /** Whole weapon-damage pools; never a per-die best-of or extra-damage reroll. */
 export const weaponDamageRollChoiceSchema = z.object({
   trigger: z.literal("once-per-turn-weapon-hit"),

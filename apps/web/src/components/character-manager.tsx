@@ -3285,8 +3285,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     </button>
                   ) : null}
                   <p className="empty">
-                    Tool checks list each ability; use the ability called for by the DM. Unresolved
-                    tool choices, tool ownership, and skill/tool overlap Advantage remain manual.
+                    Tool checks list each ability; use the ability called for by the DM. Tool
+                    ownership and skill/tool overlap Advantage remain manual.
+                    {character.build.toolProficiencyChoices === undefined
+                      ? " This older save has no recorded class/background tool choices; missing choices are not assumed."
+                      : ""}
                   </p>
                   <div className="skill-list">
                     {Object.values(evaluation.d20Tests)

@@ -28,11 +28,12 @@ a different list is a different eligible variant. Spells use the existing castin
 always-prepared/free-cast rules, and one-spell replacement allowance on later advancement.
 Newly acquired feats can choose their casting ability; older abilities stay locked.
 
-Skilled's supported skill-only path stores three distinct `skillIds` on each acquisition record.
+Skilled supports any combination of three skills or tools. Each acquisition stores its own
+`skillIds` and optional `toolIds`; original grants use source-specific tool-choice records.
 Multiple acquisitions aggregate their grants under the feat's proficiency source, without losing
 the per-acquisition selections. The old origin skill field remains separate; loading and advancing
 a character reconstructs those two sources without reallocating earlier skills. Earlier feat IDs,
-allocations, and nested skill choices are locked. Current HP, equipment, conditions, and spent
+allocations, and nested proficiency choices are locked. Current HP, equipment, conditions, and spent
 resources are not reset. The optional field is backward-compatible with older documents.
 
 The UI exposes these choices in creation and level up, including the no-increase allocations and
@@ -41,6 +42,7 @@ grant sources, repeatability, prerequisite gating, additional styles, round trip
 preservation. The production-export browser gate covers these new paths at desktop/narrow widths.
 
 Later slices add [Paladin/Ranger's level-2 alternatives](warrior-cantrips.md) and
-[Savage Attacker's declared damage-pool choice](savage-attacker.md). Tools for Skilled, Grappler's
+[Savage Attacker's declared damage-pool choice](savage-attacker.md) and
+[source-driven tool choices](tool-proficiencies.md). Grappler's
 target-specific combat effects, encounter budgets, and full semantic review of levels 1–5 remain
 unfinished; these are not implicit grants.

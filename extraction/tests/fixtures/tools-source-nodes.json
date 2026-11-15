@@ -1,0 +1,484 @@
+{
+  "nodes": [
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Tools",
+      "sourceBlocks": ["p0093-b002"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "A tool helps you make specialized ability checks, craft certain items, or both. A tool’s description includes the tool’s cost and weight, as well as the following entries:",
+      "sourceBlocks": ["p0093-b002"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability. This entry lists the ability to use when",
+      "sourceBlocks": ["p0093-b003"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "making an ability check with the tool. Utilize. This entry lists things you can do with the",
+      "sourceBlocks": ["p0093-b004"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "tool when you take the Utilize action. You can do one of those things each time you take the action. This entry also provides the DC for the action. Craft. This entry lists what, if anything, you",
+      "sourceBlocks": ["p0093-b005"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "can craft with the tool. For crafting rules, see “Crafting Nonmagical Items,” “Brewing Potions of Healing,” and “Scribing Spell Scrolls” later in “Equipment.” Variants. This entry appears if the tool has vari-",
+      "sourceBlocks": ["p0093-b006"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "ants, which are listed. Each requires a separate proficiency.",
+      "sourceBlocks": ["p0093-b007"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Tool Proficiency",
+      "sourceBlocks": ["p0093-b007"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "If you have proficiency with a tool, add your Proficiency Bonus to any ability check you make that uses the tool. If you have proficiency in a skill that’s used with that check, you have Advantage on the check too. Your features might give you proficiency with a tool. A monster has proficiency with any tool in its stat block.",
+      "sourceBlocks": ["p0093-b008"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Artisan’s Tools",
+      "sourceBlocks": ["p0093-b008"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Artisan’s Tools are each focused on crafting items and pursuing a trade. Each of these tools requires a separate proficiency.",
+      "sourceBlocks": ["p0093-b009"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Alchemist’s Supplies (50 GP)",
+      "sourceBlocks": ["p0093-b010"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Intelligence Weight: 8 lb. Utilize: Identify a substance (DC 15), or start a fire",
+      "sourceBlocks": ["p0093-b010"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "(DC 15) Craft: Acid, Alchemist’s Fire, Component Pouch, Oil,",
+      "sourceBlocks": ["p0093-b011"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Paper, Perfume",
+      "sourceBlocks": ["p0093-b012"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Brewer’s Supplies (20 GP)",
+      "sourceBlocks": ["p0093-b013"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Intelligence Weight: 9 lb. Utilize: Detect poisoned drink (DC 15), or identify alco-",
+      "sourceBlocks": ["p0093-b013"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "hol (DC 10) Craft: Antitoxin",
+      "sourceBlocks": ["p0093-b014"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Calligrapher’s Supplies (10 GP)",
+      "sourceBlocks": ["p0093-b015"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Dexterity Weight: 5 lb. Utilize: Write text with impressive flourishes that guard",
+      "sourceBlocks": ["p0093-b015"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "against forgery (DC 15) Craft: Ink, Spell Scroll",
+      "sourceBlocks": ["p0093-b016"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Carpenter’s Tools (8 GP)",
+      "sourceBlocks": ["p0093-b017"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Strength Weight: 6 lb. Utilize: Seal or pry open a door or container (DC 20) Craft: Club, Greatclub, Quarterstaff, Barrel, Chest, Lad-",
+      "sourceBlocks": ["p0093-b017"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "der, Pole, Portable Ram, Torch",
+      "sourceBlocks": ["p0093-b018"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Cartographer’s Tools (15 GP)",
+      "sourceBlocks": ["p0093-b019"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Wisdom Weight: 6 lb. Utilize: Draft a map of a small area (DC 15) Craft: Map",
+      "sourceBlocks": ["p0093-b019"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Cobbler’s Tools (5 GP)",
+      "sourceBlocks": ["p0093-b020"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Dexterity Weight: 5 lb. Utilize: Modify footwear to give Advantage on the wear-",
+      "sourceBlocks": ["p0093-b020"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "er’s next Dexterity (Acrobatics) check (DC 10) Craft: Climber’s Kit",
+      "sourceBlocks": ["p0093-b021"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Cook’s Utensils (1 GP)",
+      "sourceBlocks": ["p0093-b022"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Wisdom Weight: 8 lb. Utilize: Improve food’s flavor (DC 10), or detect spoiled",
+      "sourceBlocks": ["p0093-b022"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "or poisoned food (DC 15) Craft: Rations",
+      "sourceBlocks": ["p0093-b023"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Glassblower’s Tools (30 GP)",
+      "sourceBlocks": ["p0093-b024"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Intelligence Weight: 5 lb. Utilize: Discern what a glass object held in the past 24",
+      "sourceBlocks": ["p0093-b024"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "hours (DC 15) Craft: Glass Bottle, Magnifying Glass, Spyglass, Vial",
+      "sourceBlocks": ["p0093-b025"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Jeweler’s Tools (25 GP)",
+      "sourceBlocks": ["p0093-b026"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Intelligence Weight: 2 lb. Utilize: Discern a gem’s value (DC 15) Craft: Arcane Focus, Holy Symbol",
+      "sourceBlocks": ["p0093-b026"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Leatherworker’s Tools (5 GP)",
+      "sourceBlocks": ["p0093-b027"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Dexterity Weight: 5 lb. Utilize: Add a design to a leather item (DC 10) Craft: Sling, Whip, Hide Armor, Leather Armor, Studded",
+      "sourceBlocks": ["p0093-b027"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Leather Armor, Backpack, Crossbow Bolt Case, Map or Scroll Case, Parchment, Pouch, Quiver, Waterskin",
+      "sourceBlocks": ["p0093-b028"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Mason’s Tools (10 GP)",
+      "sourceBlocks": ["p0093-b029"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Strength Weight: 8 lb. Utilize: Chisel a symbol or hole in stone (DC 10) Craft: Block and Tackle",
+      "sourceBlocks": ["p0093-b029"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Painter’s Supplies (10 GP)",
+      "sourceBlocks": ["p0093-b030"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Wisdom Weight: 5 lb. Utilize: Paint a recognizable image of something you’ve",
+      "sourceBlocks": ["p0093-b030"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "seen (DC 10) Craft: Druidic Focus, Holy Symbol",
+      "sourceBlocks": ["p0093-b031"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Potter’s Tools (10 GP)",
+      "sourceBlocks": ["p0093-b032"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Intelligence Weight: 3 lb. Utilize: Discern what a ceramic object held in the past",
+      "sourceBlocks": ["p0093-b032"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "24 hours (DC 15) Craft: Jug, Lamp",
+      "sourceBlocks": ["p0093-b033"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Smith’s Tools (20 GP)",
+      "sourceBlocks": ["p0093-b034"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "Ability: Strength Weight: 8 lb. Utilize: Pry open a door or container (DC 20)",
+      "sourceBlocks": ["p0093-b034"]
+    },
+    {
+      "parentId": "page-0093",
+      "normalizedText": "System Reference Document 5.2.1 93",
+      "sourceBlocks": ["p0093-b001"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Craft: Any Melee weapon (except Club, Greatclub,",
+      "sourceBlocks": ["p0094-b002"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Quarterstaff, and Whip), Medium armor (except Hide), Heavy armor, Ball Bearings, Bucket, Caltrops, Chain, Crowbar, Firearm Bullets, Grappling Hook, Iron Pot, Iron Spikes, Sling Bullets",
+      "sourceBlocks": ["p0094-b003"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Tinker’s Tools (50 GP)",
+      "sourceBlocks": ["p0094-b004"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Dexterity Weight: 10 lb. Utilize: Assemble a Tiny item composed of scrap, which",
+      "sourceBlocks": ["p0094-b004"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "falls apart in 1 minute (DC 20) Craft: Musket, Pistol, Bell, Bullseye Lantern, Flask,",
+      "sourceBlocks": ["p0094-b005"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Hooded Lantern, Hunting Trap, Lock, Manacles, Mirror, Shovel, Signal Whistle, Tinderbox",
+      "sourceBlocks": ["p0094-b006"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Weaver’s Tools (1 GP)",
+      "sourceBlocks": ["p0094-b007"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Dexterity Weight: 5 lb. Utilize: Mend a tear in clothing (DC 10), or sew a Tiny",
+      "sourceBlocks": ["p0094-b007"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "design (DC 10) Craft: Padded Armor, Basket, Bedroll, Blanket, Fine",
+      "sourceBlocks": ["p0094-b008"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Clothes, Net, Robe, Rope, Sack, String, Tent, Traveler’s Clothes",
+      "sourceBlocks": ["p0094-b009"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Woodcarver’s Tools (1 GP)",
+      "sourceBlocks": ["p0094-b010"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Dexterity Weight: 5 lb. Utilize: Carve a pattern in wood (DC 10) Craft: Club, Greatclub, Quarterstaff, Ranged weapons",
+      "sourceBlocks": ["p0094-b010"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "(except Pistol, Musket, and Sling), Arcane Focus, Arrows, Bolts, Druidic Focus, Ink Pen, Needles",
+      "sourceBlocks": ["p0094-b011"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Other Tools",
+      "sourceBlocks": ["p0094-b012"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Disguise Kit (25 GP)",
+      "sourceBlocks": ["p0094-b013"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Charisma Weight: 3 lb. Utilize: Apply makeup (DC 10) Craft: Costume",
+      "sourceBlocks": ["p0094-b013"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Forgery Kit (15 GP)",
+      "sourceBlocks": ["p0094-b014"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Dexterity Weight: 5 lb. Utilize: Mimic 10 or fewer words of someone else’s",
+      "sourceBlocks": ["p0094-b014"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "handwriting (DC 15), or duplicate a wax seal (DC 20)",
+      "sourceBlocks": ["p0094-b015"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Gaming Set (Varies)",
+      "sourceBlocks": ["p0094-b016"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Wisdom Weight: — Utilize: Discern whether someone is cheating (DC 10),",
+      "sourceBlocks": ["p0094-b016"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "or win the game (DC 20) Variants: Dice (1 SP), dragonchess (1 GP), playing cards",
+      "sourceBlocks": ["p0094-b017"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "(5 SP), three-dragon ante (1 GP)",
+      "sourceBlocks": ["p0094-b018"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Herbalism Kit (5 GP)",
+      "sourceBlocks": ["p0094-b019"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Intelligence Weight: 3 lb. Utilize: Identify a plant (DC 10) Craft: Antitoxin, Candle, Healer’s Kit, Potion of Healing",
+      "sourceBlocks": ["p0094-b019"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Musical Instrument (Varies)",
+      "sourceBlocks": ["p0094-b020"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song",
+      "sourceBlocks": ["p0094-b020"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "(DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dul-",
+      "sourceBlocks": ["p0094-b021"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "cimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
+      "sourceBlocks": ["p0094-b022"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Navigator’s Tools (25 GP)",
+      "sourceBlocks": ["p0094-b023"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Wisdom Weight: 2 lb. Utilize: Plot a course (DC 10), or determine position by",
+      "sourceBlocks": ["p0094-b023"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "stargazing (DC 15)",
+      "sourceBlocks": ["p0094-b024"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Poisoner’s Kit (50 GP)",
+      "sourceBlocks": ["p0094-b025"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Intelligence Weight: 2 lb. Utilize: Detect a poisoned object (DC 10) Craft: Basic Poison",
+      "sourceBlocks": ["p0094-b025"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Thieves’ Tools (25 GP)",
+      "sourceBlocks": ["p0094-b026"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ability: Dexterity Weight: 1 lb. Utilize: Pick a lock (DC 15), or disarm a trap (DC 15)",
+      "sourceBlocks": ["p0094-b026"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Adventuring Gear",
+      "sourceBlocks": ["p0094-b026"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "The Adventuring Gear table in this section includes gear that adventurers often find useful. These items are described here in alphabetical order, with an item’s price appearing after its name.",
+      "sourceBlocks": ["p0094-b026"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Acid (25 GP)",
+      "sourceBlocks": ["p0094-b027"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "When you take the Attack action, you can replace one of your attacks with throwing a vial of Acid. Target one creature or object you can see within 20 feet of yourself. The target must succeed on a Dexterity saving throw (DC 8 plus your Dexterity modifier and Proficiency Bonus) or take 2d6 Acid damage.",
+      "sourceBlocks": ["p0094-b027"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Alchemist’s Fire (50 GP)",
+      "sourceBlocks": ["p0094-b028"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "When you take the Attack action, you can replace one of your attacks with throwing a flask of Alchemist’s Fire. Target one creature or object you can see within 20 feet of yourself. The target must succeed on a Dexterity saving throw (DC 8 plus your Dexterity modifier and Proficiency Bonus) or take 1d4 Fire damage and start burning (see “Rules Glossary”).",
+      "sourceBlocks": ["p0094-b028"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ammunition (Varies)",
+      "sourceBlocks": ["p0094-b029"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "Ammunition is required by a weapon that has the Ammunition property. A weapon’s description specifies the type of ammunition used by the weapon. The Ammunition table lists the different types and the amount you get when you buy them. The table also lists the item that is typically used to store each type; storage must be bought separately.",
+      "sourceBlocks": ["p0094-b029"]
+    },
+    {
+      "parentId": "page-0094",
+      "normalizedText": "System Reference Document 5.2.1 94",
+      "sourceBlocks": ["p0094-b001"]
+    }
+  ]
+}

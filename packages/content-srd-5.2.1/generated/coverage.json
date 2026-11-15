@@ -81,7 +81,7 @@
   "counts": {
     "AUTHORED": 2,
     "EXECUTABLE": 0,
-    "STRUCTURED": 873,
+    "STRUCTURED": 911,
     "TESTED": 0,
     "TEXT_ONLY": 0,
     "UNCLASSIFIED": 0,
@@ -99,6 +99,7 @@
     "equipment-shield": 1,
     "equipment-weapon": 38,
     "feat": 14,
+    "rule": 1,
     "rule-table": 14,
     "species": 9,
     "spell": 339,
@@ -106,6 +107,7 @@
     "subclass": 12,
     "subclass-feature": 58,
     "subclass-option": 8,
+    "tool": 37,
     "weapon-property": 3
   },
   "generatedAt": null,
@@ -113,7 +115,7 @@
   "package": "srd-5.2.1",
   "provenance": {
     "editionReference": 2,
-    "pinnedSource": 873
+    "pinnedSource": 911
   },
   "referenceRecords": [
     {

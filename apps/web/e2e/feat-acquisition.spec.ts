@@ -77,11 +77,15 @@ test("repeatable Skilled saves separate skill choices and preserves them through
 }) => {
   const dialog = await start(page, 4);
   await choose(await featStep(dialog), /^Skilled:/);
-  const choices = dialog.getByRole("group", { name: "Skilled skill choices" });
+  const choices = dialog.getByRole("group", { name: "Skilled proficiency choices" });
   await expect(choices.locator("button.selected")).toHaveCount(3);
   await choices.locator("button.selected").last().click();
   await expect(choices.locator("button.selected")).toHaveCount(2);
-  await choices.locator("button:not(.selected):not([disabled])").last().click();
+  await choices
+    .locator("button:not(.selected):not([disabled])")
+    .filter({ hasNotText: /^Tool:/ })
+    .last()
+    .click();
   await expect(choices.locator("button.selected")).toHaveCount(3);
   await walkBuilderSteps(dialog);
   const before = await saved(page);

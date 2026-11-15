@@ -3,6 +3,9 @@ import {
   classBuilderMetadataSchema,
   classFeatureChoiceSchema,
   featureChoiceEnabled,
+  toolBodySchema,
+  toolProficiencyChoiceSchema,
+  eligibleToolIds,
   startingEquipmentChoiceSchema,
   type ClassBuilderMetadata,
   type ClassFeatureChoice,
@@ -13,6 +16,11 @@ import type { CharacterEvaluation, LoadedRulesPackage } from "@dnd/rules-api";
 import { evaluateCharacter, preparedSpellLists } from "@dnd/rules-core";
 
 import { abilities, type Ability, shortEntityName, titleCase } from "./presentation";
+import {
+  reconcileToolProficiencies,
+  validateToolProficiencies,
+  advancementToolCandidates,
+} from "./tool-proficiencies";
 import { asiIncreases, asiOptions } from "./ability-score-improvements";
 import {
   advancementFeatMetadataSchema,
@@ -90,6 +98,7 @@ export interface CharacterBuilderDraft {
   speciesSkillIds: string[];
   speciesChoiceSelections: Readonly<Record<string, string[]>>;
   originFeatSkillIds: string[];
+  toolProficiencySelections?: Readonly<Record<string, string[]>> | undefined;
   magicInitiateChoices: Readonly<Record<string, MagicInitiateSelection>>;
   ritualCasterChoices: Readonly<Record<string, RitualCasterSelection>>;
   expertiseSkillIds: string[];
@@ -189,6 +198,7 @@ export interface FeatBuilderCatalog {
   skillMinimum: number;
   skillMaximum: number;
   magicInitiate?: MagicInitiateCatalog;
+  allowsTools: boolean;
   ritualCaster?: RitualCasterCatalog;
   editionReference?: EditionReferenceCatalog;
 }
@@ -311,6 +321,9 @@ export interface ClassSpellcastingCatalog {
 }
 
 export interface BuilderCatalog {
+  tools: Readonly<Record<string, { id: string; name: string; category: string }>>;
+  toolChoices: Readonly<Record<string, { minimum: number; maximum: number; options: string[] }>>;
+  fixedToolIds: Readonly<Record<string, string[]>>;
   classes: Readonly<Record<BuilderClassId, ClassBuilderCatalog>>;
   species: Readonly<Record<string, SpeciesBuilderCatalog>>;
   backgrounds: Readonly<Record<string, BackgroundBuilderCatalog>>;
@@ -1207,6 +1220,7 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
             description: entityDescription(candidate),
             category: typeof body?.category === "string" ? body.category : "unknown",
             repeatable: body?.repeatable === true,
+            allowsTools: categories.includes("tool"),
             ...(advancementFeatMetadataSchema.safeParse(body).success
               ? { advancement: advancementFeatMetadataSchema.parse(body) }
               : {}),
@@ -1261,6 +1275,58 @@ export function characterBuilderCatalog(rulesPackage: LoadedRulesPackage): Build
     .map((candidate) => ({ id: candidate.id, name: localizedName(candidate) }))
     .sort((left, right) => left.name.localeCompare(right.name));
   return {
+    tools: Object.fromEntries(
+      rulesPackage.entities.flatMap((candidate) => {
+        if (candidate.kind !== "tool") return [];
+        const parsed = toolBodySchema.safeParse(candidate.body);
+        return parsed.success
+          ? [
+              [
+                candidate.id,
+                {
+                  id: candidate.id,
+                  name: localizedName(candidate),
+                  category: parsed.data.category,
+                },
+              ],
+            ]
+          : [];
+      }),
+    ),
+    toolChoices: Object.fromEntries(
+      rulesPackage.entities.flatMap((candidate) => {
+        const choice = objectValue(candidate.body)?.toolProficiencyChoice;
+        if (choice === undefined) return [];
+        const parsed = toolProficiencyChoiceSchema.safeParse(choice);
+        return parsed.success
+          ? [
+              [
+                candidate.id,
+                {
+                  minimum: parsed.data.minimum,
+                  maximum: parsed.data.maximum,
+                  options: eligibleToolIds(parsed.data, rulesPackage.entities),
+                },
+              ],
+            ]
+          : [];
+      }),
+    ),
+    fixedToolIds: Object.fromEntries(
+      rulesPackage.entities.flatMap((candidate) => {
+        const names = stringArray(objectValue(candidate.body)?.toolProficiencies);
+        return names.length === 0
+          ? []
+          : [
+              [
+                candidate.id,
+                rulesPackage.entities
+                  .filter((tool) => tool.kind === "tool" && names.includes(localizedName(tool)))
+                  .map(({ id }) => id),
+              ],
+            ];
+      }),
+    ),
     classes: {
       [barbarianId]: classCatalog(barbarianId, rulesPackage),
       [bardId]: classCatalog(bardId, rulesPackage),
@@ -1924,14 +1990,17 @@ export function updateBuilderBackground(
     magicInitiateChoices: {},
   };
   return reconcileMagicInitiateChoices(
-    {
-      ...reconciled,
-      expertiseSkillIds: fillSelections(
-        draft.expertiseSkillIds,
-        expertiseSkillCandidates(reconciled, catalog),
-        expertiseCount(reconciled, catalog),
-      ),
-    },
+    reconcileToolProficiencies(
+      {
+        ...reconciled,
+        expertiseSkillIds: fillSelections(
+          draft.expertiseSkillIds,
+          expertiseSkillCandidates(reconciled, catalog),
+          expertiseCount(reconciled, catalog),
+        ),
+      },
+      catalog,
+    ),
     catalog,
   );
 }
@@ -1989,14 +2058,17 @@ export function updateBuilderSpecies(
     magicInitiateChoices: {},
   };
   return reconcileMagicInitiateChoices(
-    {
-      ...reconciled,
-      expertiseSkillIds: fillSelections(
-        draft.expertiseSkillIds,
-        expertiseSkillCandidates(reconciled, catalog),
-        expertiseCount(reconciled, catalog),
-      ),
-    },
+    reconcileToolProficiencies(
+      {
+        ...reconciled,
+        expertiseSkillIds: fillSelections(
+          draft.expertiseSkillIds,
+          expertiseSkillCandidates(reconciled, catalog),
+          expertiseCount(reconciled, catalog),
+        ),
+      },
+      catalog,
+    ),
     catalog,
   );
 }
@@ -2293,6 +2365,11 @@ export function reconcileAdvancementFeatChoices(
     if (!selection) continue;
     const feat = catalog.feats[selection.featId];
     const count = feat?.skillMaximum ?? 0;
+    const tools = feat?.allowsTools
+      ? (selection.toolIds ?? []).filter((id) =>
+          advancementToolCandidates(next, catalog, index).includes(id),
+        )
+      : [];
     const updated = {
       featId: selection.featId,
       abilityScoreIncreases: selection.abilityScoreIncreases,
@@ -2301,8 +2378,9 @@ export function reconcileAdvancementFeatChoices(
             skillIds: fillSelections(
               selection.skillIds ?? [],
               advancementSkillCandidates(next, catalog, index),
-              count,
+              Math.max(0, count - tools.length),
             ),
+            ...(tools.length === 0 ? {} : { toolIds: tools }),
           }
         : {}),
     };
@@ -2579,6 +2657,7 @@ export function defaultBuilderDraft(
     speciesSkillIds,
     speciesChoiceSelections: reconcileSpeciesChoiceSelections(species, {}),
     originFeatSkillIds,
+    toolProficiencySelections: {},
     magicInitiateChoices: {},
     ritualCasterChoices: {},
     expertiseSkillIds: [],
@@ -2604,7 +2683,7 @@ export function defaultBuilderDraft(
       ? draft
       : { ...draft, ...spellSelections(draft, catalog, level) };
   return reconcileRitualCasterChoices(
-    reconcileMagicInitiateChoices(completedDraft, catalog),
+    reconcileMagicInitiateChoices(reconcileToolProficiencies(completedDraft, catalog), catalog),
     catalog,
   );
 }
@@ -2895,8 +2974,12 @@ export function validateBuilderDraft(
   }
   if (
     selectedOriginFeat !== undefined &&
-    (draft.originFeatSkillIds.length < selectedOriginFeat.skillMinimum ||
-      draft.originFeatSkillIds.length > selectedOriginFeat.skillMaximum ||
+    (draft.originFeatSkillIds.length +
+      (draft.toolProficiencySelections?.[draft.originFeatId]?.length ?? 0) <
+      selectedOriginFeat.skillMinimum ||
+      draft.originFeatSkillIds.length +
+        (draft.toolProficiencySelections?.[draft.originFeatId]?.length ?? 0) >
+        selectedOriginFeat.skillMaximum ||
       new Set(draft.originFeatSkillIds).size !== draft.originFeatSkillIds.length ||
       draft.originFeatSkillIds.some((id) => !allSkillOptions.includes(id)))
   ) {
@@ -2915,7 +2998,7 @@ export function validateBuilderDraft(
     const feat = catalog.feats[selection.featId];
     const choices = selection.skillIds ?? [];
     if (
-      choices.length !== (feat?.skillMaximum ?? 0) ||
+      choices.length + (selection.toolIds?.length ?? 0) !== (feat?.skillMaximum ?? 0) ||
       choices.some((id) => !advancementSkillCandidates(draft, catalog, index).includes(id))
     )
       issues.push("Choose the required distinct feat skill proficiencies.");
@@ -2923,6 +3006,7 @@ export function validateBuilderDraft(
   if (new Set(allSkills).size !== allSkills.length) {
     issues.push("Each selected skill proficiency must be unique.");
   }
+  issues.push(...validateToolProficiencies(draft, catalog));
   for (const featId of magicInitiateFeatIds(draft, catalog)) {
     const feat = catalog.feats[featId];
     const definition = feat?.magicInitiate;
@@ -3330,6 +3414,13 @@ function assembleCharacter(
               }))
             : [],
       },
+      ...(draft.toolProficiencySelections === undefined
+        ? {}
+        : {
+            toolProficiencyChoices: Object.entries(draft.toolProficiencySelections).map(
+              ([sourceId, toolIds]) => ({ sourceId, toolIds }),
+            ),
+          }),
     },
     loadout: {
       inventory,

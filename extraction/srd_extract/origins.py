@@ -138,6 +138,8 @@ def parse_background(name: str, text: str) -> dict[str, Any]:
     feat_name = match.group("feat")
     if feat_name not in FEAT_IDS:
         raise ValueError(f"Unsupported {name} feat: {feat_name}")
+    if "choose" in match.group("tool").casefold() and "Gaming Set" not in match.group("tool"):
+        raise ValueError(f"Unsupported {name} tool choice: {match.group('tool')}")
     return {
         "abilityScoreOptions": abilities,
         "abilityScoreIncreasePatterns": [[2, 1], [1, 1, 1]],
@@ -146,7 +148,7 @@ def parse_background(name: str, text: str) -> dict[str, Any]:
         "toolProficiencyChoice": {
             "minimum": 1,
             "maximum": 1,
-            "category": "tool",
+            "category": "gaming-set" if "choose" in match.group("tool").casefold() else "tool",
             "text": match.group("tool"),
         },
         "toolProficiencies": []
