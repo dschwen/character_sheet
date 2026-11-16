@@ -189,9 +189,12 @@ Grappler is now available through shared, catalog-driven creation/advancement co
 ASI. Per-acquisition records store the feat and ability allocation. The engine enforces its
 Strength-or-Dexterity prerequisite before its own increase, allowed +1 abilities, level, maximum,
 non-repeatability, and aggregate consistency. Earlier selections remain locked; ambiguous legacy
-qualification is not invented. Combat displays its three benefits as explicitly assisted guidance;
-target tracking, grapple resolution, movement and conditional Advantage are not automated. Browser
-interaction verification and independent semantic review remain outstanding.
+qualification is not invented. Combat now offers shared metadata-driven declarations for its
+three benefits: target-specific weapon/unarmed/spell Advantage with normal cancellation, Punch
+and Grab's damage and Strength/Dexterity target-save instructions, and size-aware grapple movement
+cost guidance. The Monk's alternate grapple DC is source-linked and equipment-gated. Target saves,
+conditions, turn use, positions and remaining movement remain manual; browser flows cover the new
+controls, but independent semantic review is still outstanding. See [Grappler](rules-engine/grappler.md).
 
 Unrestricted advancement feat grants now offer Origin, General, and qualifying Fighting Style
 categories through one shared acquisition metadata schema. Non-repeatability includes background,

@@ -32,6 +32,7 @@ import {
   featureChoiceEnabled,
   weaponDamageRollChoiceSchema,
   toolBodySchema,
+  grappleBenefitsSchema,
   type AuthoringIr,
   type ContentEntity,
   type DraftRule,
@@ -305,6 +306,10 @@ const classBodySchema = z
     martialArts: z
       .object({
         ability: z.enum(abilities),
+        grappleSave: z
+          .object({ ability: z.enum(abilities), sourceFeatureId: z.string().min(1) })
+          .strict()
+          .optional(),
         monkWeapon: z
           .object({
             attackType: z.enum(["melee", "ranged"]),
@@ -7661,9 +7666,51 @@ function evaluateAttacks(
     };
     state.facts[damageBonusTraceId] = damageBonus;
     state.values[damageBonusTraceId] = { value: damageBonus, traceId: damageBonusTraceId };
+    const alternateSave = martialArts?.grappleSave;
+    const alternateModifier =
+      alternateSave === undefined
+        ? strengthModifier
+        : requireNumber(
+            state.facts[`ability.${alternateSave.ability}.modifier`] ?? null,
+            "Alternate grapple save modifier",
+          );
+    const grappleAbility =
+      martialArtsActive && alternateSave !== undefined && alternateModifier > strengthModifier
+        ? alternateSave.ability
+        : "strength";
+    const grappleModifier = grappleAbility === "strength" ? strengthModifier : alternateModifier;
+    const grappleTraceId = `${attackId}.grapple.saveDC`;
+    const grappleDifficultyClass = 8 + grappleModifier + proficiencyBonus;
+    const saveFeature =
+      alternateSave === undefined ? undefined : index.entities.get(alternateSave.sourceFeatureId);
+    state.traces[grappleTraceId] = {
+      id: grappleTraceId,
+      result: grappleDifficultyClass,
+      nodes: [
+        {
+          id: `${grappleTraceId}.formula`,
+          operation: "derive-unarmed-grapple-save-dc",
+          inputs: [8, grappleAbility, grappleModifier, proficiencyBonus, martialArtsActive],
+          output: grappleDifficultyClass,
+          label:
+            "8 + chosen permitted ability modifier + Proficiency Bonus; target chooses Strength or Dexterity save",
+        },
+      ],
+      sourceReferences: [
+        { entityId: "srd521.rule.unarmed-strike", sourceId: "wotc-srd-5.2.1-en", page: 190 },
+        ...(saveFeature === undefined ? [] : entitySourceReferences(saveFeature)),
+      ],
+    };
     state.attacks.push({
       id: attackId,
       itemId: "unarmed-strike",
+      grapple: {
+        difficultyClass: grappleDifficultyClass,
+        ability: grappleAbility,
+        traceId: grappleTraceId,
+        maximumTargetSizeSteps: 1,
+        requiresFreeHand: true,
+      },
       weaponId: "srd521.attack.unarmed-strike",
       name: "Unarmed Strike",
       ability,
@@ -8192,6 +8239,48 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
       .filter((effect) => effect.scope === "attack-rolls")
       .map((effect) => ({ kind: effect.kind, source: entity.id })),
   );
+  const grappleBenefits = [...granted].flatMap((sourceId) => {
+    const entity = index.entities.get(sourceId);
+    if (
+      !entity?.body ||
+      typeof entity.body !== "object" ||
+      Array.isArray(entity.body) ||
+      !("grappleBenefits" in entity.body)
+    )
+      return [];
+    const parsed = grappleBenefitsSchema.safeParse(entity.body.grappleBenefits);
+    if (!parsed.success) return [];
+    const traceId = `${sourceId}.grapple-benefits`;
+    state.traces[traceId] = {
+      id: traceId,
+      result: true,
+      nodes: [
+        {
+          id: `${traceId}.grant`,
+          operation: "grant-declared-target-grapple-benefits",
+          inputs: [sourceId],
+          output: true,
+          label:
+            "Targets, timing, size, hand availability and target conditions require explicit declarations.",
+        },
+      ],
+      sourceReferences: entitySourceReferences(entity),
+    };
+    return [
+      {
+        sourceId,
+        sourceName: entity.name.en ?? sourceId,
+        traceId,
+        ...(parsed.data.damageAndGrapple === undefined
+          ? {}
+          : { damageAndGrapple: parsed.data.damageAndGrapple }),
+        ...(parsed.data.targetAdvantage === undefined
+          ? {}
+          : { targetAdvantage: parsed.data.targetAdvantage }),
+        ...(parsed.data.movement === undefined ? {} : { movement: parsed.data.movement }),
+      },
+    ];
+  });
   for (const attack of state.attacks) {
     const effects = [...commonAttackEffects];
     effects.push(
@@ -8272,6 +8361,42 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   }
   evaluateStatusSpellcastingEnhancements(statuses, conditions, granted, index, state);
   evaluateConditionAttackModifiers(character, conditions, state);
+  if (grappleBenefits.some(({ targetAdvantage }) => targetAdvantage !== undefined)) {
+    const spellAttackSources = (sourceId: string) => {
+      const effects = [
+        ...commonAttackEffects,
+        ...(input.context?.d20RollEffects ?? [])
+          .filter(({ testId }) => testId === "attack-rolls")
+          .map(({ kind, source }) => ({ kind, source })),
+      ];
+      const classEnhancements = statuses
+        .filter(
+          ({ body }) =>
+            body.spellcastingEnhancement?.castingClassId === sourceId &&
+            body.sourceFeatureId !== undefined &&
+            granted.has(body.sourceFeatureId) &&
+            body.spellcastingEnhancement.attackRollAdvantage,
+        )
+        .map(({ entity }) => entity.id);
+      return {
+        advantageSources: [
+          ...effects.filter(({ kind }) => kind === "advantage").map(({ source }) => source),
+          ...classEnhancements,
+        ],
+        disadvantageSources: effects
+          .filter(({ kind }) => kind === "disadvantage")
+          .map(({ source }) => source),
+      };
+    };
+    if (state.spellcasting)
+      Object.assign(state.spellcasting, spellAttackSources(state.spellcasting.classId));
+    for (const spell of state.spells)
+      if (spell.castingOptions)
+        spell.castingOptions = spell.castingOptions.map((option) => ({
+          ...option,
+          ...spellAttackSources(option.sourceId),
+        }));
+  }
   const attackDamageRiders = evaluateBattleBlessings(character, input.packages, index, state);
   evaluateD20Minimums(granted, index, state);
   evaluateGrantedActionEnhancements(granted, index, state);
@@ -8326,6 +8451,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
     }));
   return {
     facts: state.facts,
+    ...(grappleBenefits.length === 0 ? {} : { grappleBenefits }),
     movementCapabilities,
     attackDamageRiders,
     savingThrowDamageEffects,

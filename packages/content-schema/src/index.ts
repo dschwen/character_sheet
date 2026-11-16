@@ -601,6 +601,44 @@ export const classFeatureChoiceSchema = z
 
 export const failedSaveRerollSchema = z.object({ bonusFact: z.string().min(1) }).strict();
 
+export const grappleBenefitsSchema = z
+  .object({
+    damageAndGrapple: z
+      .object({
+        name: z.string().min(1),
+        instructions: z.string().min(1),
+        attackProperty: z.literal("unarmed-strike"),
+        requiresAttackAction: z.literal(true),
+        onceOnYourTurn: z.literal(true),
+      })
+      .strict()
+      .optional(),
+    targetAdvantage: z
+      .object({
+        name: z.string().min(1),
+        instructions: z.string().min(1),
+        target: z.literal("grappled-by-you"),
+      })
+      .strict()
+      .optional(),
+    movement: z
+      .object({
+        name: z.string().min(1),
+        instructions: z.string().min(1),
+        ignoreExtraCostWhenTargetNotLarger: z.literal(true),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict()
+  .refine(
+    (value) =>
+      value.damageAndGrapple !== undefined ||
+      value.targetAdvantage !== undefined ||
+      value.movement !== undefined,
+    "At least one grapple benefit is required",
+  );
+
 export const toolBodySchema = z
   .object({
     proficiencyRuleId: entityIdSchema,

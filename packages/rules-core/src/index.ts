@@ -4,6 +4,7 @@ export { deathSaveStatus, proposeDeathSavingThrow } from "./death-saving-throws.
 export { resolveAttackRollOptions } from "./attack-roll-options.js";
 export type { AttackRollDeclaration, AttackRollOptionResolution } from "./attack-roll-options.js";
 export { evaluateCharacter } from "./character-evaluator.js";
+export * from "./grappling.js";
 export { proficiencyContribution, resolveProficiencyLevel, resolveRollMode } from "./d20.js";
 export { ExpressionEvaluator, type EvaluationContext, type EvaluationLimits } from "./evaluator.js";
 export { proposeRest } from "./rest.js";

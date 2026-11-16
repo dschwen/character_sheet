@@ -136,6 +136,13 @@ export interface DamageSummary {
 }
 
 export interface AttackSummary {
+  grapple?: {
+    difficultyClass: number;
+    ability: string;
+    traceId: string;
+    maximumTargetSizeSteps: number;
+    requiresFreeHand: true;
+  };
   damageRollChoices?: WeaponDamageRollChoiceSummary[];
   rollOptions?: AttackRollOptionSummary[];
   advantageSources?: string[];
@@ -216,6 +223,8 @@ export interface SpellSlotSummary {
 }
 
 export interface SpellcastingSummary {
+  advantageSources?: string[];
+  disadvantageSources?: string[];
   attackRollMode?: "normal" | "advantage" | "disadvantage";
   classId: string;
   model: "standard" | "pact-magic";
@@ -259,6 +268,8 @@ export interface SpellHealingEffectSummary {
 }
 
 export interface SpellCastingOptionSummary {
+  advantageSources?: string[];
+  disadvantageSources?: string[];
   cantripDamageBonuses?: SpellDamageBonusSummary[];
   attackRollMode?: "normal" | "advantage" | "disadvantage";
   sourceId: string;
@@ -461,6 +472,7 @@ export interface SpellSlotRecoverySummary {
 }
 
 export interface CharacterEvaluation {
+  grappleBenefits?: GrappleBenefitSummary[];
   movementCapabilities?: MovementCapabilitySummary[];
   attackDamageRiders?: AttackDamageRiderSummary[];
   savingThrowDamageEffects?: SavingThrowDamageEffectSummary[];
@@ -483,6 +495,21 @@ export interface CharacterEvaluation {
   validations: ValidationMessage[];
   traces: Readonly<Record<string, CalculationTrace>>;
   coverageWarnings: CoverageWarning[];
+}
+
+export interface GrappleBenefitSummary {
+  sourceId: string;
+  sourceName: string;
+  traceId: string;
+  damageAndGrapple?: {
+    name: string;
+    instructions: string;
+    attackProperty: "unarmed-strike";
+    requiresAttackAction: true;
+    onceOnYourTurn: true;
+  };
+  targetAdvantage?: { name: string; instructions: string; target: "grappled-by-you" };
+  movement?: { name: string; instructions: string; ignoreExtraCostWhenTargetNotLarger: true };
 }
 
 export interface SavingThrowDamageEffectSummary {

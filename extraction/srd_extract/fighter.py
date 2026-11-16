@@ -1236,6 +1236,10 @@ def _grappler_entity(document: dict[str, Any]) -> dict[str, Any]:
         "Grappled by you",
         "only once per turn",
         "your size or smaller",
+        "When you hit a creature with an Unarmed Strike as part of the Attack action on your turn",
+        "both the Damage and the Grapple option",
+        "You have Advantage on attack rolls against a creature Grappled by you",
+        "You don’t have to spend extra movement to move a creature Grappled by you",
     ]:
         if phrase not in text:
             raise ValueError(f"Grappler source is missing {phrase}")
@@ -1258,6 +1262,37 @@ def _grappler_entity(document: dict[str, Any]) -> dict[str, Any]:
             "abilityScoreIncreasePatterns": [[1]],
             "abilityScoreIncreaseAbilities": ["strength", "dexterity"],
             "maximumAbilityScore": 20,
+            "grappleBenefits": {
+                "damageAndGrapple": {
+                    "name": "Punch and Grab",
+                    "instructions": (
+                        "On a declared Unarmed Strike hit as part of the Attack action on your "
+                        "turn, use Damage and Grapple together, once per turn. The target chooses "
+                        "a Strength or Dexterity save; on failure set Grappled on its sheet."
+                    ),
+                    "attackProperty": "unarmed-strike",
+                    "requiresAttackAction": True,
+                    "onceOnYourTurn": True,
+                },
+                "targetAdvantage": {
+                    "name": "Attack Advantage",
+                    "instructions": (
+                        "Declare that this specific target is a creature currently Grappled by "
+                        "you. This includes weapon, Unarmed Strike and spell attack rolls; "
+                        "Disadvantage cancels normally."
+                    ),
+                    "target": "grappled-by-you",
+                },
+                "movement": {
+                    "name": "Fast Wrestler",
+                    "instructions": (
+                        "No extra grapple movement cost for a creature Grappled by you that is "
+                        "your current size or smaller. Confirm actual sizes, remaining movement "
+                        "and any other movement costs manually."
+                    ),
+                    "ignoreExtraCostWhenTargetNotLarger": True,
+                },
+            },
             "combatGuidance": [
                 "Punch and Grab: once per turn, after hitting a creature with an Unarmed Strike "
                 "as part of the Attack action on your turn, use both the Damage and Grapple "

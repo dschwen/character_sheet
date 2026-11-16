@@ -136,8 +136,10 @@ validated before saving. New sheets record each allocation at its acquisition le
 locks earlier allocations and preserves legacy aggregate-only bonuses without inventing history.
 Grappler is also offered from source-linked feat metadata, with a +1 Strength or Dexterity choice,
 non-repeatability, and a level-4 plus Strength-or-Dexterity-13 prerequisite checked before its own
-increase. Combat displays its Punch and Grab, Attack Advantage, and Fast Wrestler guidance;
-targets, grapple saves, movement, and conditional Advantage remain manually adjudicated.
+increase. Combat now provides declared Punch and Grab damage/save feedback, target-specific
+weapon/unarmed/spell attack Advantage, and size-aware Fast Wrestler movement-cost guidance.
+Target saves, conditions, turn use and actual movement remain manual. See
+[Grappler controls](docs/rules-engine/grappler.md).
 Paladin and Ranger level-2 choices offer all four SRD Fighting Styles or Blessed Warrior /
 Druidic Warrior, with two class-cast cantrips and one cantrip replacement per later class level.
 See [Warrior choices](docs/rules-engine/warrior-cantrips.md).

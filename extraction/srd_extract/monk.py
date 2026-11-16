@@ -394,6 +394,10 @@ def _class_entity(
             "featureSaveAbility": "wisdom",
             "martialArts": {
                 "ability": "dexterity",
+                "grappleSave": {
+                    "ability": "dexterity",
+                    "sourceFeatureId": "srd521.class-feature.monk.martial-arts",
+                },
                 "monkWeapon": {
                     "attackType": "melee",
                     "categories": ["simple"],
@@ -699,6 +703,19 @@ def generate_monk_content(extraction_root: Path, output: Path) -> dict[str, Any]
     traits = parse_core_traits(core_node["normalizedText"], equipment_node["normalizedText"])
     progression = parse_progression(raw_page)
     features = extract_features(document)
+    martial_text = " ".join(
+        node["normalizedText"]
+        for feature in features
+        if feature["name"] == "Martial Arts"
+        for node in feature["bodyNodes"]
+    )
+    if (
+        "Grapple or Shove" not in martial_text
+        or "determine the save DC" not in martial_text
+        or "you can use your Dexterity modifier instead of your Strength modifier"
+        not in martial_text
+    ):
+        raise ValueError("Martial Arts source is missing the alternate Grapple save ability")
     open_hand_features = extract_open_hand_features(document)
     progression_source = _source_spans([progression_node])[0]
     class_entity = _class_entity(

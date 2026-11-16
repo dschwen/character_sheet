@@ -20,6 +20,11 @@ same suite.
 
 ## What the suite verifies
 
+`grappler.spec.ts` checks acquiring Grappler and declaring its Combat benefits: Fighter fixed
+damage/save feedback, Monk critical dice and Dexterity DC traces, oversized targets, size-aware
+movement guidance, Wizard spell-attack cancellation under Poisoned, unchanged saved state and
+discarding late roll results after a character switch. It runs at both configured viewports.
+
 `tool-proficiencies.spec.ts` checks the Bard/Monk category pools, Soldier's specific gaming-set
 choice, mixed/all-tool original Skilled, level-4 Skilled with mixed proficiencies, source-linked
 check explanations, reload persistence and locked advancement history at both viewport sizes.

@@ -43,6 +43,6 @@ preservation. The production-export browser gate covers these new paths at deskt
 
 Later slices add [Paladin/Ranger's level-2 alternatives](warrior-cantrips.md) and
 [Savage Attacker's declared damage-pool choice](savage-attacker.md) and
-[source-driven tool choices](tool-proficiencies.md). Grappler's
-target-specific combat effects, encounter budgets, and full semantic review of levels 1–5 remain
-unfinished; these are not implicit grants.
+[source-driven tool choices](tool-proficiencies.md). [Grappler's declared combat controls](grappler.md)
+now resolve its assisted rolls and movement guidance. Target state, encounter budgets and full
+semantic review of levels 1–5 remain unfinished; these are not implicit grants.

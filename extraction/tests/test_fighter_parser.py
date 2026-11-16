@@ -88,9 +88,11 @@ def test_grappler_metadata_and_source_boundaries() -> None:
     text = (
         "General Feat (Prerequisite: Level 4+, Strength or Dexterity 13+) "
         "Increase your Strength or Dexterity score by 1, to a maximum of 20. "
-        "Punch and Grab can be used only once per turn. "
-        "Attack Advantage against a creature Grappled by you. "
-        "Fast Wrestler applies when it is your size or smaller."
+        "Punch and Grab. When you hit a creature with an Unarmed Strike as part of the Attack "
+        "action on your turn, you can use both the Damage and the Grapple option, "
+        "only once per turn. Attack Advantage. You have Advantage on attack rolls against "
+        "a creature Grappled by you. Fast Wrestler. You don’t have to spend extra movement "
+        "to move a creature Grappled by you if the creature is your size or smaller."
     )
     nodes: list[dict[str, Any]] = [
         {
@@ -128,6 +130,8 @@ def test_grappler_metadata_and_source_boundaries() -> None:
     assert feat["body"]["prerequisite"]["minimumCharacterLevel"] == 4
     assert feat["body"]["repeatable"] is False
     assert len(feat["body"]["combatGuidance"]) == 3
+    assert feat["body"]["grappleBenefits"]["damageAndGrapple"]["onceOnYourTurn"] is True
+    assert feat["body"]["grappleBenefits"]["targetAdvantage"]["target"] == "grappled-by-you"
     assert "Unrelated content" not in str(feat)
     for phrase in [
         "Level 4+",
@@ -137,6 +141,9 @@ def test_grappler_metadata_and_source_boundaries() -> None:
         "Grappled by you",
         "only once per turn",
         "your size or smaller",
+        "both the Damage and the Grapple option",
+        "You have Advantage on attack rolls against a creature Grappled by you",
+        "You don’t have to spend extra movement to move a creature Grappled by you",
     ]:
         broken = {"nodes": [dict(node) for node in nodes]}
         broken["nodes"][1]["normalizedText"] = text.replace(phrase, "missing")

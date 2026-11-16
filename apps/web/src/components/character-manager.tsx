@@ -41,6 +41,7 @@ import { DamageRiderControls } from "./damage-rider-controls";
 import { MovementCapabilities } from "./movement-capabilities";
 import { OnHitDamageControls } from "./on-hit-damage-controls";
 import { WeaponDamageChoiceControls } from "./weapon-damage-choice-controls";
+import { GrappleBenefitControls } from "./grapple-benefit-controls";
 import { chooseDicePoolResult, rollDicePoolChoices } from "../lib/dice-pool-choice";
 import type { WeaponDamageChoiceRequest } from "../lib/weapon-damage-roll";
 import { onHitDamageDefinition } from "../lib/on-hit-damage";
@@ -711,13 +712,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
 
   function performRoll(request: D20RollRequest): void {
     if (!beginDiceRoll()) return;
+    const generation = rollGenerationRef.current;
     const rollRequest = applyD20MinimumPreference(request, useD20Minimums);
     void rollD20Fullscreen(rollRequest)
       .catch((error: unknown) => {
-        setNotice(`3D dice were unavailable (${errorMessage(error)}); used the fallback roller.`);
+        if (generation === rollGenerationRef.current)
+          setNotice(`3D dice were unavailable (${errorMessage(error)}); used the fallback roller.`);
         return rollD20(rollRequest);
       })
-      .then(setLatestRoll)
+      .then((result) => {
+        if (generation === rollGenerationRef.current) setLatestRoll(result);
+      })
       .finally(finishDiceRoll);
   }
 
@@ -725,11 +730,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     request: DicePoolRollRequest,
   ): Promise<DicePoolRollResult | undefined> {
     if (!beginDiceRoll()) return undefined;
+    const generation = rollGenerationRef.current;
     try {
       const result = await rollDiceFullscreen(request).catch((error: unknown) => {
-        setNotice(`3D dice were unavailable (${errorMessage(error)}); used the fallback roller.`);
+        if (generation === rollGenerationRef.current)
+          setNotice(`3D dice were unavailable (${errorMessage(error)}); used the fallback roller.`);
         return rollDice(request);
       });
+      if (generation !== rollGenerationRef.current) return undefined;
       setLatestRoll(result);
       return result;
     } finally {
@@ -3584,6 +3592,25 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     </div>
                   )}
                 </Section>
+                {evaluation.grappleBenefits?.map((benefit) => (
+                  <Section
+                    key={benefit.sourceId}
+                    title={benefit.sourceName}
+                    eyebrow="Declared target benefits"
+                  >
+                    <GrappleBenefitControls
+                      key={`${character.id}:${character.metadata.updatedAt}:${benefit.sourceId}`}
+                      evaluation={evaluation}
+                      benefit={benefit}
+                      busy={diceRolling}
+                      sourceName={(id) => names.get(id) ?? shortEntityName(id)}
+                      onRoll={performRoll}
+                      onDamage={performDicePoolRoll}
+                      onNotice={setNotice}
+                      onExplain={setSelectedTraceId}
+                    />
+                  </Section>
+                ))}
                 <Section title="Equipment" eyebrow="Current loadout">
                   <div className="currency-grid" aria-label="Currency">
                     {currencyDenominations.map((denomination) => (

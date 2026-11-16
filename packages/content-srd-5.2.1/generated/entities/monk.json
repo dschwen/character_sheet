@@ -33,6 +33,10 @@
       "hitPointDie": 8,
       "martialArts": {
         "ability": "dexterity",
+        "grappleSave": {
+          "ability": "dexterity",
+          "sourceFeatureId": "srd521.class-feature.monk.martial-arts"
+        },
         "monkWeapon": {
           "attackType": "melee",
           "categories": [
