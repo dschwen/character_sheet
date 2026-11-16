@@ -20,6 +20,11 @@ same suite.
 
 ## What the suite verifies
 
+`legacy-tool-choices.spec.ts` checks empty initial selections, Cancel/Escape without mutation,
+explicit Apply, Undo, reload persistence and source-specific tool pools for old saves. Bard and
+Monk are tested at their metadata-defined level caps; missing feat histories block confirmation
+without inventing grants. These checks run at both configured viewports.
+
 `grappler.spec.ts` checks acquiring Grappler and declaring its Combat benefits: Fighter fixed
 damage/save feedback, Monk critical dice and Dexterity DC traces, oversized targets, size-aware
 movement guidance, Wizard spell-attack cancellation under Poisoned, unchanged saved state and

@@ -29,13 +29,20 @@ these boundaries instead of claiming automatic target or equipment validation.
 
 The new original-choice field is optional for backward compatibility. Older saves with no records
 stay unrecorded through advancement; fixed grants still work and missing choices are never guessed.
-The sheet explicitly identifies that legacy state. Completing old missing original choices
-currently requires explicit JSON import; new characters receive editable builder defaults.
+The sheet explicitly identifies that legacy state. In Overview → Skills & tools, **Record missing
+tool choices** opens an explicit editor with empty selections. Apply records only the missing
+original choices; Cancel (or Escape) changes nothing. Existing skills, fixed grants and later feat
+acquisitions remain locked, and Play → Undo last state change restores the previous document.
+This editor works independently of advancement, including at the supported level cap. Ambiguous
+or incomplete feat acquisition histories require repair before original tools can be recorded;
+the editor never invents acquisition records. New characters receive editable builder defaults.
 
 Unit tests cover catalog variants, 0–3 tool combinations, class/background pools, invalid imported
 records, repeatable acquisitions, legacy compatibility, round trips and history/state preservation.
 Production browser tests cover Bard/Monk/Soldier choices, mixed and all-tool original Skilled,
 new Skilled at level 4, source explanations, reload and advancement at desktop and narrow widths.
+Legacy-editor tests additionally cover empty initial choices, cancellation, explicit confirmation,
+fixed and acquired exclusions, preserved skills/history/play state, level-cap edits, reload and Undo.
 
 ```sh
 PYTHONPATH=extraction .venv/bin/python -m srd_extract.pipeline \

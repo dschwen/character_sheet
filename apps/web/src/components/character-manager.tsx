@@ -65,6 +65,7 @@ import { spellHealingRequests } from "../lib/spell-healing";
 import type { FixtureOption } from "../lib/server-data";
 import { CharacterBuilder } from "./character-builder";
 import { CharacterLevelUp } from "./character-level-up";
+import { LegacyToolChoiceEditor } from "./legacy-tool-choice-editor";
 import { SavingThrowRerollControls } from "./saving-throw-reroll-controls";
 import { ReactionAttackControls } from "./reaction-attack-controls";
 import { savingThrowRerollDefinition, savingThrowRerollRequest } from "../lib/saving-throw-reroll";
@@ -405,6 +406,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     Readonly<Record<string, Readonly<Record<string, string>>>>
   >({});
   const [preparedSpellDraft, setPreparedSpellDraft] = useState<string[]>();
+  const [toolChoiceCharacter, setToolChoiceCharacter] = useState<CharacterDocument>();
   const [restChoiceDraft, setRestChoiceDraft] = useState<{
     character: CharacterDocument;
     selections: Record<string, string>;
@@ -605,6 +607,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     if (!storageReady) return;
     window.localStorage.setItem(storageKey, JSON.stringify(character));
   }, [character, storageReady]);
+
+  useEffect(() => {
+    setToolChoiceCharacter(undefined);
+  }, [character]);
 
   const result = useMemo(() => {
     try {
@@ -3277,7 +3283,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   </div>
                 </Section>
 
-                <Section title="Skills & fixed tool grants" eyebrow="Checks & proficiencies">
+                <Section title="Skills & tools" eyebrow="Checks & proficiencies">
                   {Object.values(evaluation.d20Tests).some(
                     (test) => test.dieMinimum !== undefined,
                   ) ? (
@@ -3299,6 +3305,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       ? " This older save has no recorded class/background tool choices; missing choices are not assumed."
                       : ""}
                   </p>
+                  {character.build.toolProficiencyChoices === undefined ? (
+                    <button
+                      type="button"
+                      className="button secondary compact"
+                      onClick={() => {
+                        setToolChoiceCharacter(character);
+                      }}
+                    >
+                      Record missing tool choices
+                    </button>
+                  ) : null}
                   <div className="skill-list">
                     {Object.values(evaluation.d20Tests)
                       .filter((test) => test.id.startsWith("skill.") || test.id.startsWith("tool."))
@@ -4269,6 +4286,20 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setPreparedSpellDraft(undefined);
             setBuilderOpen(false);
             setNotice(`${builtCharacter.name} was created and saved in this browser.`);
+          }}
+        />
+      ) : null}
+      {toolChoiceCharacter === character ? (
+        <LegacyToolChoiceEditor
+          character={character}
+          catalog={builderCatalog}
+          rulesPackage={rulesPackage}
+          onCancel={() => {
+            setToolChoiceCharacter(undefined);
+          }}
+          onComplete={(nextCharacter) => {
+            savePlayState(nextCharacter, "Original tool choices recorded. No equipment was added.");
+            setToolChoiceCharacter(undefined);
           }}
         />
       ) : null}

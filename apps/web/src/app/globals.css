@@ -1892,6 +1892,15 @@ td:first-child small {
   color: var(--ink);
   background: var(--paper);
 }
+.tool-choice-editor {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
 .builder-header {
   position: sticky;
   z-index: 3;

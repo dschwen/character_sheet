@@ -9,7 +9,9 @@ because some of its functionality exists or tests pass.
 - Tool proficiency choices use a source-linked 37-tool catalog and shared pickers for Bard, Monk,
   Soldier and mixed skill/tool Skilled grants. Source-specific original choices and per-acquisition
   records persist through reload/advancement, and tool checks include source traces. Legacy missing
-  choices stay unrecorded and are identified on the sheet. Ownership, crafting and skill/tool
+  choices stay unrecorded until explicitly confirmed in Overview's missing-tool editor. It preserves
+  skills, fixed grants, feat history and play state, supports Undo and works at the level cap;
+  ambiguous feat histories require repair. Ownership, crafting and skill/tool
   overlap Advantage remain manual. See [Tool proficiencies](rules-engine/tool-proficiencies.md).
 - Savage Attacker now exposes a declared once-per-turn weapon-hit damage choice. Shared feat
   metadata drives attack summaries, source traces and the Combat UI; fullscreen dice roll two
@@ -59,8 +61,8 @@ queue|inspect|record|apply` flags unreviewed and changed records, pins each appr
   grants traced Initiative advantage, and Enter Rage includes Instinctive Pounce movement guidance
   using final adjusted Speed. Monk reaches level 7 with condition-aware Evasion and a shared,
   opt-in saving-throw damage resolver in Play. Rogue reaches level 7 with the same Evasion resolver
-  and traced Reliable Talent minima for proficient skills and fixed tool grants. Tool-choice
-  persistence/catalog completeness and tool-use adjudication remain outstanding. Ranger reaches
+  and traced Reliable Talent minima for proficient skills and tools. Tool-choice persistence and
+  the catalog are now implemented; tool-use adjudication remains manual. Ranger reaches
   level 7 with source-linked Hunter Defensive Tactics choices. Play → Rest supports atomic
   replacement of both Defensive Tactics and Hunter’s Prey. Incoming attacks, creature hits, and
   turn boundaries remain manually adjudicated; no outgoing roll modes or AC are changed. Paladin
