@@ -6,6 +6,11 @@ because some of its functionality exists or tests pass.
 
 ## Current evidence
 
+- Representative level-1–5 healing, ally-buff and spell-preparation browser flows now run at
+  desktop and narrow widths. Second Wind retains its completed roll and reports actual healing;
+  Undo clears stale cast confirmation. The d10 mesh is now closed, convex and outward-wound, with
+  geometry regression checks for all die types. See [Browser verification](testing/browser-verification.md)
+  for the exact tested paths and remaining boundaries; this is not completion of the source audit.
 - Tool proficiency choices use a source-linked 37-tool catalog and shared pickers for Bard, Monk,
   Soldier and mixed skill/tool Skilled grants. Source-specific original choices and per-acquisition
   records persist through reload/advancement, and tool checks include source traces. Legacy missing
@@ -262,10 +267,11 @@ the plan's explicit deferred work, not a character-sheet completion gate.
 4. Audit each requirement and exit criterion in the original plan against authoritative artifacts,
    commands, tests, and rendered behavior before marking the overall goal complete.
 
-Broader browser verification remains outstanding for the earlier healing, aura, recovery,
-post-roll bonus, spell-choice, rest-time feature-option, and damage-rider controls, which were
-implemented without a browser connection. The Playwright suite now provides a repeatable rendered
-gate, but its fixed smoke matrix does not reach those controls; recent manual Paladin, Monk, and
-Rogue production-export smoke checks still cover their documented flows only. Engine/roll-helper
-tests, type checks, and production builds do not substitute for a complete rendered interaction
-audit, and the browser gate is scoped in [Browser verification](testing/browser-verification.md).
+Browser coverage now reaches Second Wind, Lay on Hands, Cure Wounds, Bless/Shield of Faith recipient
+statuses, Wizard/Cleric preparation and Bard/Sorcerer daily-preparation restrictions. Broader
+verification remains outstanding for other healing features, auras, recovery, post-roll bonuses,
+spell choices, rest-time feature options and damage riders. The fixed smoke matrix does not prove
+all combinations; manual Paladin, Monk and Rogue production-export checks still cover only their
+documented flows. Engine/roll-helper tests, type checks and production builds do not substitute for
+a complete rendered interaction audit. The browser gate is scoped in
+[Browser verification](testing/browser-verification.md).

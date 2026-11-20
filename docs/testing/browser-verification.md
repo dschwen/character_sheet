@@ -20,6 +20,30 @@ same suite.
 
 ## What the suite verifies
 
+`healing-flow.spec.ts` checks Second Wind's authored d10 + level, actual capped HP restoration,
+one resource spend per use, retained roll feedback, unavailable/exhausted actions, Undo and reload.
+It also checks invalid/over-budget Lay on Hands spending and Cure Wounds' slot confirmation,
+Life Cleric healing dice/modifier, explicit manual healing, and preservation of the cast when that
+manual healing is undone. The Second Wind test uses the real fullscreen d10 with the render guard
+enabled; inward collision faces are not accepted as expected console errors.
+
+`spell-effects.spec.ts` casts Bless and Shield of Faith and verifies the named target-status
+instruction, slot cost, concentration replacement, removal of stale confirmation on Undo, and
+reload. A separate recipient fixture is then explicitly toggled: Blessed adds its d4 to a rendered
+saving throw; Shield of Faith adds and removes 2 AC. Recipient changes support Undo and reload;
+casting does not silently apply statuses or modify another character.
+
+`spell-preparation.spec.ts` verifies Wizard spellbook-only choices, count bounds, incomplete-save
+blocking, Cancel, Save, Undo, casting eligibility and reload without changing build or play state.
+Cleric coverage checks full-list choices, always-prepared spells excluded from the budget, and exclusion of unlisted or
+too-high-level choices. Bard and Sorcerer cannot use daily preparation to bypass level-up-only
+replacement rules. All three new specs run at both configured viewports; they are representative
+checks, not a complete spell, feature, or level-1–5 semantic audit.
+
+The vendored geometry unit test separately checks all six die types at three scales for closed
+edges, outward triangles, convexity and the expected number of labeled faces. The d10 has ten
+coplanar kite faces (twenty triangles), rather than an open set of ten triangles.
+
 `legacy-tool-choices.spec.ts` checks empty initial selections, Cancel/Escape without mutation,
 explicit Apply, Undo, reload persistence and source-specific tool pools for old saves. Bard and
 Monk are tested at their metadata-defined level caps; missing feat histories block confirmation

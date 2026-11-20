@@ -1,5 +1,6 @@
 import { expect, test as base } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
+import type { CharacterDocument } from "@dnd/character-model";
 
 export const CHARACTER_NAME = "E2E Verify";
 
@@ -29,6 +30,14 @@ export const test = base.extend<RenderGuardFixture>({
 });
 
 export { expect };
+
+export async function savedCharacter(page: Page): Promise<CharacterDocument> {
+  return page.evaluate(() => {
+    const saved = localStorage.getItem("dnd-character-manager.document.v1");
+    if (saved === null) throw new Error("No browser-local character was saved");
+    return JSON.parse(saved) as CharacterDocument;
+  });
+}
 
 export function sectionNav(page: Page): Locator {
   return page.getByRole("navigation", { name: "Character sheet sections" });

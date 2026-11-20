@@ -115,7 +115,7 @@ function d4VertexOverlays(vertices, faces, labels, radius, opts) {
 }
 
 function convexFromGeometry(geometry) {
-  const g = geometry.toNonIndexed();
+  const g = geometry.index ? geometry.toNonIndexed() : geometry;
   const pos = g.getAttribute('position');
   const vertices = [];
   const faces = [];

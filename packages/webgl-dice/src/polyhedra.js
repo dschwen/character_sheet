@@ -21,7 +21,7 @@ function geometryFaces(geometry) {
 }
 
 function mergeCoplanarTriangles(geometry, epsilon = 1e-4) {
-  const nonIndexed = geometry.toNonIndexed();
+  const nonIndexed = geometry.index ? geometry.toNonIndexed() : geometry;
   const pos = nonIndexed.getAttribute('position');
   const groups = [];
 
@@ -71,7 +71,9 @@ function makeD10Geometry(radius = 1) {
   // Pentagonal trapezohedron: 2 poles + alternating upper/lower rings.
   const vertices = [[0, radius * 1.08, 0], [0, -radius * 1.08, 0]];
   const ringR = radius * 0.95;
-  const y = radius * 0.24;
+  // Keep each pole and its three ring vertices coplanar, making ten true kite faces.
+  const halfStepCos = Math.cos(Math.PI / 5);
+  const y = radius * 1.08 * (1 - halfStepCos) / (1 + halfStepCos);
   for (let i = 0; i < 10; i++) {
     const a = i * Math.PI / 5;
     vertices.push([ringR * Math.cos(a), i % 2 === 0 ? y : -y, ringR * Math.sin(a)]);
@@ -80,11 +82,20 @@ function makeD10Geometry(radius = 1) {
   for (let i = 0; i < 10; i++) {
     const cur = 2 + i;
     const next = 2 + ((i + 1) % 10);
-    if (i % 2 === 0) faces.push([0, cur, next]);
-    else faces.push([1, next, cur]);
+    const end = 2 + ((i + 2) % 10);
+    const pole = i % 2 === 0 ? 0 : 1;
+    faces.push([pole, cur, next], [pole, next, end]);
   }
   const positions = [];
-  for (const f of faces) for (const idx of f) positions.push(...vertices[idx]);
+  for (const [ai, bi, ci] of faces) {
+    const a = new THREE.Vector3(...vertices[ai]);
+    const b = new THREE.Vector3(...vertices[bi]);
+    const c = new THREE.Vector3(...vertices[ci]);
+    const normal = new THREE.Vector3().crossVectors(b.clone().sub(a), c.clone().sub(a));
+    // Cannon and the visible mesh both require outward (counterclockwise) winding.
+    const face = normal.dot(a) > 0 ? [ai, bi, ci] : [ai, ci, bi];
+    for (const idx of face) positions.push(...vertices[idx]);
+  }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   g.computeVertexNormals();

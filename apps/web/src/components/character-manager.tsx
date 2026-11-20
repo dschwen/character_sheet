@@ -1000,6 +1000,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     if (previousCharacter === undefined) return;
     setCharacter(previousCharacter);
     clearLatestRoll();
+    setCastFeedback(undefined);
     setPreviousCharacter(undefined);
     setSource("browser-save");
     setNotice("Undid the last character change.");
@@ -1306,10 +1307,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         ({ id }) => id === action.parameters?.activatesEffectId,
       );
       const effectDescription = objectValue(activatedEffect?.body)?.description;
+      const healingMessage =
+        objectValue(action.parameters?.healing) === undefined
+          ? ""
+          : `Restored ${String(proposal.nextState.currentHitPoints - character.state.currentHitPoints)} HP.`;
       applyTransition(
         proposal,
         turnStart === undefined
-          ? `${actionName} applied (${String(proposal.changes.length)} changes). ${actionMovementMessage(action) ?? ""} ${typeof effectDescription === "string" ? effectDescription : ""} ${(proposal.guidance ?? []).join(" ")}`.trim()
+          ? `${actionName} applied (${String(proposal.changes.length)} changes). ${healingMessage} ${actionMovementMessage(action) ?? ""} ${typeof effectDescription === "string" ? effectDescription : ""} ${(proposal.guidance ?? []).join(" ")}`.trim()
           : `${actionName}: Heroic Inspiration gained. No action or resource spent. ${(proposal.guidance ?? []).join(" ")}`,
       );
       if (proposal.applicable && turnStart !== undefined)
@@ -1324,6 +1329,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             ? applyPostRollBonus(action, previousRoll, actionRoll.dice, actionName)
             : previousRoll,
         );
+      } else if (proposal.applicable && actionRoll !== undefined) {
+        // Committing the state invalidates old rolls; retain this action's own completed roll.
+        setLatestRoll(actionRoll);
       }
     } catch (error) {
       setNotice(`Action failed: ${errorMessage(error)}`);
