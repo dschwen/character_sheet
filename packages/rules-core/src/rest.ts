@@ -725,7 +725,21 @@ export function proposeRest(
     );
   }
   const spending = validateHitDieSpending(input, character, request, validations);
-  const evaluation = evaluateCharacter({ ...input, character });
+  const evaluation = evaluateCharacter({ ...input, character: { ...character, build: nextBuild } });
+  if (request.featureChoiceReplacements.length > 0) {
+    for (const issue of evaluation.validations.filter(
+      (issue) =>
+        issue.severity === "error" &&
+        issue.paths.some((path) => path.startsWith("loadout.preparedSpellIds")),
+    )) {
+      validation(
+        validations,
+        "REST_PREPARED_SPELL_CONFLICT",
+        `${issue.message.en ?? issue.code} Replace conflicting ordinary preparations in your spell loadout before completing this rest. No replacement spell was chosen automatically.`,
+        issue.paths,
+      );
+    }
+  }
   validateSpellSlotRecovery(request, evaluation, validations);
   if (validations.some((message) => message.severity === "error")) {
     return {

@@ -27,7 +27,7 @@
             "srd521.skill.religion"
           ],
           "minimumLevel": 2,
-          "requireClassProficiency": true,
+          "requireClassProficiency": false,
           "sourceId": "srd521.class-feature.wizard.scholar"
         },
         "supportedLevelMaximum": 9,

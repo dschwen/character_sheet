@@ -1450,10 +1450,16 @@
       "alwaysPreparedSpells": {},
       "description": "The Circle of the Land comprises mystics and sages who safeguard ancient knowledge and rites. These Druids meet within sacred circles of trees or standing stones to whisper primal secrets in Druidic. The circle’s wisest members preside as the chief priests of their communities.",
       "landChoice": {
+        "changeOn": [
+          "long-rest"
+        ],
         "id": "srd521.choice.druid.circle-of-land",
         "level": 3,
         "maximum": 1,
         "minimum": 1,
+        "optionSelection": {
+          "sourceFeatureId": "srd521.subclass-feature.druid.circle-of-the-land.circle-of-the-land-spells"
+        },
         "options": [
           "srd521.option.druid.land.arid",
           "srd521.option.druid.land.polar",

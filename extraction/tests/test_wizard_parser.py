@@ -15,6 +15,7 @@ def test_wizard_starting_equipment_preserves_package_and_gold_choices() -> None:
     equipment = entity["body"]["startingEquipment"]
     assert entity["body"]["builder"]["supportedLevelMaximum"] == 9
     assert entity["body"]["skillProficiencyChoice"]["countByLevel"]["9"] == 2
+    assert entity["body"]["builder"]["expertiseChoice"]["requireClassProficiency"] is False
 
     assert [option["currencyGp"] for option in equipment["options"]] == [5, 55]
     assert equipment["options"][0]["items"][1] == {

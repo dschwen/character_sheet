@@ -658,6 +658,10 @@ def _circle_entities(
                 "level": 3,
                 "minimum": 1,
                 "maximum": 1,
+                "changeOn": ["long-rest"],
+                "optionSelection": {
+                    "sourceFeatureId": spells_feature["id"],
+                },
                 "options": list(LAND_OPTION_IDS.values()),
             },
             "alwaysPreparedSpells": {},

@@ -17,6 +17,14 @@ choice schemas and shared resolvers, not through new per-class React branches.
 This is an engineering audit, not independent human extraction/semantics/test approval. No
 review decisions, generated rules, application code or existing character documents were changed.
 
+### Subsequent remediation
+
+F1 and F2 are addressed by the [Scholar/land-rest repair slice](../rules-engine/scholar-and-land-rest.md):
+shared metadata-driven Expertise count/pool validation, all proficiency sources for Scholar,
+source-linked Long Rest land selection, and explicit preparation-conflict handling. The findings
+below describe the audited baseline, not the repaired behavior. F3-F8 remain open; this remediation
+does not create independent human review approvals.
+
 ## Scope and evidence
 
 - Pinned [SRD 5.2.1 PDF](../../sources/wotc-srd-5.2.1-en/8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87/source.pdf).

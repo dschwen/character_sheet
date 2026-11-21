@@ -20,6 +20,11 @@ same suite.
 
 ## What the suite verifies
 
+`scholar-and-land.spec.ts` checks Scholar Expertise from Skilled, source inspection,
+reload/advancement preservation and invalid-import diagnostics. It also checks Circle of the Land
+draft-only choices, Short Rest exclusion, Long Rest application, Undo, updated spell pools,
+reload/advancement and explicit preparation-conflict repair. Both viewports run these flows.
+
 `healing-flow.spec.ts` checks Second Wind's authored d10 + level, actual capped HP restoration,
 one resource spend per use, retained roll feedback, unavailable/exhausted actions, Undo and reload.
 It also checks invalid/over-budget Lay on Hands spending and Cure Wounds' slot confirmation,

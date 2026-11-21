@@ -47,5 +47,6 @@ These limits remain intentionally roll-assisted:
 - Wild Companion supports spending Wild Shape; its alternative spell-slot payment is not yet an
   action transition.
 - Wild Resurgence’s conversion between a spell slot and Wild Shape remains descriptive.
-- A Circle land can be changed by editing the persisted selection after a Long Rest; the rest
-  transition does not choose a new land automatically.
+- Circle land changes now use the shared Play → Rest editor and commit only on a Long Rest.
+  An ordinary-preparation collision requires an explicit replacement first; no spell is chosen
+  automatically. See [Scholar and land-rest repairs](scholar-and-land-rest.md).

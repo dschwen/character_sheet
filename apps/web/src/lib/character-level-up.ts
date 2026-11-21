@@ -353,6 +353,27 @@ function advancementIssues(
   const selectedClass = catalog.classes[eligibility.classId];
   const targetLevel = eligibility.targetLevel;
   const expertiseSources = expertiseSelectionSources(draft, catalog);
+  const expertiseDefinition = selectedClass.builder.expertiseChoice;
+  if (expertiseDefinition !== undefined) {
+    const previousSources = expertiseSelectionSources(
+      { classId: eligibility.classId, level: eligibility.currentLevel },
+      catalog,
+    );
+    const declaredSources = new Set([
+      expertiseDefinition.sourceId,
+      ...(expertiseDefinition.grants?.map(({ sourceId }) => sourceId) ?? []),
+    ]);
+    if (
+      [...declaredSources].some(
+        (id) =>
+          character.build.proficiencyChoices.expertise.filter(({ sourceId }) => sourceId === id)
+            .length !== previousSources.filter((sourceId) => sourceId === id).length,
+      )
+    )
+      issues.push(
+        "Existing Expertise records must match their granted counts before leveling up. Record missing choices explicitly.",
+      );
+  }
   if (
     character.build.proficiencyChoices.expertise.some(
       (choice) =>

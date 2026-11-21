@@ -1,11 +1,54 @@
+from typing import Any
+
 import pytest
 
 from srd_extract.druid import (
     DruidProgressionRow,
+    _circle_entities,
     _class_entity,
     _starting_equipment,
     parse_core_traits,
 )
+
+
+def test_circle_land_is_a_source_linked_long_rest_choice() -> None:
+    def node(kind: str, text: str) -> dict[str, Any]:
+        return {
+            "kind": kind,
+            "normalizedText": text,
+            "parentId": "page-0046",
+            "sourceBlocks": [text],
+        }
+
+    land_nodes = []
+    for name in ("Arid Land", "Polar Land", "Temperate Land", "Tropical Land"):
+        land_nodes.extend(
+            [
+                node("HeadingNode", name),
+                node("TableNode", "3 Fire Bolt 5 Fireball"),
+            ]
+        )
+    feature = {
+        "id": "srd521.subclass-feature.druid.circle-of-the-land.circle-of-the-land-spells",
+        "level": 3,
+        "name": "Circle of the Land Spells",
+        "bodyNodes": land_nodes,
+        "source": [],
+    }
+    entities = _circle_entities(
+        {
+            "nodes": [
+                node("HeadingNode", "Circle of the Land"),
+                node("ParagraphNode", "Circle introduction"),
+            ]
+        },
+        (feature,),
+    )
+    subclass = next(entity for entity in entities if entity["kind"] == "subclass")
+    choice = subclass["body"]["landChoice"]
+    assert choice["changeOn"] == ["long-rest"]
+    assert choice["optionSelection"] == {"sourceFeatureId": feature["id"]}
+    assert len(choice["options"]) == 4
 
 
 def test_parse_core_druid_traits() -> None:

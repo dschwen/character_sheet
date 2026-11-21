@@ -39,13 +39,21 @@ test("Second Wind rolls its authored die, heals once and preserves feedback unti
   expect(await savedCharacter(page)).toEqual(after);
   // A fresh use is undoable as one state change, including its resource expenditure.
   await openSection(page, "Play");
+  // The first roll may fill HP, which correctly disables Second Wind. Explicitly
+  // take damage before testing a second use rather than relying on a low roll.
+  await page
+    .getByLabel("Damage or healing amount", { exact: true })
+    .fill(String(after.state.temporaryHitPoints + 1));
+  await page.getByRole("button", { name: "Apply damage", exact: true }).click();
+  const beforeSecondUse = await savedCharacter(page);
+  expect(beforeSecondUse.state.currentHitPoints).toBe(after.state.currentHitPoints - 1);
   await action.getByRole("button", { name: "Use & roll", exact: true }).click();
   await expect(result).toContainText("1d10 rolled:", { timeout: 20000 });
   await expect(action.getByRole("button", { name: "Use & roll", exact: true })).toBeDisabled();
   await openSection(page, "Play");
   await page.getByRole("button", { name: /Undo last state change/ }).click();
   await expect(result).toHaveCount(0);
-  expect(await savedCharacter(page)).toEqual(after);
+  expect(await savedCharacter(page)).toEqual(beforeSecondUse);
   await page.getByRole("button", { name: "Incapacitated", exact: true }).click();
   await openSection(page, "Play");
   await expect(action.getByRole("button", { name: "Use & roll", exact: true })).toBeDisabled();

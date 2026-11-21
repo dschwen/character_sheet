@@ -636,7 +636,7 @@ def _class_entity(
                         "srd521.skill.nature",
                         "srd521.skill.religion",
                     ],
-                    "requireClassProficiency": True,
+                    "requireClassProficiency": False,
                 },
             },
             "spellcastingAbility": "intelligence",

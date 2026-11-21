@@ -2,6 +2,7 @@ import { z } from "zod";
 import { resolveToolGrants } from "./tool-proficiencies.js";
 import { preparedSpellLists } from "./prepared-spell-lists.js";
 import { validateFeatureOptionChoices, validFeatureOptionIds } from "./feature-option-choices.js";
+import { validateExpertiseChoices } from "./expertise-choices.js";
 
 import type {
   CalculationTrace,
@@ -2287,7 +2288,6 @@ function validateProgressionSelections(
   const rogueLevel = classLevelCounts.get("srd521.class.rogue") ?? 0;
   const sorcererLevel = classLevelCounts.get("srd521.class.sorcerer") ?? 0;
   const warlockLevel = classLevelCounts.get("srd521.class.warlock") ?? 0;
-  const bardLevel = classLevelCounts.get("srd521.class.bard") ?? 0;
   const subclass =
     character.build.subclassId === undefined
       ? undefined
@@ -2603,52 +2603,6 @@ function validateProgressionSelections(
       "RANGER_HUNTERS_PREY_OPTION_INVALID",
       "The selected Hunter’s Prey option is not supported by the loaded Ranger content.",
       ["build.levels"],
-    );
-  }
-  const deftExplorerExpertise = character.build.proficiencyChoices.expertise.filter(
-    (choice) => choice.sourceId === "srd521.class-feature.ranger.deft-explorer",
-  );
-  if (deftExplorerExpertise.length !== (rangerLevel >= 2 ? 1 : 0)) {
-    addValidation(
-      state,
-      "RANGER_DEFT_EXPLORER_EXPERTISE_COUNT",
-      "A Ranger of level 2 or higher selects one proficient skill for Deft Explorer Expertise.",
-      ["build.proficiencyChoices.expertise"],
-    );
-  }
-  const rangerExpertise = character.build.proficiencyChoices.expertise.filter(
-    (choice) => choice.sourceId === "srd521.class-feature.ranger.expertise",
-  );
-  if (rangerExpertise.length !== (rangerLevel >= 9 ? 2 : 0)) {
-    addValidation(
-      state,
-      "RANGER_EXPERTISE_COUNT",
-      "A Ranger gains two additional Expertise selections from its level-9 Expertise feature.",
-      ["build.proficiencyChoices.expertise"],
-    );
-  }
-  const rogueExpertise = character.build.proficiencyChoices.expertise.filter(
-    (choice) => choice.sourceId === "srd521.class-feature.rogue.expertise",
-  );
-  const expectedRogueExpertise = rogueLevel >= 6 ? 4 : rogueLevel > 0 ? 2 : 0;
-  if (rogueExpertise.length !== expectedRogueExpertise) {
-    addValidation(
-      state,
-      "ROGUE_EXPERTISE_CHOICE_COUNT",
-      `A Rogue of level ${String(rogueLevel)} requires ${String(expectedRogueExpertise)} Expertise selections.`,
-      ["build.proficiencyChoices.expertise"],
-    );
-  }
-  const bardExpertise = character.build.proficiencyChoices.expertise.filter(
-    (choice) => choice.sourceId === "srd521.class-feature.bard.expertise",
-  );
-  const expectedBardExpertise = bardLevel >= 9 ? 4 : bardLevel >= 2 ? 2 : 0;
-  if (bardExpertise.length !== expectedBardExpertise) {
-    addValidation(
-      state,
-      "BARD_EXPERTISE_CHOICE_COUNT",
-      `A Bard of level ${String(bardLevel)} requires ${String(expectedBardExpertise)} Expertise selections.`,
-      ["build.proficiencyChoices.expertise"],
     );
   }
   const metamagicSelections = character.build.levels
@@ -7120,6 +7074,9 @@ function evaluateAttacks(
     classLevels.set(level.classId, (classLevels.get(level.classId) ?? 0) + 1);
   const granted = grantedFeatureIds(classLevels, index);
   grantSubclassFeatures(character, classLevels, index, granted);
+  state.validations.push(
+    ...validateExpertiseChoices(character, [...index.entities.values()], granted),
+  );
   const masteryReplacements = [...granted].flatMap((id) => {
     const entity = index.entities.get(id);
     const body = featureAutomationBodySchema.safeParse(entity?.body);
