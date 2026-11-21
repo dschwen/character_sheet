@@ -6,6 +6,10 @@ because some of its functionality exists or tests pass.
 
 ## Current evidence
 
+- The [level-1-5 feat and progression-choice audit](audits/level-1-5-feats-and-choices.md) finds
+  all ten eligible SRD feat names represented, but eight groups of incomplete/incorrect choices.
+  Scholar validation/eligibility, land-rest changes, invocation grants/prerequisites and ordinary
+  cantrip replacement remain blockers. This engineering audit adds no human review approvals.
 - Representative level-1–5 healing, ally-buff and spell-preparation browser flows now run at
   desktop and narrow widths. Second Wind retains its completed roll and reports actual healing;
   Undo clears stale cast confirmation. The d10 mesh is now closed, convex and outward-wound, with
