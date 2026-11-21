@@ -92,14 +92,15 @@ Selectors use roles and accessible names, not test ids, because the app has no t
 ## What the suite does not yet cover
 
 - It is one fixed smoke matrix, not the complete interaction audit. Earlier healing, aura,
-  recovery, Play-view spell selection, rest-time, and damage-rider controls are not exercised
-  here.
+  recovery, Play-view spell selection and damage-rider controls remain incompletely exercised.
+  Rest-time coverage includes Circle of the Land but not every rest-replaceable feature.
 - The axe scans cover two page states (initial sheet, builder dialog), not the Play/Combat/
   Spells/Features/Diagnostics tabs or the level-up dialog, and only critical/serious impacts.
-- The creation/advancement matrix covers Fighter, Bard, Wizard, Paladin and Ranger, not all twelve
-  classes or all legal choices. It covers Fighter 1→2, 3→4, and 4→5, Bard 10→11, and Wizard
-  4→5 for each ritual variant. Only two of thirteen condition toggles are exercised. Full
-  short-rest/long-rest, other dice, spell casting, inventory, and death-save flows remain uncovered.
+- The creation/advancement matrix covers Fighter, Bard, Wizard, Druid, Paladin and Ranger, not all
+  twelve classes or all legal choices. In addition to feat/warrior flows, it covers Bard 10→11,
+  Wizard Scholar 2→3 and malformed-save advancement blocking, Wizard 4→5 for each ritual variant,
+  and Druid 5→6 with a confirmed terrain choice. Only a few condition toggles are exercised. Full
+  rest/recovery, other dice, spell casting, inventory and death-save interaction matrices remain open.
 - `ritual-caster` asserts the builder presentation, selection bounds, level-up rules, and sheet
   attribution; it does not cast a granted spell in the Play view, use the Quick Ritual resource,
   or research a 2014 book spell (research is a play-time flow the UI does not expose).

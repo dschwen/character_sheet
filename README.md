@@ -5,12 +5,17 @@ currently provides strict schemas, reproducible source extraction, a validated c
 reviewable authoring IR, a traced declarative rules evaluator with atomic state-transition
 proposals, and a local-first web character sheet.
 
+New developers: read the [handoff guide](docs/developer-handoff.md),
+[updated implementation plan](dnd_srd_character_manager_implementation_plan.md#0-current-execution-plan-and-handoff)
+and [remaining milestone gates](docs/implementation-status.md) before choosing work.
+
 ## Use it now
 
 Install the workspace and start the web interface:
 
 ```bash
 corepack pnpm install
+corepack pnpm build
 corepack pnpm web
 ```
 
@@ -31,8 +36,10 @@ is emitted as a static site in `apps/web/out` by `corepack pnpm build`.
 
 Choose **New character** to open the guided Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin,
 Ranger, Rogue, Sorcerer, Warlock, and Wizard builder. It
-creates rules-valid characters through each class's reviewed limit with Human or Dwarf and all four SRD backgrounds,
-class-specific abilities and skills, reviewed subclasses, and complete choice validation.
+creates characters through each class's implemented limit with all nine SRD species and four SRD
+backgrounds, class-specific abilities and skills, and the SRD subclasses. Builder validation does
+not establish complete rules coverage or independent review; see the
+[level-1–5 audit](docs/audits/level-1-5-feats-and-choices.md).
 Barbarians gain Primal
 Knowledge, choose only eligible melee Weapon Masteries, and follow the Path of the Berserker.
 Bards choose any three skills, gain Expertise and Jack of All Trades, prepare Bard spells, use
@@ -256,9 +263,10 @@ corepack pnpm character packages/test-fixtures/characters/wizard-5.json --json
 
 Character JSON remains the source document: copy one of the reviewed fixtures, give it a new ID and
 name, and edit its choices and play-state. The schemas reject malformed documents, and the engine
-reports rules-invalid choices without changing the input. The builder currently covers the complete
-level 1–8 builder and advancement slices for all twelve SRD classes, with
-every standard SRD background and species. Higher levels and multiclassing are the next builder increments.
+reports rules-invalid choices without changing the input. The implemented builder/advancement caps
+are Bard 11, Barbarian/Fighter 10, and the other nine classes 9; see
+[coverage](docs/coverage/README.md). Lower-level choice gaps remain, and repairing them is the
+next priority before extending progression. Multiclass creation is not implemented.
 Direct JSON import remains available in the meantime.
 
 ## Requirements

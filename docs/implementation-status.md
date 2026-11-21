@@ -4,6 +4,11 @@ This tracks the original `dnd_srd_character_manager_implementation_plan.md`; it 
 reduce its scope. The full goal is not yet complete. A milestone is not considered finished just
 because some of its functionality exists or tests pass.
 
+Handoff updated 2026-11-21 against implementation commit `92e5acf`. Start with the
+[developer handoff](developer-handoff.md) for setup, current limits and the active backlog.
+The detailed progression entries below are chronological evidence, not instructions to repeat
+already delivered slices. Generated [coverage](coverage/README.md) is the current level-cap snapshot.
+
 ## Current evidence
 
 - The [level-1-5 feat and progression-choice audit](audits/level-1-5-feats-and-choices.md) finds
@@ -53,9 +58,11 @@ because some of its functionality exists or tests pass.
 - Human review of extracted records now runs through a durable ledger: `srd_extract.review
 queue|inspect|record|apply` flags unreviewed and changed records, pins each approval to exact
   rules content and verified source spans, and promotes only fresh pinned approvals into the
-  generated records. See [Review workflow](rules-authoring/review-workflow.md). The current queue
-  flags all 63 extracted records as needing semantics and test review; no approvals have been
-  recorded yet.
+  generated records. See [Review workflow](rules-authoring/review-workflow.md). The checked-in
+  generated snapshot reports zero applied semantics/test approvals over 63 records. The last audit's
+  live queue found eight clean records and 55 awaiting those decisions, using local untracked human
+  review records. Inspect the live queue before applying decisions; a fresh clone does not include
+  that ledger. See the [audit evidence](audits/level-1-5-feats-and-choices.md#scope-and-evidence).
 - A Playwright browser gate in `apps/web/e2e` drives the production static export in Chromium at
   desktop and narrow viewports: builder creation, reload persistence, a Fighter level up with its
   feature grant, a spellcaster level up with its prepared-spell growth and opened spell options,
@@ -266,15 +273,19 @@ the plan's explicit deferred work, not a character-sheet completion gate.
 
 ## Working sequence
 
-1. Complete single-class progression with source-linked data, shared engine semantics, UI controls,
-   positive/negative/interaction tests, documentation, and checkpoint commits.
-2. Implement multiclassing and magic items against the same data-driven architecture.
-3. Close extraction, review, provenance, reproducibility, and hardening gaps.
+1. Close the level-1–5 audit gaps: F5 cantrip replacement (advancement, then Wizard Long Rest),
+   F3 nested invocation grants, F4 repeatability/prerequisites, then F6–F8 language/HP/mastery choices.
+   F1/F2 are already addressed. Use the [handoff acceptance criteria](developer-handoff.md#next-work-and-acceptance-criteria).
+2. Re-audit levels 1–5, obtain independent review, and continue single-class progression with shared
+   semantics, metadata-driven UI, interaction/browser tests, documentation and checkpoint commits.
+3. Implement multiclassing and magic items; close extraction, provenance, reproducibility and
+   hardening gaps without treating automated passes as human review approvals.
 4. Audit each requirement and exit criterion in the original plan against authoritative artifacts,
    commands, tests, and rendered behavior before marking the overall goal complete.
 
 Browser coverage now reaches Second Wind, Lay on Hands, Cure Wounds, Bless/Shield of Faith recipient
-statuses, Wizard/Cleric preparation and Bard/Sorcerer daily-preparation restrictions. Broader
+statuses, Wizard/Cleric preparation, Bard/Sorcerer daily-preparation restrictions, Scholar choices
+and Circle of the Land rest changes (including Undo and preparation conflicts). Broader
 verification remains outstanding for other healing features, auras, recovery, post-roll bonuses,
 spell choices, rest-time feature options and damage riders. The fixed smoke matrix does not prove
 all combinations; manual Paladin, Monk and Rogue production-export checks still cover only their

@@ -4,9 +4,59 @@
 
 **Target ruleset:** System Reference Document 5.2.1 (2024/“5.5e” rules)
 
-**Plan version:** 0.1
+**Plan version:** 0.2 — implementation handoff
 
 **Prepared:** 2026-07-29
+
+**Updated:** 2026-11-21. Implementation baseline: `92e5acf`.
+
+## 0. Current execution plan and handoff
+
+Start with the [developer handoff](docs/developer-handoff.md), then read
+[implementation status and milestone gates](docs/implementation-status.md) and the
+[level-1–5 choice audit](docs/audits/level-1-5-feats-and-choices.md).
+The numbered design sections below retain the full product scope; illustrative interfaces,
+directory layouts, original estimates and initial tickets are not descriptions of finished code.
+The checked-in schemas, ADRs and package scripts describe the current implementation.
+
+### 0.1 Delivered versus verified
+
+- The local-first Next.js web frontend already exists, including creation, same-class advancement,
+  sheet inspection, inventory, spell preparation, fullscreen dice and reversible play-state changes.
+  It exports a static site; accounts, cloud persistence and multiclass creation are not implemented.
+- Implemented creation/advancement caps: Bard 11; Barbarian and Fighter 10; the other nine classes 9.
+  See the generated [coverage report](docs/coverage/README.md) for exact per-class limits.
+  Level-20 content tables do not establish level-20 workflow or mechanic support.
+- All ten level-1–5-eligible SRD feat names have ordinary acquisition paths, but the choice audit
+  found eight gap groups. F1 (Scholar eligibility/validation) and F2 (land-rest changes) were repaired
+  in `92e5acf`; F3–F8 remain open. The level-1–5 milestone is not complete.
+- At that baseline, 1,262 unit/integration tests, 183 extraction tests and 74 desktop/narrow browser
+  checks passed, along with build, lint and type checks. These are scoped engineering evidence,
+  not independent human rules approval or a fresh-clone completion audit.
+- Generated review coverage still reports 63 IR records with zero applied semantics/test approvals.
+  Local untracked review decisions exist; transfer them deliberately and inspect the live queue
+  before reconciling them. Do not infer absence of human work from the generated snapshot.
+
+### 0.2 Active implementation order
+
+1. **F5a — ordinary class cantrip replacement on advancement:** emit the existing shared level-up
+   policy for Cleric, Druid and Sorcerer; validate at most one replacement, including count-growth
+   levels, and preserve unrelated spell sources and earlier choices.
+2. **F5b — Wizard Long Rest cantrip replacement:** introduce a shared typed rest-time policy,
+   proposal and editor, with explicit selection, atomic persistence, Undo and reload tests.
+   Daily leveled-spell preparation is not a substitute.
+3. **F3, then F4 — invocation acquisitions:** model nested feat/spell grants before repeatable
+   per-acquisition targets and complete prerequisites. Include Lessons, Chain and Tome; do not
+   treat displaying their option names as implementing their benefits.
+4. **F6–F8 — remaining recorded choices:** languages, rolled/fixed HP controls, then Long Rest
+   weapon-mastery reselection, each with source-linked records and legacy-save handling.
+5. Re-audit levels 1–5 and obtain independent review; resume higher-level progression against
+   the remaining milestone gates. Multiclassing, magic items and beta hardening remain in scope.
+
+The [handoff backlog](docs/developer-handoff.md#next-work-and-acceptance-criteria) gives entry points,
+dependencies and acceptance criteria. Deliver each slice through source generators, shared schemas
+and resolvers, metadata-driven UI, positive/negative tests, browser verification, documentation and
+a checkpoint commit. No new per-class React rule branches or invented legacy choices.
 
 ---
 
@@ -1176,7 +1226,8 @@ Do not hard-code wizard pages for each class. Build UI controls from `ChoiceDefi
 
 ### 11.3 Sheet behavior
 
-Every calculated field opens an explanation panel containing:
+Shift-click a calculated field to open its explanation panel; an ordinary click on a rollable
+field performs the dice roll. The explanation contains:
 
 - selected calculation;
 - all contributions;
@@ -1351,6 +1402,8 @@ A release report should state exact coverage rather than “all rules supported.
 ## 14. Concrete implementation milestones
 
 The estimates below are person-weeks for one experienced developer using coding assistance. They are ranges, not commitments.
+They are original planning estimates, not remaining-work estimates. Current gate evidence is tracked
+in [implementation status](docs/implementation-status.md); none is closed merely by extending a level cap.
 
 ### Milestone 0 — decisions and skeleton (1 week)
 
@@ -1532,6 +1585,10 @@ Exit criteria:
 
 ## 15. First 30 implementation tickets
 
+This is the historical bootstrap backlog, not the next team's execution queue. Audit unfinished
+exit criteria against current code rather than recreating implemented components. Start new work
+with §0.2 and the [handoff backlog](docs/developer-handoff.md#next-work-and-acceptance-criteria).
+
 1. Create monorepo and CI.
 2. Define package boundaries and dependency rules.
 3. Add `source-manifest.schema.json`.
@@ -1613,6 +1670,10 @@ The app should never silently invent a GM ruling. It can present a choice or ask
 ## 18. Homebrew and non-SRD content
 
 Design packages now, but release homebrew authoring after the SRD engine stabilizes.
+The current package also contains two explicitly labeled out-of-SRD Ritual Caster edition-reference
+records under [ADR 0013](docs/adr/0013-out-of-source-edition-reference-records.md).
+They are not SRD extraction or SRD coverage; their presence does not close the beta's content and
+distribution gates or authorize adding other book text.
 
 Homebrew packages should:
 
@@ -1707,7 +1768,14 @@ The beta is ready when:
 
 ## 23. Immediate recommended next step
 
-Implement one end-to-end proof of concept before extracting the entire PDF:
+Implement F5a from §0.2 first, then F5b. Read the pinned source passages and existing Bard/Warlock
+cantrip-replacement flow before changing schemas. The [handoff guide](docs/developer-handoff.md)
+contains setup, code entry points, acceptance criteria, verification commands and transfer risks.
+Do not restart the extraction proof of concept or build a second web frontend.
+
+### Historical proof-of-concept rationale
+
+The original starting recommendation, retained as design context, was:
 
 ```text
 SRD pages 28–30

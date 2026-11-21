@@ -5,8 +5,9 @@
 
 ## Decision
 
-Some rules content exists only in books outside the pinned source (for example, the Ritual Caster
-feat is present in no SRD edition; only Ability Score Improvement and Grappler appear in SRD 5.2.1).
+Some rules content exists only in books outside the pinned source (for example, the explicitly
+authored Ritual Caster edition variants described here). This exception is not an enumeration of
+SRD feats; see the [level-1–5 audit](../audits/level-1-5-feats-and-choices.md) for that inventory.
 Such a record may carry an `edition-reference` source span instead of a pinned-source span: an
 explicit edition and book, an optional reference URL, a note, and a quote hash of the record's own
 stored rules text — and no page or blocks, because there is no pinned-source span to cite.
