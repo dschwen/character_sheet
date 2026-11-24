@@ -72,7 +72,7 @@ describe("bootstrap content package", () => {
     expect(packageManifestSchema.parse(manifest).id).toBe("srd-5.2.1");
     const parsedEntities = contentEntitySchema.array().parse(entities);
     const entityIds = parsedEntities.map((entity) => entity.id);
-    expect(parsedEntities).toHaveLength(913);
+    expect(parsedEntities).toHaveLength(937);
     expect(entityIds[0]).toBe("srd521.class.barbarian");
     expect(entityIds).toContain("srd521.class-feature.barbarian.rage");
     expect(entityIds).toEqual(
@@ -83,6 +83,9 @@ describe("bootstrap content package", () => {
         "srd521.spell.shocking-grasp",
         "srd521.status.spell.bless",
         "srd521.status.spell.haste",
+        "srd521.status.spell.haste-lethargy",
+        "srd521.magic-item.cloak-of-protection",
+        "srd521.magic-item.ring-of-swimming",
       ]),
     );
     expect(entityIds).toContain("srd521.class-feature.barbarian.unarmored-defense");
@@ -778,13 +781,14 @@ describe("bootstrap content package", () => {
     const gear = entities.filter((entity) => entity.kind === "equipment-gear");
     const ammunition = entities.filter((entity) => entity.kind === "equipment-ammunition");
 
-    expect(entities).toHaveLength(138);
-    expect(gear).toHaveLength(82);
+    expect(entities).toHaveLength(141);
+    expect(gear).toHaveLength(85);
     expect(ammunition).toHaveLength(5);
     expect(gear.map((entity) => entity.id)).toEqual(
       expect.arrayContaining([
         "srd521.equipment.gear.dungeoneers-pack",
         "srd521.equipment.gear.explorers-pack",
+        "srd521.equipment.gear.find-familiar-incense",
         "srd521.equipment.gear.quiver",
         "srd521.equipment.gear.robe",
         "srd521.equipment.gear.scholars-pack",

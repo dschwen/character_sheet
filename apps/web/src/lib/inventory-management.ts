@@ -5,6 +5,8 @@ import {
   type CurrencyDenomination,
 } from "@dnd/character-model";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
+import { resolveAttunement } from "@dnd/rules-core";
+import { isSpellcastingImplement } from "./spell-components";
 
 const copperValues: Readonly<Record<CurrencyDenomination, number>> = {
   cp: 1,
@@ -21,6 +23,10 @@ export interface InventoryCatalogItem {
   name: string;
   kind: string;
   equippable: boolean;
+  requiresAttunement?: boolean;
+  wearSlot?: string;
+  description?: string;
+  rarity?: string;
   purchaseQuantity: number;
   cost?: {
     amount: number;
@@ -50,7 +56,12 @@ function denomination(value: unknown): CurrencyDenomination | undefined {
 
 export function inventoryCatalog(rulesPackage: LoadedRulesPackage): InventoryCatalogItem[] {
   return rulesPackage.entities
-    .filter((entity) => entity.kind.startsWith("equipment-"))
+    .filter(
+      (entity) =>
+        entity.kind.startsWith("equipment-") ||
+        entity.kind === "magic-item" ||
+        isSpellcastingImplement(entity),
+    )
     .map((entity) => {
       const body = objectValue(entity.body);
       const costBody = objectValue(body?.cost);
@@ -61,9 +72,20 @@ export function inventoryCatalog(rulesPackage: LoadedRulesPackage): InventoryCat
         id: entity.id,
         name: localizedName(entity),
         kind: entity.kind,
-        equippable: ["equipment-weapon", "equipment-armor", "equipment-shield"].includes(
-          entity.kind,
-        ),
+        equippable:
+          ["equipment-weapon", "equipment-armor", "equipment-shield"].includes(entity.kind) ||
+          isSpellcastingImplement(entity) ||
+          (entity.kind === "magic-item" &&
+            objectValue(body?.healingPotion) === undefined &&
+            typeof body?.statusPotionId !== "string"),
+        ...(entity.kind === "magic-item"
+          ? {
+              requiresAttunement: body?.requiresAttunement === true,
+              ...(typeof body?.wearSlot === "string" ? { wearSlot: body.wearSlot } : {}),
+              ...(typeof body?.description === "string" ? { description: body.description } : {}),
+              ...(typeof body?.rarity === "string" ? { rarity: body.rarity } : {}),
+            }
+          : {}),
         purchaseQuantity:
           typeof purchaseQuantity === "number" && Number.isInteger(purchaseQuantity)
             ? purchaseQuantity
@@ -281,10 +303,12 @@ export function toggleEquippedItem(
   const currentlyEquipped = character.loadout.equippedItemIds.includes(itemId);
   let equippedItemIds = character.loadout.equippedItemIds.filter((id) => id !== itemId);
   if (!currentlyEquipped) {
-    if (item.kind === "equipment-armor" || item.kind === "equipment-shield") {
+    const exclusiveKind = item.kind === "equipment-armor" || item.kind === "equipment-shield";
+    if (exclusiveKind || item.wearSlot !== undefined) {
       equippedItemIds = equippedItemIds.filter((equippedId) => {
         const equipped = character.loadout.inventory.find((entry) => entry.id === equippedId);
-        return equipped === undefined || catalogById.get(equipped.entityId)?.kind !== item.kind;
+        const worn = equipped === undefined ? undefined : catalogById.get(equipped.entityId);
+        return exclusiveKind ? worn?.kind !== item.kind : worn?.wearSlot !== item.wearSlot;
       });
     }
     equippedItemIds.push(itemId);
@@ -294,8 +318,59 @@ export function toggleEquippedItem(
     issues: [],
     nextCharacter: committedCharacter(
       character,
-      { ...character.loadout, equippedItemIds },
+      {
+        ...character.loadout,
+        equippedItemIds,
+        inventory: endChangedTimedPowers(
+          character.loadout,
+          (id) => character.loadout.equippedItemIds.includes(id) !== equippedItemIds.includes(id),
+        ),
+      },
       updatedAt,
     ),
+  };
+}
+
+function endChangedTimedPowers(
+  loadout: CharacterDocument["loadout"],
+  changed: (id: string) => boolean,
+): CharacterDocument["loadout"]["inventory"] {
+  return loadout.inventory.map((item) =>
+    item.timedPowerState?.active && changed(item.id)
+      ? { ...item, timedPowerState: { ...item.timedPowerState, active: false } }
+      : item,
+  );
+}
+
+export function toggleAttunedItem(
+  character: CharacterDocument,
+  itemId: string,
+  catalog: InventoryCatalogItem[],
+  updatedAt = new Date(),
+): InventoryChangeProposal {
+  const wasAttuned = character.loadout.attunedItemIds.includes(itemId);
+  const loadout = {
+    ...character.loadout,
+    attunedItemIds: wasAttuned
+      ? character.loadout.attunedItemIds.filter((id) => id !== itemId)
+      : [...character.loadout.attunedItemIds, itemId],
+  };
+  const attunableItems = new Map(
+    catalog.filter((item) => item.requiresAttunement).map((item) => [item.id, item.name]),
+  );
+  const after = resolveAttunement(loadout, attunableItems);
+  if (!wasAttuned) {
+    const issue = after.rejected.get(itemId);
+    if (issue !== undefined) return { applicable: false, issues: [issue] };
+  }
+  const before = resolveAttunement(character.loadout, attunableItems);
+  loadout.inventory = endChangedTimedPowers(
+    loadout,
+    (id) => id === itemId || before.itemIds.has(id) !== after.itemIds.has(id),
+  );
+  return {
+    applicable: true,
+    issues: [],
+    nextCharacter: committedCharacter(character, loadout, updatedAt),
   };
 }

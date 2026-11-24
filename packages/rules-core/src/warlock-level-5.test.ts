@@ -56,10 +56,19 @@ describe("evaluateCharacter Warlock level-5 vertical slice", () => {
       saveDifficultyClass: 14,
       cantripsKnown: 3,
       preparedSpellLimit: 6,
-      alwaysPreparedSpells: 6,
+      alwaysPreparedSpells: 7,
       slots: [{ level: 3, maximum: 2, current: 0 }],
     });
-    expect(evaluation.spells).toHaveLength(15);
+    expect(evaluation.spells).toHaveLength(16);
+    const familiarSpell = evaluation.spells.find(
+      (spell) => spell.id === "srd521.spell.find-familiar",
+    );
+    expect(familiarSpell?.prepared).toBe(true);
+    expect(
+      familiarSpell?.castingOptions.find(
+        (option) => option.sourceId === "srd521.option.warlock.invocation.pact-of-the-chain",
+      )?.freeCastAtWill,
+    ).toBe(true);
     expect(
       evaluation.spells.find((spell) => spell.id === "srd521.spell.stinking-cloud"),
     ).toMatchObject({ prepared: true, concentration: true });

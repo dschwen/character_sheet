@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 import type { CalculationTrace, JsonValue } from "@dnd/calculation-trace";
-import { characterDocumentSchema, type CharacterState } from "@dnd/character-model";
+import {
+  characterDocumentSchema,
+  familiarConfigurationSchema,
+  type CharacterLoadout,
+  type CharacterState,
+} from "@dnd/character-model";
 import type {
   EvaluateCharacterInput,
   SpellCastRequest,
@@ -12,6 +17,9 @@ import type {
 
 import { evaluateCharacter } from "./character-evaluator.js";
 import { deathSaveStatus, deathSavingThrowSources } from "./death-saving-throws.js";
+import { findFamiliarId, pactFamiliarForms, pactOfTheChainId } from "./familiar.js";
+import { consumeInventoryUnit } from "./inventory-consumption.js";
+import { trackedSpellComponents } from "./spell-components.js";
 
 const spellCastRequestSchema = z
   .object({
@@ -20,8 +28,10 @@ const spellCastRequestSchema = z
     asRitual: z.boolean().default(false),
     castingSourceId: z.string().min(1).optional(),
     useFreeCast: z.boolean().default(false),
+    useTrackedComponent: z.boolean().default(false),
     restoresHitPointsToOther: z.boolean().default(false),
     protectedCreatureCount: z.number().int().nonnegative().default(0),
+    familiar: familiarConfigurationSchema.optional(),
   })
   .strict();
 
@@ -93,6 +103,32 @@ export function proposeSpellCast(
   const spell = evaluation.spells.find((candidate) => candidate.id === request.spellId);
   const originalState = cloneState(character.state);
   const validations: ValidationMessage[] = [];
+  const component = request.useTrackedComponent
+    ? trackedSpellComponents(input.packages).get(request.spellId)
+    : undefined;
+  const componentItem =
+    component === undefined
+      ? undefined
+      : character.loadout.inventory.find(({ entityId }) => entityId === component.itemId);
+  if (request.useTrackedComponent) {
+    if (character.settings?.spellComponentTracking === false) {
+      addValidation(
+        validations,
+        "SPELL_COMPONENT_TRACKING_DISABLED",
+        "Component tracking is turned off in this character’s settings.",
+        ["settings.spellComponentTracking"],
+      );
+    } else if (component === undefined || componentItem === undefined) {
+      addValidation(
+        validations,
+        "SPELL_COMPONENT_UNAVAILABLE",
+        component === undefined
+          ? "This spell has no tracked component."
+          : `You are carrying no ${component.name} for this cast.`,
+        ["loadout.inventory"],
+      );
+    }
+  }
   if (evaluation.facts["condition.incapacitated.active"] === true)
     addValidation(
       validations,
@@ -253,6 +289,21 @@ export function proposeSpellCast(
       }
     }
   }
+  if (
+    request.familiar !== undefined &&
+    (request.spellId !== findFamiliarId ||
+      (pactFamiliarForms.some(
+        (form) => form.toLowerCase() === request.familiar?.form.toLowerCase(),
+      ) &&
+        !spell?.castingOptions?.some((option) => option.sourceId === pactOfTheChainId)))
+  ) {
+    addValidation(
+      validations,
+      "FAMILIAR_FORM_UNAVAILABLE",
+      "This spell or casting source does not grant the selected familiar form.",
+      ["request.familiar"],
+    );
+  }
   if (validations.length > 0 || spell === undefined) {
     return {
       kind: "spell-cast",
@@ -268,6 +319,46 @@ export function proposeSpellCast(
   const nextState = cloneState(character.state);
   const changes: StateChange[] = [];
   const traces: Record<string, CalculationTrace> = {};
+  const guidance = request.useFreeCast ? [...(castingOption?.freeCastGuidance ?? [])] : [];
+  let nextLoadout: CharacterLoadout | undefined;
+  if (component !== undefined && componentItem !== undefined) {
+    if (component.consumed) {
+      nextLoadout = consumeInventoryUnit(character.loadout, componentItem);
+      recordChange(
+        changes,
+        traces,
+        `loadout.inventory.${componentItem.id}.quantity`,
+        componentItem.quantity,
+        componentItem.quantity - 1,
+        `Casting ${spell.name} consumes one ${component.name}.`,
+        "consume-spell-component",
+        [componentItem.entityId, componentItem.quantity],
+        spell.sources,
+      );
+      guidance.push(`Spent one ${component.name}.`);
+    } else {
+      guidance.push(`Used ${component.name}. The component remains in inventory.`);
+    }
+  }
+  if (request.familiar !== undefined) {
+    const familiar = {
+      ...request.familiar,
+      presence: "present" as const,
+      currentHitPoints: request.familiar.maximumHitPoints,
+    };
+    nextState.familiar = familiar;
+    recordChange(
+      changes,
+      traces,
+      "state.familiar",
+      character.state.familiar ?? null,
+      familiar,
+      `The ${familiar.form} familiar appears.`,
+      "summon-familiar",
+      [familiar.form],
+      spell.sources,
+    );
+  }
   const traceId = "transition.spell-cast.protection.maximumCreatures";
   if (request.protectedCreatureCount > 0 && protection !== undefined) {
     traces[traceId] = {
@@ -392,12 +483,8 @@ export function proposeSpellCast(
     kind: "spell-cast",
     spellId: request.spellId,
     applicable: true,
-    ...(request.useFreeCast
-      ? {
-          guidance: castingOption?.freeCastGuidance ?? [],
-          freeCastAtWill: castingOption?.freeCastAtWill ?? false,
-        }
-      : {}),
+    ...(request.useFreeCast ? { freeCastAtWill: castingOption?.freeCastAtWill ?? false } : {}),
+    ...(request.useFreeCast || guidance.length > 0 ? { guidance } : {}),
     ...(request.protectedCreatureCount > 0 && protection !== undefined
       ? {
           protection: {
@@ -410,6 +497,7 @@ export function proposeSpellCast(
       : {}),
     changes,
     nextState,
+    ...(nextLoadout === undefined ? {} : { nextLoadout }),
     validations: [],
     traces,
   };

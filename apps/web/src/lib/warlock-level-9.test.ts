@@ -47,7 +47,7 @@ describe("Warlock level 9 Pact Magic and invocation advancement", () => {
       model: "pact-magic",
       cantripsKnown: 3,
       preparedSpellLimit: 10,
-      alwaysPreparedSpells: 12,
+      alwaysPreparedSpells: 13,
       slots: [{ level: 5, maximum: 2, current: 2 }],
     });
     const slot = evaluation.spellcasting?.slots[0];

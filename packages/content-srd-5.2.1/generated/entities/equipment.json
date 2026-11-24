@@ -4913,10 +4913,19 @@
   },
   {
     "body": {
+      "category": "potion",
       "cost": {
         "amount": 50,
         "denomination": "gp"
       },
+      "description": "Regain 2d4 + 2 Hit Points when you drink this potion.",
+      "healingPotion": {
+        "bonus": 2,
+        "diceCount": 2,
+        "diceSize": 4
+      },
+      "rarity": "common",
+      "requiresAttunement": false,
       "weightLb": 0.5
     },
     "id": "srd521.equipment.gear.potion-of-healing",
@@ -4939,6 +4948,23 @@
         ],
         "page": 95,
         "quoteHash": "b96493a86ccd54745e55b9ac28d0bfe5ac0513bc5d4add666a0e47cbdbbf801e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0236-b002",
+          "p0236-b003",
+          "p0236-b004",
+          "p0236-b005",
+          "p0236-b006",
+          "p0236-b007",
+          "p0236-b008",
+          "p0236-b009",
+          "p0236-b011",
+          "p0236-b010"
+        ],
+        "page": 236,
+        "quoteHash": "a4d76d42dca6d9338f1f179147102d8683107fce6dabb159c60a580344172301",
         "sourceId": "wotc-srd-5.2.1-en"
       }
     ],
@@ -5891,6 +5917,125 @@
     "tags": [
       "equipment",
       "ammunition"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 10,
+        "denomination": "gp"
+      },
+      "spellComponent": {
+        "consumed": true,
+        "spellId": "srd521.spell.find-familiar"
+      }
+    },
+    "id": "srd521.equipment.gear.find-familiar-incense",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Find Familiar Incense"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Minimum component value for one cast, derived from the spell on page 130.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0130-b010",
+          "p0130-b011"
+        ],
+        "page": 130,
+        "quoteHash": "0fb6027534eeeb1539543897fe43038e6ebe45a55f210b23fd7405cbe2750d60",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "spell-component"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 100,
+        "denomination": "gp"
+      },
+      "spellComponent": {
+        "consumed": false,
+        "spellId": "srd521.spell.identify"
+      }
+    },
+    "id": "srd521.equipment.gear.identify-pearl",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Identify Pearl"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Minimum component value for one cast, derived from the spell on page 142.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0142-b004"
+        ],
+        "page": 142,
+        "quoteHash": "010158b1e46fdc6cc54e18078e76af2018dbee00ec802397ca40e32667215d3c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "spell-component"
+    ]
+  },
+  {
+    "body": {
+      "cost": {
+        "amount": 300,
+        "denomination": "gp"
+      },
+      "spellComponent": {
+        "consumed": true,
+        "spellId": "srd521.spell.revivify"
+      }
+    },
+    "id": "srd521.equipment.gear.revivify-diamond",
+    "kind": "equipment-gear",
+    "name": {
+      "en": "Revivify Diamond"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Minimum component value for one cast, derived from the spell on page 159.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0159-b007",
+          "p0159-b008"
+        ],
+        "page": 159,
+        "quoteHash": "97136657cdbd130e31ed596738d8e26a372fbfe26a0bd64e0ae744a9b250afc3",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "equipment",
+      "spell-component"
     ]
   }
 ]

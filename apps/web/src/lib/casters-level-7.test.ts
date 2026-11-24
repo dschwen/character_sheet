@@ -152,7 +152,7 @@ describe("Wizard and Warlock level 7", () => {
       expect(evaluation.spellcasting).toMatchObject({
         model: "pact-magic",
         preparedSpellLimit: 8,
-        alwaysPreparedSpells: 8,
+        alwaysPreparedSpells: 9,
         cantripsKnown: 3,
         slots: [{ level: 4, maximum: 2, expended: spent, current: 2 - spent }],
       });

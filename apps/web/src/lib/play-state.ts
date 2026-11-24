@@ -1,5 +1,5 @@
 import type { CharacterDocument, CharacterState, CurrencyDenomination } from "@dnd/character-model";
-import { deathSaveStatus } from "@dnd/rules-core";
+import { deathSaveStatus, healCharacterState } from "@dnd/rules-core";
 
 function nonNegativeInteger(value: number): number {
   return Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
@@ -29,6 +29,7 @@ export function applyDamage(
     maximumHitPoints?: number;
     critical?: boolean;
     concentrationEffectIds?: readonly string[];
+    dropToOneEffectId?: string;
   } = {},
 ): CharacterDocument {
   const damage = nonNegativeInteger(amount);
@@ -39,6 +40,9 @@ export function applyDamage(
     temporaryHitPoints: character.state.temporaryHitPoints - absorbed,
     currentHitPoints: Math.max(0, character.state.currentHitPoints - remaining),
   };
+  const protectedState = protectDropToZero(character.state, state, options.dropToOneEffectId);
+  if (protectedState !== undefined)
+    return commitCharacterState(character, protectedState, updatedAt);
   const previousStatus = deathSaveStatus(character.state);
   if (previousStatus === "dead") state.dead = true;
   else if (character.state.currentHitPoints > 0 && state.currentHitPoints === 0) {
@@ -79,29 +83,9 @@ export function applyHealing(
   maximumHitPoints: number,
   updatedAt?: Date,
 ): CharacterDocument {
-  const healing = nonNegativeInteger(amount);
-  if (deathSaveStatus(character.state) === "dead")
-    throw new TypeError("Ordinary healing cannot revive a dead character.");
-  const currentHitPoints = Math.min(
-    nonNegativeInteger(maximumHitPoints),
-    character.state.currentHitPoints + healing,
-  );
-  const healed = currentHitPoints > character.state.currentHitPoints;
   return commitCharacterState(
     character,
-    {
-      ...character.state,
-      currentHitPoints,
-      ...(healed
-        ? {
-            deathSaveSuccesses: 0,
-            deathSaveFailures: 0,
-            ...(character.state.stableAtZeroHitPoints === undefined
-              ? {}
-              : { stableAtZeroHitPoints: false }),
-          }
-        : {}),
-    },
+    healCharacterState(character.state, amount, maximumHitPoints),
     updatedAt,
   );
 }
@@ -285,30 +269,68 @@ export function setActiveEffectWithHitPointBonus(
   hitPointBonus: number,
   selection: string,
   updatedAt?: Date,
+  dropToOneEffectId?: string,
 ): CharacterDocument {
-  const selections = Object.fromEntries(
-    Object.entries(character.state.activeEffectSelections).filter(([id]) => id !== effectId),
+  if (active && deathSaveStatus(character.state) === "dead") return character;
+  if (character.state.activeEffectIds.includes(effectId) === active) return character;
+  const adjusted = adjustStatusHitPoints(
+    character.state,
+    active ? hitPointBonus : -hitPointBonus,
+    dropToOneEffectId,
   );
-  const parameters = active
-    ? { ...character.state.activeEffectParameters }
-    : Object.fromEntries(
-        Object.entries(character.state.activeEffectParameters).filter(([id]) => id !== effectId),
-      );
-  if (active) selections[effectId] = selection;
+  const state = active ? adjusted : withoutActiveEffects(adjusted, [effectId]);
   return commitCharacterState(
     character,
     {
-      ...character.state,
-      currentHitPoints: Math.max(
-        0,
-        character.state.currentHitPoints + (active ? hitPointBonus : -hitPointBonus),
-      ),
-      activeEffectIds: setStateIdActive(character.state.activeEffectIds, effectId, active),
-      activeEffectSelections: selections,
-      activeEffectParameters: parameters,
+      ...state,
+      activeEffectIds: setStateIdActive(state.activeEffectIds, effectId, active),
+      activeEffectSelections: active
+        ? { ...state.activeEffectSelections, [effectId]: selection }
+        : state.activeEffectSelections,
     },
     updatedAt,
   );
+}
+
+function protectDropToZero(
+  previous: CharacterState,
+  next: CharacterState,
+  effectId: string | undefined,
+): CharacterState | undefined {
+  if (
+    effectId === undefined ||
+    !previous.activeEffectIds.includes(effectId) ||
+    previous.currentHitPoints === 0 ||
+    next.currentHitPoints !== 0 ||
+    deathSaveStatus(previous) === "dead"
+  )
+    return undefined;
+  return {
+    ...withoutActiveEffects(next, [effectId]),
+    currentHitPoints: 1,
+    deathSaveSuccesses: 0,
+    deathSaveFailures: 0,
+    ...(next.stableAtZeroHitPoints === undefined ? {} : { stableAtZeroHitPoints: false }),
+  };
+}
+
+function adjustStatusHitPoints(
+  state: CharacterState,
+  amount: number,
+  dropToOneEffectId?: string,
+): CharacterState {
+  if (deathSaveStatus(state) === "dead") return state;
+  const currentHitPoints = Math.max(0, state.currentHitPoints + amount);
+  const next = { ...state, currentHitPoints };
+  const protectedState = protectDropToZero(state, next, dropToOneEffectId);
+  if (protectedState !== undefined) return protectedState;
+  if ((state.currentHitPoints === 0) !== (currentHitPoints === 0)) {
+    next.deathSaveSuccesses = 0;
+    next.deathSaveFailures = 0;
+    if (next.stableAtZeroHitPoints !== undefined) next.stableAtZeroHitPoints = false;
+    if (currentHitPoints === 0) delete next.concentrationSpellId;
+  }
+  return next;
 }
 
 export function setActiveEffectSelectionWithHitPointAdjustment(
@@ -317,14 +339,15 @@ export function setActiveEffectSelectionWithHitPointAdjustment(
   selection: string,
   hitPointAdjustment: number,
   updatedAt?: Date,
+  dropToOneEffectId?: string,
 ): CharacterDocument {
+  const state = adjustStatusHitPoints(character.state, hitPointAdjustment, dropToOneEffectId);
   return commitCharacterState(
     character,
     {
-      ...character.state,
-      currentHitPoints: Math.max(0, character.state.currentHitPoints + hitPointAdjustment),
+      ...state,
       activeEffectSelections: {
-        ...character.state.activeEffectSelections,
+        ...state.activeEffectSelections,
         [effectId]: selection,
       },
     },

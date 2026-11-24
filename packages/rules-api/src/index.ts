@@ -1,5 +1,9 @@
 import type { CalculationTrace, JsonValue, SourceReference } from "@dnd/calculation-trace";
-import type { CharacterDocument, CharacterState } from "@dnd/character-model";
+import type {
+  CharacterDocument,
+  CharacterState,
+  FamiliarConfiguration,
+} from "@dnd/character-model";
 import type { AuthoringIr, ContentEntity, PackageManifest } from "@dnd/content-schema";
 
 export type StatId = string;
@@ -122,7 +126,41 @@ export interface InventoryItemSummary {
   quantity: number;
   equipped: boolean;
   kind: string;
+  requiresAttunement?: boolean;
+  attuned?: boolean;
+  magicActive?: boolean;
+  power?: MagicItemPowerSummary;
+  healingPotion?: {
+    diceCount: number;
+    diceSize: number;
+    bonus: number;
+  };
+  statusPotionId?: string;
+  timedPower?: {
+    maximumRounds: number;
+    remainingRounds: number;
+    active: boolean;
+    available: boolean;
+    actionEconomy: "bonus-action";
+    activeDescription: string;
+  };
 }
+
+export type MagicItemPowerSummary = {
+  available: boolean;
+  charges?: {
+    current: number;
+    maximum: number;
+    maximumSpend: number;
+    dawnDieSize: number;
+    dawnBonus: number;
+    lastChargeDieSize?: number;
+    destroyedOn?: number;
+  };
+} & (
+  | { kind: "spell"; spellId: string; spellName: string; selfStatusId?: string; baseDarts?: number }
+  | { kind: "saving-throw-reaction"; ability: "dexterity" }
+);
 
 export interface DamageSummary {
   dieMinimum?: { value: number; sourceName: string; traceId: string };
@@ -359,6 +397,7 @@ export interface StateTransitionProposal {
   changes: StateChange[];
   nextState: CharacterState;
   nextBuild?: CharacterDocument["build"];
+  nextLoadout?: CharacterDocument["loadout"];
   validations: ValidationMessage[];
   traces: Readonly<Record<string, CalculationTrace>>;
 }
@@ -427,7 +466,9 @@ export interface SpellCastRequest {
   asRitual?: boolean;
   castingSourceId?: string;
   useFreeCast?: boolean;
+  useTrackedComponent?: boolean;
   restoresHitPointsToOther?: boolean;
+  familiar?: FamiliarConfiguration;
 }
 
 export interface SpellCastTransitionProposal {
@@ -439,6 +480,7 @@ export interface SpellCastTransitionProposal {
   applicable: boolean;
   changes: StateChange[];
   nextState: CharacterState;
+  nextLoadout?: CharacterDocument["loadout"];
   validations: ValidationMessage[];
   traces: Readonly<Record<string, CalculationTrace>>;
 }

@@ -45,6 +45,46 @@
   },
   {
     "body": {
+      "armorClassMinimum": 17,
+      "concentration": false,
+      "description": "You touch a willing creature. Until the spell ends, the target’s skin assumes a bark-like appearance, and the target has an Armor Class of 17 if its AC is lower than that.",
+      "duration": "1 hour",
+      "sourceSpellId": "srd521.spell.barkskin"
+    },
+    "id": "srd521.status.spell.barkskin",
+    "kind": "status",
+    "name": {
+      "en": "Barkskin"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Barkskin.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0112-b009",
+          "p0112-b010",
+          "p0112-b011",
+          "p0112-b012"
+        ],
+        "page": 112,
+        "quoteHash": "a8d25eddc11d8a21c9f4181028c2ea884ac44f50ae0cf2c5ae63b5f6f590269a",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
       "concentration": true,
       "d20BonusDice": [
         {
@@ -85,6 +125,45 @@
         ],
         "page": 113,
         "quoteHash": "19fecfe1b3a354fe50bc92c09185744fec1cf7df7b7784da61c3f2a226078ba5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": false,
+      "description": "You touch a creature and grant it a measure of protection from death. The first time the target would drop to 0 Hit Points before the spell ends, the target instead drops to 1 Hit Point, and the spell ends. If the spell is still in effect when the target is subjected to an effect that would kill it instantly without dealing damage, that effect is negated against the target, and the spell ends.",
+      "duration": "8 hours",
+      "preventsDropToZero": true,
+      "sourceSpellId": "srd521.spell.death-ward"
+    },
+    "id": "srd521.status.spell.death-ward",
+    "kind": "status",
+    "name": {
+      "en": "Death Ward"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Death Ward.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0122-b013",
+          "p0122-b014",
+          "p0122-b015"
+        ],
+        "page": 122,
+        "quoteHash": "fe4c68304d40c13d7108aa43d0e1a1b369f4673b7d5f8048b71a44108c8de0ab",
         "sourceId": "wotc-srd-5.2.1-en"
       }
     ],
@@ -157,6 +236,51 @@
   },
   {
     "body": {
+      "abilityCheckAdvantageChoices": [
+        "strength",
+        "dexterity",
+        "intelligence",
+        "wisdom",
+        "charisma"
+      ],
+      "concentration": true,
+      "description": "You touch a creature and choose Strength, Dexterity, Intelligence, Wisdom, or Charisma. For the duration, the target has Advantage on ability checks using the chosen ability. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 2. You can choose a different ability for each target.",
+      "duration": "Concentration, up to 1 hour",
+      "sourceSpellId": "srd521.spell.enhance-ability"
+    },
+    "id": "srd521.status.spell.enhance-ability",
+    "kind": "status",
+    "name": {
+      "en": "Enhance Ability"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Enhance Ability.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0127-b011",
+          "p0127-b012",
+          "p0127-b013"
+        ],
+        "page": 127,
+        "quoteHash": "d63244e4c3da264717df1249f6919782eef21b67cc80cb1b9def393fa6505b81",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
       "assistedInstructions": [
         "Descent is limited to 60 feet per round.",
         "Take no falling damage when landing.",
@@ -205,6 +329,10 @@
   },
   {
     "body": {
+      "assistedInstructions": [
+        "You can hover while flying.",
+        "When this status ends, resolve any fall if the creature is still aloft."
+      ],
       "concentration": true,
       "description": "You touch a willing creature. For the duration, the target gains a Fly Speed of 60 feet and can hover. When the spell ends, the target falls if it is still aloft unless it can stop the fall. Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot level above 3.",
       "duration": "Concentration, up to 10 minutes",
@@ -293,6 +421,9 @@
   {
     "body": {
       "armorClassBonus": 2,
+      "assistedInstructions": [
+        "On each of your turns, you can take one extra action to Attack (one attack only), Dash, Disengage, Hide, or Utilize."
+      ],
       "concentration": true,
       "d20RollEffects": [
         {
@@ -303,6 +434,7 @@
       ],
       "description": "Choose a willing creature that you can see within range. Until the spell ends, the target’s Speed is doubled, it gains a +2 bonus to Armor Class, it has Advantage on Dexterity saving throws, and it gains an additional action on each of its turns. That action can be used to take only the Attack (one attack only), Dash, Disengage, Hide, or Utilize action. When the spell ends, the target is Incapacitated and has a Speed of 0 until the end of its next turn, as a wave of lethargy washes over it.",
       "duration": "Concentration, up to 1 minute",
+      "onEndStatusId": "srd521.status.spell.haste-lethargy",
       "sourceSpellId": "srd521.spell.haste",
       "speedMultiplier": 2
     },
@@ -516,6 +648,51 @@
   {
     "body": {
       "concentration": true,
+      "damageResistanceChoices": [
+        "acid",
+        "cold",
+        "fire",
+        "lightning",
+        "thunder"
+      ],
+      "description": "For the duration, the willing creature you touch has Resistance to one damage type of your choice: Acid, Cold, Fire, Lightning, or Thunder.",
+      "duration": "Concentration, up to 1 hour",
+      "sourceSpellId": "srd521.spell.protection-from-energy"
+    },
+    "id": "srd521.status.spell.protection-from-energy",
+    "kind": "status",
+    "name": {
+      "en": "Protection from Energy"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Protection from Energy.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0157-b003",
+          "p0157-b004",
+          "p0157-b005"
+        ],
+        "page": 157,
+        "quoteHash": "5e6a34da432c964485e907debce73698a24b0baf30dd9656ebb8639399292868",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "concentration": true,
       "description": "Until the spell ends, one willing creature you touch is protected against creatures that are Aberrations, Celestials, Elementals, Fey, Fiends, or Undead. The protection grants several benefits. Creatures of those types have Disadvantage on attack rolls against the target. The target also can’t be possessed by or gain the Charmed or Frightened conditions from them. If the target is already possessed, Charmed, or Frightened by such a creature, the target has Advantage on any new saving throw against the relevant effect.",
       "duration": "Concentration up to 10 minutes",
       "situationalProtection": {
@@ -610,6 +787,67 @@
   },
   {
     "body": {
+      "armorClassBonus": 1,
+      "assistedInstructions": [
+        "Apply the damage this recipient takes to the caster’s sheet as well.",
+        "End the bond if the caster drops to 0 HP, the pair move more than 60 feet apart, or the spell is cast again on either creature."
+      ],
+      "concentration": false,
+      "damageResistances": [
+        "acid",
+        "bludgeoning",
+        "cold",
+        "fire",
+        "force",
+        "lightning",
+        "necrotic",
+        "piercing",
+        "poison",
+        "psychic",
+        "radiant",
+        "slashing",
+        "thunder"
+      ],
+      "description": "You touch another creature that is willing and create a mystic connection between you and the target until the spell ends. While the target is within 60 feet of you, it gains a +1 bonus to AC and saving throws, and it has Resistance to all damage. Also, each time it takes damage, you take the same amount of damage. The spell ends if you drop to 0 Hit Points or if you and the target become separated by more than 60 feet. It also ends if the spell is cast again on either of the connected creatures.",
+      "duration": "1 hour",
+      "savingThrowBonus": 1,
+      "sharesIncomingDamage": true,
+      "sourceSpellId": "srd521.spell.warding-bond"
+    },
+    "id": "srd521.status.spell.warding-bond",
+    "kind": "status",
+    "name": {
+      "en": "Warding Bond"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Warding Bond.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0173-b010",
+          "p0173-b011",
+          "p0173-b012",
+          "p0173-b013"
+        ],
+        "page": 173,
+        "quoteHash": "9f3bea810a7afdd461160b2f594febb520a50891d69ee9d91a7af33600d9c106",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
       "assistedInstructions": [
         "The creature can breathe underwater and retains its normal respiration.",
         "End this status after 24 hours."
@@ -652,6 +890,105 @@
       "status",
       "beneficial",
       "spell"
+    ]
+  },
+  {
+    "body": {
+      "assistedInstructions": [
+        "Walk on liquid surfaces for 1 hour. Lava can still deal heat damage.",
+        "Use a Bonus Action to move between the surface and the liquid. Falling into the liquid passes through the surface."
+      ],
+      "concentration": false,
+      "description": "This spell grants the ability to move across any liquid surface—such as water, acid, mud, snow, quicksand, or lava—as if it were harmless solid ground (creatures crossing molten lava can still take damage from the heat). Up to ten willing creatures of your choice within range gain this ability for the duration. An affected target must take a Bonus Action to pass from the liquid’s surface into the liquid itself and vice versa, but if the target falls into the liquid, the target passes through the surface into the liquid below.",
+      "duration": "1 hour",
+      "factGrants": {
+        "movement.walkOnLiquids": true
+      },
+      "sourceSpellId": "srd521.spell.water-walk"
+    },
+    "id": "srd521.status.spell.water-walk",
+    "kind": "status",
+    "name": {
+      "en": "Water Walking"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Beneficial target status derived from Water Walk.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0173-b017",
+          "p0173-b018"
+        ],
+        "page": 173,
+        "quoteHash": "27722740de1c6bc517bfe67b9c9162585f08a2eff297ee8d7fb09aef4431fc7e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      },
+      {
+        "blocks": [
+          "p0174-b002",
+          "p0174-b003"
+        ],
+        "page": 174,
+        "quoteHash": "08818c78c7ff295d7786d05e0b3c0213fbeab8e775729a3fd477224f33236ec8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "spell"
+    ]
+  },
+  {
+    "body": {
+      "assistedInstructions": [
+        "End Haste lethargy at the end of your next turn."
+      ],
+      "breaksConcentration": true,
+      "concentration": false,
+      "description": "Incapacitated with Speed 0 until the end of your next turn.",
+      "duration": "Until the end of your next turn",
+      "endsOnRest": true,
+      "grantsConditions": [
+        "srd521.condition.incapacitated"
+      ],
+      "speedMaximum": 0
+    },
+    "id": "srd521.status.spell.haste-lethargy",
+    "kind": "status",
+    "name": {
+      "en": "Haste lethargy"
+    },
+    "review": {
+      "extractionApproved": true,
+      "notes": "Lethargy after Haste ends.",
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0139-b018",
+          "p0139-b019",
+          "p0139-b020"
+        ],
+        "page": 139,
+        "quoteHash": "28f885bb6698a71a2e21d387889642a37edae1e7a6fb181eecb27abf9bab3384",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "spell",
+      "follow-up"
     ]
   }
 ]

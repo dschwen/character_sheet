@@ -1,0 +1,44 @@
+[
+  {
+    "body": {
+      "assistedInstructions": [
+        "End the effect after 1 minute."
+      ],
+      "concentration": false,
+      "damageResistances": [
+        "all"
+      ],
+      "description": "For 1 minute after you drink this potion, you have Resistance to all damage. This potion’s syrupy liquid looks like liquefied iron.",
+      "duration": "1 minute",
+      "endsOnRest": true
+    },
+    "id": "srd521.status.item.potion-of-invulnerability",
+    "kind": "status",
+    "name": {
+      "en": "Potion of Invulnerability"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0236-b016",
+          "p0236-b017"
+        ],
+        "page": 236,
+        "quoteHash": "cb901f048408a70fde1eee65e0a2c87137368dad8c67cd0bdff3dd8808c81cc5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "status",
+      "beneficial",
+      "potion"
+    ]
+  }
+]

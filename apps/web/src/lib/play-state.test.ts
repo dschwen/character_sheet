@@ -39,6 +39,64 @@ describe("browser play-state edits", () => {
     expect(character().state.currentHitPoints).not.toBe(damaged.state.currentHitPoints);
   });
 
+  it("uses Death Ward only when a living character would first drop to zero", () => {
+    const id = "srd521.status.spell.death-ward";
+    const concentrationSpellId = "srd521.spell.haste";
+    const source = character();
+    const warded: CharacterDocument = {
+      ...source,
+      state: {
+        ...source.state,
+        currentHitPoints: 4,
+        temporaryHitPoints: 3,
+        activeEffectIds: [id, "srd521.status.spell.haste"],
+        concentrationSpellId,
+      },
+    };
+    const options = { dropToOneEffectId: id, maximumHitPoints: 15, critical: true };
+    const scratched = applyDamage(warded, 3, updatedAt, options);
+    expect(scratched.state.activeEffectIds).toContain(id);
+    expect(scratched.state.currentHitPoints).toBe(4);
+    const protectedCharacter = applyDamage(warded, 30, updatedAt, options);
+    expect(protectedCharacter.state).toMatchObject({
+      currentHitPoints: 1,
+      temporaryHitPoints: 0,
+      deathSaveSuccesses: 0,
+      deathSaveFailures: 0,
+      concentrationSpellId,
+      activeEffectIds: ["srd521.status.spell.haste"],
+    });
+    expect(protectedCharacter.state.dead).not.toBe(true);
+    expect(protectedCharacter.metadata.revision).toBe(warded.metadata.revision + 1);
+    expect(applyDamage(protectedCharacter, 1, updatedAt, options).state.currentHitPoints).toBe(0);
+
+    const alreadyAtZero = { ...warded, state: { ...warded.state, currentHitPoints: 0 } };
+    expect(applyDamage(alreadyAtZero, 5, updatedAt, options).state.activeEffectIds).toContain(id);
+  });
+
+  it("uses Death Ward when ending Aid would drop the character to zero", () => {
+    const id = "srd521.status.spell.death-ward";
+    const aid = "srd521.status.spell.aid";
+    const source = character();
+    const aided: CharacterDocument = {
+      ...source,
+      state: {
+        ...source.state,
+        activeEffectIds: [id, aid],
+        activeEffectSelections: { [aid]: "2" },
+        currentHitPoints: 4,
+        concentrationSpellId: "srd521.spell.haste",
+      },
+    };
+    const ended = setActiveEffectWithHitPointBonus(aided, aid, false, 5, "2", updatedAt, id);
+    expect(ended.state).toMatchObject({
+      currentHitPoints: 1,
+      concentrationSpellId: "srd521.spell.haste",
+      activeEffectIds: [],
+      activeEffectSelections: {},
+    });
+  });
+
   it("caps healing at maximum HP and advances document metadata", () => {
     const source = character();
     const healed = applyHealing(source, 100, 32, updatedAt);
@@ -146,6 +204,43 @@ describe("browser play-state edits", () => {
     expect(heightened.state.currentHitPoints).toBe(source.state.currentHitPoints + 10);
     expect(ended.state.currentHitPoints).toBe(source.state.currentHitPoints);
     expect(ended.state.activeEffectSelections[effectId]).toBeUndefined();
+  });
+
+  it("handles Aid crossing zero HP and keeps dead characters at zero", () => {
+    const effectId = "srd521.status.spell.aid";
+    const source = character();
+    const stable = {
+      ...source,
+      state: {
+        ...source.state,
+        currentHitPoints: 0,
+        stableAtZeroHitPoints: true,
+        deathSaveSuccesses: 3,
+      },
+    };
+    const aided = setActiveEffectWithHitPointBonus(stable, effectId, true, 5, "2", updatedAt);
+    expect(aided.state).toMatchObject({
+      currentHitPoints: 5,
+      stableAtZeroHitPoints: false,
+      deathSaveSuccesses: 0,
+    });
+    expect(setActiveEffectWithHitPointBonus(aided, effectId, true, 5, "2", updatedAt)).toBe(aided);
+    const concentrating = {
+      ...aided,
+      state: { ...aided.state, concentrationSpellId: "srd521.spell.bless" },
+    };
+    const ended = setActiveEffectWithHitPointBonus(
+      concentrating,
+      effectId,
+      false,
+      5,
+      "2",
+      updatedAt,
+    );
+    expect(ended.state.currentHitPoints).toBe(0);
+    expect(ended.state.concentrationSpellId).toBeUndefined();
+    const dead = { ...stable, state: { ...stable.state, dead: true } };
+    expect(setActiveEffectWithHitPointBonus(dead, effectId, true, 5, "2", updatedAt)).toBe(dead);
   });
 
   it("ends concentration when condition data says the condition breaks it", () => {

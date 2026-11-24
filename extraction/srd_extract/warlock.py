@@ -579,6 +579,23 @@ def _class_entity(
     }
 
 
+def pact_of_the_chain_fields() -> dict[str, Any]:
+    spell_id = "srd521.spell.find-familiar"
+    return {
+        "alwaysPreparedSpells": {"1": [spell_id]},
+        "freeSpellCasting": {
+            "classId": CLASS_ID,
+            "atWill": True,
+            "spellIds": [spell_id],
+            "guidance": [
+                "Pact of the Chain casts Find Familiar as a Magic action. "
+                "Provide the consumed incense. The familiar's Reaction attack is resolved "
+                "at the table."
+            ],
+        },
+    }
+
+
 def _invocation_entities(invocations: tuple[dict[str, Any], ...]) -> list[dict[str, Any]]:
     return [
         {
@@ -594,6 +611,7 @@ def _invocation_entities(invocations: tuple[dict[str, Any], ...]) -> list[dict[s
                 "prerequisiteText": invocation["prerequisiteText"],
                 "repeatable": invocation["repeatable"],
                 "text": invocation["text"],
+                **(pact_of_the_chain_fields() if invocation["name"] == "Pact of the Chain" else {}),
             },
             "rules": [],
             "review": _review(f"{invocation['name']} Eldritch Invocation option."),

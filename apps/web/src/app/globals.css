@@ -1011,6 +1011,13 @@ button.vital-card:hover {
   align-items: end;
   gap: 6px;
 }
+.spell-cast-controls {
+  flex-wrap: wrap;
+}
+.spell-free-cast {
+  display: grid;
+  gap: 3px;
+}
 .action-inputs label {
   display: grid;
   gap: 3px;

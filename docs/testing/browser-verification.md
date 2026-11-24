@@ -20,6 +20,31 @@ same suite.
 
 ## What the suite verifies
 
+`magic-items.spec.ts` exercises loot, equipping, attunement, reload, removal, and Undo. It checks
+the three-item attunement limit, same-item duplicates, cloak swapping, and the displayed effects
+from attuned protection, falling, and swimming items. The Ring of Swimming works while equipped
+without attunement.
+The item-power checks cast Water Walk from the equipped ring without spending a spell slot
+and verify the resulting effect through reload and Undo. They spend charges from one wand
+copy, recharge it at a declared dawn, and undo the recharge. Rules tests cover the charge cap
+and both outcomes of the last-charge destruction roll.
+The Boots of Speed check covers attunement-gated activation, elapsed rounds, reload,
+deactivation on unequip and ending attunement, and Long Rest recharge with Undo.
+The Ring of Evasion check resolves a declared failed Dexterity save with and without damage.
+It checks attunement, other ability and successful-save exclusion, atomic Undo, and dawn recharge.
+The healing potion check buys the common potion, rolls and applies capped healing while using
+one dose, and undoes both changes. It also reloads the remaining dose and administers it to
+another creature. Rules tests cover the three higher-rarity formulas and invalid rolls.
+`familiars-and-focuses.spec.ts` checks that an equipped Arcane Focus covers Hex's material
+component and Find Familiar still lists its consumed incense. It verifies the Imp's SRD HP,
+AC, speed, senses, and Sting. It exercises the Pact free cast with and without a tracked
+incense dose, atomic Undo of the tracked cast, dismiss and recall across reload, and
+disappearing at 0 HP. It also verifies that
+drinking a Potion of Invulnerability uses one dose and enables all-damage resistance.
+`spell-components.spec.ts` checks that Revivify spends a tracked diamond and its spell
+slot together, Undo restores both, and turning off tracking in Settings persists across
+reload. It also checks that Identify can use a tracked pearl in a ritual and keep the pearl.
+
 `scholar-and-land.spec.ts` checks Scholar Expertise from Skilled, source inspection,
 reload/advancement preservation and invalid-import diagnostics. It also checks Circle of the Land
 draft-only choices, Short Rest exclusion, Long Rest application, Undo, updated spell pools,
@@ -37,6 +62,20 @@ instruction, slot cost, concentration replacement, removal of stale confirmation
 reload. A separate recipient fixture is then explicitly toggled: Blessed adds its d4 to a rendered
 saving throw; Shield of Faith adds and removes 2 AC. Recipient changes support Undo and reload;
 casting does not silently apply statuses or modify another character.
+Mage Armor changes the unarmored Fighter’s AC from 12 to 15, persists on reload, and ends when
+armor is equipped. Undo restores both the previous loadout and the active effect. Taking the
+armor off after the spell ends restores normal unarmored AC.
+The suite also checks Haste and Fly together, Haste lethargy through reload and Undo, Aid’s slot
+scaling on both HP values, and Guidance’s selected-skill roll and concentration cleanup. It
+exercises Longstrider, Pass without Trace, Heroism, and the recipient instructions for Feather Fall,
+Water Breathing, and Protection from Evil and Good. The recipient marks when a spell ends and
+clears Haste lethargy at the end of their next turn.
+The recipient flow also checks Barkskin’s AC floor, Enhance Ability’s saved choice and Passive Perception,
+and Protection from Energy’s saved damage type. Fire resistance rounds down after any saving
+throw adjustment, and the damage form clears its resistance selection after applying the hit.
+Warding Bond adds to AC and reports the damage to apply on the caster’s sheet. Death Ward
+consumes itself when damage would drop the recipient to zero. Undo restores HP and the ward,
+and the recipient can spend the ward manually against a non-damaging instant-death effect.
 
 `spell-preparation.spec.ts` verifies Wizard spellbook-only choices, count bounds, incomplete-save
 blocking, Cancel, Save, Undo, casting eligibility and reload without changing build or play state.

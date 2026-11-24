@@ -1051,7 +1051,7 @@ describe("guided character builder", () => {
     const expectedHitPoints = [10, 17, 24, 31, 38, 45];
     const expectedCantrips = [2, 2, 2, 3, 3, 3];
     const expectedPrepared = [2, 3, 4, 5, 6, 7];
-    const expectedAlwaysPrepared = [0, 0, 4, 4, 6, 6];
+    const expectedAlwaysPrepared = [1, 1, 5, 5, 7, 7];
     const expectedInvocations = [1, 3, 3, 3, 5, 5];
 
     for (let level = 1; level <= 6; level += 1) {

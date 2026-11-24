@@ -178,6 +178,14 @@ const characterLoadoutSchema = z
             id: z.string().min(1),
             entityId: entityIdSchema,
             quantity: z.number().int().positive().default(1),
+            charges: z.number().int().nonnegative().safe().optional(),
+            timedPowerState: z
+              .object({
+                active: z.boolean(),
+                remainingRounds: z.number().int().nonnegative().safe(),
+              })
+              .strict()
+              .optional(),
           })
           .strict(),
       )
@@ -225,6 +233,24 @@ const characterLoadoutSchema = z
     }
   });
 
+export const familiarConfigurationSchema = z
+  .object({
+    form: z.string().trim().min(1).max(80),
+    creatureType: z.enum(["celestial", "fey", "fiend"]),
+    maximumHitPoints: z.number().int().positive().safe(),
+  })
+  .strict();
+
+export type FamiliarConfiguration = z.infer<typeof familiarConfigurationSchema>;
+
+const familiarStateSchema = familiarConfigurationSchema
+  .extend({
+    currentHitPoints: z.number().int().nonnegative().safe(),
+    presence: z.enum(["present", "dismissed", "vanished"]),
+  })
+  .strict()
+  .refine((familiar) => familiar.currentHitPoints <= familiar.maximumHitPoints);
+
 const characterStateSchema = z
   .object({
     currentHitPoints: z.number().int(),
@@ -239,6 +265,7 @@ const characterStateSchema = z
       .record(entityIdSchema, z.record(z.string().min(1), z.string().min(1)))
       .default({}),
     concentrationSpellId: entityIdSchema.optional(),
+    familiar: familiarStateSchema.optional(),
     heroicInspiration: z.boolean().default(false),
     deathSaveSuccesses: z.number().int().min(0).max(3).default(0),
     deathSaveFailures: z.number().int().min(0).max(3).default(0),
@@ -274,6 +301,7 @@ export const characterDocumentSchema = z
     build: characterBuildSchema,
     loadout: characterLoadoutSchema,
     state: characterStateSchema,
+    settings: z.object({ spellComponentTracking: z.boolean() }).strict().optional(),
     overrides: z.array(characterOverrideSchema).default([]),
     metadata: characterMetadataSchema,
   })

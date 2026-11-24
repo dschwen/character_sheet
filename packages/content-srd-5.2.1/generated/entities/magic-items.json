@@ -1,0 +1,551 @@
+[
+  {
+    "body": {
+      "category": "wondrous-item",
+      "description": "While you wear these boots, you can take a Bonus Action to click the boots’ heels together. If you do, the boots double your Speed, and any creature that makes an Opportunity Attack against you has Disadvantage on the attack roll. If you click your heels together again, you end the effect. When you’ve used the boots’ property for a total of 10 minutes, the magic ceases to function for you until you finish a Long Rest.",
+      "factGrants": {
+        "incomingOpportunityAttacks.disadvantage": true
+      },
+      "rarity": "rare",
+      "requiresAttunement": true,
+      "speedMultiplier": 2,
+      "timedPower": {
+        "actionEconomy": "bonus-action",
+        "activeDescription": "Opportunity attacks against you have Disadvantage.",
+        "maximumRounds": 100
+      },
+      "wearSlot": "footwear"
+    },
+    "id": "srd521.magic-item.boots-of-speed",
+    "kind": "magic-item",
+    "name": {
+      "en": "Boots of Speed"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0214-b002",
+          "p0214-b003"
+        ],
+        "page": 214,
+        "quoteHash": "677d0089d765771724a873d617b7153637b298a28001cf99ba5c4dcd38b605eb",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "wondrous-item"
+    ]
+  },
+  {
+    "body": {
+      "armorClassBonus": 1,
+      "category": "wondrous-item",
+      "description": "You gain a +1 bonus to Armor Class and saving throws while you wear this cloak.",
+      "rarity": "uncommon",
+      "requiresAttunement": true,
+      "savingThrowBonus": 1,
+      "wearSlot": "cloak"
+    },
+    "id": "srd521.magic-item.cloak-of-protection",
+    "kind": "magic-item",
+    "name": {
+      "en": "Cloak of Protection"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0216-b003",
+          "p0216-b004"
+        ],
+        "page": 216,
+        "quoteHash": "f23e3fce4885c68e6a4160d418983b552923cc82478fc431a621cfbd83d34526",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "wondrous-item"
+    ]
+  },
+  {
+    "body": {
+      "category": "wondrous-item",
+      "description": "While wearing this cloak, you can breathe underwater, and you have a Swim Speed of 60 feet.",
+      "factGrants": {
+        "respiration.underwater": true
+      },
+      "rarity": "uncommon",
+      "requiresAttunement": true,
+      "speedOverrides": {
+        "speed.swim": 60
+      },
+      "wearSlot": "cloak"
+    },
+    "id": "srd521.magic-item.cloak-of-the-manta-ray",
+    "kind": "magic-item",
+    "name": {
+      "en": "Cloak of the Manta Ray"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0216-b007",
+          "p0216-b008"
+        ],
+        "page": 216,
+        "quoteHash": "ee5f01ef2018f2e8e6fc168727dd2c47ffde902425756626cb01c79e62e2a09e",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "wondrous-item"
+    ]
+  },
+  {
+    "body": {
+      "category": "potion",
+      "description": "For 1 minute after you drink this potion, you have Resistance to all damage. This potion’s syrupy liquid looks like liquefied iron.",
+      "rarity": "rare",
+      "requiresAttunement": false,
+      "statusPotionId": "srd521.status.item.potion-of-invulnerability"
+    },
+    "id": "srd521.magic-item.potion-of-invulnerability",
+    "kind": "magic-item",
+    "name": {
+      "en": "Potion of Invulnerability"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0236-b016",
+          "p0236-b017"
+        ],
+        "page": 236,
+        "quoteHash": "cb901f048408a70fde1eee65e0a2c87137368dad8c67cd0bdff3dd8808c81cc5",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "potion"
+    ]
+  },
+  {
+    "body": {
+      "category": "ring",
+      "description": "This ring has 3 charges, and it regains 1d3 expended charges daily at dawn. When you fail a Dexterity saving throw while wearing the ring, you can take a Reaction to expend 1 charge to succeed on that save instead.",
+      "power": {
+        "charges": {
+          "dawnBonus": 0,
+          "dawnDieSize": 3,
+          "maximum": 3,
+          "maximumSpend": 1
+        },
+        "savingThrowAbility": "dexterity"
+      },
+      "rarity": "rare",
+      "requiresAttunement": true
+    },
+    "id": "srd521.magic-item.ring-of-evasion",
+    "kind": "magic-item",
+    "name": {
+      "en": "Ring of Evasion"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0238-b007",
+          "p0238-b008"
+        ],
+        "page": 238,
+        "quoteHash": "73e4b189a08d7ce72563202faf79206aeb281e08df709738fbf2fa5ca38b1172",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "ring"
+    ]
+  },
+  {
+    "body": {
+      "category": "ring",
+      "description": "When you fall while wearing this ring, you descend 60 feet per round and take no damage from falling.",
+      "factGrants": {
+        "fall.damagePreventedOnLanding": true,
+        "fall.descentRateFeetPerRound": 60
+      },
+      "rarity": "rare",
+      "requiresAttunement": true
+    },
+    "id": "srd521.magic-item.ring-of-feather-falling",
+    "kind": "magic-item",
+    "name": {
+      "en": "Ring of Feather Falling"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0238-b009",
+          "p0238-b010"
+        ],
+        "page": 238,
+        "quoteHash": "a3403b227b7f036f47924030cdd4968459c57dfbe31a99f7d6446e239da5e44c",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "ring"
+    ]
+  },
+  {
+    "body": {
+      "armorClassBonus": 1,
+      "category": "ring",
+      "description": "You gain a +1 bonus to Armor Class and saving throws while wearing this ring.",
+      "rarity": "rare",
+      "requiresAttunement": true,
+      "savingThrowBonus": 1
+    },
+    "id": "srd521.magic-item.ring-of-protection",
+    "kind": "magic-item",
+    "name": {
+      "en": "Ring of Protection"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0238-b020",
+          "p0238-b021"
+        ],
+        "page": 238,
+        "quoteHash": "7cafddb1ea27b74e3544ad881f2bfdce0fdb873f799c0d7566a1b4c4ac0a50ea",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "ring"
+    ]
+  },
+  {
+    "body": {
+      "category": "ring",
+      "description": "You have a Swim Speed of 40 feet while wearing this ring.",
+      "rarity": "uncommon",
+      "requiresAttunement": false,
+      "speedOverrides": {
+        "speed.swim": 40
+      }
+    },
+    "id": "srd521.magic-item.ring-of-swimming",
+    "kind": "magic-item",
+    "name": {
+      "en": "Ring of Swimming"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0239-b019",
+          "p0239-b020"
+        ],
+        "page": 239,
+        "quoteHash": "a3d17cb818aec17c7440048656f1fe4b8b1d7e99505c4f3a78cf81ce99375e57",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "ring"
+    ]
+  },
+  {
+    "body": {
+      "category": "ring",
+      "description": "While wearing this ring, you cast Water Walk from it, targeting only yourself.",
+      "power": {
+        "selfStatusId": "srd521.status.spell.water-walk",
+        "spellId": "srd521.spell.water-walk"
+      },
+      "rarity": "uncommon",
+      "requiresAttunement": false
+    },
+    "id": "srd521.magic-item.ring-of-water-walking",
+    "kind": "magic-item",
+    "name": {
+      "en": "Ring of Water Walking"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0239-b029",
+          "p0239-b030"
+        ],
+        "page": 239,
+        "quoteHash": "a85fe3f892cf8dc25953519bfd379feb74bf6c71b0f35d6c4d87a3386f82e981",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "ring"
+    ]
+  },
+  {
+    "body": {
+      "category": "wand",
+      "description": "This wand has 7 charges. While holding it, you can expend no more than 3 charges to cast Magic Missile from it. For 1 charge, you cast the level 1 version of the spell. You can increase the spell’s level by 1 for each additional charge you expend. Regaining Charges. The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand’s last charge, roll 1d20. On a 1, the wand crumbles into ashes and is destroyed.",
+      "power": {
+        "baseDarts": 3,
+        "charges": {
+          "dawnBonus": 1,
+          "dawnDieSize": 6,
+          "destroyedOn": 1,
+          "lastChargeDieSize": 20,
+          "maximum": 7,
+          "maximumSpend": 3
+        },
+        "spellId": "srd521.spell.magic-missile"
+      },
+      "rarity": "uncommon",
+      "requiresAttunement": false
+    },
+    "id": "srd521.magic-item.wand-of-magic-missiles",
+    "kind": "magic-item",
+    "name": {
+      "en": "Wand of Magic Missiles"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0251-b007",
+          "p0251-b008"
+        ],
+        "page": 251,
+        "quoteHash": "c54b61e4097ee4447d948221e40c9a4c7dde60cfef96a8ff80d2f36636f68de8",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "wand"
+    ]
+  },
+  {
+    "body": {
+      "category": "potion",
+      "description": "Regain 4d4 + 4 Hit Points when you drink this potion.",
+      "healingPotion": {
+        "bonus": 4,
+        "diceCount": 4,
+        "diceSize": 4
+      },
+      "rarity": "uncommon",
+      "requiresAttunement": false
+    },
+    "id": "srd521.magic-item.potion-of-healing-greater",
+    "kind": "magic-item",
+    "name": {
+      "en": "Potion of Healing (Greater)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0236-b002",
+          "p0236-b003",
+          "p0236-b004",
+          "p0236-b005",
+          "p0236-b006",
+          "p0236-b007",
+          "p0236-b008",
+          "p0236-b009",
+          "p0236-b011",
+          "p0236-b010"
+        ],
+        "page": 236,
+        "quoteHash": "a4d76d42dca6d9338f1f179147102d8683107fce6dabb159c60a580344172301",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "potion"
+    ]
+  },
+  {
+    "body": {
+      "category": "potion",
+      "description": "Regain 8d4 + 8 Hit Points when you drink this potion.",
+      "healingPotion": {
+        "bonus": 8,
+        "diceCount": 8,
+        "diceSize": 4
+      },
+      "rarity": "rare",
+      "requiresAttunement": false
+    },
+    "id": "srd521.magic-item.potion-of-healing-superior",
+    "kind": "magic-item",
+    "name": {
+      "en": "Potion of Healing (Superior)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0236-b002",
+          "p0236-b003",
+          "p0236-b004",
+          "p0236-b005",
+          "p0236-b006",
+          "p0236-b007",
+          "p0236-b008",
+          "p0236-b009",
+          "p0236-b011",
+          "p0236-b010"
+        ],
+        "page": 236,
+        "quoteHash": "a4d76d42dca6d9338f1f179147102d8683107fce6dabb159c60a580344172301",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "potion"
+    ]
+  },
+  {
+    "body": {
+      "category": "potion",
+      "description": "Regain 10d4 + 20 Hit Points when you drink this potion.",
+      "healingPotion": {
+        "bonus": 20,
+        "diceCount": 10,
+        "diceSize": 4
+      },
+      "rarity": "very rare",
+      "requiresAttunement": false
+    },
+    "id": "srd521.magic-item.potion-of-healing-supreme",
+    "kind": "magic-item",
+    "name": {
+      "en": "Potion of Healing (Supreme)"
+    },
+    "review": {
+      "extractionApproved": true,
+      "semanticsApproved": false,
+      "status": "STRUCTURED",
+      "testsApproved": false
+    },
+    "rules": [],
+    "source": [
+      {
+        "blocks": [
+          "p0236-b002",
+          "p0236-b003",
+          "p0236-b004",
+          "p0236-b005",
+          "p0236-b006",
+          "p0236-b007",
+          "p0236-b008",
+          "p0236-b009",
+          "p0236-b011",
+          "p0236-b010"
+        ],
+        "page": 236,
+        "quoteHash": "a4d76d42dca6d9338f1f179147102d8683107fce6dabb159c60a580344172301",
+        "sourceId": "wotc-srd-5.2.1-en"
+      }
+    ],
+    "tags": [
+      "magic-item",
+      "potion"
+    ]
+  }
+]

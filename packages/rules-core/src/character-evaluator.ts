@@ -3,6 +3,12 @@ import { resolveToolGrants } from "./tool-proficiencies.js";
 import { preparedSpellLists } from "./prepared-spell-lists.js";
 import { validateFeatureOptionChoices, validFeatureOptionIds } from "./feature-option-choices.js";
 import { validateExpertiseChoices } from "./expertise-choices.js";
+import { resolveAttunement } from "./attunement.js";
+import {
+  healingPotionSchema,
+  magicItemPowerSchema,
+  timedMagicItemPowerSchema,
+} from "./magic-item-power.js";
 
 import type {
   CalculationTrace,
@@ -159,7 +165,14 @@ const statusBodySchema = z
     speedBonus: z.number().optional(),
     speedMultiplier: z.number().positive().optional(),
     speedOverrides: z.record(z.string(), z.number().nonnegative()).default({}),
+    speedMaximum: z.number().nonnegative().optional(),
+    grantsConditions: z.array(z.string()).default([]),
     armorClassBonus: z.number().int().optional(),
+    armorClassMinimum: z.number().int().optional(),
+    abilityCheckAdvantageChoices: z.array(z.enum(abilities)).default([]),
+    damageResistanceChoices: z.array(z.string().min(1)).default([]),
+    damageResistances: z.array(z.string().min(1)).default([]),
+    savingThrowBonus: z.number().int().optional(),
     armorClassCandidate: z
       .object({
         base: z.number().int(),
@@ -224,6 +237,17 @@ const statusBodySchema = z
   .passthrough();
 
 type StatusBody = z.infer<typeof statusBodySchema>;
+
+const magicEquipmentBodySchema = statusBodySchema.extend({
+  duration: z.string().default("While equipped"),
+  concentration: z.boolean().default(false),
+  requiresAttunement: z.boolean().default(false),
+  wearSlot: z.string().optional(),
+  power: magicItemPowerSchema.optional(),
+  healingPotion: healingPotionSchema.optional(),
+  statusPotionId: z.string().min(1).optional(),
+  timedPower: timedMagicItemPowerSchema.optional(),
+});
 
 interface ActiveStatus {
   readonly entity: ContentEntity;
@@ -982,7 +1006,10 @@ function resolveActiveConditions(
   granted: ReadonlySet<string>,
 ): ActiveCondition[] {
   const active = new Map<string, ActiveCondition>();
-  const pending = [...character.state.conditionIds];
+  const pending = [
+    ...character.state.conditionIds,
+    ...statuses.flatMap(({ body }) => body.grantsConditions),
+  ];
   if (
     character.state.currentHitPoints === 0 &&
     character.state.dead !== true &&
@@ -1212,6 +1239,143 @@ function resolveActiveStatuses(
   });
 }
 
+const healingPotionEquipmentSchema = z.object({ healingPotion: healingPotionSchema });
+
+function resolveMagicEquipment(
+  character: CharacterDocument,
+  index: PackageIndex,
+  state: EngineState,
+) {
+  const items = character.loadout.inventory.flatMap((item) => {
+    const entity = index.entities.get(item.entityId);
+    if (
+      entity === undefined ||
+      (entity.kind !== "magic-item" && !healingPotionEquipmentSchema.safeParse(entity.body).success)
+    )
+      return [];
+    return [{ item, entity, body: magicEquipmentBodySchema.parse(entity.body) }];
+  });
+  const attunableItems = new Map(
+    items
+      .filter(({ body }) => body.requiresAttunement)
+      .map(({ entity }) => [entity.id, entity.name.en ?? entity.id]),
+  );
+  const attunement = resolveAttunement(character.loadout, attunableItems);
+  for (const message of attunement.rejected.values())
+    addValidation(state, "INVALID_ATTUNEMENT", message, ["loadout.attunedItemIds"]);
+
+  const equippedIds = new Set(character.loadout.equippedItemIds);
+  const occupiedSlots = new Set<string>();
+  const grantedEntities = new Set<string>();
+  const statuses: ActiveStatus[] = [];
+  const summaries = new Map<
+    string,
+    Pick<
+      InventoryItemSummary,
+      | "requiresAttunement"
+      | "attuned"
+      | "magicActive"
+      | "power"
+      | "timedPower"
+      | "healingPotion"
+      | "statusPotionId"
+    >
+  >();
+  for (const { item, entity, body } of items) {
+    if (body.statusPotionId !== undefined) {
+      summaries.set(item.id, { statusPotionId: body.statusPotionId });
+      continue;
+    }
+    if (body.healingPotion !== undefined) {
+      summaries.set(item.id, { healingPotion: body.healingPotion });
+      continue;
+    }
+    const equipped = equippedIds.has(item.id);
+    const attuned = attunement.itemIds.has(item.id);
+    const slotOccupied =
+      equipped && body.wearSlot !== undefined && occupiedSlots.has(body.wearSlot);
+    if (slotOccupied) {
+      addValidation(
+        state,
+        "MULTIPLE_MAGIC_ITEMS_IN_WEAR_SLOT",
+        `Only one item can occupy the ${body.wearSlot ?? ""} slot.`,
+        ["loadout.equippedItemIds"],
+      );
+    }
+    if (equipped && body.wearSlot !== undefined) occupiedSlots.add(body.wearSlot);
+    const eligible = equipped && !slotOccupied && (!body.requiresAttunement || attuned);
+    let timedPower: InventoryItemSummary["timedPower"];
+    if (body.timedPower !== undefined) {
+      const maximum = body.timedPower.maximumRounds;
+      const remainingRounds = Math.min(maximum, item.timedPowerState?.remainingRounds ?? maximum);
+      const available = eligible && remainingRounds > 0;
+      timedPower = {
+        ...body.timedPower,
+        remainingRounds,
+        available,
+        active: available && item.timedPowerState?.active === true,
+      };
+    }
+    const magicActive =
+      eligible &&
+      !grantedEntities.has(entity.id) &&
+      (timedPower === undefined || timedPower.active);
+    let power: InventoryItemSummary["power"];
+    if (body.power !== undefined) {
+      const { charges } = body.power;
+      const current = Math.min(item.charges ?? charges?.maximum ?? 0, charges?.maximum ?? 0);
+      const chargeSummary =
+        charges === undefined
+          ? undefined
+          : {
+              maximum: charges.maximum,
+              maximumSpend: charges.maximumSpend,
+              dawnDieSize: charges.dawnDieSize,
+              dawnBonus: charges.dawnBonus,
+              ...(charges.lastChargeDieSize === undefined
+                ? {}
+                : { lastChargeDieSize: charges.lastChargeDieSize }),
+              ...(charges.destroyedOn === undefined ? {} : { destroyedOn: charges.destroyedOn }),
+              current,
+            };
+      const available = eligible && (charges === undefined || current > 0);
+      if ("savingThrowAbility" in body.power) {
+        power = {
+          kind: "saving-throw-reaction",
+          ability: body.power.savingThrowAbility,
+          available,
+          ...(chargeSummary === undefined ? {} : { charges: chargeSummary }),
+        };
+      } else {
+        const { spellId, selfStatusId, baseDarts } = body.power;
+        const spell = index.entities.get(spellId);
+        power = {
+          kind: "spell",
+          spellId,
+          spellName: spell?.name.en ?? spellId,
+          available: available && spell?.kind === "spell",
+          ...(selfStatusId === undefined ? {} : { selfStatusId }),
+          ...(baseDarts === undefined ? {} : { baseDarts }),
+          ...(chargeSummary === undefined ? {} : { charges: chargeSummary }),
+        };
+      }
+    }
+    summaries.set(item.id, {
+      requiresAttunement: body.requiresAttunement,
+      attuned,
+      magicActive,
+      ...(power === undefined ? {} : { power }),
+      ...(timedPower === undefined ? {} : { timedPower }),
+    });
+    if (magicActive) {
+      grantedEntities.add(entity.id);
+      statuses.push({ entity, body });
+      Object.assign(state.facts, body.factGrants);
+    }
+  }
+  return { statuses, summaries };
+}
+
 function conditionRollEffects(conditions: readonly ActiveCondition[]): D20RollEffect[] {
   const testsByScope: Record<string, readonly string[]> = {
     "saving-throw": [...abilities.map((ability) => `savingThrow.${ability}`), "savingThrow.death"],
@@ -1237,7 +1401,10 @@ function conditionRollEffects(conditions: readonly ActiveCondition[]): D20RollEf
   );
 }
 
-function statusRollEffects(statuses: readonly ActiveStatus[]): D20RollEffect[] {
+function statusRollEffects(
+  character: CharacterDocument,
+  statuses: readonly ActiveStatus[],
+): D20RollEffect[] {
   const testsByScope: Record<string, readonly string[]> = {
     "saving-throw": [...abilities.map((ability) => `savingThrow.${ability}`), "savingThrow.death"],
     "ability-checks": [
@@ -1246,8 +1413,21 @@ function statusRollEffects(statuses: readonly ActiveStatus[]): D20RollEffect[] {
     ],
     initiative: ["initiative"],
   };
-  return statuses.flatMap(({ entity, body }) =>
-    body.d20RollEffects.flatMap((effect) => {
+  return statuses.flatMap(({ entity, body }) => {
+    const choice = body.abilityCheckAdvantageChoices.find(
+      (ability) => ability === character.state.activeEffectSelections[entity.id],
+    );
+    const abilityChecks =
+      choice === undefined
+        ? []
+        : [
+            `abilityCheck.${choice}`,
+            ...skillDefinitions
+              .filter(({ ability }) => ability === choice)
+              .map(({ id }) => `skill.${id}`),
+            ...(choice === "dexterity" ? ["initiative"] : []),
+          ].map((testId) => ({ testId, kind: "advantage" as const, source: entity.id }));
+    const otherRollEffects = body.d20RollEffects.flatMap((effect) => {
       if (effect.scope === "attack-rolls") return [];
       const testIds =
         effect.scope === "saving-throw" && effect.ability !== undefined
@@ -1258,8 +1438,9 @@ function statusRollEffects(statuses: readonly ActiveStatus[]): D20RollEffect[] {
         kind: effect.kind,
         source: entity.id,
       }));
-    }),
-  );
+    });
+    return [...abilityChecks, ...otherRollEffects];
+  });
 }
 
 interface D20TestBonusDice extends D20BonusDice {
@@ -1443,14 +1624,25 @@ function conditionD20Modifiers(
 }
 
 function statusD20Modifiers(statuses: readonly ActiveStatus[]): D20TestModifier[] {
-  return statuses.flatMap(({ entity, body }) =>
-    body.d20Modifiers.map((modifier) => ({
+  return statuses.flatMap(({ entity, body }) => {
+    const savingThrowBonus = body.savingThrowBonus;
+    const modifiers =
+      savingThrowBonus === undefined
+        ? body.d20Modifiers
+        : [
+            ...body.d20Modifiers,
+            ...[...abilities, "death"].map((ability) => ({
+              target: `savingThrow.${ability}`,
+              bonus: savingThrowBonus,
+            })),
+          ];
+    return modifiers.map((modifier) => ({
       target: modifier.target,
       bonus: modifier.bonus,
       sourceId: entity.id,
       sourceReferences: entitySourceReferences(entity),
-    })),
-  );
+    }));
+  });
 }
 
 function evaluateConditionAttackModifiers(
@@ -1714,10 +1906,14 @@ function evaluateSpellRecoveryFeatures(
 function evaluateConditionMechanics(
   character: CharacterDocument,
   conditions: readonly ActiveCondition[],
+  statuses: readonly ActiveStatus[],
   state: EngineState,
 ): void {
+  const movementLimits = [...conditions, ...statuses].filter(
+    ({ body }) => body.speedMaximum !== undefined,
+  );
   const speedMaximum = Math.min(
-    ...conditions.map(({ body }) => body.speedMaximum ?? Number.POSITIVE_INFINITY),
+    ...movementLimits.map(({ body }) => body.speedMaximum ?? Number.POSITIVE_INFINITY),
   );
   const speedModifier = conditions.reduce(
     (total, { body }) => total + (body.speedModifierPerLevel ?? 0) * character.state.exhaustion,
@@ -1728,11 +1924,12 @@ function evaluateConditionMechanics(
     const before = state.values[speedId]?.value;
     if (typeof before !== "number") continue;
     const value = Math.max(0, Math.min(speedMaximum, before + speedModifier));
-    const sources = conditions
-      .filter(
-        ({ body }) => body.speedMaximum !== undefined || body.speedModifierPerLevel !== undefined,
-      )
-      .flatMap(({ entity }) => entitySourceReferences(entity));
+    const sources = [
+      ...movementLimits,
+      ...conditions.filter(
+        ({ body }) => body.speedMaximum === undefined && body.speedModifierPerLevel !== undefined,
+      ),
+    ].flatMap(({ entity }) => entitySourceReferences(entity));
     state.facts[speedId] = value;
     state.values[speedId] = { value, traceId: speedId };
     state.traces[speedId] = {
@@ -3176,6 +3373,7 @@ function resolveEquipment(
   character: CharacterDocument,
   index: PackageIndex,
   state: EngineState,
+  magicEquipment: ReturnType<typeof resolveMagicEquipment>["summaries"],
 ): EquipmentContext {
   const equippedIds = new Set(character.loadout.equippedItemIds);
   const classEntity = startingClassEntity(character, index);
@@ -3212,6 +3410,7 @@ function resolveEquipment(
       quantity: item.quantity,
       equipped: equippedIds.has(item.id),
       kind: entity?.kind ?? "unknown",
+      ...magicEquipment.get(item.id),
     });
     return {
       item,
@@ -4180,7 +4379,9 @@ function evaluateD20Tests(
   const perception = state.d20Tests["skill.perception"];
   if (perception !== undefined) {
     const traceId = "passive.perception";
-    const value = 10 + perception.modifier;
+    const baseValue = 10 + perception.modifier;
+    const rollModeModifier = { advantage: 5, disadvantage: -5, normal: 0 }[perception.rollMode];
+    const value = baseValue + rollModeModifier;
     state.traces[traceId] = {
       id: traceId,
       result: value,
@@ -4195,8 +4396,18 @@ function evaluateD20Tests(
           id: `${traceId}.add-modifier`,
           operation: "add",
           inputs: [10, perception.modifier],
-          output: value,
+          output: baseValue,
         },
+        ...(rollModeModifier === 0
+          ? []
+          : [
+              {
+                id: `${traceId}.roll-mode`,
+                operation: "apply-passive-check-roll-mode",
+                inputs: [baseValue, perception.rollMode, rollModeModifier],
+                output: value,
+              },
+            ]),
       ],
       sourceReferences: state.traces[perception.traceId]?.sourceReferences ?? [],
     };
@@ -6983,6 +7194,33 @@ function evaluateArmorClass(
       candidate.sourceReferences.push(...statusArmorClassSources);
     }
   }
+  for (const { entity, body } of statuses) {
+    const minimum = body.armorClassMinimum;
+    if (minimum === undefined) continue;
+    const traceId = `armorClass.${entity.id}.minimum`;
+    const sourceReferences = entitySourceReferences(entity);
+    candidates.push({
+      id: entity.id,
+      applicable: true,
+      value: minimum,
+      rejectionReasons: [],
+      trace: {
+        id: traceId,
+        result: minimum,
+        nodes: [
+          {
+            id: traceId,
+            operation: "status-armor-class-minimum",
+            inputs: [minimum],
+            output: minimum,
+            label: entity.name.en ?? entity.id,
+          },
+        ],
+        sourceReferences,
+      },
+      sourceReferences,
+    });
+  }
   const applicableCandidates = candidates.filter(
     (candidate): candidate is typeof candidate & { value: number } =>
       candidate.applicable && candidate.value !== undefined,
@@ -8113,7 +8351,9 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   validateProgressionSelections(character, index, state);
   state.validations.push(...validateFeatureOptionChoices(character, input.packages));
   const classLevels = materializeFacts(character, state);
-  const statuses = resolveActiveStatuses(character, index, state);
+  const declaredStatuses = resolveActiveStatuses(character, index, state);
+  const magicEquipment = resolveMagicEquipment(character, index, state);
+  const statuses = [...declaredStatuses, ...magicEquipment.statuses];
   const granted = grantedFeatureIds(classLevels, index);
   grantSubclassFeatures(character, classLevels, index, granted);
   if (character.build.speciesId !== undefined) {
@@ -8136,7 +8376,13 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   evaluateAbilities(state);
   evaluateProficiency(state);
   evaluateFeatureSaveDifficultyClass(character, index, state);
-  const equipment = resolveEquipment(character, index, state);
+  const equipment = resolveEquipment(character, index, state, magicEquipment.summaries);
+  for (const { entity, body } of statuses) {
+    body.damageResistances.forEach((type) => state.resistances.add(type));
+    const damageType = character.state.activeEffectSelections[entity.id];
+    if (damageType !== undefined && body.damageResistanceChoices.includes(damageType))
+      state.resistances.add(damageType);
+  }
   evaluateWalkingSpeed(character, index, state);
   evaluateMovementRules(rules, granted, index, state);
   evaluateStatusMovement(statuses, state);
@@ -8154,7 +8400,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
       ...speciesRollEffects(origins, input.context),
       ...ruleRollEffects(rules, state, index, granted),
       ...conditionRollEffects(conditions),
-      ...statusRollEffects(statuses),
+      ...statusRollEffects(character, statuses),
     ],
     [
       ...ruleD20TestModifiers(rules, state, index, granted),
@@ -8177,7 +8423,7 @@ export function evaluateCharacter(input: EvaluateCharacterInput): CharacterEvalu
   const attackRules = evaluateAttackRules(rules, granted, index, state);
   evaluateAttacks(character, equipment, attackRules, index, state);
   evaluateGrantedAttackEnhancements(granted, index, state);
-  evaluateConditionMechanics(character, conditions, state);
+  evaluateConditionMechanics(character, conditions, statuses, state);
   const grantedAttackRollOptions = [...granted].flatMap((sourceId) => {
     const entity = index.entities.get(sourceId);
     if (

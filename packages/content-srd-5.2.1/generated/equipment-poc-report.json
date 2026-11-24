@@ -140,7 +140,10 @@
     "srd521.equipment.ammunition.bolts",
     "srd521.equipment.ammunition.bullets-firearm",
     "srd521.equipment.ammunition.bullets-sling",
-    "srd521.equipment.ammunition.needles"
+    "srd521.equipment.ammunition.needles",
+    "srd521.equipment.gear.find-familiar-incense",
+    "srd521.equipment.gear.identify-pearl",
+    "srd521.equipment.gear.revivify-diamond"
   ],
   "weapons": 38
 }

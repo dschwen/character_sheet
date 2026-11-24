@@ -811,6 +811,40 @@ export function proposeRest(
   } else {
     proposeLongRest(character, evaluation, nextState, changes, traces);
   }
+  const timedItems = new Map(evaluation.inventory.map((item) => [item.id, item.timedPower]));
+  const inventory = character.loadout.inventory.map((item) => {
+    const timed = timedItems.get(item.id);
+    if (timed === undefined || item.timedPowerState === undefined) return item;
+    if (request.event === "short-rest" && !timed.active) return item;
+    const remainingRounds = request.event === "long-rest" ? timed.maximumRounds : 0;
+    const previous = item.timedPowerState;
+    if (!previous.active && previous.remainingRounds === remainingRounds) return item;
+    const source = input.packages
+      .flatMap((pkg) => pkg.entities)
+      .find((entity) => entity.id === item.entityId);
+    const next = { active: false, remainingRounds };
+    recordChange(
+      changes,
+      traces,
+      `loadout.inventory.${item.id}.timedPowerState`,
+      previous,
+      next,
+      request.event === "long-rest"
+        ? "Restore the item's duration on a Long Rest."
+        : "An active item's remaining duration elapses during a Short Rest.",
+      "resolve-timed-item-on-rest",
+      [request.event, previous.remainingRounds],
+      source?.source.map((span) => ({
+        entityId: source.id,
+        sourceId: span.sourceId,
+        ...(isEditionReferenceSpan(span) ? {} : { page: span.page }),
+      })) ?? [],
+    );
+    return { ...item, timedPowerState: next };
+  });
+  const inventoryChanged = inventory.some(
+    (item, index) => item !== character.loadout.inventory[index],
+  );
   return {
     kind: "rest",
     event: request.event,
@@ -818,6 +852,7 @@ export function proposeRest(
     changes,
     nextState,
     ...(request.featureChoiceReplacements.length > 0 ? { nextBuild } : {}),
+    ...(inventoryChanged ? { nextLoadout: { ...character.loadout, inventory } } : {}),
     validations,
     traces,
   };

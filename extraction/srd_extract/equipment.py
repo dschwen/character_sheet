@@ -374,6 +374,49 @@ def parse_ammunition_table(raw_page: dict[str, Any]) -> list[dict[str, Any]]:
     return entities
 
 
+def spell_component_gear() -> list[dict[str, Any]]:
+    entries = [
+        (
+            "find-familiar", "find-familiar-incense", "Find Familiar Incense", 10, True,
+            130, ["p0130-b010", "p0130-b011"],
+            "burning incense worth 10+ GP, which the spell consumes",
+        ),
+        (
+            "identify", "identify-pearl", "Identify Pearl", 100, False,
+            142, ["p0142-b004"], "a pearl worth 100+ GP",
+        ),
+        (
+            "revivify", "revivify-diamond", "Revivify Diamond", 300, True,
+            159, ["p0159-b007", "p0159-b008"], "a diamond worth 300+ GP, which the spell consumes",
+        ),
+    ]
+    return [
+        {
+            "id": f"srd521.equipment.gear.{item}",
+            "kind": "equipment-gear",
+            "name": {"en": name},
+            "tags": ["equipment", "spell-component"],
+            "source": _source(blocks, page, quote),
+            "body": {
+                "cost": {"amount": price, "denomination": "gp"},
+                "spellComponent": {"spellId": f"srd521.spell.{spell}", "consumed": consumed},
+            },
+            "rules": [],
+            "review": {
+                "status": "STRUCTURED",
+                "extractionApproved": True,
+                "semanticsApproved": False,
+                "testsApproved": False,
+                "notes": (
+                    "Minimum component value for one cast, derived from the spell "
+                    f"on page {page}."
+                ),
+            },
+        }
+        for spell, item, name, price, consumed, page, blocks, quote in entries
+    ]
+
+
 def generate_equipment_content(extraction_root: Path, output: Path) -> dict[str, Any]:
     weapons = parse_weapon_table(read_json(extraction_root / "raw" / "pages" / "0091.json"))
     armor = parse_armor_table(read_json(extraction_root / "raw" / "pages" / "0092.json"))
@@ -381,7 +424,7 @@ def generate_equipment_content(extraction_root: Path, output: Path) -> dict[str,
         read_json(extraction_root / "raw" / "pages" / "0095.json")
     )
     ammunition = parse_ammunition_table(read_json(extraction_root / "raw" / "pages" / "0096.json"))
-    equipment = [*weapons, *armor, *adventuring_gear, *ammunition]
+    equipment = [*weapons, *armor, *adventuring_gear, *ammunition, *spell_component_gear()]
     previous_equipment_ids = {
         entity["id"] for entity in read_json(output / "entities" / "equipment.json")
     }

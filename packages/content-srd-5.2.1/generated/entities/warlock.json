@@ -1881,7 +1881,22 @@
   },
   {
     "body": {
+      "alwaysPreparedSpells": {
+        "1": [
+          "srd521.spell.find-familiar"
+        ]
+      },
       "choiceId": "srd521.choice.warlock.eldritch-invocation",
+      "freeSpellCasting": {
+        "atWill": true,
+        "classId": "srd521.class.warlock",
+        "guidance": [
+          "Pact of the Chain casts Find Familiar as a Magic action. Provide the consumed incense. The familiar's Reaction attack is resolved at the table."
+        ],
+        "spellIds": [
+          "srd521.spell.find-familiar"
+        ]
+      },
       "minimumWarlockLevel": 1,
       "prerequisiteInvocationIds": [],
       "prerequisiteText": "",

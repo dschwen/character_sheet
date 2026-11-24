@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TimedMagicItemControls } from "./timed-magic-item-controls";
+import { FamiliarCastFields, FamiliarControls, type FamiliarDraft } from "./familiar-controls";
 
 import {
   characterDocumentSchema,
+  familiarConfigurationSchema,
   type CharacterDocument,
   type CharacterState,
   type CurrencyDenomination,
@@ -25,7 +28,12 @@ import {
   proposeAction,
   proposeRest,
   proposeSpellCast,
+  trackedSpellComponents,
   resolveSavingThrowDamage,
+  attunementLimit,
+  findFamiliarId,
+  pactOfTheChainId,
+  proposeMagicItemUse,
   deathSaveStatus,
   proposeDeathSavingThrow,
   reactionAttackDefinition,
@@ -81,6 +89,7 @@ import {
   inventoryCatalog,
   purchaseInventoryItem,
   removeInventoryItem,
+  toggleAttunedItem,
   toggleEquippedItem,
   type InventoryChangeProposal,
 } from "../lib/inventory-management";
@@ -115,6 +124,8 @@ import {
 } from "../lib/play-state";
 import { proposePreparedSpellLoadout, spellPreparationEditor } from "../lib/spell-preparation";
 import { spellStatusInstructions, spellStatusMessage } from "../lib/spell-status";
+import { familiarStatBlock } from "../lib/familiar-stat-blocks";
+import { materialComponentMessage } from "../lib/spell-components";
 import { selectedWeaponDamageMode, weaponDamageRollRequest } from "../lib/weapon-damage-roll";
 import {
   rollD20,
@@ -135,7 +146,15 @@ import {
 } from "../lib/fullscreen-dice";
 
 const storageKey = "dnd-character-manager.document.v1";
-const tabs = ["overview", "play", "combat", "spells", "features", "diagnostics"] as const;
+const tabs = [
+  "overview",
+  "play",
+  "combat",
+  "spells",
+  "features",
+  "diagnostics",
+  "settings",
+] as const;
 const currencyDenominations = ["pp", "gp", "ep", "sp", "cp"] as const;
 type Tab = (typeof tabs)[number];
 type Trace = CharacterEvaluation["traces"][string];
@@ -167,6 +186,7 @@ interface TransitionResult {
   applicable: boolean;
   changes: StateChange[];
   nextState: CharacterState;
+  nextLoadout?: CharacterDocument["loadout"];
   validations: ValidationMessage[];
 }
 
@@ -385,8 +405,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [levelUpOpen, setLevelUpOpen] = useState(false);
   const [playAmount, setPlayAmount] = useState("1");
   const [resolveSaveDamage, setResolveSaveDamage] = useState(false);
+  const [incomingResistance, setIncomingResistance] = useState<{
+    character: CharacterDocument;
+    damageType: string;
+  }>();
   const [incomingSaveAbility, setIncomingSaveAbility] = useState<Ability>("dexterity");
-  const [incomingSaveOutcome, setIncomingSaveOutcome] = useState<"success" | "failure">("failure");
+  const [declaredSaveOutcome, setIncomingSaveOutcome] = useState<"success" | "failure">("failure");
+  const [itemSaveOutcome, setItemSaveOutcome] = useState<CharacterDocument["metadata"]>();
+  const [incomingSaveReaction, setIncomingSaveReaction] = useState<{
+    character: CharacterDocument;
+    itemId: string;
+  }>();
   const [incomingSuccessDamage, setIncomingSuccessDamage] = useState<"half" | "none" | "full">(
     "half",
   );
@@ -394,6 +423,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
   const [damageIsCritical, setDamageIsCritical] = useState(false);
   const [actionDrafts, setActionDrafts] = useState<Readonly<Record<string, ActionDraft>>>({});
   const [spellLevels, setSpellLevels] = useState<Readonly<Record<string, string>>>({});
+  const [spellSources, setSpellSources] = useState<Readonly<Record<string, string>>>({});
+  const [trackedComponentChoices, setTrackedComponentChoices] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [familiarDraft, setFamiliarDraft] = useState<FamiliarDraft>({
+    form: "",
+    otherForm: "",
+    creatureType: "",
+    maximumHitPoints: "",
+  });
   const [weaponDamageModes, setWeaponDamageModes] = useState<Readonly<Record<string, string>>>({});
   const [weaponMasterySelections, setWeaponMasterySelections] = useState<
     Readonly<Record<string, string>>
@@ -547,13 +586,26 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 (instruction): instruction is string => typeof instruction === "string",
               )
             : [];
+          const rawChoices = body?.abilityCheckAdvantageChoices ?? body?.damageResistanceChoices;
+          const choices = Array.isArray(rawChoices)
+            ? rawChoices.filter((choice): choice is string => typeof choice === "string")
+            : [];
           return {
             id: entity.id,
             name: entity.name.en ?? Object.values(entity.name)[0] ?? shortEntityName(entity.id),
             description: typeof body?.description === "string" ? body.description : "",
+            followUp: entity.tags.includes("follow-up"),
+            onEndStatusId: typeof body?.onEndStatusId === "string" ? body.onEndStatusId : undefined,
+            breaksConcentration: body?.breaksConcentration === true,
+            preventsDropToZero: body?.preventsDropToZero === true,
+            sharesIncomingDamage: body?.sharesIncomingDamage === true,
+            requiresUnarmored: objectValue(body?.armorClassCandidate)?.requiresUnarmored === true,
             requiresSkillSelection: bonusDice.some(
               (bonus) => objectValue(bonus)?.selection === "skill",
             ),
+            choices,
+            choiceLabel:
+              body?.abilityCheckAdvantageChoices === undefined ? "Damage type" : "Ability",
             hitPointBonus,
             turnStartTemporaryHitPoints,
             savingThrowAuraRecipient,
@@ -574,6 +626,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     equipmentCatalog[0]?.id ?? "",
   );
   const [inventoryLots, setInventoryLots] = useState("1");
+  const [itemChargeSpends, setItemChargeSpends] = useState<Record<string, number>>({});
   const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -649,6 +702,29 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     [builderCatalog, character],
   );
   const evaluation = result.evaluation;
+  const spellComponents = useMemo(() => trackedSpellComponents([rulesPackage]), [rulesPackage]);
+  const componentTracking = character.settings?.spellComponentTracking !== false;
+  const dropToOneStatus = statusOptions.find(
+    (status) => status.preventsDropToZero && character.state.activeEffectIds.includes(status.id),
+  );
+  const incomingSaveOutcome =
+    itemSaveOutcome === character.metadata ? "success" : declaredSaveOutcome;
+  const savingThrowReactions =
+    resolveSaveDamage &&
+    incomingSaveOutcome === "failure" &&
+    evaluation?.facts["actions.disabled"] !== true &&
+    deathSaveStatus(character.state) !== "dead"
+      ? (evaluation?.inventory.filter(
+          (item) =>
+            item.power?.kind === "saving-throw-reaction" &&
+            item.power.available &&
+            item.power.ability === incomingSaveAbility,
+        ) ?? [])
+      : [];
+  const saveReaction =
+    incomingSaveReaction?.character === character
+      ? savingThrowReactions.find((item) => item.id === incomingSaveReaction.itemId)
+      : undefined;
   const incomingDamage =
     resolveSaveDamage &&
     evaluation !== undefined &&
@@ -657,9 +733,17 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       ? resolveSavingThrowDamage(evaluation, {
           damage: Number(playAmount),
           ability: incomingSaveAbility,
-          outcome: incomingSaveOutcome,
+          outcome: saveReaction === undefined ? incomingSaveOutcome : "success",
           damageOnSuccess: incomingSuccessDamage,
         })
+      : undefined;
+  const incomingResistanceType =
+    incomingResistance?.character === character ? incomingResistance.damageType : "";
+  const resistanceApplies = evaluation?.resistances.includes(incomingResistanceType) === true;
+  const damageBeforeResistance = incomingDamage?.damage ?? Number(playAmount);
+  const damageAfterResistance =
+    resistanceApplies && Number.isSafeInteger(damageBeforeResistance) && damageBeforeResistance >= 0
+      ? Math.floor(damageBeforeResistance / 2)
       : undefined;
   const attackRollMode =
     evaluation?.facts["attackRoll.mode"] === "advantage" ||
@@ -914,6 +998,13 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     );
   }
 
+  function resetSpellCastDraft(): void {
+    setSpellLevels({});
+    setSpellSources({});
+    setTrackedComponentChoices({});
+    setFamiliarDraft({ form: "", otherForm: "", creatureType: "", maximumHitPoints: "" });
+  }
+
   function selectFixture(filename: string): void {
     const fixture = fixtures.find((option) => option.filename === filename);
     if (fixture === undefined) return;
@@ -923,7 +1014,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setSource(filename);
     setSelectedTraceId(undefined);
     setActionDrafts({});
-    setSpellLevels({});
+    resetSpellCastDraft();
     setSpellHealsOther({});
     setProtectedCreatureCounts({});
     setWeaponDamageModes({});
@@ -953,7 +1044,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setSource("imported");
       setSelectedTraceId(undefined);
       setActionDrafts({});
-      setSpellLevels({});
+      resetSpellCastDraft();
       setSpellHealsOther({});
       setProtectedCreatureCounts({});
       setWeaponDamageModes({});
@@ -988,10 +1079,41 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     setNotice("Exported the current character document.");
   }
 
-  function savePlayState(nextCharacter: CharacterDocument, message: string): void {
+  function savePlayState(nextCharacter: CharacterDocument, message: string, rested = false): void {
+    let { state } = nextCharacter;
+    const previousSpell = character.state.concentrationSpellId;
+    if (previousSpell !== state.concentrationSpellId) {
+      const ended = linkedStatusIds(previousSpell).filter((id) =>
+        state.activeEffectIds.includes(id),
+      );
+      if (ended.length > 0) state = endActiveEffects(nextCharacter, ended).state;
+    }
+    const followUps = rested
+      ? []
+      : statusOptions.filter((status) =>
+          statusOptions.some(
+            (ending) =>
+              ending.onEndStatusId === status.id &&
+              character.state.activeEffectIds.includes(ending.id) &&
+              !state.activeEffectIds.includes(ending.id),
+          ),
+        );
+    if (followUps.length > 0) {
+      if (followUps.some((status) => status.breaksConcentration) && state.concentrationSpellId) {
+        state = clearConcentrationAndEffects(
+          { ...nextCharacter, state },
+          linkedStatusIds(state.concentrationSpellId),
+        ).state;
+      }
+      state = {
+        ...state,
+        activeEffectIds: [...new Set([...state.activeEffectIds, ...followUps.map(({ id }) => id)])],
+      };
+      message += ` Applied ${followUps.map(({ name }) => name).join(", ")}.`;
+    }
     clearLatestRoll();
     setPreviousCharacter(character);
-    setCharacter(nextCharacter);
+    setCharacter({ ...nextCharacter, state });
     setSource("browser-save");
     setNotice(message);
   }
@@ -1026,7 +1148,30 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setNotice(proposal.issues[0] ?? "The inventory could not be updated.");
       return;
     }
-    savePlayState(proposal.nextCharacter, successMessage);
+    const next = proposal.nextCharacter;
+    const endedStatuses = statusOptions.filter(
+      (status) => status.requiresUnarmored && next.state.activeEffectIds.includes(status.id),
+    );
+    const wearingArmor = next.loadout.inventory.some(
+      (item) =>
+        next.loadout.equippedItemIds.includes(item.id) &&
+        equipmentCatalogById.get(item.entityId)?.kind === "equipment-armor",
+    );
+    if (
+      endedStatuses.length > 0 &&
+      (wearingArmor || evaluation?.facts["equipment.wearingArmor"] === true)
+    ) {
+      const { state } = endActiveEffects(
+        character,
+        endedStatuses.map((status) => status.id),
+      );
+      savePlayState(
+        { ...next, state },
+        `${successMessage} Ended ${endedStatuses.map((status) => status.name).join(", ")} because armor was worn.`,
+      );
+      return;
+    }
+    savePlayState(next, successMessage);
   }
 
   function selectedInventoryLots(): number | undefined {
@@ -1061,22 +1206,82 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     return amount;
   }
 
+  function proposeIncomingSaveReaction(itemId: string) {
+    return proposeMagicItemUse(
+      { character, packages: [rulesPackage] },
+      {
+        mode: "saving-throw-reaction",
+        itemId,
+        ability: incomingSaveAbility,
+        outcome: incomingSaveOutcome,
+      },
+    );
+  }
+
+  function useSavingThrowReaction(): void {
+    if (saveReaction === undefined) return;
+    const proposal = proposeIncomingSaveReaction(saveReaction.id);
+    if (!proposal.applicable) {
+      setNotice(proposal.reason);
+      return;
+    }
+    const next = commitCharacterState(proposal.nextCharacter, proposal.nextCharacter.state);
+    savePlayState(next, `${saveReaction.name} spent 1 charge. The saving throw succeeds.`);
+    setItemSaveOutcome(next.metadata);
+    setIncomingSaveReaction(undefined);
+  }
+
   function damageCharacter(): void {
     const amount = positivePlayAmount();
     if (amount === undefined || evaluation === undefined) return;
-    if (resolveSaveDamage && incomingDamage === undefined) {
-      setNotice("Enter a valid safe whole-number damage amount before resolving the save.");
+    if (
+      (resolveSaveDamage && incomingDamage === undefined) ||
+      (resistanceApplies && damageAfterResistance === undefined)
+    ) {
+      setNotice("Enter a safe whole-number damage amount to resolve a saving throw or resistance.");
       return;
     }
-    savePlayState(
-      applyDamage(character, incomingDamage?.damage ?? amount, undefined, {
-        maximumHitPoints: numericFact(evaluation, "hitPoints.maximum"),
-        critical: damageIsCritical,
-        concentrationEffectIds: linkedStatusIds(character.state.concentrationSpellId),
-      }),
-      `${character.name} took ${String(incomingDamage?.damage ?? amount)} damage. ${incomingDamage?.explanation ?? ""}`.trim(),
-    );
+    const reaction =
+      saveReaction === undefined ? undefined : proposeIncomingSaveReaction(saveReaction.id);
+    if (reaction !== undefined && !reaction.applicable) {
+      setNotice(reaction.reason);
+      return;
+    }
+    const damage = damageAfterResistance ?? incomingDamage?.damage ?? amount;
+    const next = applyDamage(reaction?.nextCharacter ?? character, damage, undefined, {
+      maximumHitPoints: numericFact(evaluation, "hitPoints.maximum"),
+      critical: damageIsCritical,
+      concentrationEffectIds: linkedStatusIds(character.state.concentrationSpellId),
+      ...(dropToOneStatus === undefined ? {} : { dropToOneEffectId: dropToOneStatus.id }),
+    });
+    const explanation = [
+      saveReaction === undefined
+        ? undefined
+        : `${saveReaction.name} spent 1 charge. The saving throw succeeds.`,
+      incomingDamage?.explanation,
+      resistanceApplies
+        ? `${titleCase(incomingResistanceType)} resistance halved the damage.`
+        : undefined,
+      dropToOneStatus !== undefined && !next.state.activeEffectIds.includes(dropToOneStatus.id)
+        ? `${dropToOneStatus.name} kept ${character.name} at 1 HP and ended.`
+        : undefined,
+      ...(damage === 0
+        ? []
+        : statusOptions
+            .filter(
+              (status) =>
+                status.sharesIncomingDamage && character.state.activeEffectIds.includes(status.id),
+            )
+            .map(
+              (status) => `${status.name}: Apply ${String(damage)} damage to the caster’s sheet.`,
+            )),
+    ]
+      .filter(Boolean)
+      .join(" ");
+    savePlayState(next, `${character.name} took ${String(damage)} damage. ${explanation}`.trim());
     setDamageIsCritical(false);
+    setIncomingResistance(undefined);
+    setIncomingSaveReaction(undefined);
   }
 
   function healCharacter(): void {
@@ -1105,7 +1310,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     );
   }
 
-  function applyTransition(proposal: TransitionResult, message: string): void {
+  function applyTransition(proposal: TransitionResult, message: string, rested = false): void {
     if (!proposal.applicable) {
       const validation = proposal.validations[0];
       setNotice(
@@ -1119,7 +1324,14 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       setNotice(`${message} No persistent state changed.`);
       return;
     }
-    savePlayState(commitCharacterState(character, proposal.nextState), message);
+    savePlayState(
+      commitCharacterState(
+        { ...character, loadout: proposal.nextLoadout ?? character.loadout },
+        proposal.nextState,
+      ),
+      message,
+      rested,
+    );
   }
 
   function rest(
@@ -1146,8 +1358,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       if (proposal.applicable) setSpellRecoverySelections({});
       if (proposal.applicable && proposal.nextBuild !== undefined) {
         savePlayState(
-          commitCharacterState({ ...character, build: proposal.nextBuild }, proposal.nextState),
+          commitCharacterState(
+            {
+              ...character,
+              build: proposal.nextBuild,
+              loadout: proposal.nextLoadout ?? character.loadout,
+            },
+            proposal.nextState,
+          ),
           `${event === "short-rest" ? "Short" : "Long"} Rest applied, including selected feature options. Enemy attacks and turn boundaries remain manual.`,
+          true,
         );
         setRestChoiceDraft(undefined);
         return;
@@ -1155,6 +1375,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
       applyTransition(
         proposal,
         `${event === "short-rest" ? "Short" : "Long"} Rest applied (${String(proposal.changes.length)} changes).`,
+        true,
       );
     } catch (error) {
       setNotice(`Rest failed: ${errorMessage(error)}`);
@@ -1338,6 +1559,137 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     }
   }
 
+  async function useMagicItem(
+    item: CharacterEvaluation["inventory"][number],
+    mode: "cast" | "dawn",
+    spend: number,
+  ): Promise<void> {
+    const power = item.power;
+    if (
+      power === undefined ||
+      diceRollingRef.current ||
+      (mode === "cast" && power.kind !== "spell")
+    )
+      return;
+    const charges = power.charges;
+    try {
+      let roll: DicePoolRollResult | undefined;
+      const diceSize =
+        mode === "dawn"
+          ? charges?.dawnDieSize
+          : spend === charges?.current
+            ? charges.lastChargeDieSize
+            : undefined;
+      if (diceSize !== undefined) {
+        const request = {
+          label: mode === "dawn" ? `${item.name} dawn recharge` : `${item.name} last charge`,
+          diceCount: 1,
+          diceSize,
+          modifier: mode === "dawn" ? (charges?.dawnBonus ?? 0) : 0,
+        };
+        roll = diceSize === 3 ? rollDice(request) : await performDicePoolRoll(request);
+        if (roll === undefined) return;
+      }
+      const die = roll?.dice[0];
+      if (mode === "dawn" && die === undefined) return;
+      const proposal = proposeMagicItemUse(
+        { character, packages: [rulesPackage] },
+        mode === "dawn"
+          ? { mode, itemId: item.id, roll: die ?? 0 }
+          : {
+              mode,
+              itemId: item.id,
+              ...(charges === undefined ? {} : { charges: spend }),
+              ...(die === undefined ? {} : { lastChargeRoll: die }),
+            },
+      );
+      if (!proposal.applicable) {
+        setNotice(proposal.reason);
+        return;
+      }
+      let message = `${item.name} regained ${String(proposal.restored)} charges at dawn.`;
+      if (mode === "cast" && power.kind === "spell") {
+        message = `Cast ${power.spellName} from ${item.name}.`;
+        if (power.baseDarts !== undefined)
+          message += ` ${String(power.baseDarts + spend - 1)} darts, each dealing 1d4 + 1 Force damage. Assign damage to targets at the table.`;
+      }
+      if (proposal.destroyed) message += ` ${item.name} crumbled to ashes.`;
+      savePlayState(
+        commitCharacterState(proposal.nextCharacter, proposal.nextCharacter.state),
+        message,
+      );
+      if (roll !== undefined) setLatestRoll(roll);
+    } catch (error) {
+      setNotice(`Item use failed: ${errorMessage(error)}`);
+    }
+  }
+
+  async function consumePotion(
+    item: CharacterEvaluation["inventory"][number],
+    target: "self" | "other",
+  ): Promise<void> {
+    const potion = item.healingPotion;
+    if (diceRollingRef.current || (potion === undefined && item.statusPotionId === undefined))
+      return;
+    try {
+      const roll =
+        potion === undefined
+          ? undefined
+          : await performDicePoolRoll({
+              label: `${item.name} healing`,
+              diceCount: potion.diceCount,
+              diceSize: potion.diceSize,
+              modifier: potion.bonus,
+            });
+      if (potion !== undefined && roll === undefined) return;
+      const proposal = proposeMagicItemUse(
+        { character, packages: [rulesPackage] },
+        { mode: "consume", itemId: item.id, target, rolls: roll?.dice ?? [] },
+      );
+      if (!proposal.applicable) {
+        setNotice(proposal.reason);
+        return;
+      }
+      const next = proposal.nextCharacter;
+      const regained = next.state.currentHitPoints - character.state.currentHitPoints;
+      const result =
+        roll !== undefined
+          ? target === "self"
+            ? `${item.name} consumed. Rolled ${String(roll.total)} healing and regained ${String(regained)} HP.`
+            : `${item.name} consumed. Apply ${String(roll.total)} healing to the recipient’s sheet.`
+          : target === "self"
+            ? `${item.name} consumed. Its effect is active.`
+            : `${item.name} consumed. Set the status on the recipient’s sheet.`;
+      savePlayState(commitCharacterState(next, next.state), result);
+      if (roll !== undefined) setLatestRoll(roll);
+    } catch (error) {
+      setNotice(`Potion use failed: ${errorMessage(error)}`);
+    }
+  }
+
+  function useTimedMagicItem(
+    item: CharacterEvaluation["inventory"][number],
+    rounds?: number,
+  ): void {
+    const proposal = proposeMagicItemUse(
+      { character, packages: [rulesPackage] },
+      rounds === undefined
+        ? { mode: "toggle", itemId: item.id }
+        : { mode: "elapse", itemId: item.id, rounds },
+    );
+    if (!proposal.applicable) {
+      setNotice(proposal.reason);
+      return;
+    }
+    const next = proposal.nextCharacter;
+    const timed = next.loadout.inventory.find(({ id }) => id === item.id)?.timedPowerState;
+    if (timed === undefined) return;
+    savePlayState(
+      commitCharacterState(next, next.state),
+      `${item.name} ${timed.active ? "active" : "inactive"}. ${String(timed.remainingRounds)} rounds remain.`,
+    );
+  }
+
   function selectedSlotLevel(spell: SpellSummary): number {
     const selected = Number(spellLevels[spell.id]);
     if (Number.isInteger(selected) && selected >= spell.level) return selected;
@@ -1353,14 +1705,34 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
     castingSourceId?: string,
     useFreeCast = false,
   ): void {
+    const component = spellComponents.get(spell.id);
+    const useTrackedComponent =
+      componentTracking &&
+      trackedComponentChoices[spell.id] === true &&
+      character.loadout.inventory.some(({ entityId }) => entityId === component?.itemId);
     const request: SpellCastRequest = {
       spellId: spell.id,
       asRitual,
       useFreeCast,
+      useTrackedComponent,
       ...(castingSourceId === undefined ? {} : { castingSourceId }),
       restoresHitPointsToOther: spellHealsOther[spell.id] ?? false,
       protectedCreatureCount: Number(protectedCreatureCounts[spell.id] ?? 0),
     };
+    if (spell.id === findFamiliarId) {
+      const familiar = familiarConfigurationSchema.safeParse({
+        form: familiarDraft.form === "other" ? familiarDraft.otherForm : familiarDraft.form,
+        creatureType: familiarDraft.creatureType,
+        maximumHitPoints:
+          familiarStatBlock(familiarDraft.form)?.hitPoints ??
+          Number(familiarDraft.maximumHitPoints),
+      });
+      if (!familiar.success) {
+        setNotice("Choose a familiar form, creature type, and maximum HP before casting.");
+        return;
+      }
+      request.familiar = familiar.data;
+    }
     const slotLevel =
       spell.level > 0 && !asRitual && !useFreeCast ? selectedSlotLevel(spell) : undefined;
     if (slotLevel !== undefined) request.slotLevel = slotLevel;
@@ -1377,6 +1749,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
         request,
       );
       if (proposal.applicable) {
+        if (useTrackedComponent) {
+          setTrackedComponentChoices((current) => ({ ...current, [spell.id]: false }));
+        }
         setProtectedCreatureCounts((current) => ({ ...current, [spell.id]: "0" }));
         setSpellHealsOther((current) => ({ ...current, [spell.id]: false }));
         const slot = evaluation?.spellcasting?.slots.find(
@@ -1696,6 +2071,25 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   </strong>
                   <small>shift-click to inspect</small>
                 </TraceButton>
+                {(["climb", "swim", "fly"] as const).map((mode) => {
+                  const traceId = `speed.${mode}`;
+                  if (evaluation.values[traceId] === undefined) return null;
+                  return (
+                    <TraceButton
+                      key={mode}
+                      className="vital-card"
+                      traceId={traceId}
+                      onSelect={setSelectedTraceId}
+                    >
+                      <span>{titleCase(mode)} speed</span>
+                      <strong>
+                        {numericFactText(evaluation, traceId)}
+                        <small> ft.</small>
+                      </strong>
+                      <small>shift-click to inspect</small>
+                    </TraceButton>
+                  );
+                })}
               </div>
             </section>
 
@@ -1778,9 +2172,9 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       />
                       <button className="button danger" type="button" onClick={damageCharacter}>
                         Apply{" "}
-                        {incomingDamage === undefined
+                        {incomingDamage === undefined && damageAfterResistance === undefined
                           ? "damage"
-                          : `${String(incomingDamage.damage)} damage`}
+                          : `${String(damageAfterResistance ?? incomingDamage?.damage)} damage`}
                       </button>
                       <button className="button heal" type="button" onClick={healCharacter}>
                         Heal
@@ -1798,21 +2192,40 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     </label>
                   </div>
                   <div className="play-control save-damage-controls">
+                    {evaluation.resistances.length > 0 ? (
+                      <label>
+                        Apply resistance to incoming damage
+                        <select
+                          value={resistanceApplies ? incomingResistanceType : ""}
+                          onChange={(event) => {
+                            setIncomingResistance({ character, damageType: event.target.value });
+                          }}
+                        >
+                          <option value="">No resistance applied</option>
+                          {evaluation.resistances.map((type) => (
+                            <option key={type} value={type}>
+                              {titleCase(type)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    ) : null}
                     <label>
                       <input
                         type="checkbox"
                         checked={resolveSaveDamage}
                         onChange={(event) => {
                           setResolveSaveDamage(event.target.checked);
+                          setIncomingSaveReaction(undefined);
+                          setItemSaveOutcome(undefined);
                         }}
                       />
                       Resolve damage from a saving throw
                     </label>
                     <small>
-                      Leave off for damage already resolved by the DM. Resistances, vulnerability,
-                      and other reductions remain manual. If they apply, resolve them separately and
-                      turn this off before entering the final total. Healing ignores these save
-                      controls.
+                      For damage already resolved by the DM, leave the saving throw and resistance
+                      controls off. Resolve vulnerability and other reductions separately. Healing
+                      ignores these controls.
                     </small>
                     {resolveSaveDamage ? (
                       <>
@@ -1822,6 +2235,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             value={incomingSaveAbility}
                             onChange={(event) => {
                               setIncomingSaveAbility(event.target.value as Ability);
+                              setIncomingSaveReaction(undefined);
+                              setItemSaveOutcome(undefined);
                             }}
                           >
                             {abilities.map((ability) => (
@@ -1837,12 +2252,51 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             value={incomingSaveOutcome}
                             onChange={(event) => {
                               setIncomingSaveOutcome(event.target.value as "success" | "failure");
+                              setIncomingSaveReaction(undefined);
+                              setItemSaveOutcome(undefined);
                             }}
                           >
                             <option value="failure">Failed save</option>
                             <option value="success">Successful save</option>
                           </select>
                         </label>
+                        {savingThrowReactions.length > 0 ? (
+                          <>
+                            <label>
+                              Saving throw reaction
+                              <select
+                                value={saveReaction?.id ?? ""}
+                                onChange={(event) => {
+                                  setIncomingSaveReaction({
+                                    character,
+                                    itemId: event.target.value,
+                                  });
+                                }}
+                              >
+                                <option value="">No reaction</option>
+                                {savingThrowReactions.map((item) => (
+                                  <option key={item.id} value={item.id}>
+                                    {item.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            {saveReaction === undefined ? null : (
+                              <>
+                                <small>
+                                  Apply damage to use the reaction and resolve damage together.
+                                </small>
+                                <button
+                                  type="button"
+                                  className="button secondary compact"
+                                  onClick={useSavingThrowReaction}
+                                >
+                                  Use reaction for save only
+                                </button>
+                              </>
+                            )}
+                          </>
+                        ) : null}
                         <label>
                           The effect normally deals on a successful save
                           <select
@@ -2100,42 +2554,87 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         <small>Set spell and feature effects on this sheet</small>
                       </span>
                       <div className="condition-grid">
-                        {statusOptions.map((status) => {
-                          const active = character.state.activeEffectIds.includes(status.id);
-                          return (
-                            <button
-                              key={status.id}
-                              type="button"
-                              className={active ? "condition-toggle active" : "condition-toggle"}
-                              aria-pressed={active}
-                              title={status.description}
-                              onClick={() => {
-                                const selection =
-                                  character.state.activeEffectSelections[status.id] ??
-                                  String(status.hitPointBonus?.minimumSelection ?? "");
-                                const hitPointBonus =
-                                  status.hitPointBonus === undefined
-                                    ? undefined
-                                    : selectedStatusHitPointBonus(status.hitPointBonus, selection);
-                                savePlayState(
-                                  hitPointBonus === undefined
-                                    ? setActiveEffectActive(character, status.id, !active)
-                                    : setActiveEffectWithHitPointBonus(
-                                        character,
-                                        status.id,
-                                        !active,
-                                        hitPointBonus,
-                                        selection,
-                                      ),
-                                  `${status.name} ${active ? "removed" : "set"}.`,
-                                );
-                              }}
-                            >
-                              {status.name}
-                            </button>
-                          );
-                        })}
+                        {statusOptions
+                          .filter((status) => !status.followUp)
+                          .map((status) => {
+                            const active = character.state.activeEffectIds.includes(status.id);
+                            const blocked =
+                              !active &&
+                              ((status.requiresUnarmored &&
+                                evaluation.facts["equipment.wearingArmor"] === true) ||
+                                (status.hitPointBonus !== undefined &&
+                                  deathSaveStatus(character.state) === "dead"));
+                            return (
+                              <button
+                                key={status.id}
+                                type="button"
+                                className={active ? "condition-toggle active" : "condition-toggle"}
+                                aria-pressed={active}
+                                disabled={blocked}
+                                title={
+                                  blocked
+                                    ? status.requiresUnarmored
+                                      ? "Remove worn armor before applying this status."
+                                      : "This effect cannot revive a dead character."
+                                    : status.description
+                                }
+                                onClick={() => {
+                                  const selection =
+                                    character.state.activeEffectSelections[status.id] ??
+                                    String(status.hitPointBonus?.minimumSelection ?? "");
+                                  const hitPointBonus =
+                                    status.hitPointBonus === undefined
+                                      ? undefined
+                                      : selectedStatusHitPointBonus(
+                                          status.hitPointBonus,
+                                          selection,
+                                        );
+                                  savePlayState(
+                                    hitPointBonus === undefined
+                                      ? setActiveEffectActive(character, status.id, !active)
+                                      : setActiveEffectWithHitPointBonus(
+                                          character,
+                                          status.id,
+                                          !active,
+                                          hitPointBonus,
+                                          selection,
+                                          undefined,
+                                          dropToOneStatus?.id,
+                                        ),
+                                    `${status.name} ${active ? "removed" : "set"}.`,
+                                  );
+                                }}
+                              >
+                                {status.name}
+                              </button>
+                            );
+                          })}
                       </div>
+                      {evaluation.facts["equipment.wearingArmor"] === true &&
+                      statusOptions.some((status) => status.requiresUnarmored) ? (
+                        <small>
+                          Remove worn armor to apply{" "}
+                          {statusOptions
+                            .filter((status) => status.requiresUnarmored)
+                            .map((status) => status.name)
+                            .join(", ")}
+                          .
+                        </small>
+                      ) : null}
+                      {evaluation.values.armorClass?.candidates
+                        ?.filter(
+                          (candidate) =>
+                            candidate.applicable &&
+                            character.state.activeEffectIds.includes(candidate.id) &&
+                            candidate.id !== evaluation.values.armorClass?.selectedCandidate,
+                        )
+                        .map((candidate) => (
+                          <small key={candidate.id}>
+                            {names.get(candidate.id) ?? shortEntityName(candidate.id)} gives AC{" "}
+                            {String(candidate.value)}. Your current AC is{" "}
+                            {numericFactText(evaluation, "armorClass")}.
+                          </small>
+                        ))}
                       {statusOptions
                         .filter(
                           (status) =>
@@ -2177,6 +2676,38 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             </label>
                           );
                         })}
+                      {statusOptions
+                        .filter(
+                          (status) =>
+                            status.choices.length > 0 &&
+                            character.state.activeEffectIds.includes(status.id),
+                        )
+                        .map((status) => (
+                          <label className="effect-selection" key={status.id}>
+                            <span>{status.choiceLabel}</span>
+                            <select
+                              aria-label={`${status.name} ${status.choiceLabel.toLowerCase()}`}
+                              value={character.state.activeEffectSelections[status.id] ?? ""}
+                              onChange={(event) => {
+                                const selection = event.target.value;
+                                if (!status.choices.includes(selection)) return;
+                                savePlayState(
+                                  setActiveEffectSelection(character, status.id, selection),
+                                  `${status.name} set to ${titleCase(selection)}.`,
+                                );
+                              }}
+                            >
+                              <option value="" disabled>
+                                Choose {status.choiceLabel.toLowerCase()}
+                              </option>
+                              {status.choices.map((choice) => (
+                                <option key={choice} value={choice}>
+                                  {titleCase(choice)}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        ))}
                       {statusOptions
                         .filter(
                           (status) =>
@@ -2246,6 +2777,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                       status.id,
                                       event.target.value,
                                       nextBonus - currentBonus,
+                                      undefined,
+                                      dropToOneStatus?.id,
                                     ),
                                     `${status.name} now grants ${String(nextBonus)} current and maximum HP.`,
                                   );
@@ -2456,6 +2989,31 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                             </div>
                           );
                         })}
+                      {dropToOneStatus !== undefined &&
+                      deathSaveStatus(character.state) !== "dead" ? (
+                        <div className="effect-instructions">
+                          <strong>{dropToOneStatus.name}</strong>
+                          <p>
+                            The ward ends after keeping the character at 1 HP the first time they
+                            would drop to 0.
+                          </p>
+                          <button
+                            type="button"
+                            className="button secondary compact"
+                            onClick={() => {
+                              savePlayState(
+                                endActiveEffects(character, [dropToOneStatus.id]),
+                                `${dropToOneStatus.name} negated instant death and ended.`,
+                              );
+                            }}
+                          >
+                            Use against instant death
+                          </button>
+                          <small>
+                            Use for an effect that would kill the character without dealing damage.
+                          </small>
+                        </div>
+                      ) : null}
                       {statusOptions
                         .filter(
                           (status) =>
@@ -2474,6 +3032,29 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         ))}
                     </div>
                   )}
+                  {evaluation.inventory.some(
+                    (item) =>
+                      item.magicActive && item.power === undefined && item.timedPower === undefined,
+                  ) ? (
+                    <div className="effect-instructions">
+                      <strong>Magic item effects</strong>
+                      <ul>
+                        {evaluation.inventory
+                          .filter(
+                            (item) =>
+                              item.magicActive &&
+                              item.power === undefined &&
+                              item.timedPower === undefined,
+                          )
+                          .map((item) => (
+                            <li key={item.id}>
+                              <strong>{item.name}</strong>{" "}
+                              {equipmentCatalogById.get(item.entityId)?.description}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  ) : null}
                   {character.state.activeEffectIds.length === 0 ? null : (
                     <div className="active-effect-controls">
                       <span>
@@ -2504,6 +3085,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                       hitPointBonus,
                                       character.state.activeEffectSelections[effectId] ??
                                         String(status?.hitPointBonus?.minimumSelection ?? ""),
+                                      undefined,
+                                      dropToOneStatus?.id,
                                     ),
                                 `${names.get(effectId) ?? shortEntityName(effectId)} ended.`,
                               );
@@ -2517,6 +3100,190 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   )}
                 </Section>
 
+                {evaluation.inventory.some(
+                  (item) =>
+                    item.power !== undefined ||
+                    item.timedPower !== undefined ||
+                    item.healingPotion !== undefined ||
+                    item.statusPotionId !== undefined,
+                ) ? (
+                  <Section title="Magic items" eyebrow="Item spells and charges">
+                    <div className="item-list">
+                      {evaluation.inventory.map((item) => {
+                        if (item.healingPotion !== undefined || item.statusPotionId !== undefined) {
+                          const potion = item.healingPotion;
+                          const disabled =
+                            diceRolling ||
+                            evaluation.facts["actions.disabled"] === true ||
+                            deathSaveStatus(character.state) === "dead";
+                          return (
+                            <div key={item.id} className="effect-action-setup">
+                              <strong>{item.name}</strong>
+                              <small>
+                                {String(item.quantity)} {item.quantity === 1 ? "dose" : "doses"}
+                                {potion === undefined
+                                  ? ""
+                                  : ` · ${String(potion.diceCount)}d${String(potion.diceSize)} + ${String(potion.bonus)} HP`}
+                              </small>
+                              <div className="effect-selection-action">
+                                <button
+                                  type="button"
+                                  className="button secondary compact"
+                                  disabled={disabled}
+                                  onClick={() => {
+                                    void consumePotion(item, "self");
+                                  }}
+                                >
+                                  Drink · Bonus Action
+                                </button>
+                                <button
+                                  type="button"
+                                  className="button secondary compact"
+                                  disabled={disabled}
+                                  onClick={() => {
+                                    void consumePotion(item, "other");
+                                  }}
+                                >
+                                  Administer · Bonus Action
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        }
+                        if (item.timedPower !== undefined)
+                          return (
+                            <TimedMagicItemControls
+                              key={item.id}
+                              name={item.name}
+                              power={item.timedPower}
+                              actionsDisabled={
+                                diceRolling || evaluation.facts["actions.disabled"] === true
+                              }
+                              onToggle={() => {
+                                useTimedMagicItem(item);
+                              }}
+                              onElapse={(rounds) => {
+                                useTimedMagicItem(item, rounds);
+                              }}
+                            />
+                          );
+                        const power = item.power;
+                        if (power === undefined) return null;
+                        const charges = power.charges;
+                        const maximumSpend =
+                          charges === undefined
+                            ? 1
+                            : Math.min(charges.current, charges.maximumSpend);
+                        const spend = Math.max(
+                          1,
+                          Math.min(itemChargeSpends[item.id] ?? 1, maximumSpend),
+                        );
+                        return (
+                          <div key={item.id} className="effect-action-setup">
+                            <strong>{item.name}</strong>
+                            {charges === undefined ? null : (
+                              <small>
+                                {String(charges.current)} / {String(charges.maximum)} charges
+                              </small>
+                            )}
+                            {!item.equipped ? (
+                              <small>Equip this item to use its power.</small>
+                            ) : null}
+                            {power.kind === "saving-throw-reaction" ? (
+                              <small>
+                                Choose this Reaction in the saving throw controls after a failed
+                                Dexterity save.
+                              </small>
+                            ) : null}
+                            <div className="effect-selection-action">
+                              {power.kind === "spell" &&
+                              charges !== undefined &&
+                              maximumSpend > 0 ? (
+                                <label>
+                                  Charges to spend
+                                  <select
+                                    value={spend}
+                                    onChange={(event) => {
+                                      const selected = Number(event.target.value);
+                                      setItemChargeSpends((current) => ({
+                                        ...current,
+                                        [item.id]: selected,
+                                      }));
+                                    }}
+                                  >
+                                    {Array.from({ length: maximumSpend }, (_, i) => i + 1).map(
+                                      (level) => (
+                                        <option key={level} value={level}>
+                                          {String(level)}
+                                        </option>
+                                      ),
+                                    )}
+                                  </select>
+                                </label>
+                              ) : null}
+                              {power.kind === "spell" ? (
+                                <button
+                                  type="button"
+                                  className="button secondary compact"
+                                  disabled={
+                                    !power.available ||
+                                    diceRolling ||
+                                    evaluation.facts["actions.disabled"] === true
+                                  }
+                                  onClick={() => {
+                                    void useMagicItem(item, "cast", spend);
+                                  }}
+                                >
+                                  Cast {power.spellName}
+                                </button>
+                              ) : null}
+                              {charges === undefined ? null : (
+                                <button
+                                  type="button"
+                                  className="button secondary compact"
+                                  disabled={charges.current >= charges.maximum || diceRolling}
+                                  onClick={() => {
+                                    void useMagicItem(item, "dawn", spend);
+                                  }}
+                                >
+                                  Record dawn
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </Section>
+                ) : null}
+                {character.state.familiar === undefined ? null : (
+                  <Section title="Familiar" eyebrow="Find Familiar">
+                    <FamiliarControls
+                      key={`${character.id}:${String(character.state.familiar.currentHitPoints)}`}
+                      familiar={character.state.familiar}
+                      pact={evaluation.spells.some(
+                        ({ id, castingOptions }) =>
+                          id === findFamiliarId &&
+                          castingOptions?.some(({ sourceId }) => sourceId === pactOfTheChainId),
+                      )}
+                      commandsDisabled={
+                        evaluation.facts["actions.disabled"] === true ||
+                        deathSaveStatus(character.state) === "dead"
+                      }
+                      save={(familiar) => {
+                        const state = { ...character.state };
+                        if (familiar === undefined) delete state.familiar;
+                        else state.familiar = familiar;
+                        savePlayState(
+                          commitCharacterState(character, state),
+                          familiar === undefined
+                            ? "Familiar dismissed forever."
+                            : `${familiar.form} familiar updated.`,
+                        );
+                      }}
+                    />
+                  </Section>
+                )}
                 <Section title="Rest" eyebrow="Atomic rules transitions">
                   <p className="section-copy">
                     Rests apply all modeled recovery rules together. A Short Rest without Hit Dice
@@ -3067,6 +3834,25 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                     )}
                     <div className="play-spell-list">
                       {evaluation.spells.map((spell) => {
+                        const component = componentTracking
+                          ? spellComponents.get(spell.id)
+                          : undefined;
+                        const componentCount =
+                          component === undefined
+                            ? 0
+                            : evaluation.inventory
+                                .filter(({ entityId }) => entityId === component.itemId)
+                                .reduce((total, item) => total + item.quantity, 0);
+                        const castingOptions = spell.castingOptions ?? [];
+                        const selectedSource =
+                          castingOptions.find(({ sourceId }) => sourceId === spellSources[spell.id])
+                            ?.sourceId ?? castingOptions[0]?.sourceId;
+                        const material = materialComponentMessage(
+                          spell,
+                          evaluation.inventory,
+                          rulesPackage,
+                          selectedSource,
+                        );
                         const eligibleSlots =
                           evaluation.spellcasting?.slots.filter(
                             (slot) => slot.level >= spell.level,
@@ -3086,6 +3872,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                           <div key={spell.id}>
                             <div className="spell-summary">
                               <strong>{spell.name}</strong>
+                              {material === undefined ? null : <small>{material}</small>}
                               <small>
                                 {spell.level === 0
                                   ? "Cantrip · Always available"
@@ -3098,9 +3885,71 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   effects are not automated.
                                 </small>
                               ) : null}
-                              {spellRollControls(spell, spell.level === 0 ? undefined : slotLevel)}
+                              {spellRollControls(
+                                spell,
+                                spell.level === 0 ? undefined : slotLevel,
+                                selectedSource,
+                              )}
                             </div>
                             <div className="spell-cast-controls">
+                              {castingOptions.length <= 1 ? null : (
+                                <select
+                                  aria-label={`Casting source for ${spell.name}`}
+                                  value={selectedSource}
+                                  onChange={(event) => {
+                                    const sourceId = event.target.value;
+                                    setSpellSources((current) => ({
+                                      ...current,
+                                      [spell.id]: sourceId,
+                                    }));
+                                  }}
+                                >
+                                  {castingOptions.map(({ sourceId }) => (
+                                    <option key={sourceId} value={sourceId}>
+                                      {names.get(sourceId) ?? shortEntityName(sourceId)}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                              {spell.id === findFamiliarId ? (
+                                <FamiliarCastFields
+                                  pact={
+                                    spell.castingOptions?.some(
+                                      ({ sourceId }) => sourceId === pactOfTheChainId,
+                                    ) ?? false
+                                  }
+                                  draft={familiarDraft}
+                                  update={(value) => {
+                                    setFamiliarDraft((current) => ({ ...current, ...value }));
+                                  }}
+                                />
+                              ) : null}
+                              {component === undefined ? null : (
+                                <label
+                                  title={
+                                    component.consumed
+                                      ? "Consumed on a successful cast"
+                                      : "Reusable component"
+                                  }
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={
+                                      componentCount > 0 &&
+                                      trackedComponentChoices[spell.id] === true
+                                    }
+                                    disabled={componentCount === 0}
+                                    onChange={(event) => {
+                                      const checked = event.target.checked;
+                                      setTrackedComponentChoices((current) => ({
+                                        ...current,
+                                        [spell.id]: checked,
+                                      }));
+                                    }}
+                                  />
+                                  Use tracked {component.name} ({String(componentCount)} carried)
+                                </label>
+                              )}
                               {protection === undefined ? null : (
                                 <label>
                                   {protection.sourceName}: visible, affected creatures other than
@@ -3180,38 +4029,50 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   type="button"
                                   disabled={!canCastWithSlot}
                                   onClick={() => {
-                                    castSpell(spell, false);
+                                    castSpell(spell, false, selectedSource);
                                   }}
                                 >
                                   Cast
                                 </button>
                               ) : null}
-                              {freeCastingOptions?.map((freeCastingOption) => (
-                                <button
-                                  key={freeCastingOption.sourceId}
-                                  className="button secondary compact"
-                                  type="button"
-                                  disabled={freeCastingOption.freeCastAvailable !== true}
-                                  onClick={() => {
-                                    castSpell(spell, false, freeCastingOption.sourceId, true);
-                                  }}
-                                >
-                                  {freeCastingOption.freeCastAtWill
-                                    ? "Cast at will"
-                                    : freeCastingOption.freeCastAvailable === true
-                                      ? "Free cast"
-                                      : "Free cast spent"}
-                                  {" · "}
-                                  {names.get(freeCastingOption.sourceId) ??
-                                    shortEntityName(freeCastingOption.sourceId)}
-                                </button>
-                              ))}
+                              {freeCastingOptions?.map((freeCastingOption) => {
+                                const freeSource = freeCastingOption.sourceId;
+                                const freeMaterial = materialComponentMessage(
+                                  spell,
+                                  evaluation.inventory,
+                                  rulesPackage,
+                                  freeSource,
+                                );
+                                return (
+                                  <div key={freeSource} className="spell-free-cast">
+                                    <button
+                                      className="button secondary compact"
+                                      type="button"
+                                      disabled={freeCastingOption.freeCastAvailable !== true}
+                                      onClick={() => {
+                                        castSpell(spell, false, freeSource, true);
+                                      }}
+                                    >
+                                      {freeCastingOption.freeCastAtWill
+                                        ? "Cast at will"
+                                        : freeCastingOption.freeCastAvailable === true
+                                          ? "Free cast"
+                                          : "Free cast spent"}
+                                      {" · "}
+                                      {names.get(freeSource) ?? shortEntityName(freeSource)}
+                                    </button>
+                                    {freeMaterial === material ? null : (
+                                      <small>{freeMaterial}</small>
+                                    )}
+                                  </div>
+                                );
+                              })}
                               {spell.ritual ? (
                                 <button
                                   className="button secondary compact"
                                   type="button"
                                   onClick={() => {
-                                    castSpell(spell, true);
+                                    castSpell(spell, true, selectedSource);
                                   }}
                                 >
                                   Ritual
@@ -3664,7 +4525,10 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       >
                         {equipmentCatalog.map((item) => (
                           <option key={item.id} value={item.id}>
-                            {item.name} · {formatEquipmentCost(item)}
+                            {item.name} ·{" "}
+                            {item.rarity === undefined
+                              ? formatEquipmentCost(item)
+                              : `${titleCase(item.rarity)} magic item`}
                           </option>
                         ))}
                       </select>
@@ -3703,19 +4567,42 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                       Buy
                     </button>
                   </div>
+                  {evaluation.inventory.some((item) => item.requiresAttunement) ? (
+                    <p className="section-copy">
+                      Attunement{" "}
+                      {String(evaluation.inventory.filter((item) => item.attuned).length)} /{" "}
+                      {String(attunementLimit)}. Record attunement after focusing on the item during
+                      a Short Rest.
+                    </p>
+                  ) : null}
                   <div className="item-list">
                     {evaluation.inventory.length === 0 ? (
                       <p className="empty">No carried equipment.</p>
                     ) : (
                       evaluation.inventory.map((item) => {
                         const catalogItem = equipmentCatalogById.get(item.entityId);
+                        const attunementRecorded = character.loadout.attunedItemIds.includes(
+                          item.id,
+                        );
                         return (
                           <div key={item.id} className="inventory-row">
                             <span>
                               <strong>{item.name}</strong>
                               <small>
                                 {titleCase(item.kind)} · {item.equipped ? "Equipped" : "Carried"}
+                                {item.requiresAttunement
+                                  ? item.attuned
+                                    ? " · Attuned"
+                                    : " · Requires attunement"
+                                  : ""}
+                                {item.magicActive ? " · Magic active" : ""}
+                                {item.power?.charges === undefined
+                                  ? ""
+                                  : ` · ${String(item.power.charges.current)} / ${String(item.power.charges.maximum)} charges`}
                               </small>
+                              {catalogItem?.description ? (
+                                <small>{catalogItem.description}</small>
+                              ) : null}
                             </span>
                             <div className="inventory-actions">
                               {catalogItem?.equippable === true ? (
@@ -3730,6 +4617,21 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                                   }}
                                 >
                                   {item.equipped ? "Unequip" : "Equip"}
+                                </button>
+                              ) : null}
+                              {item.requiresAttunement || attunementRecorded ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    commitInventoryProposal(
+                                      toggleAttunedItem(character, item.id, equipmentCatalog),
+                                      attunementRecorded
+                                        ? `Ended attunement to ${item.name}.`
+                                        : `Attuned to ${item.name}.`,
+                                    );
+                                  }}
+                                >
+                                  {attunementRecorded ? "End attunement" : "Attune"}
                                 </button>
                               ) : null}
                               {!catalogItem?.equippable || item.quantity > 1 ? (
@@ -3801,6 +4703,38 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   </div>
                 </Section>
               </div>
+            ) : null}
+
+            {tab === "settings" ? (
+              <Section title="Character settings" eyebrow="Table rules">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={componentTracking}
+                    onChange={(event) => {
+                      const enabled = event.target.checked;
+                      setTrackedComponentChoices({});
+                      savePlayState(
+                        commitCharacterState(
+                          {
+                            ...character,
+                            settings: { ...character.settings, spellComponentTracking: enabled },
+                          },
+                          character.state,
+                        ),
+                        enabled
+                          ? "Spell component tracking enabled."
+                          : "Spell components are handled at the table.",
+                      );
+                    }}
+                  />
+                  Track spell components
+                </label>
+                <p>
+                  Choose whether to use carried components when casting. Turn tracking off to handle
+                  components at the table.
+                </p>
+              </Section>
             ) : null}
 
             {tab === "spells" ? (
@@ -4026,10 +4960,16 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                         const ritualFeatSourceId = spell.castingOptions?.find((option) =>
                           option.sourceId.includes(".feat.general.ritual-caster"),
                         )?.sourceId;
+                        const material = materialComponentMessage(
+                          spell,
+                          evaluation.inventory,
+                          rulesPackage,
+                        );
                         return (
                           <div key={spell.id}>
                             <span>
                               <strong>{spell.name}</strong>
+                              {material === undefined ? null : <small>{material}</small>}
                               <small>
                                 {spell.level === 0 ? "Cantrip" : `Level ${String(spell.level)}`} ·{" "}
                                 {titleCase(spell.school)}
@@ -4282,7 +5222,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setTab("overview");
             setSelectedTraceId(undefined);
             setActionDrafts({});
-            setSpellLevels({});
+            resetSpellCastDraft();
             setSpellHealsOther({});
             setProtectedCreatureCounts({});
             setWeaponDamageModes({});
@@ -4326,7 +5266,7 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
             setTab("overview");
             setSelectedTraceId(undefined);
             setActionDrafts({});
-            setSpellLevels({});
+            resetSpellCastDraft();
             setSpellHealsOther({});
             setProtectedCreatureCounts({});
             setWeaponDamageModes({});

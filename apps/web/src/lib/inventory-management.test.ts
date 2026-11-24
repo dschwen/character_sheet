@@ -37,8 +37,21 @@ describe("inventory management", () => {
     const catalog = inventoryCatalog(rulesPackage);
     const arrows = catalog.find((item) => item.id === "srd521.equipment.ammunition.arrows");
     const spellbook = catalog.find((item) => item.id === "srd521.equipment.gear.spellbook");
+    const incense = catalog.find(
+      (item) => item.id === "srd521.equipment.gear.find-familiar-incense",
+    );
 
-    expect(catalog).toHaveLength(139);
+    expect(catalog.filter((item) => item.kind.startsWith("equipment-"))).toHaveLength(142);
+    expect(incense).toMatchObject({
+      purchaseQuantity: 1,
+      equippable: false,
+      cost: { amount: 10, denomination: "gp" },
+    });
+    const magicItems = catalog.filter((item) => item.kind === "magic-item");
+    expect(magicItems).toHaveLength(13);
+    expect(
+      magicItems.find((item) => item.id === "srd521.magic-item.cloak-of-protection"),
+    ).toMatchObject({ equippable: true, requiresAttunement: true, wearSlot: "cloak" });
     expect(arrows).toMatchObject({ purchaseQuantity: 20, cost: { amount: 1, denomination: "gp" } });
     expect(arrows === undefined ? "" : formatEquipmentCost(arrows)).toBe("1 GP for 20");
     expect(spellbook?.cost).toBeUndefined();
