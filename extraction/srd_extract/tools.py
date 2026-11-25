@@ -72,6 +72,11 @@ def parse_tools(document: dict[str, Any]) -> list[dict[str, Any]]:
                     "rules": [],
                     "body": {
                         "category": category,
+                        **(
+                            {"spellcastingFocusFor": ["srd521.class.bard"]}
+                            if category == "musical-instrument"
+                            else {}
+                        ),
                         "proficiencyRuleId": "srd521.rule.tool-proficiency",
                         "ability": ability[1].casefold(),
                         "description": text,

@@ -4,6 +4,8 @@ import {
   preparedSpellLists,
   proposeSpellCast,
   proposeRest,
+  spellPreparationEditor,
+  proposePreparedSpellLoadout,
 } from "@dnd/rules-core";
 import { preparedSpellListExpansionSchema } from "@dnd/content-schema";
 import {
@@ -21,7 +23,6 @@ import {
   previewLevelUp,
 } from "./character-level-up";
 import { loadWebData } from "./server-data";
-import { spellPreparationEditor, proposePreparedSpellLoadout } from "./spell-preparation";
 
 const options = { id: "bard-ten", now: new Date("2026-10-12T19:00:00Z") };
 const extras = [

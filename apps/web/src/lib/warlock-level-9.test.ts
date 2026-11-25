@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { characterDocumentSchema } from "@dnd/character-model";
-import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeAction,
+  proposeRest,
+  proposeSpellCast,
+  spellPreparationEditor,
+} from "@dnd/rules-core";
 import {
   buildCharacter,
   characterBuilderCatalog,
@@ -16,7 +22,6 @@ import {
   previewLevelUp,
 } from "./character-level-up";
 import { loadWebData } from "./server-data";
-import { spellPreparationEditor } from "./spell-preparation";
 
 const options = { id: "warlock-nine", now: new Date("2026-10-11T17:00:00Z") };
 const choiceId = "srd521.choice.warlock.eldritch-invocation";

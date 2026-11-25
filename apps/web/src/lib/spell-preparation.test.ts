@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateCharacter } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposePreparedSpellLoadout,
+  spellPreparationEditor,
+} from "@dnd/rules-core";
 
 import { loadWebData } from "./server-data";
-import { proposePreparedSpellLoadout, spellPreparationEditor } from "./spell-preparation";
 
 const updatedAt = new Date("2026-08-07T12:00:00.000Z");
 

@@ -15,3 +15,5 @@ __pycache__/
 *.tsbuildinfo
 sources/**/source.pdf
 /generated/
+
+/.campaign-data/

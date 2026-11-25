@@ -423,6 +423,16 @@ def generate_equipment_content(extraction_root: Path, output: Path) -> dict[str,
     adventuring_gear = parse_adventuring_gear_table(
         read_json(extraction_root / "raw" / "pages" / "0095.json")
     )
+    focus_classes = {
+        "srd521.equipment.gear.arcane-focus": ["sorcerer", "warlock", "wizard"],
+        "srd521.equipment.gear.druidic-focus": ["druid", "ranger"],
+        "srd521.equipment.gear.holy-symbol": ["cleric", "paladin"],
+    }
+    for item in adventuring_gear:
+        if item["id"] in focus_classes:
+            item["body"]["spellcastingFocusFor"] = [
+                f"srd521.class.{name}" for name in focus_classes[item["id"]]
+            ]
     ammunition = parse_ammunition_table(read_json(extraction_root / "raw" / "pages" / "0096.json"))
     equipment = [*weapons, *armor, *adventuring_gear, *ammunition, *spell_component_gear()]
     previous_equipment_ids = {

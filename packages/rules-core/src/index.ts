@@ -22,3 +22,10 @@ export { trackedSpellComponents } from "./spell-components.js";
 export { resolveSavingThrowDamage } from "./saving-throw-damage.js";
 export * from "./reaction-attacks.js";
 export * from "./prepared-spell-lists.js";
+
+export { familiarStatBlock } from "./familiar-stat-blocks.js";
+export { isSpellcastingImplement, resolveMaterialComponent } from "./spell-focus.js";
+export * from "./play-state.js";
+export * from "./inventory-management.js";
+export * from "./spell-preparation.js";
+export * from "./spell-healing.js";

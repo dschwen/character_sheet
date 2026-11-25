@@ -7,6 +7,10 @@ import {
   proposeDeathSavingThrow,
   proposeRest,
   proposeSpellCast,
+  applyDamage,
+  applyHealing,
+  setTemporaryHitPoints,
+  setExhaustion,
 } from "@dnd/rules-core";
 import {
   buildCharacter,
@@ -17,7 +21,7 @@ import {
   updateBuilderSpecies,
 } from "./character-builder";
 import { loadWebData } from "./server-data";
-import { applyDamage, applyHealing, setTemporaryHitPoints, setExhaustion } from "./play-state";
+
 import {
   canResolveDeathSave,
   deathSaveResolutionRequest,

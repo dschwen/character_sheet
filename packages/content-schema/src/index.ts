@@ -642,6 +642,7 @@ export const grappleBenefitsSchema = z
 export const toolBodySchema = z
   .object({
     proficiencyRuleId: entityIdSchema,
+    spellcastingFocusFor: z.array(entityIdSchema).optional(),
     category: z.enum(["artisan", "gaming-set", "musical-instrument", "other"]),
     ability: characterBuilderAbilitySchema,
     checkId: z.string().min(1),

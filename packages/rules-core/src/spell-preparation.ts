@@ -1,7 +1,8 @@
 import { characterDocumentSchema, type CharacterDocument } from "@dnd/character-model";
 import { classFeatureChoiceSchema } from "@dnd/content-schema";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
-import { evaluateCharacter, preparedSpellLists } from "@dnd/rules-core";
+import { evaluateCharacter } from "./character-evaluator.js";
+import { preparedSpellLists } from "./prepared-spell-lists.js";
 
 export type SpellPreparationMode = "spellbook" | "full-list";
 

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { evaluateCharacter, proposeRest } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeRest,
+  spellPreparationEditor,
+  proposePreparedSpellLoadout,
+} from "@dnd/rules-core";
 import { validateExpertiseChoices } from "../../../../packages/rules-core/src/expertise-choices";
 import {
   buildCharacter,
@@ -13,7 +18,6 @@ import {
 } from "./character-builder";
 import { createLevelUpDraft, levelUpCharacter, previewLevelUp } from "./character-level-up";
 import { loadWebData } from "./server-data";
-import { spellPreparationEditor, proposePreparedSpellLoadout } from "./spell-preparation";
 
 const { rulesPackage } = loadWebData();
 const catalog = characterBuilderCatalog(rulesPackage);

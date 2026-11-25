@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { characterDocumentSchema } from "@dnd/character-model";
-import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeAction,
+  proposeRest,
+  proposeSpellCast,
+  spellPreparationEditor,
+} from "@dnd/rules-core";
 import {
   buildCharacter,
   characterBuilderCatalog,
@@ -13,7 +19,6 @@ import {
 import { createLevelUpDraft, levelUpCharacter, levelUpEligibility } from "./character-level-up";
 import { actionInstructions, actionTargeting, actionTargetingRequest } from "./action-targeting";
 import { loadWebData } from "./server-data";
-import { spellPreparationEditor } from "./spell-preparation";
 
 const options = { id: "paladin-nine", now: new Date("2026-10-11T20:00:00Z") };
 const channel = "srd521.resource.paladin.channel-divinity";

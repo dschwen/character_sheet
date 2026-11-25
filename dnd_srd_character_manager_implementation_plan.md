@@ -1256,6 +1256,8 @@ Commands return a proposed patch, validation messages, and a trace. Persist an a
 
 ### 11.5 Offline and persistence
 
+The [campaign multiplayer plan](docs/multiplayer-plan.md) sets the delivery order and acceptance criteria for authenticated rosters, server storage, and cross-character spell effects.
+
 Start with IndexedDB/local storage through a repository abstraction. Add cloud sync later without changing the engine.
 
 ```ts

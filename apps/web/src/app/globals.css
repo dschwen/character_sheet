@@ -505,6 +505,17 @@ button.vital-card:hover {
   grid-template-columns: 1fr 1fr;
   gap: 0 20px;
 }
+.skill-checks-panel {
+  container: skill-checks / inline-size;
+}
+.skill-checks-panel .skill-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+@container skill-checks (min-width: 27rem) {
+  .skill-checks-panel .skill-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 .skill-list button {
   display: grid;
   grid-template-columns: 10px 1fr auto 34px;
@@ -523,6 +534,9 @@ button.vital-card:hover {
 }
 .skill-list button span {
   font-size: 13px;
+}
+.skill-checks-panel .skill-list button span {
+  overflow-wrap: anywhere;
 }
 .skill-list button small {
   color: var(--muted);
@@ -2892,4 +2906,45 @@ button.builder-choice:disabled {
 .heroic-inspiration-trigger p {
   margin: 0;
   font-size: 13px;
+}
+
+.campaign-panel {
+  max-width: 52rem;
+}
+.campaign-panel fieldset {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.campaign-panel form,
+.campaign-panel fieldset > div {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: end;
+}
+.campaign-panel label {
+  display: grid;
+  gap: 0.3rem;
+}
+.campaign-panel input {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+}
+.campaign-panel p,
+.campaign-panel h3,
+.campaign-panel h4,
+.campaign-panel ul {
+  margin: 0;
+}
+.campaign-panel [role="status"]:not(:empty) {
+  margin-top: 1rem;
+}
+.campaign-panel fieldset > button {
+  justify-self: start;
 }

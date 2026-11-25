@@ -879,7 +879,10 @@
       "category": "musical-instrument",
       "checkId": "bagpipes",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.bagpipes",
     "kind": "tool",
@@ -916,7 +919,10 @@
       "category": "musical-instrument",
       "checkId": "drum",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.drum",
     "kind": "tool",
@@ -953,7 +959,10 @@
       "category": "musical-instrument",
       "checkId": "dulcimer",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.dulcimer",
     "kind": "tool",
@@ -990,7 +999,10 @@
       "category": "musical-instrument",
       "checkId": "flute",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.flute",
     "kind": "tool",
@@ -1027,7 +1039,10 @@
       "category": "musical-instrument",
       "checkId": "horn",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.horn",
     "kind": "tool",
@@ -1064,7 +1079,10 @@
       "category": "musical-instrument",
       "checkId": "lute",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.lute",
     "kind": "tool",
@@ -1101,7 +1119,10 @@
       "category": "musical-instrument",
       "checkId": "lyre",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.lyre",
     "kind": "tool",
@@ -1138,7 +1159,10 @@
       "category": "musical-instrument",
       "checkId": "pan-flute",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.pan-flute",
     "kind": "tool",
@@ -1175,7 +1199,10 @@
       "category": "musical-instrument",
       "checkId": "shawm",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.shawm",
     "kind": "tool",
@@ -1212,7 +1239,10 @@
       "category": "musical-instrument",
       "checkId": "viol",
       "description": "Musical Instrument (Varies) Ability: Charisma Weight: Varies Utilize: Play a known tune (DC 10), or improvise a song (DC 15) Variants: Bagpipes (30 GP, 6 lb.), drum (6 GP, 3 lb.), dulcimer (25 GP, 10 lb.), flute (2 GP, 1 lb.), horn (3 GP, 2 lb.), lute (35 GP, 2 lb.), lyre (30 GP, 2 lb.), pan flute (12 GP, 2 lb.), shawm (2 GP, 1 lb.), viol (30 GP, 1 lb.)",
-      "proficiencyRuleId": "srd521.rule.tool-proficiency"
+      "proficiencyRuleId": "srd521.rule.tool-proficiency",
+      "spellcastingFocusFor": [
+        "srd521.class.bard"
+      ]
     },
     "id": "srd521.tool.viol",
     "kind": "tool",

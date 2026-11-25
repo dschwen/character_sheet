@@ -5,8 +5,8 @@ import {
   type CurrencyDenomination,
 } from "@dnd/character-model";
 import type { LoadedRulesPackage } from "@dnd/rules-api";
-import { resolveAttunement } from "@dnd/rules-core";
-import { isSpellcastingImplement } from "./spell-components";
+import { resolveAttunement } from "./attunement.js";
+import { isSpellcastingImplement } from "./spell-focus.js";
 
 const copperValues: Readonly<Record<CurrencyDenomination, number>> = {
   cp: 1,

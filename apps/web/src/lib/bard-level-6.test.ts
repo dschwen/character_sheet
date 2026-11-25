@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateCharacter, proposeSpellCast } from "@dnd/rules-core";
+import { evaluateCharacter, proposeSpellCast, spellPreparationEditor } from "@dnd/rules-core";
 import type { CharacterDocument } from "@dnd/character-model";
 import {
   bardId,
@@ -13,7 +13,6 @@ import {
   validateBuilderDraft,
 } from "./character-builder";
 import { createLevelUpDraft, levelUpCharacter, previewLevelUp } from "./character-level-up";
-import { spellPreparationEditor } from "./spell-preparation";
 import { loadWebData } from "./server-data";
 
 const choiceId = "srd521.choice.bard.magical-discoveries";

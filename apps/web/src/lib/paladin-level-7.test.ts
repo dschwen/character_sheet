@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateCharacter } from "@dnd/rules-core";
+import { evaluateCharacter, setActiveEffectActive, setConditionActive } from "@dnd/rules-core";
 import {
   buildCharacter,
   characterBuilderCatalog,
@@ -8,7 +8,7 @@ import {
   fighterId,
 } from "./character-builder";
 import { createLevelUpDraft, levelUpCharacter, levelUpEligibility } from "./character-level-up";
-import { setActiveEffectActive, setConditionActive } from "./play-state";
+
 import { loadWebData } from "./server-data";
 
 const featureId = "srd521.subclass-feature.paladin.oath-of-devotion.aura-of-devotion";

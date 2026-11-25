@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { characterDocumentSchema } from "@dnd/character-model";
-import { evaluateCharacter, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeRest,
+  proposeSpellCast,
+  spellPreparationEditor,
+  proposePreparedSpellLoadout,
+} from "@dnd/rules-core";
 import {
   buildCharacter,
   characterBuilderCatalog,
@@ -17,7 +23,6 @@ import {
   previewLevelUp,
 } from "./character-level-up";
 import { loadWebData } from "./server-data";
-import { spellPreparationEditor, proposePreparedSpellLoadout } from "./spell-preparation";
 
 const options = { id: "arcane-nine", now: new Date("2026-10-11T11:00:00Z") };
 const savant = "srd521.choice.wizard.evocation-savant.level-9";

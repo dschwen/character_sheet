@@ -2,6 +2,37 @@ import type { CharacterDocument } from "@dnd/character-model";
 import type { Page } from "@playwright/test";
 import { expect, levelUpOnce, openApp, test, walkBuilderSteps } from "./support";
 
+test("Skills & tools fits its columns to the panel width", async ({ page }) => {
+  await openApp(page);
+  const panel = page.locator(".panel").filter({
+    has: page.getByRole("heading", { name: "Skills & tools", exact: true }),
+  });
+  const list = panel.locator(".skill-list");
+  await expect(list.getByRole("button").first()).toBeVisible();
+
+  for (const { width, columns } of [
+    { width: 1280, columns: 1 },
+    { width: 1000, columns: 2 },
+    { width: 390, columns: 1 },
+  ]) {
+    await page.setViewportSize({ width, height: 850 });
+    await expect
+      .poll(() =>
+        list.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length),
+      )
+      .toBe(columns);
+    await expect
+      .poll(() =>
+        list.evaluate((element) =>
+          [element, ...element.querySelectorAll("button")].every(
+            (row) => row.scrollWidth <= row.clientWidth,
+          ),
+        ),
+      )
+      .toBe(true);
+  }
+});
+
 async function start(page: Page, className: string, level: number) {
   await openApp(page);
   await page.getByRole("button", { name: "New character" }).click();

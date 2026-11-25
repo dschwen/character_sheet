@@ -2907,6 +2907,11 @@
   {
     "body": {
       "cost": null,
+      "spellcastingFocusFor": [
+        "srd521.class.sorcerer",
+        "srd521.class.warlock",
+        "srd521.class.wizard"
+      ],
       "weightLb": null
     },
     "id": "srd521.equipment.gear.arcane-focus",
@@ -3840,6 +3845,10 @@
   {
     "body": {
       "cost": null,
+      "spellcastingFocusFor": [
+        "srd521.class.druid",
+        "srd521.class.ranger"
+      ],
       "weightLb": null
     },
     "id": "srd521.equipment.gear.druidic-focus",
@@ -4089,6 +4098,10 @@
   {
     "body": {
       "cost": null,
+      "spellcastingFocusFor": [
+        "srd521.class.cleric",
+        "srd521.class.paladin"
+      ],
       "weightLb": null
     },
     "id": "srd521.equipment.gear.holy-symbol",

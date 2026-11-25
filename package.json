@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "pnpm -r --if-present run build",
+    "campaign": "node apps/web/scripts/campaign-cli.mjs",
     "character": "node apps/cli/dist/index.js",
     "web": "pnpm --filter @dnd/web dev",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",

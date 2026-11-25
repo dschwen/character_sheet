@@ -9,6 +9,10 @@ New developers: read the [handoff guide](docs/developer-handoff.md),
 [updated implementation plan](dnd_srd_character_manager_implementation_plan.md#0-current-execution-plan-and-handoff)
 and [remaining milestone gates](docs/implementation-status.md) before choosing work.
 
+## Campaign play
+
+Run the optional campaign server to sign in, invite other players, and share character copies. See the [setup instructions and multiplayer roadmap](docs/multiplayer-plan.md).
+
 ## Use it now
 
 Install the workspace and start the web interface:

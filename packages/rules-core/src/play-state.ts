@@ -1,5 +1,6 @@
 import type { CharacterDocument, CharacterState, CurrencyDenomination } from "@dnd/character-model";
-import { deathSaveStatus, healCharacterState } from "@dnd/rules-core";
+import { deathSaveStatus } from "./death-saving-throws.js";
+import { healCharacterState } from "./hit-point-healing.js";
 
 function nonNegativeInteger(value: number): number {
   return Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));

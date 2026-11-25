@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { characterDocumentSchema } from "@dnd/character-model";
 import { classBuilderMetadataSchema } from "@dnd/content-schema";
-import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeAction,
+  proposeRest,
+  proposeSpellCast,
+  spellPreparationEditor,
+} from "@dnd/rules-core";
 import {
   buildCharacter,
   characterBuilderCatalog,
@@ -19,7 +25,6 @@ import {
   previewLevelUp,
 } from "./character-level-up";
 import { loadWebData } from "./server-data";
-import { spellPreparationEditor } from "./spell-preparation";
 
 const options = { id: "ranger-nine", now: new Date("2026-10-11T19:00:00Z") };
 const deft = "srd521.class-feature.ranger.deft-explorer";

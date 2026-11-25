@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { evaluateCharacter, proposeAction, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeAction,
+  proposeRest,
+  proposeSpellCast,
+  setActiveEffectActive,
+} from "@dnd/rules-core";
 import {
   buildCharacter,
   characterBuilderCatalog,
@@ -11,7 +17,6 @@ import {
 } from "./character-builder";
 import { createLevelUpDraft, levelUpCharacter, levelUpEligibility } from "./character-level-up";
 import { loadWebData } from "./server-data";
-import { setActiveEffectActive } from "./play-state";
 
 const statusId = "srd521.status.feature.innate-sorcery";
 const innateResource = "srd521.resource.sorcerer.innate-sorcery";

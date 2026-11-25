@@ -30,4 +30,12 @@ export default tseslint.config(
       "@typescript-eslint/no-non-null-assertion": "error",
     },
   },
+  {
+    files: ["apps/web/scripts/{campaign-*,serve-export}.mjs"],
+    ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      parserOptions: { projectService: false },
+      globals: { Buffer: "readonly", console: "readonly", process: "readonly", URL: "readonly" },
+    },
+  },
 );

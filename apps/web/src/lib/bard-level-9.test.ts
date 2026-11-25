@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { characterDocumentSchema } from "@dnd/character-model";
-import { evaluateCharacter, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeRest,
+  proposeSpellCast,
+  proposePreparedSpellLoadout,
+  spellPreparationEditor,
+} from "@dnd/rules-core";
 import {
   bardId,
   buildCharacter,
@@ -21,7 +27,6 @@ import {
   previewLevelUp,
 } from "./character-level-up";
 import { loadWebData } from "./server-data";
-import { proposePreparedSpellLoadout, spellPreparationEditor } from "./spell-preparation";
 
 const options = { id: "bard-nine", now: new Date("2026-10-11T15:00:00Z") };
 const expertiseSource = "srd521.class-feature.bard.expertise";

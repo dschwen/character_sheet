@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { characterDocumentSchema } from "@dnd/character-model";
-import { evaluateCharacter, proposeRest, proposeSpellCast } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  proposeRest,
+  proposeSpellCast,
+  proposePreparedSpellLoadout,
+  spellPreparationEditor,
+} from "@dnd/rules-core";
 import {
   buildCharacter,
   characterBuilderCatalog,
@@ -18,7 +24,6 @@ import {
   previewLevelUp,
 } from "./character-level-up";
 import { loadWebData } from "./server-data";
-import { proposePreparedSpellLoadout, spellPreparationEditor } from "./spell-preparation";
 
 const options = { id: "divine-primal-nine", now: new Date("2026-10-11T13:00:00Z") };
 const landChoice = "srd521.choice.druid.circle-of-land";

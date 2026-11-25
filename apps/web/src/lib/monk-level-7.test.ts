@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateCharacter, resolveSavingThrowDamage } from "@dnd/rules-core";
+import { evaluateCharacter, resolveSavingThrowDamage, applyDamage } from "@dnd/rules-core";
 import { featureAutomationBodySchema } from "@dnd/content-schema";
 import {
   buildCharacter,
@@ -9,7 +9,7 @@ import {
   fighterId,
 } from "./character-builder";
 import { createLevelUpDraft, levelUpCharacter, levelUpEligibility } from "./character-level-up";
-import { applyDamage } from "./play-state";
+
 import { loadWebData } from "./server-data";
 
 const evasionId = "srd521.class-feature.monk.evasion";

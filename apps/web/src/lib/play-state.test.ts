@@ -18,7 +18,7 @@ import {
   setExhaustion,
   setHeroicInspiration,
   setTemporaryHitPoints,
-} from "./play-state";
+} from "@dnd/rules-core";
 import { loadWebData } from "./server-data";
 
 function character(): CharacterDocument {

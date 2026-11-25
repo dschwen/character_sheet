@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { evaluateCharacter } from "@dnd/rules-core";
+import {
+  evaluateCharacter,
+  setActiveEffectActive,
+  setActiveEffectSelection,
+} from "@dnd/rules-core";
 
 import {
   buildCharacter,
@@ -7,7 +11,7 @@ import {
   defaultBuilderDraft,
   fighterId,
 } from "./character-builder";
-import { setActiveEffectActive, setActiveEffectSelection } from "./play-state";
+
 import { loadWebData } from "./server-data";
 
 describe("party Aura of Protection status controls", () => {

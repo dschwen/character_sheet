@@ -65,7 +65,7 @@ describe("evaluateCharacter Warlock level-5 vertical slice", () => {
     );
     expect(familiarSpell?.prepared).toBe(true);
     expect(
-      familiarSpell?.castingOptions.find(
+      familiarSpell?.castingOptions?.find(
         (option) => option.sourceId === "srd521.option.warlock.invocation.pact-of-the-chain",
       )?.freeCastAtWill,
     ).toBe(true);

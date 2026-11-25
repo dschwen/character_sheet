@@ -13,7 +13,7 @@ import {
   removeInventoryItem,
   toggleEquippedItem,
   type InventoryChangeProposal,
-} from "./inventory-management";
+} from "@dnd/rules-core";
 import { loadWebData } from "./server-data";
 
 const updatedAt = new Date("2026-08-07T12:00:00.000Z");

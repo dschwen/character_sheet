@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { CampaignPanel } from "./campaign-panel";
 import { TimedMagicItemControls } from "./timed-magic-item-controls";
 import { FamiliarCastFields, FamiliarControls, type FamiliarDraft } from "./familiar-controls";
 
@@ -29,6 +30,7 @@ import {
   proposeRest,
   proposeSpellCast,
   trackedSpellComponents,
+  familiarStatBlock,
   resolveSavingThrowDamage,
   attunementLimit,
   findFamiliarId,
@@ -37,9 +39,36 @@ import {
   deathSaveStatus,
   proposeDeathSavingThrow,
   reactionAttackDefinition,
+  addInventoryItem,
+  adjustInventoryQuantity,
+  formatEquipmentCost,
+  inventoryCatalog,
+  purchaseInventoryItem,
+  removeInventoryItem,
+  toggleAttunedItem,
+  toggleEquippedItem,
+  type InventoryChangeProposal,
+  applyDamage,
+  applyHealing,
+  clearConcentrationAndEffects,
+  commitCharacterState,
+  endActiveEffects,
+  setActiveEffectActive,
+  setActiveEffectParameter,
+  setActiveEffectSelection,
+  setActiveEffectSelectionWithHitPointAdjustment,
+  setActiveEffectWithHitPointBonus,
+  setConditionActive,
+  setExhaustion,
+  setHeroicInspiration,
+  setCurrency,
+  setTemporaryHitPoints,
+  proposePreparedSpellLoadout,
+  spellPreparationEditor,
 } from "@dnd/rules-core";
 
 import { levelUpEligibility } from "../lib/character-level-up";
+import { materialComponentMessage } from "../lib/spell-components";
 import {
   actionTargeting,
   actionTargetingRequest,
@@ -82,17 +111,7 @@ import { FailedSaveRerollControls } from "./failed-save-reroll-controls";
 import { WeaponMasteryControls } from "./weapon-mastery-controls";
 import { DeathSaveControls } from "./death-save-controls";
 import { AttackRollControls } from "./attack-roll-controls";
-import {
-  addInventoryItem,
-  adjustInventoryQuantity,
-  formatEquipmentCost,
-  inventoryCatalog,
-  purchaseInventoryItem,
-  removeInventoryItem,
-  toggleAttunedItem,
-  toggleEquippedItem,
-  type InventoryChangeProposal,
-} from "../lib/inventory-management";
+
 import {
   abilities,
   classSummary,
@@ -105,27 +124,8 @@ import {
   titleCase,
   type Ability,
 } from "../lib/presentation";
-import {
-  applyDamage,
-  applyHealing,
-  clearConcentrationAndEffects,
-  commitCharacterState,
-  endActiveEffects,
-  setActiveEffectActive,
-  setActiveEffectParameter,
-  setActiveEffectSelection,
-  setActiveEffectSelectionWithHitPointAdjustment,
-  setActiveEffectWithHitPointBonus,
-  setConditionActive,
-  setExhaustion,
-  setHeroicInspiration,
-  setCurrency,
-  setTemporaryHitPoints,
-} from "../lib/play-state";
-import { proposePreparedSpellLoadout, spellPreparationEditor } from "../lib/spell-preparation";
+
 import { spellStatusInstructions, spellStatusMessage } from "../lib/spell-status";
-import { familiarStatBlock } from "../lib/familiar-stat-blocks";
-import { materialComponentMessage } from "../lib/spell-components";
 import { selectedWeaponDamageMode, weaponDamageRollRequest } from "../lib/weapon-damage-roll";
 import {
   rollD20,
@@ -154,6 +154,7 @@ const tabs = [
   "features",
   "diagnostics",
   "settings",
+  "campaigns",
 ] as const;
 const currencyDenominations = ["pp", "gp", "ep", "sp", "cp"] as const;
 type Tab = (typeof tabs)[number];
@@ -335,10 +336,11 @@ function spellDamageRolls(spell: SpellSummary): SpellSummary["damage"] {
 function Section({
   title,
   eyebrow,
+  className,
   children,
-}: Readonly<{ title: string; eyebrow?: string; children: React.ReactNode }>) {
+}: Readonly<{ title: string; eyebrow?: string; className?: string; children: React.ReactNode }>) {
   return (
-    <section className="panel">
+    <section className={className === undefined ? "panel" : `panel ${className}`}>
       <div className="panel-heading">
         {eyebrow === undefined ? null : <span>{eyebrow}</span>}
         <h2>{title}</h2>
@@ -4152,7 +4154,11 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                   </div>
                 </Section>
 
-                <Section title="Skills & tools" eyebrow="Checks & proficiencies">
+                <Section
+                  title="Skills & tools"
+                  eyebrow="Checks & proficiencies"
+                  className="skill-checks-panel"
+                >
                   {Object.values(evaluation.d20Tests).some(
                     (test) => test.dieMinimum !== undefined,
                   ) ? (
@@ -4704,6 +4710,8 @@ export function CharacterManager({ rulesPackage, fixtures }: Readonly<CharacterM
                 </Section>
               </div>
             ) : null}
+
+            {tab === "campaigns" ? <CampaignPanel character={character} /> : null}
 
             {tab === "settings" ? (
               <Section title="Character settings" eyebrow="Table rules">

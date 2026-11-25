@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import type { CharacterState } from "@dnd/character-model";
-import { ordinaryFamiliarForms, pactFamiliarForms } from "@dnd/rules-core";
-import { familiarStatBlock } from "../lib/familiar-stat-blocks";
+import { ordinaryFamiliarForms, pactFamiliarForms, familiarStatBlock } from "@dnd/rules-core";
 
 export interface FamiliarDraft {
   form: string;
